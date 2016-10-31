@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{265569DC-34A0-49B3-9BE3-5133199DB24D}</ProjectGuid>
+    <RootNamespace>MechanismDesignSystem</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120_xp</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MinSpace</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="TCanvas.cpp" />
+    <ClCompile Include="TConfiguration.cpp" />
+    <ClCompile Include="DPOINT.cpp" />
+    <ClCompile Include="TDraw.cpp" />
+    <ClCompile Include="TEdit.cpp" />
+    <ClCompile Include="TLine.cpp" />
+    <ClCompile Include="TLineTool.cpp" />
+    <ClCompile Include="TMainWindow.cpp" />
+    <ClCompile Include="TManageTool.cpp" />
+    <ClCompile Include="TRealLine.cpp" />
+    <ClCompile Include="TSelectTool.cpp" />
+    <ClCompile Include="TShape.cpp" />
+    <ClCompile Include="TStatus.cpp" />
+    <ClCompile Include="TTool.cpp" />
+    <ClCompile Include="TToolbar.cpp" />
+    <ClCompile Include="KWindow.cpp" />
+    <ClCompile Include="TTrackbar.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ControlStyle.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="TCanvas.h" />
+    <ClInclude Include="TConfiguration.h" />
+    <ClInclude Include="DPOINT.h" />
+    <ClInclude Include="TDraw.h" />
+    <ClInclude Include="TEdit.h" />
+    <ClInclude Include="TLine.h" />
+    <ClInclude Include="TLineTool.h" />
+    <ClInclude Include="TMainWindow.h" />
+    <ClInclude Include="TManageTool.h" />
+    <ClInclude Include="TRealLine.h" />
+    <ClInclude Include="TSelectTool.h" />
+    <ClInclude Include="TShape.h" />
+    <ClInclude Include="TStatus.h" />
+    <ClInclude Include="TTool.h" />
+    <ClInclude Include="TToolbar.h" />
+    <ClInclude Include="KWindow.h" />
+    <ClInclude Include="TTrackbar.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Mechanism Design System.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="toolbar_main.bmp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
