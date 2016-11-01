@@ -5,6 +5,7 @@ TEdit::TEdit()
 {
 	m_hWnd = NULL;
 	m_hInst = NULL;
+	bVisible = false;
 }
 
 
@@ -68,27 +69,15 @@ void TEdit::SetPos(int x, int y, int width, int height)
 	::SetWindowPos(m_hWnd, HWND_TOP, x,y,width,height,0);//SWP_SHOWWINDOW
 }
 
-void TEdit::ShowWindow(bool bShow)
+void TEdit::SetVisible(bool bShow)
 {
+	bVisible = bShow;
 	::ShowWindow(m_hWnd, bShow ? SW_SHOWNORMAL : SW_HIDE);
 }
 
-bool TEdit::OnKeyDown(WPARAM wParam, LPARAM lParam)
+bool TEdit::GetVisible()
 {
-	switch (wParam)
-	{
-	case VK_ESCAPE:
-	case VK_SPACE:
-	case VK_RETURN:
-		SetWindowText(this->m_hWnd, TEXT("no"));
-		return false;
-	}
-	return true;
-}
-
-bool TEdit::OnChar(WPARAM wParam, LPARAM lParam)
-{
-	return false;
+	return bVisible;
 }
 
 int TEdit::GetLength()
@@ -98,7 +87,7 @@ int TEdit::GetLength()
 
 void TEdit::SetSelect(int iStart, int iEnd)
 {
-	SendMessage(m_hWnd, EM_SETSEL, iStart, iEnd);
+	::SendMessage(m_hWnd, EM_SETSEL, iStart, iEnd);
 }
 
 void TEdit::SetSelectAll()
@@ -111,8 +100,13 @@ void CDECL TEdit::SetText(TCHAR szFormat[], ...)
 	TCHAR szBuffer[1024];
 	va_list pArgList;
 	va_start(pArgList, szFormat);
-	_vsntprintf(szBuffer, sizeof(szBuffer) / sizeof(TCHAR), szFormat, pArgList);
+	_vsntprintf_s(szBuffer, sizeof(szBuffer) / sizeof(TCHAR), szFormat, pArgList);
 	va_end(pArgList);
 
-	SetWindowText(m_hWnd, szBuffer);
+	::SetWindowText(m_hWnd, szBuffer);
+}
+
+void TEdit::GetText(TCHAR text[])
+{
+	::GetWindowText(m_hWnd, text, GetLength()+1);//不知道为什么要加1才取得全
 }

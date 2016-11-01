@@ -172,18 +172,6 @@ void TCanvas::OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	::InvalidateRect(m_hWnd, &ClientRect, false);
 }
 
-void TCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
-{
-	int wmId = LOWORD(wParam);
-	int wmEvent = HIWORD(wParam);
-	if (wmId == IDR_LINEEDIT)
-	{
-		win.SetText(TEXT("%x  %x"), wParam, lParam);
-		int i;
-		i = 1;
-	}
-}
-
 void TCanvas::OnDraw(HDC hdc)
 {
 	SetBkMode(hdc, TRANSPARENT);

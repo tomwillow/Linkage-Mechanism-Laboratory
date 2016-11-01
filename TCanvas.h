@@ -20,6 +20,5 @@ public:
 	void OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void OnSetCursor(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	void TCanvas::OnCommand(WPARAM wParam, LPARAM lParam);
 	void OnDraw(HDC hdc);
 };

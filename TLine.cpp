@@ -6,12 +6,11 @@ TLine::TLine()
 	TLine::dLength = 0;
 }
 
-TLine::TLine(int iStyle, int iWidth, COLORREF crColor)
+void TLine::SetStyle(int iStyle, int iWidth, COLORREF crColor)
 {
-	TLine::iStyle=iStyle;
-	 TLine::iWidth=iWidth;
-	 TLine::crColor = crColor;
-	 TLine::dLength = 0;
+	logpenStyle.lopnStyle = iStyle;
+	logpenStyle.lopnWidth.x = iWidth;
+	logpenStyle.lopnColor = crColor;
 }
 
 

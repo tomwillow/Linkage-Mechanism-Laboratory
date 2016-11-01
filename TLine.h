@@ -8,13 +8,12 @@ class TLine
 {
 public:
 	POINT ptBegin, ptEnd;
-	int iStyle, iWidth;
-	COLORREF crColor;
+	LOGPEN logpenStyle;
 	double dLength;
 	TLine *pNext = NULL;
 	TLine();
-	TLine(int iStyle, int iWidth, COLORREF crColor);
 	~TLine();
+	void TLine::SetStyle(int iStyle, int iWidth, COLORREF crColor);
 	void TLine::CalcLength();
 };
 

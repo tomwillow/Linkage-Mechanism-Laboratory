@@ -67,11 +67,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TAttach.cpp" />
     <ClCompile Include="TCanvas.cpp" />
     <ClCompile Include="TConfiguration.cpp" />
     <ClCompile Include="DPOINT.cpp" />
     <ClCompile Include="TDraw.cpp" />
     <ClCompile Include="TEdit.cpp" />
+    <ClCompile Include="TLineEdit.cpp" />
     <ClCompile Include="TLine.cpp" />
     <ClCompile Include="TLineTool.cpp" />
     <ClCompile Include="TMainWindow.cpp" />
@@ -84,15 +86,18 @@
     <ClCompile Include="TToolbar.cpp" />
     <ClCompile Include="KWindow.cpp" />
     <ClCompile Include="TTrackbar.cpp" />
+    <ClCompile Include="TTransfer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ControlStyle.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="TAttach.h" />
     <ClInclude Include="TCanvas.h" />
     <ClInclude Include="TConfiguration.h" />
     <ClInclude Include="DPOINT.h" />
     <ClInclude Include="TDraw.h" />
     <ClInclude Include="TEdit.h" />
+    <ClInclude Include="TLineEdit.h" />
     <ClInclude Include="TLine.h" />
     <ClInclude Include="TLineTool.h" />
     <ClInclude Include="TMainWindow.h" />
@@ -105,6 +110,7 @@
     <ClInclude Include="TToolbar.h" />
     <ClInclude Include="KWindow.h" />
     <ClInclude Include="TTrackbar.h" />
+    <ClInclude Include="TTransfer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Mechanism Design System.rc" />

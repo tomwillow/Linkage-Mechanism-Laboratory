@@ -20,8 +20,7 @@ void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos)
 void TDraw::DrawLine(HDC hdc, TLine Line)
 {
 	HPEN hPen;
-
-	hPen = ::CreatePen(Line.iStyle, Line.iWidth, Line.crColor);
+	hPen = ::CreatePenIndirect(&Line.logpenStyle);
 	::SelectObject(hdc, hPen);
 	DrawLine(hdc, Line.ptBegin, Line.ptEnd);
 
@@ -32,7 +31,7 @@ void TDraw::DrawRealLine(HDC hdc, TRealLine RealLine,TConfiguration *Config)
 {
 	HPEN hPen;
 
-	hPen = ::CreatePen(RealLine.iStyle, RealLine.iWidth, RealLine.crColor);
+	hPen = ::CreatePenIndirect(&RealLine.logpenStyle);
 	::SelectObject(hdc, hPen);
 	DrawLine(hdc, Config->RealToScreen(RealLine.ptBegin), Config->RealToScreen(RealLine.ptEnd));
 
@@ -167,11 +166,11 @@ void TDraw::DrawAxes(HDC hdc, int Ox, int Oy, COLORREF crColor)
 }
 
 //»­XÐÎ
-void TDraw::DrawCross(HDC hdc, POINT pt, int size, TLine Style)
+void TDraw::DrawCross(HDC hdc, POINT pt, int size, LOGPEN Style)
 {
 	HPEN hPen;
 
-	hPen = ::CreatePen(Style.iStyle, Style.iWidth, Style.crColor);
+	hPen = CreatePenIndirect(&Style);
 	SelectObject(hdc, hPen);
 
 	::MoveToEx(hdc, pt.x - size / 2, pt.y - size / 2, NULL);
@@ -230,16 +229,18 @@ void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config)
 	int x, y;
 	x = xOffset;
 	y = yOffset;
-	TLine xLine(PS_SOLID, 1, Config->crGridSmall);
-	TLine yLine(PS_SOLID, 1, Config->crGridSmall);
+	TLine xLine;
+	TLine yLine;
+	xLine.SetStyle(PS_SOLID, 1, Config->crGridSmall);
+	yLine.SetStyle(PS_SOLID, 1, Config->crGridSmall);
 	for (int i = 0; i < rect.right / screenGrid.x; i++)
 	{
 		xLine.ptBegin = { x, rect.top };
 		xLine.ptEnd = { x, rect.bottom };
 		if (i % 5 == xBigOffset)
-			xLine.crColor = Config->crGridBig;
+			xLine.logpenStyle.lopnColor = Config->crGridBig;
 		else
-			xLine.crColor = Config->crGridSmall;
+			xLine.logpenStyle.lopnColor = Config->crGridSmall;
 		TDraw::DrawLine(hdc, xLine);
 		x += screenGrid.x;
 	}
@@ -249,10 +250,18 @@ void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config)
 		yLine.ptBegin = { rect.left,y  };
 		yLine.ptEnd = { rect.right, y };
 		if (i % 5 == yBigOffset)
-			yLine.crColor = Config->crGridBig;
+			yLine.logpenStyle.lopnColor = Config->crGridBig;
 		else
-			yLine.crColor = Config->crGridSmall;
+			yLine.logpenStyle.lopnColor = Config->crGridSmall;
 		TDraw::DrawLine(hdc, yLine);
 		y += screenGrid.y;
 	}
+}
+
+void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt)
+{
+	RECT rect;
+	::GetWindowRect(hWnd, &rect);
+	pt->x += rect.left;
+	pt->y += rect.top;
 }

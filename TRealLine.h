@@ -9,7 +9,8 @@ public:
 	DPOINT ptBegin, ptEnd;
 	TRealLine();
 	~TRealLine();
-	TRealLine(int iStyle, int iWidth, COLORREF crColor);
 	void TRealLine::CalcLength();
+	void TRealLine::SetPoint(DPOINT ptBegin, DPOINT ptEnd);
+	void TRealLine::SetPoint(DPOINT ptBegin, double dLength,double dAngle);
 };
 

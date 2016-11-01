@@ -10,7 +10,7 @@ public:
 	TRealLine *RealLine;
 	TShape();
 	~TShape();
-	void TShape::AddLine(DPOINT ptBegin, DPOINT ptEnd, int iStyle, int iWidth, COLORREF crColor);
+	void TShape::AddRealLine(TRealLine realline);
 	void DeleteNewestLine();
 };
 

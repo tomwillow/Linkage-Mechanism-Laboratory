@@ -69,6 +69,15 @@
     <ClCompile Include="TEdit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TTransfer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TLineEdit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TAttach.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -126,6 +135,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TEdit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TTransfer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TLineEdit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TAttach.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
