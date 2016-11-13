@@ -30,9 +30,6 @@
     <ClCompile Include="TCanvas.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="KWindow.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TMainWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -78,6 +75,33 @@
     <ClCompile Include="TAttach.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TFramePoint.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TFramePointTool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TBar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TBarTool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TRightWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TListView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TTreeView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TElement.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -96,9 +120,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TCanvas.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="KWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TMainWindow.h">
@@ -146,6 +167,33 @@
     <ClInclude Include="TAttach.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TFramePoint.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TFramePointTool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TBar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TBarTool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TRightWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TListView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TTreeView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TElement.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Mechanism Design System.rc">
@@ -153,7 +201,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="toolbar_main.bmp">
+    <Image Include="Resource\toolbar_mechanism.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

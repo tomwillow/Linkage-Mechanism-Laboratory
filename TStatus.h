@@ -5,7 +5,7 @@
 #include <tchar.h>
 #include <stdio.h>
 
-#include "KWindow.h"
+#include "TWindow.h"
 
 #pragma comment(lib, "comctl32.lib")
 

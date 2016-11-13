@@ -18,7 +18,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -68,23 +68,31 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TAttach.cpp" />
+    <ClCompile Include="TBar.cpp" />
+    <ClCompile Include="TBarTool.cpp" />
     <ClCompile Include="TCanvas.cpp" />
     <ClCompile Include="TConfiguration.cpp" />
     <ClCompile Include="DPOINT.cpp" />
     <ClCompile Include="TDraw.cpp" />
     <ClCompile Include="TEdit.cpp" />
+    <ClCompile Include="TElement.cpp" />
+    <ClCompile Include="TFramePoint.cpp" />
+    <ClCompile Include="TFramePointTool.cpp" />
     <ClCompile Include="TLineEdit.cpp" />
     <ClCompile Include="TLine.cpp" />
     <ClCompile Include="TLineTool.cpp" />
+    <ClCompile Include="TListView.cpp" />
     <ClCompile Include="TMainWindow.cpp" />
     <ClCompile Include="TManageTool.cpp" />
     <ClCompile Include="TRealLine.cpp" />
+    <ClCompile Include="TRightWindow.cpp" />
     <ClCompile Include="TSelectTool.cpp" />
     <ClCompile Include="TShape.cpp" />
     <ClCompile Include="TStatus.cpp" />
     <ClCompile Include="TTool.cpp" />
     <ClCompile Include="TToolbar.cpp" />
-    <ClCompile Include="KWindow.cpp" />
+    <ClCompile Include="TTreeView.cpp" />
+    <ClCompile Include="TWindow.cpp" />
     <ClCompile Include="TTrackbar.cpp" />
     <ClCompile Include="TTransfer.cpp" />
   </ItemGroup>
@@ -92,23 +100,31 @@
     <ClInclude Include="ControlStyle.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TAttach.h" />
+    <ClInclude Include="TBar.h" />
+    <ClInclude Include="TBarTool.h" />
     <ClInclude Include="TCanvas.h" />
     <ClInclude Include="TConfiguration.h" />
     <ClInclude Include="DPOINT.h" />
     <ClInclude Include="TDraw.h" />
     <ClInclude Include="TEdit.h" />
+    <ClInclude Include="TElement.h" />
+    <ClInclude Include="TFramePoint.h" />
+    <ClInclude Include="TFramePointTool.h" />
     <ClInclude Include="TLineEdit.h" />
     <ClInclude Include="TLine.h" />
     <ClInclude Include="TLineTool.h" />
+    <ClInclude Include="TListView.h" />
     <ClInclude Include="TMainWindow.h" />
     <ClInclude Include="TManageTool.h" />
     <ClInclude Include="TRealLine.h" />
+    <ClInclude Include="TRightWindow.h" />
     <ClInclude Include="TSelectTool.h" />
     <ClInclude Include="TShape.h" />
     <ClInclude Include="TStatus.h" />
     <ClInclude Include="TTool.h" />
     <ClInclude Include="TToolbar.h" />
-    <ClInclude Include="KWindow.h" />
+    <ClInclude Include="TTreeView.h" />
+    <ClInclude Include="TWindow.h" />
     <ClInclude Include="TTrackbar.h" />
     <ClInclude Include="TTransfer.h" />
   </ItemGroup>
@@ -116,7 +132,7 @@
     <ResourceCompile Include="Mechanism Design System.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="toolbar_main.bmp" />
+    <Image Include="Resource\toolbar_mechanism.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

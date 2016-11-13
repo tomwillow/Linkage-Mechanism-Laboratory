@@ -3,14 +3,16 @@
 
 #include <windows.h>
 #include <tchar.h>
+#include <CommCtrl.h>
 
 #include "ControlStyle.h"
 #include "resource.h"
 
-#include "KWindow.h"
+#include "TWindow.h"
 #include "TMainWindow.h"
 #include "TCanvas.h"
 #include "TManageTool.h"
+
 #pragma comment(lib,"kernel32.lib")
 #pragma comment(lib,"user32.lib")
 #pragma comment(lib,"gdi32.lib")
@@ -28,6 +30,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine
 
 	const TCHAR szAppTitle[] = TEXT("机构设计系统");
 
+	win.LoadTitleIcon(hInstance, IDI_ICON);
 	win.CreateEx(0, szAppTitle,szAppTitle,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
@@ -35,7 +38,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		NULL, (HMENU)LoadMenu(hInstance,MAKEINTRESOURCE(IDR_MENUMAIN)), hInstance);
-	//win.SetDoubleBuffer(true);
 	win.SetAccel(LoadAccelerators(hInstance, (LPCTSTR)IDR_ACCELERATOR_MAIN));
 	win.ShowWindow(iCmdShow);
 

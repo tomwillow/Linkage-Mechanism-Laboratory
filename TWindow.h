@@ -1,9 +1,10 @@
 #pragma once
 #include <Windows.h>
 
-class KWindow
+class TWindow
 {
 private:
+	HICON m_hTitleIcon;
 	HACCEL    m_hAccelTable;
 	bool m_bDoubleBuffer;
 protected:
@@ -45,21 +46,23 @@ protected:
 
 public:
 
-	HWND  m_hWnd;
+	HWND m_hWnd;
+	HWND m_hParent;
 	HINSTANCE m_hInst;
 	RECT ClientRect;
 	RECT WindowRect;
-	KWindow(void)
+	TWindow(void)
 	{
+		m_hParent = NULL;
 		m_hWnd		   = NULL;
 		m_hPalette	   = NULL;
 		m_nUpdateCount = 0;
 		m_bMainWindow  = false;
 		m_bDoubleBuffer = false;
-
+		m_hTitleIcon = NULL;
 	}
 
-	virtual ~KWindow(void)
+	virtual ~TWindow(void)
 	{
 		if ( m_hPalette )
 		{
@@ -67,7 +70,8 @@ public:
 			m_hPalette = NULL;
 		}
 	}
-    
+
+	void TWindow::LoadTitleIcon(HINSTANCE hInst, UINT id);
 	virtual bool CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWORD dwStyle, 
 		int x, int y, int nWidth, int nHeight, HWND hParent, HMENU hMenu, HINSTANCE hInst);
 
@@ -76,7 +80,7 @@ public:
 	virtual WPARAM MessageLoop(void);
 	void SetAccel(HACCEL hAccel);
 	void SetDoubleBuffer(bool bDoubleBuffer);
-	void CDECL KWindow::SetText(TCHAR szFormat[], ...);
+	void CDECL TWindow::SetText(TCHAR szFormat[], ...);
 	BOOL ShowWindow(int nCmdShow) const
 	{
 		return ::ShowWindow(m_hWnd, nCmdShow);

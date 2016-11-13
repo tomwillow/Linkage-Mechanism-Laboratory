@@ -1,11 +1,14 @@
 #pragma once
+#include <Windows.h>
+
 #include "TTool.h"
+
 
 class TManageTool
 {
 public:
 	UINT m_uiCurActiveTool;
-	TTool        *m_pCurrentTool;
+	TTool *m_pCurrentTool;
 
 	TManageTool();
 	~TManageTool();

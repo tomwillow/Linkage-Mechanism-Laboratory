@@ -6,7 +6,7 @@ class TTool
 {
 public:
 	TTool();
-	~TTool();
+	virtual ~TTool();
 	virtual void OnKeyDown(HWND hWnd, WPARAM wParam,LPARAM lParam)   { }
 	virtual void OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)   { }
 	virtual void OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)   { }

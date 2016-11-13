@@ -1,7 +1,7 @@
 #pragma once
-#include "KWindow.h"
+#include "TWindow.h"
 
-class TCanvas:public KWindow
+class TCanvas:public TWindow
 {
 private:
 	TConfiguration *Config;

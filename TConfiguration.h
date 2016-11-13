@@ -6,19 +6,28 @@ enum units { UNITS_PX, UNITS_MM, UNITS_INCH };
 class TConfiguration
 {
 private:
+	POINT Org;
 	double dProportion;
 public:
 	units uUnits;
 	int iMapMode;
-	POINT Org;
 	int iStyle, iWidth;
-	COLORREF crBackground, crPen,crDash,crDot;
+	COLORREF crBackground, crPen,crDash,crDot,crCoordinate;
 	COLORREF crGridBig, crGridSmall;
 	double DPUX,DPUY;
 	double DPMX, DPMY;
 	double DPIX, DPIY;
 	TConfiguration();
 	~TConfiguration();
+	void TConfiguration::SetOrg(LONG x, LONG y)
+	{
+		Org.x = x;
+		Org.y = y;
+	}
+	POINT TConfiguration::GetOrg()
+	{
+		return Org;
+	}
 	void TConfiguration::SetDPU(double Proportion);
 	double TConfiguration::GetProportion();
 	void TConfiguration::Initial(HWND hwnd);

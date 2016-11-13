@@ -12,16 +12,13 @@
 class TLineTool :public TTool
 {
 private:
-	TAttach Attach;
+	TAttach *Attach;
 	TConfiguration *Config;
 	UINT m_uiHit;//点击数
 	DPOINT *m_pptHit;//每次的点击位置
 	TRealLine *MoveLine;//显示点的位置
-	TRealLine *XAssistLine, *YAssistLine;//X,Y轴辅助线
-	bool bShowXAssist, bShowYAssist;//显示X,Y轴辅助线
 	bool bShowDimLine;
 	POINT pt1, pt2;
-	int iIvoryLine;
 	TLine *Line1, *Line2, *LineDim;
 
 public:
@@ -34,7 +31,7 @@ public:
 	void OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnMouseWheel(HWND hWnd, UINT nFlags, POINT ptPos);
-	void TLineTool::InitialLine(POINT ptPos);
+	void TLineTool::InitialLine(DPOINT dptPos);
 	void Draw(HDC hdc);
 };
 

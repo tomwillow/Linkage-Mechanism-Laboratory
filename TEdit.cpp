@@ -1,16 +1,18 @@
 #include "TEdit.h"
 
-
+#include <CommCtrl.h>
 TEdit::TEdit()
 {
 	m_hWnd = NULL;
 	m_hInst = NULL;
 	bVisible = false;
+	m_hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 }
 
 
 TEdit::~TEdit()
 {
+	::DeleteObject(m_hFont);
 }
 
 WNDPROC TEdit::oldEditProc;
@@ -42,31 +44,38 @@ LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 }
 
-void TEdit::CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWORD dwStyle,
-	int x, int y, int nWidth, int nHeight, HWND hParent,
-	HMENU hMenu, HINSTANCE hInst)
+void TEdit::CreateEditEx(HWND hParent,UINT id,HINSTANCE hInst,DWORD dwStyle)
 {
 	m_hInst = hInst;
-	m_hWnd = CreateWindowEx(dwExStyle, lpszClass,
-		lpszName, dwStyle, x, y, nWidth, nHeight,
-		hParent, hMenu, hInst, 0);
+	m_hWnd=::CreateWindowEx(dwStyle,//WS_EX_CLIENTEDGE
+		TEXT("Edit"), 0,
+		WS_CHILD,//|ES_RIGHT | ES_AUTOHSCROLL | WS_VISIBLE
+		0, 0, 0, 0, hParent,(HMENU)id, hInst,0);
+
+	//SetFont(m_hFont);
+
+	SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
+	oldEditProc = (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subEditProc);
 }
 
-void TEdit::CreateEditEx(HWND hParent,UINT id,HINSTANCE hInst)
+void TEdit::SetFont(HFONT hFont)
 {
-	m_hInst = hInst;
-	TEdit::CreateEx(WS_EX_CLIENTEDGE,
-		TEXT("Edit"), 0,
-		WS_CHILD,// | ES_AUTOHSCROLL | WS_VISIBLE
-		0, 0, 0, 0, hParent,(HMENU)id, hInst);
-	SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
-
-	oldEditProc = (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subEditProc);
+	SendMessage(m_hWnd,             // Handle of edit control
+		WM_SETFONT,         // Message to change the font
+		(WPARAM)hFont,     // handle of the font
+		MAKELPARAM(TRUE, 0) // Redraw text
+		);
 }
 
 void TEdit::SetPos(int x, int y, int width, int height)
 {
-	::SetWindowPos(m_hWnd, HWND_TOP, x,y,width,height,0);//SWP_SHOWWINDOW
+	::SetWindowPos(m_hWnd, HWND_TOP, x, y, width, height, 0);//SWP_SHOWWINDOW
+}
+
+//rect中各值均为坐标
+void TEdit::SetPos(RECT rect)
+{
+	::SetWindowPos(m_hWnd, HWND_TOP, rect.left,rect.top,rect.right-rect.left,rect.bottom-rect.top, 0);//SWP_SHOWWINDOW
 }
 
 void TEdit::SetVisible(bool bShow)

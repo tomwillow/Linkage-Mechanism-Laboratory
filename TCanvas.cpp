@@ -78,8 +78,10 @@ void TCanvas::OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	//若中键按下，拖动坐标原点并刷新显示
 	if (bMButtonPressing)
 	{
-		Config->Org.x += (ptPos.x - uiMoveStartX);
-		Config->Org.y += (ptPos.y - uiMoveStartY);
+		Config->SetOrg(Config->GetOrg().x + (ptPos.x - uiMoveStartX),
+			Config->GetOrg().y + (ptPos.y - uiMoveStartY));
+		//Config->Org.x += (ptPos.x - uiMoveStartX);
+		//Config->Org.y += (ptPos.y - uiMoveStartY);
 		uiMoveStartX = ptPos.x;
 		uiMoveStartY = ptPos.y;
 	}
@@ -115,14 +117,16 @@ void TCanvas::OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 
+	POINT ptPos;
+	ptPos.x = LOWORD(lParam);
+	ptPos.y = HIWORD(lParam);
 	//WM_MOUSEWHEEL事件获得的是相对于屏幕的绝对坐标
-	UINT xPos = LOWORD(lParam) - WindowRect.left;
-	UINT yPos = HIWORD(lParam) - WindowRect.top;
+	ScreenToClient(hWnd, &ptPos);
 
 	//首先取得鼠标位置到原点的实际距离，在比例变动后以相同的实际距离推断新的原点位置。
 	//变动前后的依据是实际距离不变。
-	double xlen = Config->ScreenToLengthX(xPos - Config->Org.x);
-	double ylen = Config->ScreenToLengthY(yPos - Config->Org.y);
+	double xlen = Config->ScreenToLengthX(ptPos.x - Config->GetOrg().x);
+	double ylen = Config->ScreenToLengthY(ptPos.y - Config->GetOrg().y);
 
 	double OldProportion = Config->GetProportion();
 	if (zDelta > 0)//向前滚
@@ -130,8 +134,7 @@ void TCanvas::OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	else
 		Config->SetDPU(Config->GetProportion() / 2);
 
-	Config->Org.x = xPos - Config->LengthToScreenX(xlen);
-	Config->Org.y = yPos - Config->LengthToScreenY(ylen);
+	Config->SetOrg(ptPos.x - Config->LengthToScreenX(xlen), ptPos.y - Config->LengthToScreenY(ylen));
 
 	win.m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("比例："), Config->GetProportion() * 100);
 	win.m_Status.SetText(IDR_STATUS_PROPORTION, TEXT("%.0f%%"), Config->GetProportion() * 100);
@@ -177,26 +180,29 @@ void TCanvas::OnDraw(HDC hdc)
 	SetBkMode(hdc, TRANSPARENT);
 
 	//填充背景
-	RECT rect;
-	GetClientRect(m_hWnd, &rect);
-	TDraw::FillRect(hdc, &rect, Config->crBackground);
+	//RECT rect;
+	//GetClientRect(m_hWnd, &rect);
+	TDraw::FillRect(hdc, &ClientRect, Config->crBackground);
 
 	//画网格
 	TDraw::DrawGrid(hdc, ClientRect, Config);
 
 	//画坐标原点
-	TDraw::DrawAxes(hdc, Config->Org.x, Config->Org.y, Config->crPen);
-
-	//工具类绘制
-	if (win.m_ManageTool.m_uiCurActiveTool == ID_DRAW_LINE)
-	{
-		win.m_ManageTool.m_pCurrentTool->Draw(hdc);//工具在使用中的图形绘制交由工具类执行
-	}
+	TDraw::DrawAxes(hdc, Config->GetOrg().x, Config->GetOrg().y, Config->crCoordinate);
 
 	//图形绘制
-	for (unsigned int i = 0; i < win.m_Shape.uiLineNum; i++)
+	for (unsigned int i = 0; i < win.m_Shape.RealLine.size(); i++)
 	{
 		TDraw::DrawRealLine(hdc, win.m_Shape.RealLine[i], Config);
 	}
+
+	for (unsigned int i = 0; i < win.m_Shape.FramePoint.size(); i++)
+	{
+		TDraw::DrawFramePoint(hdc, win.m_Shape.FramePoint[i], Config);
+	}
+
+	//工具类绘制
+	if (win.m_ManageTool.m_pCurrentTool!=NULL)
+		win.m_ManageTool.m_pCurrentTool->Draw(hdc);//工具在使用中的图形绘制交由工具类执行
 
 }

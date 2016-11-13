@@ -1,5 +1,7 @@
+#pragma once
 #include "TDraw.h"
 
+#include "TFramePoint.h"
 
 TDraw::TDraw()
 {
@@ -36,6 +38,74 @@ void TDraw::DrawRealLine(HDC hdc, TRealLine RealLine,TConfiguration *Config)
 	DrawLine(hdc, Config->RealToScreen(RealLine.ptBegin), Config->RealToScreen(RealLine.ptEnd));
 
 	::DeleteObject(hPen);
+}
+
+//画机架点
+void TDraw::DrawFramePoint(HDC hdc, TFramePoint FramePoint, TConfiguration *Config)
+{
+	HPEN hPen;
+	HBRUSH hBrush;
+	hPen = ::CreatePenIndirect(&FramePoint.logpenStyle);
+	hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
+	::SelectObject(hdc, hPen);
+	::SelectObject(hdc, hBrush);
+
+	const int r = 6;//半径
+	const int h = 20;//高
+	const int b = 30;//底边长
+	const double angle = 60.0 / 180.0 * M_PI;
+	POINT ptO = Config->RealToScreen(FramePoint.dpt);
+	//画圆
+	::Ellipse(hdc, ptO.x - r, ptO.y - r, ptO.x + r, ptO.y + r);
+
+	//设置圆下方的两个点
+	POINT ptA1, ptB1;
+	ptA1 = { ptO.x-r*sin(angle / 2), ptO.y+r*cos(angle / 2) };
+	ptB1 = { ptO.x + r*sin(angle / 2), ptA1.y };
+
+	//设置三角形的底边两个点
+	POINT ptA2, ptB2;
+	ptA2 = { ptO.x - h*tan(angle / 2), ptO.y + h };
+	ptB2 = { ptO.x + h*tan(angle / 2), ptA2.y };
+	DrawLine(hdc, ptA1, ptA2);
+	DrawLine(hdc, ptB1, ptB2);
+
+	//设置地面线
+	POINT ptH1, ptH2;
+	ptH1 = { ptO.x - b / 2, ptO.y + h };
+	ptH2 = { ptO.x + b / 2, ptH1.y };
+	DrawLine(hdc, ptH1, ptH2);
+
+	//画剖面线
+	DrawSection(hdc, ptH1.x, ptH1.y, ptH2.x, ptH1.y + 10,6,45);
+
+	::DeleteObject(hPen);
+	::DeleteObject(hBrush);
+}
+
+//画剖面线：d为垂直间距，angleDEG为角度
+void TDraw::DrawSection(HDC hdc, int x1,int y1,int x2,int y2,int d, int angleDEG)
+{
+	double angle = angleDEG / 180.0*M_PI;
+	int dx= d / sin(angle);
+	int h = y2-y1;
+	POINT pt1,pt2;
+	pt1 = { x1 + dx, y1 };
+	pt2 = { pt1.x - h / tan(angle), y2 };
+
+	HRGN hRgn;
+	hRgn = ::CreateRectRgn(x1,y1,x2,y2);
+	::SelectClipRgn(hdc, hRgn);
+
+	while (pt2.x < x2)
+	{
+		DrawLine(hdc, pt1, pt2);
+		pt1.x += dx;
+		pt2.x += dx;
+	}
+	
+	::SelectClipRgn(hdc, NULL);
+	::DeleteObject(hRgn);
 }
 
 //将点集以指定原点旋转theta，Y方向向上为正
@@ -216,14 +286,14 @@ void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config)
 	}
 
 	//原点对小格大小取余，得到网格初始偏移量
-	int xOffset = Config->Org.x % screenGrid.x;
-	int yOffset = Config->Org.y % screenGrid.y;
+	int xOffset = Config->GetOrg().x % screenGrid.x;
+	int yOffset = Config->GetOrg().y % screenGrid.y;
 
 	//原点减去网格偏移量，除以格子大小得到到原点的格数。再对5取余，得到原点到左侧最近大格格数。
 	//用格数取余若得到xBigOffset则应画大格。
-	int xBigOffset = ((Config->Org.x - xOffset) / screenGrid.x) % 5;
+	int xBigOffset = ((Config->GetOrg().x - xOffset) / screenGrid.x) % 5;
 	if (xBigOffset < 0) xBigOffset = 5 + xBigOffset;
-	int yBigOffset = ((Config->Org.y - yOffset) / screenGrid.y) % 5;
+	int yBigOffset = ((Config->GetOrg().y - yOffset) / screenGrid.y) % 5;
 	if (yBigOffset < 0) yBigOffset = 5 + yBigOffset;
 
 	int x, y;
@@ -256,6 +326,33 @@ void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config)
 		TDraw::DrawLine(hdc, yLine);
 		y += screenGrid.y;
 	}
+}
+
+double TDraw::Distance(POINT pt1, POINT pt2)
+{
+	return sqrt(double((pt1.x - pt2.x)*(pt1.x - pt2.x) + (pt1.y - pt2.y)*(pt1.y - pt2.y)));
+}
+
+void TDraw::DrawRect(HDC hdc, RECT &rect,LOGPEN &logpen)
+{
+	HPEN hPen = ::CreatePenIndirect(&logpen);
+	::SelectObject(hdc, hPen);
+	::Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+	::DeleteObject(hPen);
+}
+
+void TDraw::DrawPickSquare(HDC hdc,POINT pt)
+{
+	LOGPEN logpen;
+	logpen.lopnStyle = PS_SOLID;
+	logpen.lopnWidth = { 1, 0 };
+	logpen.lopnColor = RGB(101, 101, 101);
+
+	const int halfsize=5;
+	RECT rect = { pt.x - halfsize, pt.y - halfsize, pt.x + halfsize, pt.y + halfsize };
+	DrawRect(hdc, rect, logpen);
+	rect = { rect.left + 1, rect.top + 1, rect.right - 1, rect.bottom - 1 };
+	FillRect(hdc, &rect, RGB(0, 127, 255));
 }
 
 void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt)

@@ -10,7 +10,7 @@ private:
 	HINSTANCE m_hInst;
 	int iButtonNum;
 	TBBUTTON *tbButtons; 
-	void TToolbar::CreateImageList(UINT uMsg, int cx, int cy, UINT BitmapID);
+	void TToolbar::CreateImageList(UINT uMsg, int cx, int cy, UINT BitmapID, COLORREF crMask);
 	void TToolbar::AddElement(int BitmapIndex, int idCommand, BYTE fsState, BYTE fsStyle, BYTE bReverse[], DWORD_PTR dwData, INT_PTR iString); 
 public:
 	bool bIsFlat;//¸¡¶¯ÑùÊ½
@@ -20,9 +20,9 @@ public:
 	TToolbar();
 	~TToolbar();
 	void TToolbar::CreateToolbar(HWND hwndParent, HINSTANCE hInst);
-	void TToolbar::LoadImageList(int cx, int cy, UINT BitmapID);
-	void TToolbar::LoadHotImageList(int cx, int cy, UINT BitmapID);
-	void TToolbar::LoadDisabledImageList(int cx, int cy, UINT BitmapID);
+	void TToolbar::LoadImageList(int cx, int cy, UINT BitmapID, COLORREF crMask);
+	void TToolbar::LoadHotImageList(int cx, int cy, UINT BitmapID, COLORREF crMask);
+	void TToolbar::LoadDisabledImageList(int cx, int cy, UINT BitmapID, COLORREF crMask);
 	void TToolbar::AddButton(int IconIndex, int idCommand, bool Enable, TCHAR iString[]); 
 	void TToolbar::AddGroup(int IconIndex, int idCommand, bool Enable, TCHAR iString[]);
 	void TToolbar::AddCheck(int IconIndex, int idCommand, bool Enable, TCHAR iString[]);

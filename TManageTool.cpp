@@ -1,13 +1,11 @@
 #pragma once
-#include <Windows.h>
+#include "TManageTool.h"
 
 #include "resource.h"
-#include "TMainWindow.h"
-#include "TManageTool.h"
+
 #include "TSelectTool.h"
 #include "TLineTool.h"
-
-extern TMainWindow win;
+#include "TFramePointTool.h"
 
 TManageTool::TManageTool()
 {
@@ -24,6 +22,7 @@ void TManageTool::SetCurActiveTool(UINT id)
 {
 	if (m_pCurrentTool != NULL)
 	{
+		m_pCurrentTool->~TTool();
 		delete m_pCurrentTool;
 		m_pCurrentTool = NULL;
 	}
@@ -31,11 +30,17 @@ void TManageTool::SetCurActiveTool(UINT id)
 	m_uiCurActiveTool = id;
 	switch (id)
 	{
-	case ID_DRAW_LINE:
-		m_pCurrentTool = new TLineTool;
-		break;
 	case ID_SELECT:
 		m_pCurrentTool = new TSelectTool;
+		break;
+	case ID_DRAW_FRAME:
+		m_pCurrentTool = new TFramePointTool;
+		break;
+	case ID_DRAW_BAR:
+		//m_pCurrentTool = new TFramePointTool;
+		break;
+	case ID_DRAW_LINE:
+		m_pCurrentTool = new TLineTool;
 		break;
 	}
 }

@@ -28,7 +28,6 @@ void TConfiguration::Initial(HWND hwnd)
 	dProportion = 1.0;
 	SetDPU(dProportion);
 
-
 	iStyle = PS_SOLID;
 	iWidth = 1;
 
@@ -36,6 +35,8 @@ void TConfiguration::Initial(HWND hwnd)
 	crPen = RGB(255, 255, 255);
 	crDash = RGB(0, 200, 0);
 	crDot = RGB(0, 200, 0);
+
+	crCoordinate = RGB(100, 100, 100);
 
 	crGridBig = RGB(51, 57, 73);
 	crGridSmall = RGB(39, 45, 56);
@@ -71,7 +72,7 @@ DPOINT TConfiguration::ScreenToReal(POINT pt)
 {
 	DPOINT dpt;
 		dpt.x = double(pt.x - Org.x) / DPUX;
-		dpt.y = -double(pt.y - Org.y) / DPUX;
+		dpt.y = -double(pt.y - Org.y) / DPUY;
 	return dpt;
 }
 

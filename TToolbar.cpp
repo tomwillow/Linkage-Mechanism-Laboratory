@@ -32,35 +32,35 @@ void TToolbar::CreateToolbar(HWND hwndParent, HINSTANCE hInst)
 }
 
 //内部函数：创建图片列表
-void TToolbar::CreateImageList(UINT uMsg,int cx, int cy, UINT BitmapID)
+void TToolbar::CreateImageList(UINT uMsg,int cx, int cy, UINT BitmapID,COLORREF crMask)
 {
 	// Create the image list.
 	HIMAGELIST m_hImageList;
-	m_hImageList = ImageList_Create(cx, cy, ILC_COLOR32 | ILC_MASK, 1, 1);
+	m_hImageList = ImageList_Create(cx, cy, ILC_COLOR32 | ILC_MASK, 1, 1);//
 	HANDLE hImage = NULL;
 	hImage = LoadImage(m_hInst, (TCHAR *)BitmapID, IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
-	ImageList_AddMasked(m_hImageList, (HBITMAP)hImage, 0);
+	ImageList_AddMasked(m_hImageList, (HBITMAP)hImage, crMask);
 
 	DeleteObject(hImage);
 	SendMessage(m_hWnd, uMsg, (WPARAM)0, (LPARAM)m_hImageList);
 }
 
 //设置工具栏图片
-void TToolbar::LoadImageList(int cx, int cy, UINT BitmapID)
+void TToolbar::LoadImageList(int cx, int cy, UINT BitmapID,COLORREF crMask)
 {
-	CreateImageList(TB_SETIMAGELIST, cx, cy, BitmapID);
+	CreateImageList(TB_SETIMAGELIST, cx, cy, BitmapID,crMask);
 }
 
 //设置工具栏悬浮图片
-void TToolbar::LoadHotImageList(int cx, int cy, UINT BitmapID)
+void TToolbar::LoadHotImageList(int cx, int cy, UINT BitmapID, COLORREF crMask)
 {
-	CreateImageList(TB_SETHOTIMAGELIST, cx, cy, BitmapID);
+	CreateImageList(TB_SETHOTIMAGELIST, cx, cy, BitmapID, crMask);
 }
 
 //设置工具栏禁用图片
-void TToolbar::LoadDisabledImageList(int cx, int cy, UINT BitmapID)
+void TToolbar::LoadDisabledImageList(int cx, int cy, UINT BitmapID, COLORREF crMask)
 {
-	CreateImageList(TB_SETDISABLEDIMAGELIST, cx, cy, BitmapID);
+	CreateImageList(TB_SETDISABLEDIMAGELIST, cx, cy, BitmapID,crMask);
 }
 
 //添加按钮

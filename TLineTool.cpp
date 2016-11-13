@@ -4,19 +4,13 @@
 extern TMainWindow win;
 TLineTool::TLineTool() 
 {
-	Attach.Load(win.Canvas.m_hWnd, &(win.m_Shape), &(win.m_Configuration));
+	Attach = new TAttach(win.Canvas.m_hWnd, &(win.m_Shape), &(win.m_Configuration));
 	Config = &(win.m_Configuration);
 	m_uiHit = 0;
 	m_pptHit = NULL;
-	bShowXAssist = false;
-	bShowYAssist = false;
 	bShowDimLine = false;
 	MoveLine = new TRealLine;
-	XAssistLine = new TRealLine;
-	YAssistLine = new TRealLine;
 	MoveLine->SetStyle(PS_SOLID, 1, Config->crPen);
-	XAssistLine->SetStyle(PS_DOT, 1, Config->crDot);
-	YAssistLine->SetStyle(PS_DOT, 1, Config->crDot);
 
 	Line1 = new TLine;
 	Line2 = new TLine; 
@@ -25,8 +19,6 @@ TLineTool::TLineTool()
 	Line2->SetStyle(PS_DOT, 1, Config->crPen);
 	LineDim->SetStyle(PS_DOT, 1, Config->crPen);
 
-	iIvoryLine = 0;
-
 	LineEdit = new TLineEdit;
 }
 
@@ -34,10 +26,10 @@ TLineTool::TLineTool()
 TLineTool::~TLineTool()
 {
 	DestroyWindow(LineEdit->m_hWnd);
+	delete Attach;
+
 	delete LineEdit;
 	delete MoveLine;
-	delete XAssistLine;
-	delete YAssistLine;
 
 	delete Line1;
 	delete Line2;
@@ -51,61 +43,8 @@ void TLineTool::OnMouseWheel(HWND hWnd, UINT nFlags, POINT ptPos)
 
 void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	DPOINT ptDPos = Config->ScreenToReal(ptPos);
-	if (m_uiHit>0)
-	{
-		MoveLine->ptEnd = ptDPos;
-	}
-
-	Attach.AttachAll(ptPos);
-
-	//检测X轴辅助线
-	if (abs(Config->LengthToScreenY(ptDPos.y - MoveLine->ptBegin.y)) < 10)//当前点和起始点y轴偏差10像素
-	{
-		bShowXAssist = true;
-
-		//设置辅助线x,y坐标
-		if (ptDPos.x - XAssistLine->ptBegin.x > 0)//当前位置位于辅助线起始点右边
-		{
-			XAssistLine->ptEnd.x = Config->ScreenToReal({ win.Canvas.ClientRect.right, 0 }).x;
-			iIvoryLine = 1;
-		}
-		else
-		{
-			XAssistLine->ptEnd.x = Config->ScreenToReal({ win.Canvas.ClientRect.left, 0 }).x;
-			iIvoryLine = 3;
-		}
-		XAssistLine->ptEnd.y = XAssistLine->ptBegin.y;
-
-		MoveLine->ptEnd.y = XAssistLine->ptEnd.y;//将当前点吸附到坐标轴
-	}
-	else
-	{
-		bShowXAssist = false;
-		iIvoryLine = 0;
-	}
-
-	//检测Y轴辅助线
-	if (abs(Config->LengthToScreenX(ptDPos.x - MoveLine->ptBegin.x)) < 10)
-	{
-		bShowYAssist = true;
-		if (ptDPos.y - YAssistLine->ptBegin.y > 0)
-		{
-			YAssistLine->ptEnd.y = Config->ScreenToReal({ 0, win.Canvas.ClientRect.top }).y;
-			iIvoryLine = 2;
-		}
-		else
-		{
-			YAssistLine->ptEnd.y = Config->ScreenToReal({ 0, win.Canvas.ClientRect.bottom }).y;
-			iIvoryLine = 4;
-		}
-		YAssistLine->ptEnd.x = YAssistLine->ptBegin.x;
-		MoveLine->ptEnd.x = YAssistLine->ptEnd.x;//吸附
-	}
-	else
-	{
-		bShowYAssist = false;
-	}
+	Attach->AttachAll(ptPos,MoveLine->ptBegin);
+	MoveLine->ptEnd = Attach->dptAttach;
 
 	if (m_uiHit > 0)
 	{
@@ -159,24 +98,11 @@ void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	//由Canvas刷新
 }
 
-//插入WM_PAINT事件中进行绘制
+//由祖先插入WM_PAINT事件中进行绘制
 void TLineTool::Draw(HDC hdc)
 {
-	//画X辅助线
-	if (bShowXAssist)
-	{
-		TDraw::DrawRealLine(hdc, *XAssistLine,Config);//
-		TDraw::DrawCross(hdc, Config->RealToScreen(MoveLine->ptEnd), 18, MoveLine->logpenStyle);
-	}
 
-	//画Y辅助线
-	if (bShowYAssist)
-	{
-		TDraw::DrawRealLine(hdc, *YAssistLine,Config);//
-		TDraw::DrawCross(hdc, Config->RealToScreen(MoveLine->ptEnd), 18, MoveLine->logpenStyle);
-	}
-
-	Attach.Draw(hdc);
+	Attach->Draw(hdc);
 
 	//画临时线及尺寸线
 	if (m_uiHit > 0)
@@ -216,10 +142,10 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			RealLine.ptBegin = m_pptHit[m_uiHit - 1];
 
 			//计算得到终点坐标
-			double angle;
-			switch (iIvoryLine)
+			switch (Attach->GetiIvoryLine())
 			{
 			case 0:
+				double angle;
 				angle=TDraw::GetAngleFromPointReal(RealLine.ptBegin, MoveLine->ptEnd);
 				RealLine.SetPoint(RealLine.ptBegin, num, angle);
 				break;
@@ -248,10 +174,12 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 			//设置临时线
 			POINT ptNew = Config->RealToScreen(RealLine.ptEnd);
-			InitialLine(ptNew);
+			InitialLine(RealLine.ptEnd);
+			Attach->InitialLine(ptNew);
 
 			LineEdit->SetVisible(false);//避免在画完线后还显示Edit
 
+			//移动到新坐标
 			TDraw::ClientPosToScreen(hWnd, &ptNew);
 			SetCursorPos(ptNew.x, ptNew.y);
 		}
@@ -260,27 +188,25 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	if (bShowXAssist)
-		ptPos = Config->RealToScreen(MoveLine->ptEnd);//若吸附点出现则进行吸附
-	if (bShowYAssist)
-		ptPos = Config->RealToScreen(MoveLine->ptEnd);//若吸附点出现则进行吸附
+	ptPos = Config->RealToScreen(MoveLine->ptEnd);
 
 	//上一点及当前点存入数据
 	if (m_uiHit > 0)
 	{
 		TRealLine RealLine;
 		RealLine.SetStyle(Config->iStyle, Config->iWidth, Config->crPen);
-		RealLine.SetPoint(m_pptHit[m_uiHit - 1], Config->ScreenToReal(ptPos));
+		RealLine.SetPoint(m_pptHit[m_uiHit - 1], MoveLine->ptEnd);
 		win.m_Shape.AddRealLine(RealLine);
 	}
 
 	//当前点存入暂存点集
 	m_uiHit++;
 	m_pptHit = (DPOINT *)realloc(m_pptHit, m_uiHit*sizeof(DPOINT));
-	m_pptHit[m_uiHit - 1] = Config->ScreenToReal(ptPos);
+	m_pptHit[m_uiHit - 1] = MoveLine->ptEnd;
 
 	//设置临时线
-	InitialLine(ptPos);
+	InitialLine(MoveLine->ptEnd);
+	Attach->InitialLine(ptPos);
 
 	//创建LineEdit或隐藏
 	if (LineEdit->m_hWnd == NULL)
@@ -294,15 +220,11 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	//交给画布刷新
 }
 
-void TLineTool::InitialLine(POINT ptPos)
+void TLineTool::InitialLine(DPOINT dptPos)
 {
-	MoveLine->ptBegin = Config->ScreenToReal(ptPos);
-	MoveLine->ptEnd = Config->ScreenToReal(ptPos);
-
-	XAssistLine->ptBegin = Config->ScreenToReal(ptPos);
-	XAssistLine->ptEnd = Config->ScreenToReal(ptPos);
-	YAssistLine->ptBegin = Config->ScreenToReal(ptPos);
-	YAssistLine->ptEnd = Config->ScreenToReal(ptPos);
+	POINT ptPos = Config->RealToScreen(dptPos);
+	MoveLine->ptBegin = dptPos;
+	MoveLine->ptEnd = dptPos;
 
 	Line1->ptBegin = ptPos;
 	Line1->ptEnd = ptPos;
@@ -322,8 +244,6 @@ void TLineTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	free(m_pptHit);
 	m_pptHit = NULL;
 
-	bShowXAssist = false;
-	bShowYAssist = false;
 	bShowDimLine = false;
 
 	::InvalidateRect(win.Canvas.m_hWnd, &win.Canvas.ClientRect, false);

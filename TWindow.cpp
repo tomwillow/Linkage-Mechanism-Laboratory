@@ -6,11 +6,11 @@
 #include <assert.h>
 #include <tchar.h>
 #include <stdio.h>
-#include "KWindow.h"
+#include "TWindow.h"
 
 
 // Default message handler for main program window, dispatch to OnKeyDown, OnDraw, etc.
-LRESULT KWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT TWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch( uMsg )
 	{
@@ -110,19 +110,19 @@ LRESULT KWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
-// Generic window procedure passed to WIN32 API, dispatches to KWindow::WndProc
-LRESULT CALLBACK KWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+// Generic window procedure passed to WIN32 API, dispatches to TWindow::WndProc
+LRESULT CALLBACK TWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	KWindow * pWindow;
+	TWindow * pWindow;
         
 	if ( uMsg==WM_NCCREATE )
 	{   
 		MDICREATESTRUCT * pMDIC = (MDICREATESTRUCT *) ((LPCREATESTRUCT) lParam)->lpCreateParams;
-		pWindow = (KWindow *) (pMDIC->lParam);
+		pWindow = (TWindow *) (pMDIC->lParam);
 		SetWindowLong(hWnd, GWL_USERDATA, (LONG) pWindow);
 	}
 	else
-		pWindow=(KWindow *)GetWindowLong(hWnd, GWL_USERDATA);
+		pWindow=(TWindow *)GetWindowLong(hWnd, GWL_USERDATA);
 	if ( pWindow )
 		return pWindow->WndProc(hWnd, uMsg, wParam, lParam);
 	else
@@ -131,7 +131,7 @@ LRESULT CALLBACK KWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 
 // Register WNDCLASS for the window class. Registering only once
-bool KWindow::RegisterClass(LPCTSTR lpszClass, HINSTANCE hInst)
+bool TWindow::RegisterClass(LPCTSTR lpszClass, HINSTANCE hInst)
 {
 	WNDCLASSEX wc;
 
@@ -154,7 +154,7 @@ bool KWindow::RegisterClass(LPCTSTR lpszClass, HINSTANCE hInst)
 
 
 // Handles window creation
-bool KWindow::CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWORD dwStyle, 
+bool TWindow::CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWORD dwStyle, 
     int x, int y, int nWidth, int nHeight, HWND hParent, 
     HMENU hMenu, HINSTANCE hInst)
 {
@@ -167,6 +167,7 @@ bool KWindow::CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWO
 	mdic.lParam = (LPARAM) this;
 
 	m_hInst = hInst;
+	m_hParent = hParent;
 	m_hWnd = CreateWindowEx(dwExStyle, lpszClass, 
 		lpszName, dwStyle, x, y, nWidth, nHeight, 
 		hParent, hMenu, hInst, & mdic);
@@ -174,9 +175,13 @@ bool KWindow::CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWO
 	return m_hWnd!=NULL;
 }
 
+void TWindow::LoadTitleIcon(HINSTANCE hInst,UINT id)
+{
+	m_hTitleIcon=LoadIcon(hInst, MAKEINTRESOURCE(id));
+}
 
 // Fill WNDCLASSEX, virtual function
-void KWindow::GetWndClassEx(WNDCLASSEX & wc)
+void TWindow::GetWndClassEx(WNDCLASSEX & wc)
 {
 	memset(& wc, 0, sizeof(wc));
 
@@ -186,7 +191,7 @@ void KWindow::GetWndClassEx(WNDCLASSEX & wc)
 	wc.cbClsExtra    = 0;
 	wc.cbWndExtra    = 0;
 	wc.hInstance     = NULL;
-	wc.hIcon         = NULL;
+	wc.hIcon         = m_hTitleIcon;
 	wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
 	wc.lpszMenuName  = NULL;
@@ -195,7 +200,7 @@ void KWindow::GetWndClassEx(WNDCLASSEX & wc)
 }
 
 
-WPARAM KWindow::MessageLoop(void)
+WPARAM TWindow::MessageLoop(void)
 {
 	MSG msg;
 
@@ -221,7 +226,7 @@ WPARAM KWindow::MessageLoop(void)
 
 
 // Common message processing for MDI Child Window
-HRESULT KWindow::CommonMDIChildProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
+HRESULT TWindow::CommonMDIChildProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
 									HMENU hMenu, int nWindowMenu)
 {
 	switch ( uMsg )
@@ -246,7 +251,7 @@ HRESULT KWindow::CommonMDIChildProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 }
 
 
-LRESULT KWindow::OnQueryNewPalette(void)
+LRESULT TWindow::OnQueryNewPalette(void)
 {
 	if ( m_hPalette==NULL )
 		return FALSE;
@@ -268,7 +273,7 @@ LRESULT KWindow::OnQueryNewPalette(void)
 }
 
 
-LRESULT KWindow::OnPaletteChanged(HWND hWnd, WPARAM wParam)
+LRESULT TWindow::OnPaletteChanged(HWND hWnd, WPARAM wParam)
 { 
 	if ( ( hWnd != (HWND) wParam ) && m_hPalette )
 	{
@@ -294,17 +299,17 @@ LRESULT KWindow::OnPaletteChanged(HWND hWnd, WPARAM wParam)
 	return 0;
 }
 
-void KWindow::SetAccel(HACCEL hAccel)
+void TWindow::SetAccel(HACCEL hAccel)
 {
 	m_hAccelTable = hAccel;
 }
 
-void KWindow::SetDoubleBuffer(bool bDoubleBuffer)
+void TWindow::SetDoubleBuffer(bool bDoubleBuffer)
 {
 	m_bDoubleBuffer = bDoubleBuffer;
 }
 
-void CDECL KWindow::SetText(TCHAR szFormat[], ...)
+void CDECL TWindow::SetText(TCHAR szFormat[], ...)
 {
 	TCHAR szBuffer[1024];
 	va_list pArgList;
