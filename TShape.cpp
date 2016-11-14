@@ -1,40 +1,38 @@
 #pragma once
 #include "TShape.h"
 
-
 TShape::TShape()
 {
-	//uiLineNum = 0;
-	//RealLine = NULL;
 }
 
 
 TShape::~TShape()
 {
-	//free(RealLine);
 }
 
-void TShape::AddRealLine(TRealLine realline)
+void TShape::AddElement(TElement element)
 {
-	//uiLineNum++;
-	RealLine.push_back(realline);
-	//RealLine = (TRealLine *)realloc(RealLine, uiLineNum*sizeof(TRealLine));
-	//RealLine[uiLineNum - 1] = realline;
+	Element.push_back(element);
 }
 
-void TShape::AddFramePoint(TFramePoint fp)
+void TShape::DeleteElement(int index)
 {
-	FramePoint.push_back(fp);
+	std::vector<TElement>::iterator iter = Element.begin() + index;
+	Element.erase(iter);
 }
 
-void TShape::DeleteRealLine(int index)
-{
-	std::vector<TRealLine>::iterator iter=RealLine.begin()+index;
-	RealLine.erase(iter);
-}
-
-void TShape::DeleteNewestLine()
-{
-	//uiLineNum--;
-	//RealLine = (TRealLine *)realloc(RealLine, uiLineNum*sizeof(TRealLine));
-}
+//void TShape::AddRealLine(TRealLine realline)
+//{
+//	RealLine.push_back(realline);
+//}
+//
+//void TShape::AddFramePoint(TFramePoint fp)
+//{
+//	FramePoint.push_back(fp);
+//}
+//
+//void TShape::DeleteRealLine(int index)
+//{
+//	std::vector<TRealLine>::iterator iter=RealLine.begin()+index;
+//	RealLine.erase(iter);
+//}

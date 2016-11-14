@@ -9,6 +9,11 @@
 class TFramePoint;
 class TDraw
 {
+#define FRAMEPOINT_R 6//半径
+#define FRAMEPOINT_H 20//高-圆心到地线距离
+#define FRAMEPOINT_B 30//底边长
+#define FRAMEPOINT_SECTION_H 10//剖面线区域高度
+#define FRAMEPOINT_ANGLE 60.0 / 180.0 * M_PI//三角形角度
 public:
 	TDraw();
 	~TDraw();
@@ -17,6 +22,8 @@ public:
 	static void Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta);
 	static void TDraw::MirrorX(POINT apt[], int apt_num, int Oy);
 	static double TDraw::Distance(POINT pt1, POINT pt2);
+	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt);
+	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);
 
 	static void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen);
 	static void TDraw::DrawPickSquare(HDC hdc, POINT pt);

@@ -33,11 +33,49 @@ void TDraw::DrawRealLine(HDC hdc, TRealLine RealLine,TConfiguration *Config)
 {
 	HPEN hPen;
 
-	hPen = ::CreatePenIndirect(&RealLine.logpenStyle);
+	hPen = ::CreatePenIndirect(&RealLine.logpenStyleShow);
 	::SelectObject(hdc, hPen);
 	DrawLine(hdc, Config->RealToScreen(RealLine.ptBegin), Config->RealToScreen(RealLine.ptEnd));
 
 	::DeleteObject(hPen);
+}
+
+bool TDraw::PointInRgn(POINT *ptRgn,int RgnCount, POINT pt)
+{
+	double sum=0,angle,p1, p2;
+	for (int i = 0; i < RgnCount-1; i++)
+	{
+		p1 = GetAngleFromPointScreen(pt, ptRgn[i]);
+		p2 = GetAngleFromPointScreen(pt, ptRgn[i + 1]);
+		angle = p2 - p1;
+		if (angle > M_PI) angle = 2 * M_PI - angle;
+		if (angle < -M_PI) angle = 2 * M_PI + angle;
+		sum += angle;
+	}
+	p1 = GetAngleFromPointScreen(pt, ptRgn[RgnCount - 1]);
+	p2 = GetAngleFromPointScreen(pt, ptRgn[0]);
+	angle = p2 - p1;
+	if (angle > M_PI) angle = 2 * M_PI - angle;
+	if (angle < -M_PI) angle = 2 * M_PI + angle;
+	sum += angle;
+
+	if (abs(sum) < 0.001)//sum==0
+		return false;//在多边形外
+	else
+		return true;
+
+}
+
+bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt)
+{
+	POINT FramePointRgn[6];
+	FramePointRgn[0] = { ptFramePoint.x - FRAMEPOINT_R, ptFramePoint.y - FRAMEPOINT_R };
+	FramePointRgn[1] = { ptFramePoint.x + FRAMEPOINT_R, ptFramePoint.y - FRAMEPOINT_R };
+	FramePointRgn[2] = { ptFramePoint.x-FRAMEPOINT_B/2, ptFramePoint.y+FRAMEPOINT_H };
+	FramePointRgn[3] = { ptFramePoint.x + FRAMEPOINT_B / 2, ptFramePoint.y + FRAMEPOINT_H };
+	FramePointRgn[4] = { ptFramePoint.x - FRAMEPOINT_B / 2, ptFramePoint.y+FRAMEPOINT_H+FRAMEPOINT_SECTION_H };
+	FramePointRgn[5] = { ptFramePoint.x + FRAMEPOINT_B / 2, ptFramePoint.y + FRAMEPOINT_H + FRAMEPOINT_SECTION_H };
+	return PointInRgn(FramePointRgn, 6, pt);
 }
 
 //画机架点
@@ -50,34 +88,30 @@ void TDraw::DrawFramePoint(HDC hdc, TFramePoint FramePoint, TConfiguration *Conf
 	::SelectObject(hdc, hPen);
 	::SelectObject(hdc, hBrush);
 
-	const int r = 6;//半径
-	const int h = 20;//高
-	const int b = 30;//底边长
-	const double angle = 60.0 / 180.0 * M_PI;
 	POINT ptO = Config->RealToScreen(FramePoint.dpt);
 	//画圆
-	::Ellipse(hdc, ptO.x - r, ptO.y - r, ptO.x + r, ptO.y + r);
+	::Ellipse(hdc, ptO.x - FRAMEPOINT_R, ptO.y - FRAMEPOINT_R, ptO.x + FRAMEPOINT_R, ptO.y + FRAMEPOINT_R);
 
 	//设置圆下方的两个点
 	POINT ptA1, ptB1;
-	ptA1 = { ptO.x-r*sin(angle / 2), ptO.y+r*cos(angle / 2) };
-	ptB1 = { ptO.x + r*sin(angle / 2), ptA1.y };
+	ptA1 = { ptO.x - FRAMEPOINT_R*sin(FRAMEPOINT_ANGLE / 2), ptO.y + FRAMEPOINT_R*cos(FRAMEPOINT_ANGLE / 2) };
+	ptB1 = { ptO.x + FRAMEPOINT_R*sin(FRAMEPOINT_ANGLE / 2), ptA1.y };
 
 	//设置三角形的底边两个点
 	POINT ptA2, ptB2;
-	ptA2 = { ptO.x - h*tan(angle / 2), ptO.y + h };
-	ptB2 = { ptO.x + h*tan(angle / 2), ptA2.y };
+	ptA2 = { ptO.x - FRAMEPOINT_H*tan(FRAMEPOINT_ANGLE / 2), ptO.y + FRAMEPOINT_H };
+	ptB2 = { ptO.x + FRAMEPOINT_H*tan(FRAMEPOINT_ANGLE / 2), ptA2.y };
 	DrawLine(hdc, ptA1, ptA2);
 	DrawLine(hdc, ptB1, ptB2);
 
 	//设置地面线
 	POINT ptH1, ptH2;
-	ptH1 = { ptO.x - b / 2, ptO.y + h };
-	ptH2 = { ptO.x + b / 2, ptH1.y };
+	ptH1 = { ptO.x - FRAMEPOINT_B / 2, ptO.y + FRAMEPOINT_H };
+	ptH2 = { ptO.x + FRAMEPOINT_B / 2, ptH1.y };
 	DrawLine(hdc, ptH1, ptH2);
 
 	//画剖面线
-	DrawSection(hdc, ptH1.x, ptH1.y, ptH2.x, ptH1.y + 10,6,45);
+	DrawSection(hdc, ptH1.x, ptH1.y, ptH2.x, ptH1.y + FRAMEPOINT_SECTION_H, 6, 45);
 
 	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
@@ -108,7 +142,7 @@ void TDraw::DrawSection(HDC hdc, int x1,int y1,int x2,int y2,int d, int angleDEG
 	::DeleteObject(hRgn);
 }
 
-//将点集以指定原点旋转theta，Y方向向上为正
+//将点集以指定原点旋转theta，传入点以Y方向向上为正
 void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta)
 {
 	int x, y;
@@ -127,7 +161,7 @@ void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta)
 	}
 }
 
-//返回pt相对于原点ptO的角度，Y方向向上为正
+//返回pt相对于原点ptO的角度，传入点以Y方向向上为正
 double GetAngleFromPoint(POINT ptO, POINT pt)
 {
 	double angle;
@@ -142,7 +176,7 @@ double GetAngleFromPoint(POINT ptO, POINT pt)
 	return angle;
 }
 
-//返回pt相对于原点ptO的角度，Y方向向上为正
+//返回pt相对于原点ptO的角度，传入点以Y方向向上为正
 double TDraw::GetAngleFromPointReal(DPOINT ptO, DPOINT pt)
 {
 	double angle;
@@ -157,7 +191,7 @@ double TDraw::GetAngleFromPointReal(DPOINT ptO, DPOINT pt)
 	return angle;
 }
 
-//以屏幕点返回角度，Y方向向下为正
+//以屏幕点返回角度，传入点以Y方向向下为正
 double TDraw::GetAngleFromPointScreen(POINT pt0, POINT pt)
 {
 	pt0.y = -pt0.y;
@@ -348,8 +382,8 @@ void TDraw::DrawPickSquare(HDC hdc,POINT pt)
 	logpen.lopnWidth = { 1, 0 };
 	logpen.lopnColor = RGB(101, 101, 101);
 
-	const int halfsize=5;
-	RECT rect = { pt.x - halfsize, pt.y - halfsize, pt.x + halfsize, pt.y + halfsize };
+	const int size=10;
+	RECT rect = { pt.x - size / 2, pt.y - size / 2, pt.x + size / 2, pt.y + size / 2 };
 	DrawRect(hdc, rect, logpen);
 	rect = { rect.left + 1, rect.top + 1, rect.right - 1, rect.bottom - 1 };
 	FillRect(hdc, &rect, RGB(0, 127, 255));

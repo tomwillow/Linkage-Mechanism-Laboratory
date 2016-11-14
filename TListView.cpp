@@ -4,13 +4,15 @@
 
 TListView::TListView()
 {
-	tempEdit = NULL;
+	iRowCount = 0;
+	iColumnCount = 0;
+	//tempEdit = NULL;
 }
 
 
 TListView::~TListView()
 {
-	DeleteAllEdit();
+	//DeleteAllEdit();
 	//tempEdit不需要delete，因为tempEdit指向的是pEdit最后一个元素，在前面已经delete掉了。
 	//if (tempEdit != NULL)
 	//	delete tempEdit;
@@ -18,12 +20,12 @@ TListView::~TListView()
 
 void TListView::DeleteAllEdit()
 {
-	for (int i = 0; i < pEdit.size(); i++)
-	{
-		DestroyWindow(pEdit[i]->m_hWnd);
-		delete pEdit[i];
-	}
-	pEdit.clear();
+	//for (int i = 0; i < pEdit.size(); i++)
+	//{
+	//	DestroyWindow(pEdit[i]->m_hWnd);
+	//	delete pEdit[i];
+	//}
+	//pEdit.clear();
 }
 
 WNDPROC TListView::oldEditProc;
@@ -41,58 +43,37 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 {
 	switch (uMsg)
 	{
-	case WM_NOTIFY:
-	{
-		//NMHDR *pNMHDR = (NMHDR *)lParam;
-		//switch (pNMHDR->code)
-		//{
-		//	//拖动和双击都会引起表头宽度的变化
-		//case HDN_BEGINTRACK:	//开始拖动列头
-		//	UpdateControl();
-		//	break;
-		//case HDN_ENDTRACK:			//拖动列头
-		//	UpdateControl();
-		//	break;
-		//case HDN_DIVIDERDBLCLICK:	//双击列头
-		//	UpdateControl();
-		//	break;
-		//}
+	case WM_LBUTTONDOWN:
+	case WM_RBUTTONDOWN:
 		return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
-	}
-	//case LVM_INSERTCOLUMN:
-	//case LVM_INSERTITEM:
-	//case WM_KEYDOWN:
-	////case WM_MOUSEMOVE:
-	//case WM_MOUSEWHEEL:
-	//case WM_VSCROLL:
-	case WM_PAINT:
-		UpdateControl();
-		return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
+	//case WM_PAINT:
+	//	UpdateControl();
+	//	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 	}
 	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 }
 
 void TListView::UpdateControl()
 {
-	RECT ClientRect;
-	::GetClientRect(m_hWnd, &ClientRect);
-	for (int i = 0; i < pEdit.size(); i++)
-	{
-		pEdit[i]->SetVisible(false);
-	}
-	for (int i = 0; i < pEdit.size(); i++)
-	{
-		pEdit[i]->SetVisible(false);
-		RECT rect = GetGridRectInMargin(i, 1);
-		if (rect.bottom <= ClientRect.top + 25) //顶端溢出
-			continue;
-		if (rect.top >= ClientRect.bottom)//底端溢出
-			break;
-		
-			pEdit[i]->SetPos(rect);
-			pEdit[i]->SetVisible(true);
+	//RECT ClientRect;
+	//::GetClientRect(m_hWnd, &ClientRect);
+	//for (int i = 0; i < pEdit.size(); i++)
+	//{
+	//	pEdit[i]->SetVisible(false);
+	//}
+	//for (int i = 0; i < pEdit.size(); i++)
+	//{
+	//	pEdit[i]->SetVisible(false);
+	//	RECT rect = GetGridRectInMargin(i, 1);
+	//	if (rect.bottom <= ClientRect.top + 25) //顶端溢出
+	//		continue;
+	//	if (rect.top >= ClientRect.bottom)//底端溢出
+	//		break;
+	//	
+	//		pEdit[i]->SetPos(rect);
+	//		pEdit[i]->SetVisible(true);
 
-	}	
+	//}	
 	//for (int i = 0; i < pEdit.size(); i++)
 	//{
 	//	RECT rect = GetGridRectInMargin(i, 1);
@@ -114,27 +95,35 @@ void TListView::UpdateControl()
 void TListView::DeleteAllItems()
 {
 	ListView_DeleteAllItems(m_hWnd);
+	iRowCount = 0;
+	iColumnCount = 0;
+
 	DeleteAllEdit();
 }
 
-void CDECL TListView::InsertAttributeItem(int index, TCHAR szName[], int iEditId, TCHAR szEditFormat[],...)
+int TListView::GetItemCount()
 {
+	return ListView_GetItemCount(m_hWnd);
+}
 
-	InsertItem(index, 0, szName);
-	InsertItem(index, 1,TEXT(""));
-	tempEdit = new TEdit;
-	pEdit.push_back(tempEdit);
-	pEdit.back()->CreateEditEx(m_hWnd, iEditId, m_hInst, 0);
-	pEdit.back()->SetPos(GetGridRectInMargin(index, 1));
-	pEdit.back()->SetFont((HFONT)SendMessage(m_hWnd, WM_GETFONT, 0, 0));
+void CDECL TListView::AddAttributeItem(TCHAR szName[], TCHAR szEditFormat[],...)
+{
+	InsertItem(iRowCount, 0, szName);
+	//tempEdit = new TEdit;
+	//pEdit.push_back(tempEdit);
+	//pEdit.back()->CreateEditEx(m_hWnd, iEditId, m_hInst, 0);
+	//pEdit.back()->SetPos(GetGridRectInMargin(index, 1));
+	//pEdit.back()->SetFont((HFONT)SendMessage(m_hWnd, WM_GETFONT, 0, 0));
 
 	TCHAR szBuffer[1024];
 	va_list pArgList;
 	va_start(pArgList, szEditFormat);
 	_vsntprintf_s(szBuffer, sizeof(szBuffer) / sizeof(TCHAR), szEditFormat, pArgList);
 	va_end(pArgList);
-	pEdit.back()->SetText(szBuffer);
-	pEdit.back()->SetVisible(true);
+
+	InsertItem(iRowCount - 1, 1, szBuffer);
+	//pEdit.back()->SetText(szBuffer);
+	//pEdit.back()->SetVisible(true);
 }
 
 void CDECL TListView::SetAttributeItemValue(int index, TCHAR szFormat[], ...)
@@ -170,6 +159,12 @@ void TListView::InsertColumn(int index, TCHAR text[], int width, int styleLVCFMT
 	lvc.iSubItem = index;
 	lvc.iOrder = index;
 	SendMessage(m_hWnd, LVM_INSERTCOLUMN, index, (LPARAM)&lvc);
+	iColumnCount++;
+}
+
+void TListView::AddColumn(TCHAR text[], int width, int styleLVCFMT)
+{
+	InsertColumn(iColumnCount, text, width, styleLVCFMT);
 }
 
 void CDECL TListView::InsertItem(int index, int subitem, TCHAR szFormat[], ...)
@@ -188,6 +183,7 @@ void CDECL TListView::InsertItem(int index, int subitem, TCHAR szFormat[], ...)
 	{
 		lvi.iSubItem = 0;
 		::SendMessage(m_hWnd, LVM_INSERTITEM, 0, (LPARAM)&lvi);
+		iRowCount++;
 	}
 	else
 	{

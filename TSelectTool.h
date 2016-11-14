@@ -5,14 +5,15 @@ class TRealLine;
 class TConfiguration;
 class TShape;
 class TCanvas;
+class TListView;
 class TSelectTool:public TTool
 {
 private:
-	UINT uiLastLineStyle;
 	int iPickRealLineIndex;
-	TShape *Shape;
-	TConfiguration *Config;
-	TCanvas *Canvas;
+	TShape *pShape;
+	TListView *pListView;
+	TConfiguration *pConfig;
+	TCanvas *pCanvas;
 	void TSelectTool::Draw(HDC hdc);
 	void OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos);

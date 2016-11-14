@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+//#include <vector>
 #include <Windows.h>
 
 #include <CommCtrl.h>
@@ -7,12 +7,14 @@
 #include <stdio.h>
 #pragma comment(lib, "comctl32.lib")
 
-class TEdit;
+enum eControl_Type {CTRLTYPE_EDIT};
+//class TEdit;
 class TListView
 {
 private:
-	TEdit *tempEdit;
-	std::vector<TEdit *> pEdit;
+	int iRowCount, iColumnCount;
+	//TEdit *tempEdit;
+	//std::vector<TEdit *> pEdit;
 	void TListView::DeleteAllEdit();
 protected:
 	static WNDPROC oldEditProc;
@@ -26,11 +28,13 @@ public:
 	TListView();
 	~TListView();
 	void TListView::CreateListViewEx(HWND hParent, UINT id, HINSTANCE hInst);//´´½¨ListView
-	void TListView::InsertColumn(int index, TCHAR text[], int width, int styleLVCFMT=LVCFMT_CENTER);
+	void TListView::AddColumn(TCHAR text[], int width, int styleLVCFMT = LVCFMT_LEFT);
+	void TListView::InsertColumn(int index, TCHAR text[], int width, int styleLVCFMT = LVCFMT_LEFT);
 	void CDECL TListView::InsertItem(int index, int subitem, TCHAR szFormat[], ...);
-	void CDECL TListView::InsertAttributeItem(int index, TCHAR szName[], int iEditId, TCHAR szEditFormat[], ...);
+	void CDECL TListView::AddAttributeItem(TCHAR szName[],TCHAR szEditFormat[], ...);
 	void CDECL TListView::SetAttributeItemValue(int index, TCHAR szFormat[], ...);
 	void TListView::UpdateControl();
+	int TListView::GetItemCount();
 	void TListView::DeleteAllItems();
 	RECT TListView::GetGridRect(int index, int subitem);
 	RECT TListView::GetGridRectInMargin(int index, int subitem);

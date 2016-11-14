@@ -1,8 +1,9 @@
 #pragma once
 #include <Windows.h>
 
+#include "TElement.h"
 #include "DPOINT.h"
-class TFramePoint
+class TFramePoint:public TElement
 {
 public:
 	TFramePoint();

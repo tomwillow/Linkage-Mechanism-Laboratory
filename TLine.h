@@ -2,13 +2,13 @@
 #include <Windows.h>
 #include <math.h>
 
-#include "TConfiguration.h"
+#include "TElement.h"
 
-class TLine
+class TLine:public TElement
 {
 public:
 	POINT ptBegin, ptEnd;
-	LOGPEN logpenStyle;
+	LOGPEN logpenStyleShow,logpenStyle;
 	double dLength;
 	TLine *pNext = NULL;
 	TLine();

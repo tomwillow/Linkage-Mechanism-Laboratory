@@ -40,7 +40,7 @@ void TLineTool::OnMouseWheel(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	OnMouseMove(hWnd, nFlags, ptPos);
 }
-
+ 
 void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	Attach->AttachAll(ptPos,MoveLine->ptBegin);
@@ -151,15 +151,19 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				break;
 			case 1:
 				RealLine.ptEnd = { RealLine.ptBegin.x + num, RealLine.ptBegin.y };
+				RealLine.dLength = num;
 				break;
 			case 3:
 				RealLine.ptEnd = { RealLine.ptBegin.x - num, RealLine.ptBegin.y };
+				RealLine.dLength = num;
 				break;
 			case 2:
-				RealLine.ptEnd = { RealLine.ptBegin.x, RealLine.ptBegin.y+num };
+				RealLine.ptEnd = { RealLine.ptBegin.x, RealLine.ptBegin.y + num };
+				RealLine.dLength = num;
 				break;
 			case 4:
 				RealLine.ptEnd = { RealLine.ptBegin.x, RealLine.ptBegin.y - num };
+				RealLine.dLength = num;
 				break;
 			}
 			RealLine.SetStyle(Config->iStyle, Config->iWidth, Config->crPen);

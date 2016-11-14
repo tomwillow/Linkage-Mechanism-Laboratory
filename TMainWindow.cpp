@@ -52,31 +52,25 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	//创建右窗口
 	RightWindow.CreateEx(0, TEXT("RightWindow"), TEXT("RightWindow"),
 		WS_CHILD,
-		ClientRect.right-m_iRightWindowWidth,
-		ClientRect.top + m_Toolbar.GetClientRect().bottom,
-		m_iRightWindowWidth,
-		ClientRect.bottom - m_Toolbar.GetClientRect().bottom - m_Status.GetClientRect().bottom,
+		0,0,0,0,
 		hWnd,
 		(HMENU)ID_RIGHTWINDOW,//id
 		m_hInst);
+	SetRightWindowPos();
 	RightWindow.ShowWindow(TRUE);
 	RightWindow.UpdateWindow();
 
 	//创建画布
-	int x, y, width, height;
-	x = ClientRect.left;
-	y = ClientRect.top + m_Toolbar.GetClientRect().bottom;
-	width = ClientRect.right - ClientRect.left-m_iRightWindowWidth;
-	height = ClientRect.bottom - m_Toolbar.GetClientRect().bottom - m_Status.GetClientRect().bottom;
 	Canvas.CreateEx(0, TEXT("canvas"), TEXT("canvas"),
 		WS_CHILD,
-		x,
-		y,
-		width,
-		height,
+		0,
+		0,
+		0,
+		0,
 		hWnd,
 		(HMENU)ID_CANVAS,//id
 		m_hInst);
+	SetCanvasPos();
 	Canvas.SetDoubleBuffer(true);
 	Canvas.ShowWindow(TRUE);
 	Canvas.UpdateWindow();
@@ -138,7 +132,6 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	{
 	case ID_ACCELERATOR_NEW:
 	case ID_NEW:
-		//MessageBeep(0);
 		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);
 
 		break;
@@ -157,6 +150,24 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 }
 
+void TMainWindow::SetCanvasPos()
+{
+	::MoveWindow(Canvas.m_hWnd,
+		ClientRect.left,
+		ClientRect.top + m_Toolbar.GetClientRect().bottom,
+		ClientRect.right - ClientRect.left - (RightWindow.ClientRect.right - RightWindow.ClientRect.left),
+		ClientRect.bottom - m_Toolbar.GetClientRect().bottom - m_Status.GetClientRect().bottom, true);
+}
+
+void TMainWindow::SetRightWindowPos()
+{
+	::MoveWindow(RightWindow.m_hWnd,
+		ClientRect.right - m_iRightWindowWidth,
+		ClientRect.top + m_Toolbar.GetClientRect().bottom,
+		m_iRightWindowWidth,
+		ClientRect.bottom - m_Toolbar.GetClientRect().bottom - m_Status.GetClientRect().bottom, true);
+}
+
 //只有此处会变更布局大小
 void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 {
@@ -164,26 +175,19 @@ void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 		return;
 	m_Toolbar.FreshSize();
 	m_Status.FreshSize();
-	m_Trackbar.MoveWindow(m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0));
+	m_Trackbar.MoveWindow(m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0));//Trackbar嵌入Status
 
-	::MoveWindow(RightWindow.m_hWnd, 
-		ClientRect.right - m_iRightWindowWidth,
-		ClientRect.top + m_Toolbar.GetClientRect().bottom,
-		m_iRightWindowWidth,
-		ClientRect.bottom - m_Toolbar.GetClientRect().bottom - m_Status.GetClientRect().bottom, true);
+	SetRightWindowPos();
 
-	//记录下坐标原点相对比例，Canvas变动后再按比例恢复坐标位置
-	DPOINT OrgProportion;
-	OrgProportion.x = (double)m_Configuration.GetOrg().x / (double)Canvas.ClientRect.right;
-	OrgProportion.y = (double)m_Configuration.GetOrg().y / (double)Canvas.ClientRect.bottom;
 
-	::MoveWindow(Canvas.m_hWnd,
-		ClientRect.left,
-		ClientRect.top + m_Toolbar.GetClientRect().bottom,
-		ClientRect.right - ClientRect.left-(RightWindow.ClientRect.right-RightWindow.ClientRect.left),
-		ClientRect.bottom - m_Toolbar.GetClientRect().bottom - m_Status.GetClientRect().bottom, true);
+		//记录下坐标原点相对比例，Canvas变动后再按比例恢复坐标位置
+		DPOINT OrgProportion;
+		OrgProportion.x = (double)m_Configuration.GetOrg().x / (double)Canvas.ClientRect.right;
+		OrgProportion.y = (double)m_Configuration.GetOrg().y / (double)Canvas.ClientRect.bottom;
 
-	m_Configuration.SetOrg((LONG)(OrgProportion.x*Canvas.ClientRect.right), (LONG)(OrgProportion.y*Canvas.ClientRect.bottom));
+	SetCanvasPos();
+
+		m_Configuration.SetOrg((LONG)(OrgProportion.x*Canvas.ClientRect.right), (LONG)(OrgProportion.y*Canvas.ClientRect.bottom));
 
 	::InvalidateRect(Canvas.m_hWnd, &Canvas.ClientRect, FALSE);
 }

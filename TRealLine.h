@@ -11,6 +11,7 @@ public:
 	~TRealLine();
 	void TRealLine::CalcLength();
 	void TRealLine::SetPoint(DPOINT ptBegin, DPOINT ptEnd);
-	void TRealLine::SetPoint(DPOINT ptBegin, double dLength,double dAngle);
+	void TRealLine::SetPoint(DPOINT ptBegin, double dLength, double dAngle);
+	void TRealLine::NoticeListView(TListView *pListView);
 };
 

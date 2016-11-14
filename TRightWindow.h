@@ -3,7 +3,6 @@
 #include "TListView.h"
 #include "TTreeView.h"
 
-class TEdit;
 class TRightWindow :public TWindow
 {
 private:
@@ -14,7 +13,6 @@ private:
 	void TRightWindow::SetListViewPos();
 	void TRightWindow::SetTreeViewPos();
 public:
-	TEdit *EditX;
 	TListView ListView;
 	TTreeView TreeView;
 	TRightWindow();

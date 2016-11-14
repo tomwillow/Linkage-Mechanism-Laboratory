@@ -11,6 +11,8 @@ void TLine::SetStyle(int iStyle, int iWidth, COLORREF crColor)
 	logpenStyle.lopnStyle = iStyle;
 	logpenStyle.lopnWidth.x = iWidth;
 	logpenStyle.lopnColor = crColor;
+
+	logpenStyleShow = logpenStyle;
 }
 
 
