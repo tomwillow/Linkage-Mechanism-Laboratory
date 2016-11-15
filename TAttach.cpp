@@ -154,6 +154,7 @@ void TAttach::AttachPoint(DPOINT dptPos)
 	{
 		switch (Shape->Element[i]->eType)
 		{
+		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
 		{
 			TRealLine *pRealLine = (TRealLine *)(Shape->Element[i]);

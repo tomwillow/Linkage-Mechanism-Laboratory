@@ -17,6 +17,13 @@ void TShape::AddRealLine(TRealLine &realline)
 	Element.push_back(tempRealLine);
 }
 
+void TShape::AddBar(TBar *bar)
+{
+	TBar *tempBar = new TBar;
+	*tempBar = *bar;
+	Element.push_back(tempBar);
+}
+
 void TShape::AddFramePoint(TFramePoint &framepoint)
 {
 	TFramePoint *tempFramePoint = new TFramePoint;

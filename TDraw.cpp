@@ -39,7 +39,36 @@ void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
 	case ELEMENT_FRAMEPOINT:
 		DrawFramePoint(hdc, ((TFramePoint *)Element)->dpt, ((TFramePoint *)Element)->logpenStyleShow, pConfig);
 		break;
+	case ELEMENT_BAR:
+		DrawBar(hdc, ((TBar *)Element)->ptBegin, ((TBar *)Element)->ptEnd, ((TBar *)Element)->logpenStyleShow, pConfig);
+		break;
 	}
+}
+
+void TDraw::DrawBar(HDC hdc, DPOINT dptBegin, DPOINT dptEnd, LOGPEN logpen, TConfiguration *pConfig)
+{
+	HPEN hPen;
+	HBRUSH hBrush;
+	hPen = ::CreatePenIndirect(&logpen);
+	hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
+	::SelectObject(hdc, hPen);
+	::SelectObject(hdc, hBrush);
+
+	POINT ptBegin, ptEnd;
+	ptBegin = pConfig->RealToScreen(dptBegin);
+	ptEnd = pConfig->RealToScreen(dptEnd);
+	DrawCircle(hdc, ptBegin, FRAMEPOINT_R);
+	DrawCircle(hdc, ptEnd, FRAMEPOINT_R);
+
+	POINT p1, p2;
+	double theta1 = GetAngleFromPointScreen(ptBegin, ptEnd);
+	double theta2 = GetAngleFromPointScreen(ptEnd, ptBegin);
+	p1 = { ptBegin.x + FRAMEPOINT_R*cos(theta1), ptBegin.y - FRAMEPOINT_R*sin(theta1) };
+	p2 = { ptEnd.x + FRAMEPOINT_R*cos(theta2), ptEnd.y - FRAMEPOINT_R*sin(theta2) };
+	DrawLine(hdc, p1, p2);
+
+	::DeleteObject(hPen);
+	::DeleteObject(hBrush);
 }
 
 void TDraw::DrawRealLine(HDC hdc,TRealLine &RealLine, TConfiguration *Config)
@@ -110,6 +139,12 @@ bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt)
 	FramePointRgn[3] = { ptFramePoint.x + FRAMEPOINT_B / 2, ptFramePoint.y + FRAMEPOINT_H + FRAMEPOINT_SECTION_H };
 	
 	return PointInRgn(FramePointRgn, 6, pt);
+}
+
+//画圆 没有样式
+void TDraw::DrawCircle(HDC hdc, POINT pt, int r)
+{
+	::Ellipse(hdc, pt.x - r, pt.y - r, pt.x + r, pt.y + r);
 }
 
 //画机架点
@@ -206,7 +241,7 @@ double GetAngleFromPoint(POINT ptO, POINT pt)
 	if (((pt.x - ptO.x) < 0) && ((pt.y - ptO.y) <= 0))//第3象限[PI,PI*3/2)
 		angle = M_PI + atan(double(ptO.y - pt.y) / (ptO.x - pt.x));
 	if (((pt.x - ptO.x) >= 0) && ((pt.y - ptO.y) < 0))//第4象限[PI*3/2,2*PI)
-		angle = 3 / 2 * M_PI + atan(double(pt.x - ptO.x) / (ptO.y - pt.y));
+		angle = 3.0 / 2.0 * M_PI + atan(double(pt.x - ptO.x) / (ptO.y - pt.y));
 	return angle;
 }
 

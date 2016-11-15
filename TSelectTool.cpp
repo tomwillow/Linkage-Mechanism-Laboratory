@@ -64,6 +64,7 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	{
 		switch (pShape->Element[i]->eType)
 		{
+		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
 			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
 			{
@@ -117,6 +118,7 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	{
 		switch (pShape->Element[i]->eType)
 		{
+		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
 			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
 			{
@@ -167,6 +169,7 @@ void TSelectTool::Draw(HDC hdc)
 	{
 		switch (pShape->Element[iPickIndex]->eType)
 		{
+		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
 			//画拾取方格
 			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->Element[iPickIndex])->ptBegin));

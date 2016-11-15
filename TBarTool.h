@@ -6,5 +6,6 @@ class TBarTool:public TLineTool
 public:
 	TBarTool();
 	~TBarTool();
+	void TBarTool::AddIntoShape(TRealLine &RealLine);
 };
 

@@ -125,6 +125,11 @@ void TLineTool::Draw(HDC hdc)
 	}
 }
 
+void TLineTool::AddIntoShape(TRealLine &RealLine)
+{
+	pShape->AddRealLine(RealLine);
+}
+
 //LineEdit出现时Canvas是接收不到KEYDOWN的，自然LineTool也接收不到。
 //KEYDOWN消息由LineEdit截获发送给Canvas，再传递下来。
 void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -175,7 +180,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			RealLine.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 
 			//入库
-			pShape->AddRealLine(RealLine);
+			AddIntoShape(RealLine);
 
 			//计算得出的终点存入暂存点集
 			dptHit.push_back(RealLine.ptEnd);
@@ -204,7 +209,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		TRealLine RealLine;
 		RealLine.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 		RealLine.SetPoint(dptHit[dptHit.size() - 1], MoveLine->ptEnd);
-		pShape->AddRealLine(RealLine);
+		AddIntoShape(RealLine);
 	}
 
 	//当前点存入暂存点集

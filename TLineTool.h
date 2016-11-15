@@ -28,6 +28,8 @@ private:
 	void OnMouseWheel(HWND hWnd, UINT nFlags, POINT ptPos);
 	void TLineTool::InitialLine(DPOINT dptPos);
 	void Draw(HDC hdc);
+protected:
+	virtual void TLineTool::AddIntoShape(TRealLine &RealLine);
 public:
 	TLineTool();
 	~TLineTool();
