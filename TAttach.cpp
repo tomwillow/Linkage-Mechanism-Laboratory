@@ -47,23 +47,23 @@ void TAttach::Draw(HDC hdc)
 	{
 		TDraw::DrawCross(hdc, Config->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, Config->crPen });
 	}
-		//画X辅助线
-		if (bShowXAssist)
-		{
-			TDraw::DrawRealLine(hdc, *XAssistLine, Config);//
-			TDraw::DrawCross(hdc, Config->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, Config->crPen });
-		}
+	//画X辅助线
+	if (bShowXAssist)
+	{
+		TDraw::DrawRealLine(hdc, *XAssistLine, Config);//
+		TDraw::DrawCross(hdc, Config->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, Config->crPen });
+	}
 
-		//画Y辅助线
-		if (bShowYAssist)
-		{
-			TDraw::DrawRealLine(hdc, *YAssistLine, Config);//
-			TDraw::DrawCross(hdc, Config->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, Config->crPen });
-		}
-	
+	//画Y辅助线
+	if (bShowYAssist)
+	{
+		TDraw::DrawRealLine(hdc, *YAssistLine, Config);//
+		TDraw::DrawCross(hdc, Config->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, Config->crPen });
+	}
+
 }
 
-void TAttach::AttachAll(POINT ptNowPos,DPOINT dptCheckPos)
+void TAttach::AttachAll(POINT ptNowPos, DPOINT dptCheckPos)
 {
 	DPOINT dptPos = Config->ScreenToReal(ptNowPos);
 	dptAttach = dptPos;
@@ -81,7 +81,7 @@ void TAttach::AttachAll(POINT ptNowPos)
 }
 
 //检查NowPos是否靠近CheckPos的极轴，使用前应设置dptAttach
-bool TAttach::AttachAxis(DPOINT dptNowPos,DPOINT dptCheckPos)
+bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos)
 {
 
 	iIvoryLine = 0;
@@ -149,32 +149,36 @@ bool TAttach::AttachAxis(DPOINT dptNowPos,DPOINT dptCheckPos)
 void TAttach::AttachPoint(DPOINT dptPos)
 {
 	bAttachPoint = false;
-	for (int i = 0; i < Shape->RealLine.size(); i++)
+	for (int i = 0; i < Shape->Element.size(); i++)
 	{
-		//吸附起点
-		if (DPTisApproached(dptPos, Shape->RealLine[i].ptBegin,10))
+		switch (Shape->Element[i].eType)
 		{
-			bAttachPoint = true;
-			dptAttach = Shape->RealLine[i].ptBegin;
-			break;
-		}
+		case ELEMENT_REALLINE:
+			//吸附起点
+			if (DPTisApproached(dptPos, Shape->Element[i].ptBegin, 10))
+			{
+				bAttachPoint = true;
+				dptAttach = Shape->Element[i].ptBegin;
+				return;
+			}
 
-		//吸附终点
-		if (DPTisApproached(dptPos, Shape->RealLine[i].ptEnd,10))
-		{
-			bAttachPoint = true;
-			dptAttach = Shape->RealLine[i].ptEnd;
+			//吸附终点
+			if (DPTisApproached(dptPos, Shape->Element[i].ptEnd, 10))
+			{
+				bAttachPoint = true;
+				dptAttach = Shape->Element[i].ptEnd;
+				return;
+			}
 			break;
-		}
-	}
 
-	//吸附机架点
-	for (int i = 0;i< Shape->FramePoint.size(); i++)
-	{
-		if (DPTisApproached(dptPos, Shape->FramePoint[i].dpt, 10))
-		{
-			bAttachPoint = true;
-			dptAttach = Shape->FramePoint[i].dpt;
+		case ELEMENT_FRAMEPOINT:
+			//吸附机架点
+			if (DPTisApproached(dptPos, Shape->Element[i].dpt, 10))
+			{
+				bAttachPoint = true;
+				dptAttach = Shape->Element[i].dpt;
+				return;
+			}
 			break;
 		}
 	}

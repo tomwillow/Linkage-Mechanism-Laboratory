@@ -5,6 +5,7 @@ TRealLine::TRealLine()
 {
 	TRealLine::dLength = 0;
 	_tcscpy(Name, TEXT(""));
+	eType = ELEMENT_REALLINE;
 }
 
 TRealLine::~TRealLine()

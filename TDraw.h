@@ -25,12 +25,17 @@ public:
 	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt);
 	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);
 
+	static void TDraw::DrawElement(HDC hdc, TElement Element, TConfiguration *pConfig);
+	static void TDraw::DrawFramePoint(HDC hdc, DPOINT dpt, LOGPEN logpen, TConfiguration *Config);
+	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config);
+	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, TConfiguration *Config);
+
 	static void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen);
 	static void TDraw::DrawPickSquare(HDC hdc, POINT pt);
 	static void DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos);
 	static void TDraw::DrawLine(HDC hdc, TLine Line);
-	static void TDraw::DrawFramePoint(HDC hdc, TFramePoint FramePoint, TConfiguration *Config);
-	static void TDraw::DrawRealLine(HDC hdc, TRealLine RealLine, TConfiguration *Config);
+
+
 	static void TDraw::DrawCross(HDC hdc, POINT pt, int size, LOGPEN Style);
 	static void TDraw::DrawArrow(HDC hdc, POINT ptBegin, POINT ptEnd, int length, int width);
 	static void TDraw::DrawAxes(HDC hdc, int Ox, int Oy, COLORREF crColor);

@@ -11,17 +11,16 @@ TSelectTool::TSelectTool()
 	pConfig = &(win.m_Configuration);
 	pCanvas = &(win.Canvas);
 	pListView = &(win.RightWindow.ListView);
-	iPickRealLineIndex = -1;
-	iPickFramePointIndex = -1;
+	iPickIndex = -1;
 }
 
 //由TTool的虚析构函数重载
 TSelectTool::~TSelectTool()
 {
-	if (iPickRealLineIndex != -1)
+	if (iPickIndex != -1)
 	{
 		//恢复线型
-		pShape->RealLine[iPickRealLineIndex].logpenStyleShow.lopnStyle = pShape->RealLine[iPickRealLineIndex].logpenStyle.lopnStyle;
+		pShape->Element[iPickIndex].logpenStyleShow.lopnStyle = pShape->Element[iPickIndex].logpenStyle.lopnStyle;
 
 		//通知TreeView取消选中
 
@@ -36,19 +35,15 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	switch (wParam)
 	{
 	case VK_DELETE:
-		if (iPickRealLineIndex != -1)
+		if (iPickIndex != -1)
 		{
-			pShape->DeleteRealLine(iPickRealLineIndex);
-			iPickRealLineIndex = -1;
+			pShape->DeleteElement(iPickIndex);
+			iPickIndex = -1;
 			//通知TreeView取消选中
 
 			//通知ListView更新
 			pListView->DeleteAllItems();
 		}
-		//if (iPickFramePointIndex != -1)
-		//{
-		//	pShape->DeleteFramePoint
-		//}
 		return;
 	}
 }
@@ -63,68 +58,65 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 }
 
-bool TSelectTool::PickRealLine(POINT ptPos, TRealLine &RealLine)
+bool TSelectTool::PickRealLine(POINT ptPos, TElement &RealLine)
 {
-	POINT pt1 = pConfig->RealToScreen(RealLine.ptBegin);
-	POINT pt2 = pConfig->RealToScreen(RealLine.ptEnd);
-	double length = TDraw::Distance(pt1, pt2);
-	double length1 = TDraw::Distance(ptPos, pt1);
-	double length2 = TDraw::Distance(ptPos, pt2);
+	if (RealLine.eType == ELEMENT_REALLINE)
+	{
+		POINT pt1 = pConfig->RealToScreen(RealLine.ptBegin);
+		POINT pt2 = pConfig->RealToScreen(RealLine.ptEnd);
+		double length = TDraw::Distance(pt1, pt2);
+		double length1 = TDraw::Distance(ptPos, pt1);
+		double length2 = TDraw::Distance(ptPos, pt2);
 
-	if (length1 + length2 - length <=0.5)//容差
-		return true;
-	else
-		return false;
+		if (length1 + length2 - length <= 0.5)//容差
+			return true;
+		else
+			return false;
+	}
 }
 
 void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	//若之前已经拾取得到线，则恢复线型。（若再次拾取下面将变更线型，若不是则线型将在此恢复）
-	if (iPickRealLineIndex != -1)
+	if (iPickIndex != -1)
 	{
-		pShape->RealLine[iPickRealLineIndex].logpenStyleShow.lopnStyle = pShape->RealLine[iPickRealLineIndex].logpenStyle.lopnStyle;
+		pShape->Element[iPickIndex].logpenStyleShow.lopnStyle = pShape->Element[iPickIndex].logpenStyle.lopnStyle;
+		iPickIndex = -1;
 	}
 
-	//遍历所有线
-	for (int i = 0; i < pShape->RealLine.size(); i++)
+	//遍历所有
+	for (int i = 0; i < pShape->Element.size(); i++)
 	{
-		if (PickRealLine(ptPos,pShape->RealLine[i]))//发现拾取
+		switch (pShape->Element[i].eType)
 		{
-			iPickRealLineIndex = i;
-
+		case ELEMENT_REALLINE:
+			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
+			{
+				iPickIndex = i;
+			}
+			break;
+		case ELEMENT_FRAMEPOINT:
+			if (TDraw::PointInFramePoint(pConfig->RealToScreen(pShape->Element[i].dpt), ptPos))
+			{
+				iPickIndex = i;
+			}
+			break;
+		}
+		if (iPickIndex != -1)
+		{
 			//暂存当前线型并更改
-			pShape->RealLine[iPickRealLineIndex].logpenStyleShow.lopnStyle = PS_DOT;
+			pShape->Element[iPickIndex].logpenStyleShow.lopnStyle = PS_DOT;
 
 			//通知TreeView选中
 
 			//通知ListView更新
-			pShape->RealLine[iPickRealLineIndex].NoticeListView(pListView);
+			pShape->Element[iPickIndex].NoticeListView(pListView);
 			return;
 		}
+
 	}
+
 	//没有拾得
-	iPickRealLineIndex = -1;
-
-	for (int i = 0; i < pShape->FramePoint.size(); i++)
-	{
-		if (TDraw::PointInFramePoint(pConfig->RealToScreen(pShape->FramePoint[i].dpt), ptPos))
-		{
-			iPickFramePointIndex = i;
-
-			//暂存当前线型并更改
-			pShape->FramePoint[iPickFramePointIndex].logpenStyleShow.lopnStyle = PS_DOT;
-
-			//通知TreeView选中
-
-			//通知ListView更新
-			pShape->FramePoint[iPickFramePointIndex].NoticeListView(pListView);
-			return;
-		}
-	}
-	//没有拾得
-	iPickFramePointIndex = -1;
-
-	
 
 	//通知TreeView取消选中
 
@@ -140,24 +132,25 @@ void TSelectTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 //由祖先插入WM_PAINT事件中进行绘制
 void TSelectTool::Draw(HDC hdc)
 {
-	if (iPickRealLineIndex != -1)
+	if (iPickIndex != -1)
 	{
+		switch (pShape->Element[iPickIndex].eType)
+		{
+		case ELEMENT_REALLINE:
+			//画拾取方格
+			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(pShape->Element[iPickIndex].ptBegin));
+			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(pShape->Element[iPickIndex].ptEnd));
+			//由于线型变化，且画线位于工具绘制之前，所以需要刷新一次
+			::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
+			break;
 
-		//画拾取方格
-		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(pShape->RealLine[iPickRealLineIndex].ptBegin));
-		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(pShape->RealLine[iPickRealLineIndex].ptEnd));
+		case ELEMENT_FRAMEPOINT:
+			//画拾取方格
+			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(pShape->Element[iPickIndex].dpt));
+			//由于线型变化，且画线位于工具绘制之前，所以需要刷新一次
+			::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
+			break;
+		}
 
-		//由于线型变化，且画线位于工具绘制之前，所以需要刷新一次
-		::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
-	}
-
-	if (iPickFramePointIndex != -1)
-	{
-
-		//画拾取方格
-		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(pShape->FramePoint[iPickFramePointIndex].dpt));
-
-		//由于线型变化，且画线位于工具绘制之前，所以需要刷新一次
-		::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
 	}
 }

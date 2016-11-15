@@ -12,7 +12,6 @@ public:
 	TLine *pNext = NULL;
 	TLine();
 	~TLine();
-	void TLine::SetStyle(int iStyle, int iWidth, COLORREF crColor);
 	void TLine::CalcLength();
 };
 

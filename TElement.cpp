@@ -5,12 +5,22 @@
 #include "TListView.h"
 TElement::TElement()
 {
+	eType = ELEMENT_ELEMENT;
 	_tcscpy(Name,TEXT("undefined"));
 }
 
 TElement::~TElement()
 {
 	
+}
+
+void TElement::SetStyle(int iStyle, int iWidth, COLORREF crColor)
+{
+	logpenStyle.lopnStyle = iStyle;
+	logpenStyle.lopnWidth.x = iWidth;
+	logpenStyle.lopnColor = crColor;
+
+	logpenStyleShow = logpenStyle;
 }
 
 TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[])

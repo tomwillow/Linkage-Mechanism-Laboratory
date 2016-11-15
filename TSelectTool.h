@@ -6,11 +6,11 @@ class TConfiguration;
 class TShape;
 class TCanvas;
 class TListView;
+class TElement;
 class TSelectTool:public TTool
 {
 private:
-	int iPickFramePointIndex;
-	int iPickRealLineIndex;
+	int iPickIndex;
 	TShape *pShape;
 	TListView *pListView;
 	TConfiguration *pConfig;
@@ -21,7 +21,7 @@ private:
 	void OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
-	bool TSelectTool::PickRealLine(POINT ptPos, TRealLine &RealLine);
+	bool TSelectTool::PickRealLine(POINT ptPos, TElement &RealLine);
 public:
 	TSelectTool();
 	~TSelectTool();

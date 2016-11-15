@@ -29,13 +29,31 @@ void TDraw::DrawLine(HDC hdc, TLine Line)
 	::DeleteObject(hPen);
 }
 
-void TDraw::DrawRealLine(HDC hdc, TRealLine RealLine,TConfiguration *Config)
+void TDraw::DrawElement(HDC hdc, TElement Element, TConfiguration *pConfig)
+{
+	switch (Element.eType)
+	{
+	case ELEMENT_REALLINE:
+		DrawRealLine(hdc, Element.ptBegin, Element.ptEnd, Element.logpenStyleShow, pConfig);
+		break;
+	case ELEMENT_FRAMEPOINT:
+		DrawFramePoint(hdc, Element.dpt, Element.logpenStyleShow, pConfig);
+		break;
+	}
+}
+
+void TDraw::DrawRealLine(HDC hdc,TRealLine &RealLine, TConfiguration *Config)
+{
+	DrawRealLine(hdc, RealLine.ptBegin, RealLine.ptEnd, RealLine.logpenStyleShow, Config);
+}
+
+void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin,DPOINT ptEnd,LOGPEN logpen,TConfiguration *Config)
 {
 	HPEN hPen;
 
-	hPen = ::CreatePenIndirect(&RealLine.logpenStyleShow);
+	hPen = ::CreatePenIndirect(&logpen);
 	::SelectObject(hdc, hPen);
-	DrawLine(hdc, Config->RealToScreen(RealLine.ptBegin), Config->RealToScreen(RealLine.ptEnd));
+	DrawLine(hdc, Config->RealToScreen(ptBegin), Config->RealToScreen(ptEnd));
 
 	::DeleteObject(hPen);
 }
@@ -95,16 +113,16 @@ bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt)
 }
 
 //»­»ú¼Üµã
-void TDraw::DrawFramePoint(HDC hdc, TFramePoint FramePoint, TConfiguration *Config)
+void TDraw::DrawFramePoint(HDC hdc,DPOINT dpt, LOGPEN logpen, TConfiguration *Config)
 {
 	HPEN hPen;
 	HBRUSH hBrush;
-	hPen = ::CreatePenIndirect(&FramePoint.logpenStyle);
+	hPen = ::CreatePenIndirect(&logpen);
 	hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
 	::SelectObject(hdc, hPen);
 	::SelectObject(hdc, hBrush);
 
-	POINT ptO = Config->RealToScreen(FramePoint.dpt);
+	POINT ptO = Config->RealToScreen(dpt);
 	//»­Ô²
 	::Ellipse(hdc, ptO.x - FRAMEPOINT_R, ptO.y - FRAMEPOINT_R, ptO.x + FRAMEPOINT_R, ptO.y + FRAMEPOINT_R);
 

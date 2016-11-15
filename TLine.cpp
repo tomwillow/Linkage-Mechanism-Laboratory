@@ -1,19 +1,15 @@
 #pragma once
+#include <tchar.h>
+#include <stdio.h>
+
 #include "TLine.h"
 
 TLine::TLine()
 {
 	TLine::dLength = 0;
+	_tcscpy(Name, TEXT("TLine"));
 }
 
-void TLine::SetStyle(int iStyle, int iWidth, COLORREF crColor)
-{
-	logpenStyle.lopnStyle = iStyle;
-	logpenStyle.lopnWidth.x = iWidth;
-	logpenStyle.lopnColor = crColor;
-
-	logpenStyleShow = logpenStyle;
-}
 
 
 TLine::~TLine()

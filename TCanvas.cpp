@@ -191,15 +191,15 @@ void TCanvas::OnDraw(HDC hdc)
 	TDraw::DrawAxes(hdc, Config->GetOrg().x, Config->GetOrg().y, Config->crCoordinate);
 
 	//图形绘制
-	for (unsigned int i = 0; i < win.m_Shape.RealLine.size(); i++)
+	for (unsigned int i = 0; i < win.m_Shape.Element.size(); i++)
 	{
-		TDraw::DrawRealLine(hdc, win.m_Shape.RealLine[i], Config);
+		TDraw::DrawElement(hdc, win.m_Shape.Element[i], Config);
 	}
 
-	for (unsigned int i = 0; i < win.m_Shape.FramePoint.size(); i++)
-	{
-		TDraw::DrawFramePoint(hdc, win.m_Shape.FramePoint[i], Config);
-	}
+	//for (unsigned int i = 0; i < win.m_Shape.Element.size(); i++)
+	//{
+	//	TDraw::DrawFramePoint(hdc, win.m_Shape.Element[i], Config);
+	//}
 
 	//工具类绘制
 	if (win.m_ManageTool.m_pCurrentTool!=NULL)

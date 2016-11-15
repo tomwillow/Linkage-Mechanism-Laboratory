@@ -6,18 +6,12 @@ TFramePoint::TFramePoint()
 	dpt.x = 0;
 	dpt.y = 0;
 	_tcscpy(Name, TEXT(""));
+	eType = ELEMENT_FRAMEPOINT;
 }
 
 
 TFramePoint::~TFramePoint()
 {
-}
-
-void TFramePoint::SetStyle(int iStyle, int iWidth, COLORREF crColor)
-{
-	logpenStyle.lopnStyle = iStyle;
-	logpenStyle.lopnWidth.x = iWidth;
-	logpenStyle.lopnColor = crColor;
 }
 
 void TFramePoint::NoticeListView(TListView *pListView)
