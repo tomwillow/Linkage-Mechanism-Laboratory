@@ -9,12 +9,10 @@ class TAttach;
 class TLine;
 class TRealLine;
 class TLineEdit;
-class TConfiguration;
 class TLineTool :public TTool
 {
 private:
 	TAttach *Attach;
-	TConfiguration *Config;
 	std::vector<DPOINT> dptHit;//每次的点击位置
 	TRealLine *MoveLine;//显示点的位置
 	bool bShowDimLine;

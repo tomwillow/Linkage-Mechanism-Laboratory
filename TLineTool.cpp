@@ -1,31 +1,29 @@
 #pragma once
 #include "TLineTool.h"
 
+#include "TCanvas.h"
 #include "resource.h"
 #include "TTool.h"
 #include "TLine.h"
 
 #include "TConfiguration.h"
-#include "TMainWindow.h"
 #include "TDraw.h"
 #include "TLineEdit.h"
 #include "TAttach.h"
 
-extern TMainWindow win;
 TLineTool::TLineTool() 
 {
-	Attach = new TAttach(win.Canvas.m_hWnd, &(win.m_Shape), &(win.m_Configuration));
-	Config = &(win.m_Configuration);
+	Attach = new TAttach(pCanvas->m_hWnd,pShape,pConfig);
 	bShowDimLine = false;
 	MoveLine = new TRealLine;
-	MoveLine->SetStyle(PS_SOLID, 1, Config->crPen);
+	MoveLine->SetStyle(PS_SOLID, 1, pConfig->crPen);
 
 	Line1 = new TLine;
 	Line2 = new TLine; 
 	LineDim = new TLine;
-	Line1->SetStyle(PS_DOT, 1, Config->crPen);
-	Line2->SetStyle(PS_DOT, 1, Config->crPen);
-	LineDim->SetStyle(PS_DOT, 1, Config->crPen);
+	Line1->SetStyle(PS_DOT, 1, pConfig->crPen);
+	Line2->SetStyle(PS_DOT, 1, pConfig->crPen);
+	LineDim->SetStyle(PS_DOT, 1, pConfig->crPen);
 
 	LineEdit = new TLineEdit;
 }
@@ -65,8 +63,8 @@ void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 		//计算尺寸线各点坐标
 		int dist = 40;//暂存线和尺寸线距离
 		double theta = TDraw::GetAngleFromPointReal(MoveLine->ptBegin, MoveLine->ptEnd);
-		pt1 = Config->RealToScreen(MoveLine->ptBegin);
-		pt2 = Config->RealToScreen(MoveLine->ptEnd);
+		pt1 = pConfig->RealToScreen(MoveLine->ptBegin);
+		pt2 = pConfig->RealToScreen(MoveLine->ptEnd);
 		Line1->ptBegin = pt1;
 		Line2->ptBegin = pt2;
 		if (MoveLine->ptEnd.y - MoveLine->ptBegin.y >= 0)//位于1,2象限
@@ -115,7 +113,7 @@ void TLineTool::Draw(HDC hdc)
 	//画临时线及尺寸线
 	if (dptHit.size() > 0)
 	{
-		TDraw::DrawRealLine(hdc, *MoveLine,Config);//点过一次后才开始画临时线
+		TDraw::DrawRealLine(hdc, *MoveLine,pConfig);//点过一次后才开始画临时线
 
 		if (bShowDimLine)
 		{
@@ -174,16 +172,16 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				RealLine.dLength = num;
 				break;
 			}
-			RealLine.SetStyle(Config->iStyle, Config->iWidth, Config->crPen);
+			RealLine.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 
 			//入库
-			win.m_Shape.AddRealLine(RealLine);
+			pShape->AddRealLine(RealLine);
 
 			//计算得出的终点存入暂存点集
 			dptHit.push_back(RealLine.ptEnd);
 
 			//设置临时线
-			POINT ptNew = Config->RealToScreen(RealLine.ptEnd);
+			POINT ptNew = pConfig->RealToScreen(RealLine.ptEnd);
 			InitialLine(RealLine.ptEnd);
 			Attach->InitialLine(ptNew);
 
@@ -198,15 +196,15 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	ptPos = Config->RealToScreen(MoveLine->ptEnd);
+	ptPos = pConfig->RealToScreen(MoveLine->ptEnd);
 
 	//上一点及当前点存入数据
 	if (dptHit.size() > 0)
 	{
 		TRealLine RealLine;
-		RealLine.SetStyle(Config->iStyle, Config->iWidth, Config->crPen);
+		RealLine.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 		RealLine.SetPoint(dptHit[dptHit.size() - 1], MoveLine->ptEnd);
-		win.m_Shape.AddRealLine(RealLine);
+		pShape->AddRealLine(RealLine);
 	}
 
 	//当前点存入暂存点集
@@ -219,7 +217,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	//创建LineEdit或隐藏
 	if (LineEdit->m_hWnd == NULL)
 	{
-		LineEdit->CreateEditEx(win.Canvas.m_hWnd, IDR_LineEdit, win.Canvas.m_hInst);
+		LineEdit->CreateEditEx(pCanvas->m_hWnd, IDR_LineEdit, pCanvas->m_hInst);
 		LineEdit->Load(hWnd);
 	}
 	else
@@ -230,7 +228,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 void TLineTool::InitialLine(DPOINT dptPos)
 {
-	POINT ptPos = Config->RealToScreen(dptPos);
+	POINT ptPos = pConfig->RealToScreen(dptPos);
 	MoveLine->ptBegin = dptPos;
 	MoveLine->ptEnd = dptPos;
 
@@ -254,12 +252,12 @@ void TLineTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 	//没有画线的情况下点右键则重置工具
 	if (dptHit.size()==0)
-		::PostMessage(win.m_hWnd, WM_COMMAND, ID_SELECT, 0);
+		::PostMessage(hwndWin, WM_COMMAND, ID_SELECT, 0);
 	else
 	{
 		dptHit.clear();
 
-		::InvalidateRect(win.Canvas.m_hWnd, &win.Canvas.ClientRect, false);
+		::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), false);
 
 	}
 }

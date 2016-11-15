@@ -1,21 +1,12 @@
 #pragma once
 #include "TTool.h"
 
-class TRealLine;
-class TConfiguration;
-class TShape;
-class TCanvas;
-class TListView;
 class TElement;
 class TSelectTool:public TTool
 {
 private:
 	int iPickIndex;
 	int iHoverIndex;
-	TShape *pShape;
-	TListView *pListView;
-	TConfiguration *pConfig;
-	TCanvas *pCanvas;
 	void TSelectTool::Draw(HDC hdc);
 	void OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos);

@@ -1,17 +1,15 @@
 #pragma once
 #include "TSelectTool.h"
 
+#include "TCanvas.h"
+#include "TShape.h"
+#include "TListView.h"
+
 #include "TDraw.h"
-#include "TMainWindow.h"
 #include "TConfiguration.h"
 
-extern TMainWindow win;
 TSelectTool::TSelectTool()
 {
-	pShape = &(win.m_Shape);
-	pConfig = &(win.m_Configuration);
-	pCanvas = &(win.Canvas);
-	pListView = &(win.RightWindow.ListView);
 	iPickIndex = -1;
 	iHoverIndex = -1;
 }

@@ -4,6 +4,7 @@
 #include "resource.h"
 
 #include "TSelectTool.h"
+#include "TBarTool.h"
 #include "TLineTool.h"
 #include "TFramePointTool.h"
 
@@ -37,7 +38,7 @@ void TManageTool::SetCurActiveTool(UINT id)
 		m_pCurrentTool = new TFramePointTool;
 		break;
 	case ID_DRAW_BAR:
-		//m_pCurrentTool = new TFramePointTool;
+		m_pCurrentTool = new TBarTool;
 		break;
 	case ID_DRAW_LINE:
 		m_pCurrentTool = new TLineTool;

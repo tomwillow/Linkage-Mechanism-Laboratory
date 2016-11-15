@@ -141,6 +141,9 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_SELECT:
 		p_Managetool->SetCurActiveTool(ID_SELECT);
 		break;
+	case ID_DRAW_BAR:
+		p_Managetool->SetCurActiveTool(ID_DRAW_BAR);
+		break;
 	case ID_DRAW_FRAME:
 		p_Managetool->SetCurActiveTool(ID_DRAW_FRAME);
 		break;
