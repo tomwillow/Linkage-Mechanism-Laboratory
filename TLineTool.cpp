@@ -6,8 +6,6 @@ TLineTool::TLineTool()
 {
 	Attach = new TAttach(win.Canvas.m_hWnd, &(win.m_Shape), &(win.m_Configuration));
 	Config = &(win.m_Configuration);
-	m_uiHit = 0;
-	m_pptHit = NULL;
 	bShowDimLine = false;
 	MoveLine = new TRealLine;
 	MoveLine->SetStyle(PS_SOLID, 1, Config->crPen);
@@ -46,7 +44,7 @@ void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	Attach->AttachAll(ptPos,MoveLine->ptBegin);
 	MoveLine->ptEnd = Attach->dptAttach;
 
-	if (m_uiHit > 0)
+	if (dptHit.size() > 0)
 	{
 		//计算暂存线长度并存入Edit
 		MoveLine->CalcLength();
@@ -105,7 +103,7 @@ void TLineTool::Draw(HDC hdc)
 	Attach->Draw(hdc);
 
 	//画临时线及尺寸线
-	if (m_uiHit > 0)
+	if (dptHit.size() > 0)
 	{
 		TDraw::DrawRealLine(hdc, *MoveLine,Config);//点过一次后才开始画临时线
 
@@ -139,7 +137,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			num = TTransfer::TCHAR2double(buffer);
 
 			TRealLine RealLine;
-			RealLine.ptBegin = m_pptHit[m_uiHit - 1];
+			RealLine.ptBegin = dptHit[dptHit.size() - 1];
 
 			//计算得到终点坐标
 			switch (Attach->GetiIvoryLine())
@@ -172,9 +170,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			win.m_Shape.AddRealLine(RealLine);
 
 			//计算得出的终点存入暂存点集
-			m_uiHit++;
-			m_pptHit = (DPOINT *)realloc(m_pptHit, m_uiHit*sizeof(DPOINT));
-			m_pptHit[m_uiHit - 1] = RealLine.ptEnd;
+			dptHit.push_back(RealLine.ptEnd);
 
 			//设置临时线
 			POINT ptNew = Config->RealToScreen(RealLine.ptEnd);
@@ -195,18 +191,16 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	ptPos = Config->RealToScreen(MoveLine->ptEnd);
 
 	//上一点及当前点存入数据
-	if (m_uiHit > 0)
+	if (dptHit.size() > 0)
 	{
 		TRealLine RealLine;
 		RealLine.SetStyle(Config->iStyle, Config->iWidth, Config->crPen);
-		RealLine.SetPoint(m_pptHit[m_uiHit - 1], MoveLine->ptEnd);
+		RealLine.SetPoint(dptHit[dptHit.size() - 1], MoveLine->ptEnd);
 		win.m_Shape.AddRealLine(RealLine);
 	}
 
 	//当前点存入暂存点集
-	m_uiHit++;
-	m_pptHit = (DPOINT *)realloc(m_pptHit, m_uiHit*sizeof(DPOINT));
-	m_pptHit[m_uiHit - 1] = MoveLine->ptEnd;
+	dptHit.push_back(MoveLine->ptEnd);
 
 	//设置临时线
 	InitialLine(MoveLine->ptEnd);
@@ -245,17 +239,19 @@ void TLineTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	if (LineEdit->m_hWnd != NULL)
 		LineEdit->SetVisible(false);
 
-	free(m_pptHit);
-	m_pptHit = NULL;
-
 	bShowDimLine = false;
 
-	::InvalidateRect(win.Canvas.m_hWnd, &win.Canvas.ClientRect, false);
 
 	//没有画线的情况下点右键则重置工具
-	if (m_uiHit==0)
+	if (dptHit.size()==0)
 		::PostMessage(win.m_hWnd, WM_COMMAND, ID_SELECT, 0);
-	m_uiHit = 0;
+	else
+	{
+		dptHit.clear();
+
+		::InvalidateRect(win.Canvas.m_hWnd, &win.Canvas.ClientRect, false);
+
+	}
 }
 
 void TLineTool::OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos)

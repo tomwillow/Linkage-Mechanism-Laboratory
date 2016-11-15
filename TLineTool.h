@@ -15,8 +15,7 @@ class TLineTool :public TTool
 private:
 	TAttach *Attach;
 	TConfiguration *Config;
-	UINT m_uiHit;//点击数
-	DPOINT *m_pptHit;//每次的点击位置
+	std::vector<DPOINT> dptHit;//每次的点击位置
 	TRealLine *MoveLine;//显示点的位置
 	bool bShowDimLine;
 	POINT pt1, pt2;
