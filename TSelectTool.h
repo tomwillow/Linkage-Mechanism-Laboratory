@@ -9,6 +9,7 @@ class TListView;
 class TSelectTool:public TTool
 {
 private:
+	int iPickFramePointIndex;
 	int iPickRealLineIndex;
 	TShape *pShape;
 	TListView *pListView;

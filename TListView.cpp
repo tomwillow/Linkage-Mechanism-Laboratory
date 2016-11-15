@@ -106,7 +106,7 @@ int TListView::GetItemCount()
 	return ListView_GetItemCount(m_hWnd);
 }
 
-void CDECL TListView::AddAttributeItem(TCHAR szName[], TCHAR szEditFormat[],...)
+void CDECL TListView::AddAttributeItem(const TCHAR szName[], const TCHAR szEditFormat[],...)
 {
 	InsertItem(iRowCount, 0, szName);
 	//tempEdit = new TEdit;
@@ -167,7 +167,7 @@ void TListView::AddColumn(TCHAR text[], int width, int styleLVCFMT)
 	InsertColumn(iColumnCount, text, width, styleLVCFMT);
 }
 
-void CDECL TListView::InsertItem(int index, int subitem, TCHAR szFormat[], ...)
+void CDECL TListView::InsertItem(int index, int subitem,const TCHAR szFormat[], ...)
 {
 	TCHAR szBuffer[1024];
 	va_list pArgList;

@@ -12,6 +12,7 @@ TSelectTool::TSelectTool()
 	pCanvas = &(win.Canvas);
 	pListView = &(win.RightWindow.ListView);
 	iPickRealLineIndex = -1;
+	iPickFramePointIndex = -1;
 }
 
 //由TTool的虚析构函数重载
@@ -39,7 +40,15 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		{
 			pShape->DeleteRealLine(iPickRealLineIndex);
 			iPickRealLineIndex = -1;
+			//通知TreeView取消选中
+
+			//通知ListView更新
+			pListView->DeleteAllItems();
 		}
+		//if (iPickFramePointIndex != -1)
+		//{
+		//	pShape->DeleteFramePoint
+		//}
 		return;
 	}
 }
@@ -93,16 +102,29 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			return;
 		}
 	}
+	//没有拾得
+	iPickRealLineIndex = -1;
 
 	for (int i = 0; i < pShape->FramePoint.size(); i++)
 	{
 		if (TDraw::PointInFramePoint(pConfig->RealToScreen(pShape->FramePoint[i].dpt), ptPos))
 		{
+			iPickFramePointIndex = i;
+
+			//暂存当前线型并更改
+			pShape->FramePoint[iPickFramePointIndex].logpenStyleShow.lopnStyle = PS_DOT;
+
+			//通知TreeView选中
+
+			//通知ListView更新
+			pShape->FramePoint[iPickFramePointIndex].NoticeListView(pListView);
+			return;
 		}
 	}
-
 	//没有拾得
-	iPickRealLineIndex = -1;
+	iPickFramePointIndex = -1;
+
+	
 
 	//通知TreeView取消选中
 
@@ -124,6 +146,16 @@ void TSelectTool::Draw(HDC hdc)
 		//画拾取方格
 		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(pShape->RealLine[iPickRealLineIndex].ptBegin));
 		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(pShape->RealLine[iPickRealLineIndex].ptEnd));
+
+		//由于线型变化，且画线位于工具绘制之前，所以需要刷新一次
+		::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
+	}
+
+	if (iPickFramePointIndex != -1)
+	{
+
+		//画拾取方格
+		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(pShape->FramePoint[iPickFramePointIndex].dpt));
 
 		//由于线型变化，且画线位于工具绘制之前，所以需要刷新一次
 		::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);

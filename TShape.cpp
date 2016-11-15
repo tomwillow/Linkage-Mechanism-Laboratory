@@ -15,24 +15,25 @@ void TShape::AddElement(TElement element)
 	Element.push_back(element);
 }
 
-void TShape::DeleteElement(int index)
+//void TShape::DeleteElement(int index)
+//{
+//	std::vector<TElement>::iterator iter = Element.begin() + index;
+//	Element.erase(iter);
+//}
+
+void TShape::AddRealLine(TRealLine realline)
 {
-	std::vector<TElement>::iterator iter = Element.begin() + index;
-	Element.erase(iter);
+	RealLine.push_back(realline);
+	Element.push_back(realline);
 }
 
-//void TShape::AddRealLine(TRealLine realline)
-//{
-//	RealLine.push_back(realline);
-//}
-//
-//void TShape::AddFramePoint(TFramePoint fp)
-//{
-//	FramePoint.push_back(fp);
-//}
-//
-//void TShape::DeleteRealLine(int index)
-//{
-//	std::vector<TRealLine>::iterator iter=RealLine.begin()+index;
-//	RealLine.erase(iter);
-//}
+void TShape::AddFramePoint(TFramePoint fp)
+{
+	FramePoint.push_back(fp);
+}
+
+void TShape::DeleteRealLine(int index)
+{
+	std::vector<TRealLine>::iterator iter=RealLine.begin()+index;
+	RealLine.erase(iter);
+}

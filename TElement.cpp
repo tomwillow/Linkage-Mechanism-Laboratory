@@ -1,13 +1,16 @@
+#include <stdio.h>
+
 #include "TElement.h"
 
 #include "TListView.h"
 TElement::TElement()
 {
+	_tcscpy(Name,TEXT("undefined"));
 }
-
 
 TElement::~TElement()
 {
+	
 }
 
 TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[])

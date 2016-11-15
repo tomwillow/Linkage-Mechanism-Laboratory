@@ -42,28 +42,43 @@ void TDraw::DrawRealLine(HDC hdc, TRealLine RealLine,TConfiguration *Config)
 
 bool TDraw::PointInRgn(POINT *ptRgn,int RgnCount, POINT pt)
 {
-	double sum=0,angle,p1, p2;
-	for (int i = 0; i < RgnCount-1; i++)
+	//double sum=0,angle,p1, p2;
+	//double angledeg = 0;
+	//for (int i = 0; i < RgnCount-1; i++)
+	//{
+	//	p1 = GetAngleFromPointScreen(pt, ptRgn[i]);
+	//	p2 = GetAngleFromPointScreen(pt, ptRgn[i + 1]);
+	//	angle = p2 - p1;
+	//	if (angle > M_PI) angle = 2 * M_PI - angle;
+	//	if (angle < -M_PI) angle = 2 * M_PI + angle;
+	//	angledeg = angle / M_PI * 180;
+	//	sum += angle;
+	//}
+	//p1 = GetAngleFromPointScreen(pt, ptRgn[RgnCount - 1]);
+	//p2 = GetAngleFromPointScreen(pt, ptRgn[0]);
+	//angle = p2 - p1;
+	//if (angle > M_PI) angle = 2 * M_PI - angle;
+	//if (angle < -M_PI) angle = 2 * M_PI + angle;
+	//sum += angle;
+
+	//if (abs(sum) < 0.001)//sum==0
+	//	return false;//在多边形外
+	//else
+	//	return true;
+	int   i, j = RgnCount - 1;
+	bool  oddNodes = false;
+
+	for (i = 0; i<RgnCount; i++) 
 	{
-		p1 = GetAngleFromPointScreen(pt, ptRgn[i]);
-		p2 = GetAngleFromPointScreen(pt, ptRgn[i + 1]);
-		angle = p2 - p1;
-		if (angle > M_PI) angle = 2 * M_PI - angle;
-		if (angle < -M_PI) angle = 2 * M_PI + angle;
-		sum += angle;
+		if ((ptRgn[i].y< pt.y && ptRgn[j].y >= pt.y
+			|| ptRgn[j].y<pt.y && ptRgn[i].y >= pt.y)
+			&& (ptRgn[i].x <= pt.x || ptRgn[j].x <= pt.x)) 
+		{
+			oddNodes ^= (ptRgn[i].x + (pt.y - ptRgn[i].y) / (ptRgn[j].y - ptRgn[i].y)*(ptRgn[j].x - ptRgn[i].x)<pt.x);
+		}
+		j = i;
 	}
-	p1 = GetAngleFromPointScreen(pt, ptRgn[RgnCount - 1]);
-	p2 = GetAngleFromPointScreen(pt, ptRgn[0]);
-	angle = p2 - p1;
-	if (angle > M_PI) angle = 2 * M_PI - angle;
-	if (angle < -M_PI) angle = 2 * M_PI + angle;
-	sum += angle;
-
-	if (abs(sum) < 0.001)//sum==0
-		return false;//在多边形外
-	else
-		return true;
-
+	return oddNodes;
 }
 
 bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt)
@@ -71,10 +86,11 @@ bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt)
 	POINT FramePointRgn[6];
 	FramePointRgn[0] = { ptFramePoint.x - FRAMEPOINT_R, ptFramePoint.y - FRAMEPOINT_R };
 	FramePointRgn[1] = { ptFramePoint.x + FRAMEPOINT_R, ptFramePoint.y - FRAMEPOINT_R };
-	FramePointRgn[2] = { ptFramePoint.x-FRAMEPOINT_B/2, ptFramePoint.y+FRAMEPOINT_H };
-	FramePointRgn[3] = { ptFramePoint.x + FRAMEPOINT_B / 2, ptFramePoint.y + FRAMEPOINT_H };
+	FramePointRgn[5] = { ptFramePoint.x-FRAMEPOINT_B/2, ptFramePoint.y+FRAMEPOINT_H };
+	FramePointRgn[2] = { ptFramePoint.x + FRAMEPOINT_B / 2, ptFramePoint.y + FRAMEPOINT_H };
 	FramePointRgn[4] = { ptFramePoint.x - FRAMEPOINT_B / 2, ptFramePoint.y+FRAMEPOINT_H+FRAMEPOINT_SECTION_H };
-	FramePointRgn[5] = { ptFramePoint.x + FRAMEPOINT_B / 2, ptFramePoint.y + FRAMEPOINT_H + FRAMEPOINT_SECTION_H };
+	FramePointRgn[3] = { ptFramePoint.x + FRAMEPOINT_B / 2, ptFramePoint.y + FRAMEPOINT_H + FRAMEPOINT_SECTION_H };
+	
 	return PointInRgn(FramePointRgn, 6, pt);
 }
 

@@ -11,5 +11,6 @@ public:
 	DPOINT dpt;
 	LOGPEN logpenStyle;
 	void TFramePoint::SetStyle(int iStyle, int iWidth, COLORREF crColor);
+	void TFramePoint::NoticeListView(TListView *pListView);
 };
 

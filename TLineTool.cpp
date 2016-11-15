@@ -201,6 +201,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		RealLine.SetStyle(Config->iStyle, Config->iWidth, Config->crPen);
 		RealLine.SetPoint(m_pptHit[m_uiHit - 1], MoveLine->ptEnd);
 		win.m_Shape.AddRealLine(RealLine);
+		win.m_Shape.AddElement(RealLine);
 	}
 
 	//当前点存入暂存点集

@@ -10,14 +10,14 @@ class TShape
 {
 public:
 	std::vector<TElement> Element;
-	//std::vector<TRealLine> RealLine;
-	//std::vector<TFramePoint> FramePoint;
+	std::vector<TRealLine> RealLine;
+	std::vector<TFramePoint> FramePoint;
 	TShape();
 	~TShape();
 	void TShape::AddElement(TElement element);
-	void TShape::DeleteElement(int index);
-	//void TShape::DeleteRealLine(int index);
-	//void TShape::AddRealLine(TRealLine realline);
-	//void TShape::AddFramePoint(TFramePoint fp);
+	//void TShape::DeleteElement(int index);
+	void TShape::DeleteRealLine(int index);
+	void TShape::AddRealLine(TRealLine realline);
+	void TShape::AddFramePoint(TFramePoint fp);
 };
 
