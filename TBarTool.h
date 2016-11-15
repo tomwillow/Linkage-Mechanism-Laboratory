@@ -1,5 +1,7 @@
 #pragma once
-class TBarTool
+#include "TLineTool.h"
+
+class TBarTool:public TLineTool
 {
 public:
 	TBarTool();

@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "resource.h"
 #include "TTool.h"
 #include "TLine.h"
@@ -21,10 +22,7 @@ private:
 	POINT pt1, pt2;
 	TLine *Line1, *Line2, *LineDim;
 
-public:
 	TLineEdit *LineEdit;
-	TLineTool();
-	~TLineTool();
 	void OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos);
@@ -33,5 +31,8 @@ public:
 	void OnMouseWheel(HWND hWnd, UINT nFlags, POINT ptPos);
 	void TLineTool::InitialLine(DPOINT dptPos);
 	void Draw(HDC hdc);
+public:
+	TLineTool();
+	~TLineTool();
 };
 

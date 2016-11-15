@@ -29,15 +29,15 @@ void TDraw::DrawLine(HDC hdc, TLine Line)
 	::DeleteObject(hPen);
 }
 
-void TDraw::DrawElement(HDC hdc, TElement Element, TConfiguration *pConfig)
+void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
 {
-	switch (Element.eType)
+	switch (Element->eType)
 	{
 	case ELEMENT_REALLINE:
-		DrawRealLine(hdc, Element.ptBegin, Element.ptEnd, Element.logpenStyleShow, pConfig);
+		DrawRealLine(hdc, ((TRealLine *)Element)->ptBegin, ((TRealLine *)Element)->ptEnd, ((TRealLine *)Element)->logpenStyleShow, pConfig);
 		break;
 	case ELEMENT_FRAMEPOINT:
-		DrawFramePoint(hdc, Element.dpt, Element.logpenStyleShow, pConfig);
+		DrawFramePoint(hdc, ((TFramePoint *)Element)->dpt, ((TFramePoint *)Element)->logpenStyleShow, pConfig);
 		break;
 	}
 }

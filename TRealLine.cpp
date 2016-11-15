@@ -1,3 +1,4 @@
+#pragma once
 #include "TRealLine.h"
 
 #include "TListView.h"

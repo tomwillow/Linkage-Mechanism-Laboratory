@@ -1,3 +1,4 @@
+#pragma once
 #include "TToolbar.h"
 
 TToolbar::TToolbar()

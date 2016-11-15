@@ -11,6 +11,7 @@ class TSelectTool:public TTool
 {
 private:
 	int iPickIndex;
+	int iHoverIndex;
 	TShape *pShape;
 	TListView *pListView;
 	TConfiguration *pConfig;
@@ -21,7 +22,8 @@ private:
 	void OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
-	bool TSelectTool::PickRealLine(POINT ptPos, TElement &RealLine);
+	bool TSelectTool::PickRealLine(POINT ptPos, TElement *Element);
+	void TSelectTool::CancelTreeViewAndListView();
 public:
 	TSelectTool();
 	~TSelectTool();

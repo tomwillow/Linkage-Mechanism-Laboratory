@@ -3,7 +3,7 @@
 
 #include "DPOINT.h"
 
-enum EnumElementType{ELEMENT_ELEMENT,ELEMENT_REALLINE,ELEMENT_FRAMEPOINT};
+enum EnumElementType{ELEMENT_ELEMENT,ELEMENT_REALLINE,ELEMENT_FRAMEPOINT,ELEMENT_BAR};
 
 class TListView;
 class TElement
@@ -13,8 +13,8 @@ public:
 	TCHAR Name[64];
 	LOGPEN logpenStyleShow, logpenStyle;
 
-	DPOINT dpt;
-	DPOINT ptBegin, ptEnd;
+	//DPOINT dpt;
+	//DPOINT ptBegin, ptEnd;
 	TElement();
 	~TElement();
 	void TElement::SetStyle(int iStyle, int iWidth, COLORREF crColor);

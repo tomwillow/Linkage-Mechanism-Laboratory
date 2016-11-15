@@ -1,3 +1,4 @@
+#pragma once
 #include "TRightWindow.h"
 #include <CommCtrl.h>
 #include <tchar.h>

@@ -1,3 +1,4 @@
+#pragma once
 #include "TAttach.h"
 
 
@@ -151,35 +152,40 @@ void TAttach::AttachPoint(DPOINT dptPos)
 	bAttachPoint = false;
 	for (int i = 0; i < Shape->Element.size(); i++)
 	{
-		switch (Shape->Element[i].eType)
+		switch (Shape->Element[i]->eType)
 		{
 		case ELEMENT_REALLINE:
+		{
+			TRealLine *pRealLine = (TRealLine *)(Shape->Element[i]);
 			//Îü¸½Æðµã
-			if (DPTisApproached(dptPos, Shape->Element[i].ptBegin, 10))
+			if (DPTisApproached(dptPos, pRealLine->ptBegin, 10))
 			{
 				bAttachPoint = true;
-				dptAttach = Shape->Element[i].ptBegin;
+				dptAttach = pRealLine->ptBegin;
 				return;
 			}
 
 			//Îü¸½ÖÕµã
-			if (DPTisApproached(dptPos, Shape->Element[i].ptEnd, 10))
+			if (DPTisApproached(dptPos, pRealLine->ptEnd, 10))
 			{
 				bAttachPoint = true;
-				dptAttach = Shape->Element[i].ptEnd;
+				dptAttach = pRealLine->ptEnd;
 				return;
 			}
 			break;
-
+		}
 		case ELEMENT_FRAMEPOINT:
+		{
+			TFramePoint *pFramePoint = (TFramePoint *)(Shape->Element[i]);
 			//Îü¸½»ú¼Üµã
-			if (DPTisApproached(dptPos, Shape->Element[i].dpt, 10))
+			if (DPTisApproached(dptPos, pFramePoint->dpt, 10))
 			{
 				bAttachPoint = true;
-				dptAttach = Shape->Element[i].dpt;
+				dptAttach = pFramePoint->dpt;
 				return;
 			}
 			break;
+		}
 		}
 	}
 }
