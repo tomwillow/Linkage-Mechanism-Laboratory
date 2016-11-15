@@ -1,15 +1,15 @@
 #pragma once
+#include <Windows.h>
 #include <vector>
-#include "resource.h"
+
 #include "TTool.h"
-#include "TLine.h"
+#include "DPOINT.h"
 
-#include "TConfiguration.h"
-#include "TMainWindow.h"
-#include "TDraw.h"
-#include "TLineEdit.h"
-#include "TAttach.h"
-
+class TAttach;
+class TLine;
+class TRealLine;
+class TLineEdit;
+class TConfiguration;
 class TLineTool :public TTool
 {
 private:

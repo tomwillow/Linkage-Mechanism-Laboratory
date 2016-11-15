@@ -1,6 +1,16 @@
 #pragma once
 #include "TLineTool.h"
 
+#include "resource.h"
+#include "TTool.h"
+#include "TLine.h"
+
+#include "TConfiguration.h"
+#include "TMainWindow.h"
+#include "TDraw.h"
+#include "TLineEdit.h"
+#include "TAttach.h"
+
 extern TMainWindow win;
 TLineTool::TLineTool() 
 {
