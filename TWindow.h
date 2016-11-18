@@ -19,13 +19,13 @@ protected:
 	virtual void OnMButtonUp(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
 	virtual void OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
 	virtual void OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
+	virtual void OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){ }
 	virtual void OnSetCursor(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		//WM_SETCURSOR事件捕捉后，系统将不处理光标变化。程序若不自行设置，光标将变成“忙”光标。
 		DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 	virtual void OnSize(WPARAM wParam, LPARAM lParam){	}
-	virtual void OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){ }
     
 	virtual LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -78,7 +78,7 @@ public:
 	bool RegisterClass(LPCTSTR lpszClass, HINSTANCE hInst);
 
 	virtual WPARAM MessageLoop(void);
-	void SetAccel(HACCEL hAccel);
+	void SetAccel(UINT id);
 	void SetDoubleBuffer(bool bDoubleBuffer);
 	void CDECL TWindow::SetText(TCHAR szFormat[], ...);
 	BOOL ShowWindow(int nCmdShow) const

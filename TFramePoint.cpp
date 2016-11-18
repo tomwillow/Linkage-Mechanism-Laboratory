@@ -21,6 +21,7 @@ void TFramePoint::NoticeListView(TListView *pListView)
 
 	TCHAR buffer[16];
 
+	pListView->AddAttributeItem(TEXT("ID"), TEXT("%d"), id);
 	pListView->AddAttributeItem(TEXT("名称"), Name);
 	pListView->AddAttributeItem(TEXT("类型"), TEXT("机架"));
 	pListView->AddAttributeItem(TEXT("线型"), GetLineStyleName(this->logpenStyle.lopnStyle, buffer));

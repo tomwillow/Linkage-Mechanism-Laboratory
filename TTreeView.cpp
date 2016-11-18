@@ -16,11 +16,9 @@ void TTreeView::CreateTreeViewEx(HWND hParent, UINT id, HINSTANCE hInst)//创建Tr
 {
 
 	// Create the Treeview control
-	//RECT rc;
-	//GetClientRect(hWnd, &rc);
 	m_hInst = hInst;
 	m_hWnd = CreateWindowEx(0, WC_TREEVIEW, 0,
-		TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS | WS_CHILD | WS_VISIBLE,
+		TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS | WS_CHILD | WS_VISIBLE |TVS_SHOWSELALWAYS,
 		0,0,0,0,
 		hParent, (HMENU)id, hInst, 0);
 
@@ -58,30 +56,31 @@ void TTreeView::CreateTreeViewEx(HWND hParent, UINT id, HINSTANCE hInst)//创建Tr
 
 	// Attach image lists to tree view common control
 	TreeView_SetImageList(m_hWnd, hImages, TVSIL_NORMAL);
+}
 
-
+void TTreeView::Initial()
+{
 	/////////////////////////////////////////////////////////////////////////
 	// Add items to the tree view common control.
 	// 
 
 	// Insert the first item at root level
-	HTREEITEM hPrev = InsertTreeviewItem(m_hWnd, TEXT("First"), TVI_ROOT);
+	HTREEITEM hPrev = InsertTreeviewItem(TEXT("First"), TVI_ROOT);
 
 	// Sub item of first item
-	hPrev = InsertTreeviewItem(m_hWnd, TEXT("Level01"), hPrev);
+	hPrev = InsertTreeviewItem(TEXT("Level01"), hPrev);
 
 	// Sub item of 'level01' item
-	hPrev = InsertTreeviewItem(m_hWnd, TEXT("Level02"), hPrev);
+	hPrev = InsertTreeviewItem(TEXT("Level02"), hPrev);
 
 	// Insert the second item at root level
-	hPrev = InsertTreeviewItem(m_hWnd, TEXT("Second"), TVI_ROOT);
+	hPrev = InsertTreeviewItem(TEXT("Second"), TVI_ROOT);
 
 	// Insert the third item at root level
-	hPrev = InsertTreeviewItem(m_hWnd, TEXT("Third"), TVI_ROOT);
-
+	hPrev = InsertTreeviewItem(TEXT("Third"), TVI_ROOT);
 }
 
-HTREEITEM TTreeView::InsertTreeviewItem(const HWND hTreeview, const LPTSTR pszText, HTREEITEM htiParent)
+HTREEITEM TTreeView::InsertTreeviewItem(const LPTSTR pszText, HTREEITEM htiParent)
 {
 	TVITEM tvi = { 0 };
 	tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
@@ -95,5 +94,5 @@ HTREEITEM TTreeView::InsertTreeviewItem(const HWND hTreeview, const LPTSTR pszTe
 	tvis.hInsertAfter = 0;
 	tvis.hParent = htiParent;
 
-	return (HTREEITEM)SendMessage(hTreeview, TVM_INSERTITEM, 0, (LPARAM)&tvis);
+	return (HTREEITEM)SendMessage(m_hWnd, TVM_INSERTITEM, 0, (LPARAM)&tvis);
 }

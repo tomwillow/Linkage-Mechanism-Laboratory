@@ -130,10 +130,22 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	TManageTool *p_Managetool = &m_ManageTool;
 	switch (wmId)
 	{
-	case ID_ACCELERATOR_NEW:
 	case ID_NEW:
-		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);
+		m_ManageTool.CloseCurTool();
+		m_Shape.ReleaseAll();
+		RightWindow.TreeViewContent.DeleteAllItems();
+		RightWindow.ListView.DeleteAllItems();
 
+		RightWindow.TreeViewContent.Initial();
+		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);
+		m_ManageTool.SetCurActiveTool(ID_SELECT);
+		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
+		break;
+	case ID_OPEN:
+		break;
+	case ID_SAVE:
+		break;
+	case ID_SAVEAS:
 		break;
 	case ID_EXIT:
 		PostMessage(m_hWnd, WM_CLOSE, 0, 0);
@@ -185,8 +197,13 @@ void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 
 		//记录下坐标原点相对比例，Canvas变动后再按比例恢复坐标位置
 		DPOINT OrgProportion;
-		OrgProportion.x = (double)m_Configuration.GetOrg().x / (double)Canvas.ClientRect.right;
-		OrgProportion.y = (double)m_Configuration.GetOrg().y / (double)Canvas.ClientRect.bottom;
+		if (Canvas.ClientRect.right != 0 && Canvas.ClientRect.bottom != 0)
+		{
+			OrgProportion.x = (double)m_Configuration.GetOrg().x / (double)Canvas.ClientRect.right;
+			OrgProportion.y = (double)m_Configuration.GetOrg().y / (double)Canvas.ClientRect.bottom;
+		}
+		else
+			OrgProportion = { 1.0, 1.0 };
 
 	SetCanvasPos();
 

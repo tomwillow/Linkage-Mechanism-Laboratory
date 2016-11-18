@@ -1,15 +1,16 @@
 #pragma once
+#include "Resource.h"
 #include "TFramePointTool.h"
+#include "TCanvas.h"
 
-#include "TMainWindow.h"
+#include "TTreeViewContent.h"
+#include "TConstraintCoincide.h"
 
-extern TMainWindow win;
 TFramePointTool::TFramePointTool()
 {
-	Attach = new TAttach(win.Canvas.m_hWnd, &(win.m_Shape), &(win.m_Configuration));
-	Config = &(win.m_Configuration);
+	Attach = new TAttach(pCanvas->m_hWnd, pShape, pConfig);
 
-	tempFramePoint.SetStyle(PS_SOLID, 1, Config->crPen);
+	tempFramePoint.SetStyle(PS_SOLID, 1, pConfig->crPen);
 }
 
 
@@ -28,12 +29,30 @@ void TFramePointTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	tempFramePoint.dpt = Attach->dptAttach;
-	win.m_Shape.AddFramePoint(tempFramePoint);
+
+	pTreeViewContent->AddItem(&tempFramePoint, pShape->iNextId);
+	pShape->AddFramePoint(tempFramePoint); 
+
+	if (Attach->iAttachElementId != -1)
+	{
+		TConstraintCoincide coincide;
+		coincide.eElementType1 = Attach->eAttachElementType;
+		coincide.ElementId1 = Attach->iAttachElementId;
+		coincide.Element1PointIndex = Attach->iAttachElementPointIndex;
+
+		coincide.eElementType2 = ELEMENT_FRAMEPOINT;
+		coincide.ElementId2 = pShape->iNextId-1;
+		coincide.Element2PointIndex = 1;
+
+		pTreeViewContent->AddItem(&coincide, pShape->iNextId);
+		pShape->AddCoincide(coincide);
+	}
+
 }
 
 void TFramePointTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	::PostMessage(win.m_hWnd, WM_COMMAND, ID_SELECT, 0);
+	::PostMessage(hwndWin, WM_COMMAND, ID_SELECT, 0);
 }
 
 //插入WM_PAINT事件中进行绘制

@@ -15,6 +15,7 @@ public:
 	TTreeView();
 	~TTreeView();
 	void TTreeView::CreateTreeViewEx(HWND hParent, UINT id, HINSTANCE hInst);//´´½¨TreeView
-	HTREEITEM TTreeView::InsertTreeviewItem(const HWND hTreeview, const LPTSTR pszText, HTREEITEM htiParent);
+	HTREEITEM TTreeView::InsertTreeviewItem(const LPTSTR pszText, HTREEITEM htiParent);
+	virtual void TTreeView::Initial();
 };
 

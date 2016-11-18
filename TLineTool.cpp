@@ -5,27 +5,35 @@
 #include "resource.h"
 #include "TTool.h"
 #include "TLine.h"
+#include "TTreeViewContent.h"
 
 #include "TConfiguration.h"
 #include "TDraw.h"
 #include "TLineEdit.h"
 #include "TAttach.h"
+#include "TConstraintCoincide.h"
 
-TLineTool::TLineTool() 
+TLineTool::TLineTool()
 {
-	Attach = new TAttach(pCanvas->m_hWnd,pShape,pConfig);
+	Attach = new TAttach(pCanvas->m_hWnd, pShape, pConfig);
 	bShowDimLine = false;
 	MoveLine = new TRealLine;
 	MoveLine->SetStyle(PS_SOLID, 1, pConfig->crPen);
 
 	Line1 = new TLine;
-	Line2 = new TLine; 
+	Line2 = new TLine;
 	LineDim = new TLine;
 	Line1->SetStyle(PS_DOT, 1, pConfig->crPen);
 	Line2->SetStyle(PS_DOT, 1, pConfig->crPen);
 	LineDim->SetStyle(PS_DOT, 1, pConfig->crPen);
 
 	LineEdit = new TLineEdit;
+
+	CoincideBegin = NULL;
+
+	myElementType = ELEMENT_REALLINE;
+
+	iPrevLineId = -1;
 }
 
 
@@ -40,16 +48,19 @@ TLineTool::~TLineTool()
 	delete Line1;
 	delete Line2;
 	delete LineDim;
+
+	if (CoincideBegin != NULL)
+		delete CoincideBegin;
 }
 
 void TLineTool::OnMouseWheel(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	OnMouseMove(hWnd, nFlags, ptPos);
 }
- 
+
 void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	Attach->AttachAll(ptPos,MoveLine->ptBegin);
+	Attach->AttachAll(ptPos, MoveLine->ptBegin);
 	MoveLine->ptEnd = Attach->dptAttach;
 
 	if (dptHit.size() > 0)
@@ -113,7 +124,7 @@ void TLineTool::Draw(HDC hdc)
 	//画临时线及尺寸线
 	if (dptHit.size() > 0)
 	{
-		TDraw::DrawRealLine(hdc, *MoveLine,pConfig);//点过一次后才开始画临时线
+		TDraw::DrawRealLine(hdc, *MoveLine, pConfig);//点过一次后才开始画临时线
 
 		if (bShowDimLine)
 		{
@@ -124,6 +135,8 @@ void TLineTool::Draw(HDC hdc)
 
 	}
 }
+
+
 
 void TLineTool::AddIntoShape(TRealLine &RealLine)
 {
@@ -149,52 +162,69 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			LineEdit->GetText(buffer);
 			num = TTransfer::TCHAR2double(buffer);
 
-			TRealLine RealLine;
-			RealLine.ptBegin = dptHit[dptHit.size() - 1];
-
-			//计算得到终点坐标
-			switch (Attach->GetiIvoryLine())
+			if (abs(num) > 1e-6)
 			{
-			case 0:
-				double angle;
-				angle=TDraw::GetAngleFromPointReal(RealLine.ptBegin, MoveLine->ptEnd);
-				RealLine.SetPoint(RealLine.ptBegin, num, angle);
-				break;
-			case 1:
-				RealLine.ptEnd = { RealLine.ptBegin.x + num, RealLine.ptBegin.y };
-				RealLine.dLength = num;
-				break;
-			case 3:
-				RealLine.ptEnd = { RealLine.ptBegin.x - num, RealLine.ptBegin.y };
-				RealLine.dLength = num;
-				break;
-			case 2:
-				RealLine.ptEnd = { RealLine.ptBegin.x, RealLine.ptBegin.y + num };
-				RealLine.dLength = num;
-				break;
-			case 4:
-				RealLine.ptEnd = { RealLine.ptBegin.x, RealLine.ptBegin.y - num };
-				RealLine.dLength = num;
-				break;
+				TRealLine RealLine;
+				RealLine.ptBegin = dptHit[dptHit.size() - 1];
+
+				//计算得到终点坐标
+				switch (Attach->GetiIvoryLine())
+				{
+				case 0:
+					double angle;
+					angle = TDraw::GetAngleFromPointReal(RealLine.ptBegin, MoveLine->ptEnd);
+					RealLine.SetPoint(RealLine.ptBegin, num, angle);
+					break;
+				case 1:
+					RealLine.ptEnd = { RealLine.ptBegin.x + num, RealLine.ptBegin.y };
+					RealLine.dLength = num;
+					break;
+				case 3:
+					RealLine.ptEnd = { RealLine.ptBegin.x - num, RealLine.ptBegin.y };
+					RealLine.dLength = num;
+					break;
+				case 2:
+					RealLine.ptEnd = { RealLine.ptBegin.x, RealLine.ptBegin.y + num };
+					RealLine.dLength = num;
+					break;
+				case 4:
+					RealLine.ptEnd = { RealLine.ptBegin.x, RealLine.ptBegin.y - num };
+					RealLine.dLength = num;
+					break;
+				}
+				RealLine.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
+
+				//入库
+				iPrevLineId = pShape->iNextId;
+				pTreeViewContent->AddItem(&RealLine, pShape->iNextId);
+				AddIntoShape(RealLine);
+
+				if (CoincideBegin != NULL)
+				{
+					//上一个约束入库
+					CoincideBegin->ElementId2 = iPrevLineId;
+					pTreeViewContent->AddItem(CoincideBegin,pShape->iNextId);
+					pShape->AddCoincide(*CoincideBegin);
+
+					delete CoincideBegin;
+					CoincideBegin = NULL;
+				}
+
+
+				//计算得出的终点存入暂存点集
+				dptHit.push_back(RealLine.ptEnd);
+
+				//设置临时线
+				POINT ptNew = pConfig->RealToScreen(RealLine.ptEnd);
+				InitialLine(RealLine.ptEnd);
+				Attach->InitialLine(ptNew);
+
+				LineEdit->SetVisible(false);//避免在画完线后还显示Edit
+
+				//移动到新坐标
+				TDraw::ClientPosToScreen(hWnd, &ptNew);
+				SetCursorPos(ptNew.x, ptNew.y);
 			}
-			RealLine.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
-
-			//入库
-			AddIntoShape(RealLine);
-
-			//计算得出的终点存入暂存点集
-			dptHit.push_back(RealLine.ptEnd);
-
-			//设置临时线
-			POINT ptNew = pConfig->RealToScreen(RealLine.ptEnd);
-			InitialLine(RealLine.ptEnd);
-			Attach->InitialLine(ptNew);
-
-			LineEdit->SetVisible(false);//避免在画完线后还显示Edit
-
-			//移动到新坐标
-			TDraw::ClientPosToScreen(hWnd, &ptNew);
-			SetCursorPos(ptNew.x, ptNew.y);
 		}
 		break;
 	}
@@ -203,13 +233,74 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	ptPos = pConfig->RealToScreen(MoveLine->ptEnd);
 
-	//上一点及当前点存入数据
-	if (dptHit.size() > 0)
+	//处理约束
+	if (dptHit.size() == 0)//第一点捕捉到的约束
 	{
+		if (Attach->iAttachElementId != -1)
+		{
+			//ID被捕捉=ID新元素.begin
+			CoincideBegin = new TConstraintCoincide;
+			CoincideBegin->eElementType1 = Attach->eAttachElementType;
+			CoincideBegin->ElementId1 = Attach->iAttachElementId;
+			CoincideBegin->Element1PointIndex = Attach->iAttachElementPointIndex;
+
+			CoincideBegin->eElementType2 = myElementType;
+			//CoincideBegin->ElementId2 = pShape->iNextId;//此处未入库，此为下一个Element的id
+			CoincideBegin->Element2PointIndex = 1;//ptBegin
+		}
+	}
+	else//非第一点
+	{
+		//若超出1个点则入库
 		TRealLine RealLine;
 		RealLine.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 		RealLine.SetPoint(dptHit[dptHit.size() - 1], MoveLine->ptEnd);
+
+		iPrevLineId = pShape->iNextId;
+		pTreeViewContent->AddItem(&RealLine, pShape->iNextId);
 		AddIntoShape(RealLine);
+
+		if (CoincideBegin != NULL)
+		{
+			//上一个约束入库
+			CoincideBegin->ElementId2 = iPrevLineId;
+			pTreeViewContent->AddItem(CoincideBegin, pShape->iNextId);
+			pShape->AddCoincide(*CoincideBegin);
+			//RefreshTreeViewContent();
+			delete CoincideBegin;
+			CoincideBegin = NULL;
+		}
+
+		if (Attach->iAttachElementId != -1)//若终点捕捉上了
+		{
+			//ID被捕捉=ID这个.end
+			CoincideBegin = new TConstraintCoincide;
+			CoincideBegin->eElementType1 = Attach->eAttachElementType;
+			CoincideBegin->ElementId1 = Attach->iAttachElementId;
+			CoincideBegin->Element1PointIndex = Attach->iAttachElementPointIndex;
+
+			CoincideBegin->eElementType2 = myElementType;
+			CoincideBegin->ElementId2 = iPrevLineId;//此处已入库，已入库元素id为nextid-1
+			CoincideBegin->Element2PointIndex = 2;//ptEnd
+
+			//终点连接入库
+			pTreeViewContent->AddItem(CoincideBegin, pShape->iNextId);
+			pShape->AddCoincide(*CoincideBegin);
+
+			delete CoincideBegin;
+			CoincideBegin = NULL;
+		}
+
+
+			//加入连接约束：ID上一个.end=ID这个.begin
+			CoincideBegin = new TConstraintCoincide;
+			CoincideBegin->eElementType1 = myElementType;
+			CoincideBegin->ElementId1 = iPrevLineId;//上一条线id
+			CoincideBegin->Element1PointIndex = 2;//ptEnd
+
+			CoincideBegin->eElementType2 = myElementType;
+			//CoincideBegin->ElementId2 = pShape->iNextId;//此处未入库，此为当前序号
+			CoincideBegin->Element2PointIndex = 1;//ptBegin
 	}
 
 	//当前点存入暂存点集
@@ -248,19 +339,24 @@ void TLineTool::InitialLine(DPOINT dptPos)
 
 void TLineTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	//若已创建Edit则隐藏Edit
-	if (LineEdit->m_hWnd != NULL)
-		LineEdit->SetVisible(false);
-
-	bShowDimLine = false;
-
-
-	//没有画线的情况下点右键则重置工具
-	if (dptHit.size()==0)
+	if (dptHit.size() == 0)//没有点的情况下点右键则重置工具
 		::PostMessage(hwndWin, WM_COMMAND, ID_SELECT, 0);
 	else
 	{
-		dptHit.clear();
+		//若已创建Edit则隐藏Edit
+		if (LineEdit->m_hWnd != NULL)
+			LineEdit->SetVisible(false);
+
+		bShowDimLine = false;
+
+		//消除暂存重合约束
+		if (CoincideBegin != NULL)
+		{
+			delete CoincideBegin;
+			CoincideBegin = NULL;
+		}
+
+		dptHit.swap(std::vector<DPOINT>());
 
 		::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), false);
 

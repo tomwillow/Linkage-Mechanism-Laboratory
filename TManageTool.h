@@ -14,6 +14,7 @@ public:
 	~TManageTool();
 
 	void SetCurActiveTool(UINT id);
+	void TManageTool::CloseCurTool();
 	void Message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	void SetCursor(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };

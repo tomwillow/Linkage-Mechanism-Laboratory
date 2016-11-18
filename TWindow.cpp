@@ -299,9 +299,9 @@ LRESULT TWindow::OnPaletteChanged(HWND hWnd, WPARAM wParam)
 	return 0;
 }
 
-void TWindow::SetAccel(HACCEL hAccel)
+void TWindow::SetAccel(UINT id)
 {
-	m_hAccelTable = hAccel;
+	m_hAccelTable = LoadAccelerators(m_hInst, (LPCTSTR)id);
 }
 
 void TWindow::SetDoubleBuffer(bool bDoubleBuffer)

@@ -6,6 +6,7 @@
 
 TBarTool::TBarTool()
 {
+	myElementType = ELEMENT_BAR;
 }
 
 

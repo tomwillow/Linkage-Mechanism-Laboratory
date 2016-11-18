@@ -6,7 +6,8 @@
 #include "TListView.h"
 TElement::TElement()
 {
-	eType = ELEMENT_ELEMENT;
+	id = -1;
+	eType = ELEMENT_NULL;
 	_tcscpy(Name,TEXT("undefined"));
 }
 
@@ -22,6 +23,27 @@ void TElement::SetStyle(int iStyle, int iWidth, COLORREF crColor)
 	logpenStyle.lopnColor = crColor;
 
 	logpenStyleShow = logpenStyle;
+}
+
+TCHAR * TElement::GetElementTypeName(TCHAR name[])
+{
+	switch (eType)
+	{
+	case ELEMENT_REALLINE:
+		_tcscpy(name, TEXT("线"));
+		break;
+	case ELEMENT_FRAMEPOINT:
+		_tcscpy(name, TEXT("机架"));
+		break;
+	case ELEMENT_BAR:
+		_tcscpy(name, TEXT("连杆"));
+		break;
+	case CONSTRAINT_COINCIDE:
+		_tcscpy(name, TEXT("重合"));
+		break;
+
+	}
+	return name;
 }
 
 TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[])

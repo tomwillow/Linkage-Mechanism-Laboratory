@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		NULL, (HMENU)LoadMenu(hInstance,MAKEINTRESOURCE(IDR_MENUMAIN)), hInstance);
-	win.SetAccel(LoadAccelerators(hInstance, (LPCTSTR)IDR_ACCELERATOR_MAIN));
+	win.SetAccel(IDR_ACCELERATOR_MAIN);
 	win.ShowWindow(iCmdShow);
 
 	win.UpdateWindow();

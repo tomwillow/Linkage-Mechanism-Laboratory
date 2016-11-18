@@ -18,7 +18,8 @@ void TRealLine::NoticeListView(TListView *pListView)
 	pListView->DeleteAllItems();
 
 	TCHAR buffer[16];
-	
+
+	pListView->AddAttributeItem(TEXT("ID"), TEXT("%d"), id);
 	pListView->AddAttributeItem(TEXT("名称"),Name);// stringToTCHAR(&Name,buffer)
 	pListView->AddAttributeItem(TEXT("类型"), TEXT("线"));
 	pListView->AddAttributeItem(TEXT("线型"), GetLineStyleName(this->logpenStyle.lopnStyle, buffer));

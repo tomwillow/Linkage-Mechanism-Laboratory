@@ -8,6 +8,8 @@
 class TAttach
 {
 private:
+	//bool bAttachPoint;
+	HWND hCanvas;
 	TShape *Shape;
 	TConfiguration *Config;
 	int iIvoryLine;
@@ -15,12 +17,12 @@ private:
 	bool bShowXAssist, bShowYAssist;//œ‘ æX,Y÷·∏®÷˙œﬂ
 	bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2, int distance);
 public:
+	EnumElementType eAttachElementType;
+	int iAttachElementId;
+	int iAttachElementPointIndex;
 	DPOINT dptAttach;
-	bool bAttachPoint;
-	HWND hCanvas;
 	TAttach(HWND hCanvas, TShape *shape, TConfiguration *config);
 	~TAttach();
-	void TAttach::Load(HWND hCanvas, TShape *shape, TConfiguration *config);
 	void TAttach::InitialLine(POINT ptPos);
 	void TAttach::AttachAll(POINT ptNowPos, DPOINT dptCheckPos);
 	void TAttach::AttachAll(POINT ptNowPos);

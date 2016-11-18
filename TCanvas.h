@@ -7,6 +7,7 @@ private:
 	TConfiguration *Config;
 	bool bMButtonPressing;
 	UINT uiMoveStartX, uiMoveStartY;
+	void TCanvas::OnCommand(WPARAM wParam, LPARAM lParam);
 public:
 	TCanvas();
 	~TCanvas();

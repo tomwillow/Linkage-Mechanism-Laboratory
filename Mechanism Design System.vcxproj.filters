@@ -102,6 +102,12 @@
     <ClCompile Include="TElement.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TConstraintCoincide.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TTreeViewContent.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -194,6 +200,12 @@
     <ClInclude Include="TElement.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TConstraintCoincide.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TTreeViewContent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Mechanism Design System.rc">
@@ -202,6 +214,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resource\toolbar_mechanism.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\Icon.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\Icon_16.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

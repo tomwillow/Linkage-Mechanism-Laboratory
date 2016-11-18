@@ -73,6 +73,7 @@
     <ClCompile Include="TCanvas.cpp" />
     <ClCompile Include="TConfiguration.cpp" />
     <ClCompile Include="DPOINT.cpp" />
+    <ClCompile Include="TConstraintCoincide.cpp" />
     <ClCompile Include="TDraw.cpp" />
     <ClCompile Include="TEdit.cpp" />
     <ClCompile Include="TElement.cpp" />
@@ -92,6 +93,7 @@
     <ClCompile Include="TTool.cpp" />
     <ClCompile Include="TToolbar.cpp" />
     <ClCompile Include="TTreeView.cpp" />
+    <ClCompile Include="TTreeViewContent.cpp" />
     <ClCompile Include="TWindow.cpp" />
     <ClCompile Include="TTrackbar.cpp" />
     <ClCompile Include="TTransfer.cpp" />
@@ -105,6 +107,7 @@
     <ClInclude Include="TCanvas.h" />
     <ClInclude Include="TConfiguration.h" />
     <ClInclude Include="DPOINT.h" />
+    <ClInclude Include="TConstraintCoincide.h" />
     <ClInclude Include="TDraw.h" />
     <ClInclude Include="TEdit.h" />
     <ClInclude Include="TElement.h" />
@@ -124,6 +127,7 @@
     <ClInclude Include="TTool.h" />
     <ClInclude Include="TToolbar.h" />
     <ClInclude Include="TTreeView.h" />
+    <ClInclude Include="TTreeViewContent.h" />
     <ClInclude Include="TWindow.h" />
     <ClInclude Include="TTrackbar.h" />
     <ClInclude Include="TTransfer.h" />
@@ -132,6 +136,8 @@
     <ResourceCompile Include="Mechanism Design System.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Resource\Icon.ico" />
+    <Image Include="Resource\Icon_16.ico" />
     <Image Include="Resource\toolbar_mechanism.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -40,6 +40,12 @@ void TCanvas::DealMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		pManageTool->SetCursor(hWnd, uMsg, wParam, lParam);
 }
 
+void TCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	//热键返回给主窗口
+	win.OnCommand(wParam, lParam);
+}
+
 void TCanvas::OnKeyDown(WPARAM wParam, LPARAM lParam)	
 {
 	DealMessage(m_hWnd, WM_KEYDOWN, wParam, lParam);
@@ -80,8 +86,6 @@ void TCanvas::OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		Config->SetOrg(Config->GetOrg().x + (ptPos.x - uiMoveStartX),
 			Config->GetOrg().y + (ptPos.y - uiMoveStartY));
-		//Config->Org.x += (ptPos.x - uiMoveStartX);
-		//Config->Org.y += (ptPos.y - uiMoveStartY);
 		uiMoveStartX = ptPos.x;
 		uiMoveStartY = ptPos.y;
 	}
@@ -180,8 +184,6 @@ void TCanvas::OnDraw(HDC hdc)
 	SetBkMode(hdc, TRANSPARENT);
 
 	//填充背景
-	//RECT rect;
-	//GetClientRect(m_hWnd, &rect);
 	TDraw::FillRect(hdc, &ClientRect, Config->crBackground);
 
 	//画网格
@@ -195,11 +197,6 @@ void TCanvas::OnDraw(HDC hdc)
 	{
 		TDraw::DrawElement(hdc, win.m_Shape.Element[i], Config);
 	}
-
-	//for (unsigned int i = 0; i < win.m_Shape.Element.size(); i++)
-	//{
-	//	TDraw::DrawFramePoint(hdc, win.m_Shape.Element[i], Config);
-	//}
 
 	//工具类绘制
 	if (win.m_ManageTool.m_pCurrentTool!=NULL)

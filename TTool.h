@@ -6,14 +6,18 @@ class TCanvas;
 class TShape;
 class TConfiguration;
 class TListView;
+class TTreeViewContent;
 class TTool
 {
+private:
 protected:
 	TShape *pShape;
 	TCanvas *pCanvas;
 	HWND hwndWin;
 	TConfiguration *pConfig;
 	TListView *pListView;
+	TTreeViewContent *pTreeViewContent;
+	//void TTool::RefreshTreeViewContent();
 public:
 	TTool();
 	virtual ~TTool();

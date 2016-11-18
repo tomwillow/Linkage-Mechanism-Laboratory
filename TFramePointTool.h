@@ -11,7 +11,6 @@ class TFramePointTool:public TTool
 private:
 	TAttach *Attach;
 	TFramePoint tempFramePoint;
-	TConfiguration *Config;
 public:
 	TFramePointTool();
 	~TFramePointTool();

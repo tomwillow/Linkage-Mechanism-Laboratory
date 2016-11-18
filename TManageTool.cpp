@@ -19,7 +19,7 @@ TManageTool::~TManageTool()
 {
 }
 
-void TManageTool::SetCurActiveTool(UINT id)
+void TManageTool::CloseCurTool()
 {
 	if (m_pCurrentTool != NULL)
 	{
@@ -27,6 +27,11 @@ void TManageTool::SetCurActiveTool(UINT id)
 		delete m_pCurrentTool;
 		m_pCurrentTool = NULL;
 	}
+}
+
+void TManageTool::SetCurActiveTool(UINT id)
+{
+	CloseCurTool();
 
 	m_uiCurActiveTool = id;
 	switch (id)

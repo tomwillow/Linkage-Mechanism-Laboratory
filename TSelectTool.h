@@ -18,5 +18,6 @@ private:
 public:
 	TSelectTool();
 	~TSelectTool();
+	void TSelectTool::SelectById(int id);
 };
 
