@@ -58,18 +58,10 @@ TElement * TShape::GetElementById(int id)
 	}
 }
 
-void TShape::DeleteElement(int index)
+std::vector<int> TShape::GetInfluenceId(int id)
 {
-	//先记下id，再删掉元素。再清除掉和该元素相关的约束
-	int id = Element[index]->id;
-
-	delete Element[index];
-	std::vector<TElement *>::iterator iter = Element.begin() + index;
-	Element.erase(iter);
-
-	int i = 0;
-	int s = Element.size();
-	while (i <= s - 1)
+	std::vector<int> InfluenceId;
+	for (int i = 0; i < Element.size(); i++)
 	{
 		switch (Element[i]->eType)
 		{
@@ -77,15 +69,63 @@ void TShape::DeleteElement(int index)
 			if (((TConstraintCoincide *)Element[i])->ElementId1 == id ||
 				((TConstraintCoincide *)Element[i])->ElementId2 == id)
 			{
+				InfluenceId.push_back(Element[i]->id);
+			}
+		}
+	}
+	return InfluenceId;
+}
+
+void TShape::DeleteById(std::vector<int> IdArray)
+{
+	
+}
+
+std::vector<int> TShape::DeleteElement(int index)
+{
+	int id = Element[index]->id;
+
+	delete Element[index];
+	std::vector<TElement *>::iterator iter = Element.begin() + index;
+	Element.erase(iter);
+
+	////将所有牵涉到的约束设为无效
+	//for (int i = 0; i < Element.size(); i++)
+	//{
+	//	switch (Element[i]->eType)
+	//	{
+	//	case CONSTRAINT_COINCIDE:
+	//		if (((TConstraintCoincide *)Element[i])->ElementId1 == id ||
+	//			((TConstraintCoincide *)Element[i])->ElementId2 == id)
+	//		{
+	//			((TConstraintCoincide *)Element[i])->available = false;
+	//		}
+	//	}
+	//}
+	std::vector<int> InfluenceId;
+
+	//再删掉元素。再清除掉和该元素相关的约束
+	int i = Element.size()-1;
+	while (i >=0)
+	{
+		switch (Element[i]->eType)
+		{
+		case CONSTRAINT_COINCIDE:
+			if (((TConstraintCoincide *)Element[i])->ElementId1 == id ||
+				((TConstraintCoincide *)Element[i])->ElementId2 == id)
+			{
+				InfluenceId.push_back(Element[i]->id);
+
 				delete Element[i];
 				std::vector<TElement *>::iterator iter = Element.begin() + i;
 				Element.erase(iter);
+
 			}
 			break;
 		}
-		s = Element.size();
-		i++;
+		i--;
 	}
+	return InfluenceId;
 }
 
 void TShape::ReleaseAll()

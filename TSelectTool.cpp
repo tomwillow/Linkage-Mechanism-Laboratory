@@ -22,12 +22,30 @@ TSelectTool::~TSelectTool()
 	if (iPickIndex != -1)
 	{
 		//恢复线型
-		pShape->Element[iPickIndex]->logpenStyleShow.lopnStyle = pShape->Element[iPickIndex]->logpenStyle.lopnStyle;
+		RestorePickedLineStyle();
+		RestoreHoveredLineStyle();
 
 		CancelTreeViewAndListView();
 	}
 }
 
+void TSelectTool::RestorePickedLineStyle()
+{
+	while (PickedLineId.size() > 0)
+	{
+		pShape->GetElementById(PickedLineId.top())->logpenStyleShow.lopnStyle = pShape->GetElementById(PickedLineId.top())->logpenStyle.lopnStyle;
+		PickedLineId.pop();
+	}
+}
+
+void TSelectTool::RestoreHoveredLineStyle()
+{
+	while (HoveredLineId.size() > 0)
+	{
+		pShape->GetElementById(HoveredLineId.top())->logpenStyleShow.lopnColor = pShape->GetElementById(HoveredLineId.top())->logpenStyle.lopnColor;
+		HoveredLineId.pop();
+	}
+}
 
 void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
@@ -37,14 +55,20 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		if (iPickIndex != -1)
 		{
 			//先恢复线型，否则删掉元素后index将失效
+			RestorePickedLineStyle();
+			RestoreHoveredLineStyle();
 
+			int id = pShape->Element[iPickIndex]->id;
+			std::vector<int> InfluenceId;// = pShape->GetInfluenceId(id);
 
-			pShape->DeleteElement(iPickIndex);
 			pTreeViewContent->DeleteById(pShape->Element[iPickIndex]->id);
+			InfluenceId=pShape->DeleteElement(iPickIndex);
+
+			for (int i = 0; i < InfluenceId.size(); i++)
+				pTreeViewContent->DeleteById(InfluenceId[i]);
 
 			iPickIndex = -1;
 			iHoverIndex = -1;
-
 
 			CancelTreeViewAndListView();
 		}
@@ -60,12 +84,8 @@ void TSelectTool::OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos)
 
 void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {	
-	//若之前已经拾取得到线，则恢复线型。（若再次拾取下面将变更线型，若不是则线型将在此恢复）
-	if (iHoverIndex != -1)
-	{
-		pShape->Element[iHoverIndex]->logpenStyleShow.lopnColor = pShape->Element[iHoverIndex]->logpenStyle.lopnColor;
-		iHoverIndex = -1;
-	}
+	RestoreHoveredLineStyle();
+	iHoverIndex = -1;
 
 	//遍历所有
 	for (int i = 0; i < pShape->Element.size(); i++)
@@ -88,9 +108,12 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 		}
 		if (iHoverIndex != -1)
 		{
-			if (iPickIndex!=iHoverIndex)//若浮过的线已被选中则不变色
-			//暂存当前线型并更改
-			pShape->Element[iHoverIndex]->logpenStyleShow.lopnColor= RGB(200,200,200);
+			if (iPickIndex != iHoverIndex)//若浮过的线已被选中则不变色
+			{
+				//暂存当前线型并更改
+				pShape->Element[iHoverIndex]->logpenStyleShow.lopnColor = RGB(200, 200, 200);
+				HoveredLineId.push(pShape->Element[iHoverIndex]->id);
+			}
 			return;
 		}
 	}
@@ -114,12 +137,9 @@ bool TSelectTool::PickRealLine(POINT ptPos, TElement *Element)
 
 void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	//若之前已经拾取得到线，则恢复线型。（若再次拾取下面将变更线型，若不是则线型将在此恢复）
-	if (iPickIndex != -1)
-	{
-		pShape->Element[iPickIndex]->logpenStyleShow.lopnStyle = pShape->Element[iPickIndex]->logpenStyle.lopnStyle;
-		iPickIndex = -1;
-	}
+	CancelTreeViewAndListView();
+	RestorePickedLineStyle();
+	iPickIndex = -1;
 
 	//遍历所有
 	for (int i = 0; i < pShape->Element.size(); i++)
@@ -144,6 +164,7 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		{
 			//暂存当前线型并更改
 			pShape->Element[iPickIndex]->logpenStyleShow.lopnStyle = PS_DOT;
+			PickedLineId.push(pShape->Element[iPickIndex]->id);
 
 			//通知TreeView选中
 			pTreeViewContent->SelectById(pShape->Element[iPickIndex]->id);
@@ -154,12 +175,13 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		}
 	}
 
-	//没有拾得
-	CancelTreeViewAndListView();
 }
 
 void TSelectTool::SelectById(int id)
 {
+	RestorePickedLineStyle();
+	iPickIndex = -1;
+
 	for (int i = 0; i < pShape->Element.size(); i++)
 	{
 		if (pShape->Element[i]->id == id)
@@ -167,9 +189,13 @@ void TSelectTool::SelectById(int id)
 			iPickIndex = i;
 			//暂存当前线型并更改
 			pShape->Element[iPickIndex]->logpenStyleShow.lopnStyle = PS_DOT;
+			PickedLineId.push(pShape->Element[iPickIndex]->id);
 
 			//通知ListView更新
-			pShape->Element[iPickIndex]->NoticeListView(pListView);
+			//pShape->Element[iPickIndex]->NoticeListView(pListView);
+
+			::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
+			return;
 		}
 	}
 }
@@ -215,20 +241,23 @@ void TSelectTool::Draw(HDC hdc)
 			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TFramePoint *)pShape->Element[iPickIndex])->dpt));
 			break;
 		case CONSTRAINT_COINCIDE:
-			//画重合点
-			int id = ((TConstraintCoincide *)pShape->Element[iPickIndex])->ElementId1;
-			switch (((TConstraintCoincide *)pShape->Element[iPickIndex])->eElementType1)
+			if (pShape->Element[iPickIndex]->available == true)
 			{
-			case ELEMENT_BAR:
-			case ELEMENT_REALLINE:
-				if (((TConstraintCoincide *)pShape->Element[iPickIndex])->Element1PointIndex == 0)
-					TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->GetElementById(id))->ptBegin));
-				else
-					TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->GetElementById(id))->ptEnd));
-				break;
-			case ELEMENT_FRAMEPOINT:
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TFramePoint *)pShape->GetElementById(id))->dpt));
-				break;
+				//画重合点
+				int id = ((TConstraintCoincide *)pShape->Element[iPickIndex])->ElementId1;
+				switch (((TConstraintCoincide *)pShape->Element[iPickIndex])->eElementType1)
+				{
+				case ELEMENT_BAR:
+				case ELEMENT_REALLINE:
+					if (((TConstraintCoincide *)pShape->Element[iPickIndex])->Element1PointIndex == 1)
+						TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->GetElementById(id))->ptBegin));
+					else
+						TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->GetElementById(id))->ptEnd));
+					break;
+				case ELEMENT_FRAMEPOINT:
+					TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TFramePoint *)pShape->GetElementById(id))->dpt));
+					break;
+				}
 			}
 			break;
 		}

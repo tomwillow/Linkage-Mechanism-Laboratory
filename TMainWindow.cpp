@@ -29,6 +29,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.AddButton(1, ID_DRAW_FRAME, true, TEXT("机架"));
 	m_Toolbar.AddButton(2, ID_DRAW_BAR, true, TEXT("连杆"));
 	m_Toolbar.AddButton(3, ID_DRAW_LINE, true, TEXT("线"));
+	m_Toolbar.AddButton(4, ID_ANALYZE_MECHANISM, true, TEXT("分析机构"));
 	m_Toolbar.ShowToolbar();
 
 	//创建状态栏
@@ -151,16 +152,14 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		PostMessage(m_hWnd, WM_CLOSE, 0, 0);
 		break;
 	case ID_SELECT:
-		p_Managetool->SetCurActiveTool(ID_SELECT);
-		break;
 	case ID_DRAW_BAR:
-		p_Managetool->SetCurActiveTool(ID_DRAW_BAR);
-		break;
 	case ID_DRAW_FRAME:
-		p_Managetool->SetCurActiveTool(ID_DRAW_FRAME);
-		break;
 	case ID_DRAW_LINE:
-		p_Managetool->SetCurActiveTool(ID_DRAW_LINE);
+		p_Managetool->SetCurActiveTool(wmId);
+		break;
+	case ID_ANALYZE_MECHANISM:
+		int nb;
+		
 		break;
 	}
 }

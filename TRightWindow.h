@@ -6,6 +6,10 @@
 class TRightWindow :public TWindow
 {
 private:
+	int margin;
+	int TitleHeight;
+	RECT rcRegion1, rcRegion2;
+	RECT rcTitle1, rcTitle2;
 	void TRightWindow::OnDraw(HDC hdc);
 	void TRightWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam); 
 	void TRightWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

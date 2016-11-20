@@ -233,7 +233,7 @@ void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta)
 //返回pt相对于原点ptO的角度，传入点以Y方向向上为正
 double GetAngleFromPoint(POINT ptO, POINT pt)
 {
-	double angle;
+	double angle=0;
 	if (((pt.x - ptO.x) > 0) && ((pt.y - ptO.y) >= 0))//第1象限[0,PI/2)
 		angle = atan(double(pt.y - ptO.y) / (pt.x - ptO.x));
 	if (((pt.x - ptO.x) <= 0) && ((pt.y - ptO.y) > 0)) //第2象限[PI/2,PI)
@@ -248,7 +248,7 @@ double GetAngleFromPoint(POINT ptO, POINT pt)
 //返回pt相对于原点ptO的角度，传入点以Y方向向上为正
 double TDraw::GetAngleFromPointReal(DPOINT ptO, DPOINT pt)
 {
-	double angle;
+	double angle=0;
 	if (((pt.x - ptO.x) >= 0) && ((pt.y - ptO.y) >= 0))//第1象限[0,PI/2)
 		angle = atan(double(pt.y - ptO.y) / (pt.x - ptO.x));
 	if (((pt.x - ptO.x) <= 0) && ((pt.y - ptO.y) > 0)) //第2象限[PI/2,PI)
@@ -464,4 +464,36 @@ void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt)
 	::GetWindowRect(hWnd, &rect);
 	pt->x += rect.left;
 	pt->y += rect.top;
+}
+
+void TDraw::GetMarginRect(RECT *rect, int margin)
+{
+	rect->left += margin;
+	rect->top += margin;
+	rect->right -= margin;
+	rect->bottom -= margin;
+}
+
+RECT TDraw::GetMarginRect(RECT rect, int margin)
+{
+	RECT rc=rect;
+	GetMarginRect(&rc, margin);
+	return rc;
+}
+
+void TDraw::DrawTextAdvance(HDC hdc, TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format)
+{
+	long lfHeight;
+	HFONT hf;
+	lfHeight = -MulDiv(FontSize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	hf = CreateFont(lfHeight, 0, 0, 0, FontWeight, 0, 0, 0, 0, 0, 0, 0, 0, FontName);
+	SelectObject(hdc, hf);
+	SetTextColor(hdc, color);
+	DrawText(hdc, text, -1, rect, format);
+	DeleteObject(hf);
+}
+
+void TDraw::DrawSystemFontText(HDC hdc, TCHAR text[], RECT &rect, COLORREF color, UINT format)
+{
+	DrawTextAdvance(hdc, text, &rect, 9, 400, color, TEXT("宋体"), format);
 }

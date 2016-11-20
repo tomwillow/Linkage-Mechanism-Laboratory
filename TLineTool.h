@@ -14,6 +14,7 @@ class TConstraintCoincide;
 class TLineTool :public TTool
 {
 private:
+	POINT ptPrevPos;
 	int iPrevLineId;
 	TAttach *Attach;
 	std::vector<DPOINT> dptHit;//每次的点击位置
@@ -35,6 +36,7 @@ private:
 protected:
 	EnumElementType myElementType;
 	virtual void TLineTool::AddIntoShape(TRealLine &RealLine);
+	virtual void TLineTool::AddIntoTreeViewContent(TElement *Element, int id);
 public:
 	TLineTool();
 	~TLineTool();

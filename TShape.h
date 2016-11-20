@@ -17,12 +17,14 @@ public:
 	TShape();
 	~TShape();
 	void TShape::ReleaseAll();
-	void TShape::DeleteElement(int index);
+	std::vector<int> TShape::DeleteElement(int index);
 	void TShape::AddRealLine(TRealLine &realline);
 	void TShape::AddBar(TBar *bar);
 	void TShape::AddFramePoint(TFramePoint &framepoint);
 
 	void TShape::AddCoincide(TConstraintCoincide &coincide);
+	std::vector<int> TShape::GetInfluenceId(int id);
+	void TShape::DeleteById(std::vector<int> IdArray);
 	TElement * GetElementById(int id);
 };
 

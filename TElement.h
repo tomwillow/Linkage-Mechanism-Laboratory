@@ -11,6 +11,7 @@ class TElement
 {
 public:
 	int id;
+	bool available;
 	EnumElementType eType;
 	TCHAR Name[64];
 	LOGPEN logpenStyleShow, logpenStyle;

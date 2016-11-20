@@ -6,7 +6,7 @@
 
 #include "TListView.h"
 
-TConstraintCoincide::TConstraintCoincide()
+TConstraintCoincide::TConstraintCoincide() 
 {
 	eType = CONSTRAINT_COINCIDE;
 	ElementId1 = -1;

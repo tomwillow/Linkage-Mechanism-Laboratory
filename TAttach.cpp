@@ -160,7 +160,7 @@ void TAttach::AttachPoint(DPOINT dptPos)
 			if (DPTisApproached(dptPos, pRealLine->ptBegin, 10))
 			{
 				iAttachElementId = Shape->Element[i]->id;
-				iAttachElementPointIndex = 0;
+				iAttachElementPointIndex = 1;
 				dptAttach = pRealLine->ptBegin;
 				return;
 			}
@@ -169,7 +169,7 @@ void TAttach::AttachPoint(DPOINT dptPos)
 			if (DPTisApproached(dptPos, pRealLine->ptEnd, 10))
 			{
 				iAttachElementId = Shape->Element[i]->id;
-				iAttachElementPointIndex = 1;
+				iAttachElementPointIndex = 2;
 				dptAttach = pRealLine->ptEnd;
 				return;
 			}

@@ -143,6 +143,13 @@ void TLineTool::AddIntoShape(TRealLine &RealLine)
 	pShape->AddRealLine(RealLine);
 }
 
+void TLineTool::AddIntoTreeViewContent(TElement *Element, int id)
+{
+	if (Element->eType == ELEMENT_REALLINE)
+		Element->eType = myElementType;
+	pTreeViewContent->AddItem(Element, pShape->iNextId);
+}
+
 //LineEdit出现时Canvas是接收不到KEYDOWN的，自然LineTool也接收不到。
 //KEYDOWN消息由LineEdit截获发送给Canvas，再传递下来。
 void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -196,20 +203,29 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 				//入库
 				iPrevLineId = pShape->iNextId;
-				pTreeViewContent->AddItem(&RealLine, pShape->iNextId);
+				AddIntoTreeViewContent(&RealLine, pShape->iNextId);
 				AddIntoShape(RealLine);
 
 				if (CoincideBegin != NULL)
 				{
 					//上一个约束入库
 					CoincideBegin->ElementId2 = iPrevLineId;
-					pTreeViewContent->AddItem(CoincideBegin,pShape->iNextId);
+					AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
 					pShape->AddCoincide(*CoincideBegin);
 
 					delete CoincideBegin;
 					CoincideBegin = NULL;
 				}
 
+				//加入连接约束：ID上一个.end=ID这个.begin
+				CoincideBegin = new TConstraintCoincide;
+				CoincideBegin->eElementType1 = myElementType;
+				CoincideBegin->ElementId1 = iPrevLineId;//上一条线id
+				CoincideBegin->Element1PointIndex = 2;//ptEnd
+
+				CoincideBegin->eElementType2 = myElementType;
+				//CoincideBegin->ElementId2 = pShape->iNextId;//此处未入库，此为当前序号
+				CoincideBegin->Element2PointIndex = 1;//ptBegin
 
 				//计算得出的终点存入暂存点集
 				dptHit.push_back(RealLine.ptEnd);
@@ -251,20 +267,23 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	}
 	else//非第一点
 	{
+		if (ptPos.x == ptPrevPos.x && ptPos.y == ptPrevPos.y)
+			return;
+
 		//若超出1个点则入库
 		TRealLine RealLine;
 		RealLine.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 		RealLine.SetPoint(dptHit[dptHit.size() - 1], MoveLine->ptEnd);
 
 		iPrevLineId = pShape->iNextId;
-		pTreeViewContent->AddItem(&RealLine, pShape->iNextId);
+		AddIntoTreeViewContent(&RealLine, pShape->iNextId);
 		AddIntoShape(RealLine);
 
 		if (CoincideBegin != NULL)
 		{
 			//上一个约束入库
 			CoincideBegin->ElementId2 = iPrevLineId;
-			pTreeViewContent->AddItem(CoincideBegin, pShape->iNextId);
+			AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
 			pShape->AddCoincide(*CoincideBegin);
 			//RefreshTreeViewContent();
 			delete CoincideBegin;
@@ -284,7 +303,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			CoincideBegin->Element2PointIndex = 2;//ptEnd
 
 			//终点连接入库
-			pTreeViewContent->AddItem(CoincideBegin, pShape->iNextId);
+			AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
 			pShape->AddCoincide(*CoincideBegin);
 
 			delete CoincideBegin;
@@ -319,6 +338,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	else
 		LineEdit->SetVisible(false);//避免在画完线后还显示Edit
 
+	ptPrevPos = ptPos;
 	//交给画布刷新
 }
 

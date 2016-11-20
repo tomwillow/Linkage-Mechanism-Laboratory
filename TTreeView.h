@@ -7,11 +7,11 @@
 #include <stdio.h>
 #pragma comment(lib, "comctl32.lib")
 
-class TTreeView
+#include "TControl.h"
+
+class TTreeView:public TControl
 {
 public:
-	HWND m_hWnd;
-	HINSTANCE m_hInst;
 	TTreeView();
 	~TTreeView();
 	void TTreeView::CreateTreeViewEx(HWND hParent, UINT id, HINSTANCE hInst);//´´½¨TreeView

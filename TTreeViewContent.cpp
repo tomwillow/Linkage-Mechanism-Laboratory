@@ -26,6 +26,7 @@ void TTreeViewContent::DeleteById(int id)
 	{
 		if (Item[i].ObjectId == id)
 		{
+			SelectNull();
 			TreeView_DeleteItem(m_hWnd, Item[i].hTreeItem);
 			std::vector<TItem>::iterator iter = Item.begin() + i;
 			Item.erase(iter);
@@ -70,52 +71,6 @@ void TTreeViewContent::Initial()
 	hPrevConstraint = InsertTreeviewItem(TEXT("约束"), TVI_ROOT);
 }
 
-void TTreeViewContent::RefreshItem()
-{
-	DeleteAllItems();
-	HTREEITEM hPrevObject = InsertTreeviewItem(TEXT("元素"), TVI_ROOT);
-	HTREEITEM hPrevConstraint = InsertTreeviewItem(TEXT("约束"), TVI_ROOT);
-
-	HTREEITEM temp;
-	TCHAR buffer[64], szTypeName[16];
-	for (int i = 0; i < pShape->Element.size(); i++)
-	{
-		//ID:0 类型 名称
-		wsprintf(buffer, TEXT("ID:%d "), pShape->Element[i]->id);
-		pShape->Element[i]->GetElementTypeName(szTypeName);
-		wsprintf(buffer, TEXT("%s %s %s"), buffer, szTypeName, pShape->Element[i]->Name);
-		//_tcscat(buffer, szTypeName);
-		//_tcscat(buffer, pShape->Element[i]->Name);
-
-		switch (pShape->Element[i]->eType)
-		{
-		case ELEMENT_REALLINE:
-		case ELEMENT_FRAMEPOINT:
-		case ELEMENT_BAR:
-		{
-			temp = InsertTreeviewItem(buffer, hPrevObject);
-			TItem tempItem;
-			tempItem.ObjectId = pShape->Element[i]->id;
-			tempItem.hTreeItem = temp;
-			Item.push_back(tempItem);
-			break;
-		}
-		case CONSTRAINT_COINCIDE:
-		{
-			temp = InsertTreeviewItem(buffer, hPrevConstraint);
-			TItem tempItem;
-			tempItem.ObjectId = pShape->Element[i]->id;
-			tempItem.hTreeItem = temp;
-			Item.push_back(tempItem);
-			break;
-		}
-		}
-	}
-
-	TreeView_Expand(m_hWnd, hPrevObject, TVE_EXPAND);
-	TreeView_Expand(m_hWnd, hPrevConstraint, TVE_EXPAND);
-}
-
 void TTreeViewContent::SelectNull()
 {
 	TreeView_SelectItem(m_hWnd, NULL);
@@ -131,6 +86,18 @@ void TTreeViewContent::SelectById(int id)
 			TreeView_Select(m_hWnd, Item[i].hTreeItem, TVGN_CARET);
 		}
 	}
+}
+
+HTREEITEM TTreeViewContent::GetHTreeItemFromId(int id)
+{
+	for (int i = 0; i < Item.size(); i++)
+	{
+		if (Item[i].ObjectId==id)
+		{
+			return Item[i].hTreeItem;
+		}
+	}
+	return NULL;
 }
 
 int TTreeViewContent::GetIdFromHTreeView(HTREEITEM hTreeItem)

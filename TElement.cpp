@@ -4,7 +4,7 @@
 #include "TElement.h"
 
 #include "TListView.h"
-TElement::TElement()
+TElement::TElement() :available(true)
 {
 	id = -1;
 	eType = ELEMENT_NULL;
@@ -19,7 +19,7 @@ TElement::~TElement()
 void TElement::SetStyle(int iStyle, int iWidth, COLORREF crColor)
 {
 	logpenStyle.lopnStyle = iStyle;
-	logpenStyle.lopnWidth.x = iWidth;
+	logpenStyle.lopnWidth = { iWidth, 0 };
 	logpenStyle.lopnColor = crColor;
 
 	logpenStyleShow = logpenStyle;

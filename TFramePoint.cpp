@@ -27,5 +27,5 @@ void TFramePoint::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("线型"), GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
 	pListView->AddAttributeItem(TEXT("线宽"), TEXT("%d"), this->logpenStyle.lopnWidth);
 	pListView->AddAttributeItem(TEXT("颜色"), TEXT("0x%X"), this->logpenStyle.lopnColor);
-	pListView->AddAttributeItem(TEXT("P"), TEXT("%.3f,%.3f"),dpt.x, dpt.y);
+	pListView->AddAttributeItem(TEXT("P0"), TEXT("%.3f,%.3f"),dpt.x, dpt.y);
 }

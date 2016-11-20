@@ -26,6 +26,8 @@ public:
 	static double TDraw::Distance(POINT pt1, POINT pt2);
 	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt);
 	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);
+	static RECT TDraw::GetMarginRect(RECT rect, int margin);
+	static void TDraw::GetMarginRect(RECT *rect, int margin);
 
 	static void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig);
 	static void TDraw::DrawFramePoint(HDC hdc, DPOINT dpt, LOGPEN logpen, TConfiguration *Config);
@@ -44,6 +46,8 @@ public:
 	static void TDraw::DrawAxes(HDC hdc, int Ox, int Oy, COLORREF crColor);
 	static void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor);
 	static void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config);
+	static void TDraw::DrawSystemFontText(HDC hdc, TCHAR text[], RECT &rect, COLORREF color, UINT format);
+	static void TDraw::DrawTextAdvance(HDC hdc, TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format);
 
 	static void TDraw::DrawSection(HDC hdc, int x1, int y1, int x2, int y2, int d, int angleDEG);
 	static double TDraw::GetAngleFromPointReal(DPOINT ptO, DPOINT pt);

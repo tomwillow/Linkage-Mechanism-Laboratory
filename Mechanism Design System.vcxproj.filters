@@ -108,6 +108,9 @@
     <ClCompile Include="TTreeViewContent.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TControl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -204,6 +207,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TTreeViewContent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TControl.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

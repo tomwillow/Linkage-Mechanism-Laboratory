@@ -7,9 +7,11 @@
 #include <stdio.h>
 #pragma comment(lib, "comctl32.lib")
 
+#include "TControl.h"
+
 enum eControl_Type {CTRLTYPE_EDIT};
 //class TEdit;
-class TListView
+class TListView:public TControl
 {
 private:
 	int iRowCount, iColumnCount;
@@ -23,8 +25,6 @@ protected:
 	//虚拟消息处理函数，可重载
 	virtual LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 public:
-	HWND m_hWnd;
-	HINSTANCE m_hInst;
 	TListView();
 	~TListView();
 	void TListView::CreateListViewEx(HWND hParent, UINT id, HINSTANCE hInst);//创建ListView
