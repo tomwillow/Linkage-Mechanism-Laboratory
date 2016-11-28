@@ -168,6 +168,8 @@ bool TWindow::CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWO
 
 	m_hInst = hInst;
 	m_hParent = hParent;
+	szName = new TCHAR[_tcslen(lpszName)+1];
+	_tcscpy(szName, lpszName);
 	m_hWnd = CreateWindowEx(dwExStyle, lpszClass, 
 		lpszName, dwStyle, x, y, nWidth, nHeight, 
 		hParent, hMenu, hInst, & mdic);

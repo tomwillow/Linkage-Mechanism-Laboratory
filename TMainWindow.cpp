@@ -1,6 +1,9 @@
 #pragma once
 #include "TMainWindow.h"
 
+#include "TConstraintCoincide.h" 
+#include "TSolve.h"
+
 TMainWindow::TMainWindow()
 {
 	m_iRightWindowWidth = 200;
@@ -53,7 +56,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	//创建右窗口
 	RightWindow.CreateEx(0, TEXT("RightWindow"), TEXT("RightWindow"),
 		WS_CHILD,
-		0,0,0,0,
+		0, 0, 0, 0,
 		hWnd,
 		(HMENU)ID_RIGHTWINDOW,//id
 		m_hInst);
@@ -76,20 +79,10 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	Canvas.ShowWindow(TRUE);
 	Canvas.UpdateWindow();
 
-
-	////创建工具栏
-	//TToolbar m_Toolbar2;
-	//m_Toolbar2.CreateToolbar(Canvas.m_hWnd, m_hInst);
-	//m_Toolbar2.LoadImageList(32, 32, IDR_TOOLBAR_MAIN, RGB(255, 255, 255));
-	//m_Toolbar2.AddButton(0, ID_SELECT, true, TEXT("选择"));
-	//m_Toolbar2.AddSeparator(0);
-	//m_Toolbar2.AddButton(1, ID_DRAW_LINE, true, TEXT("机架"));
-	//m_Toolbar2.AddButton(2, ID_DRAW_LINE, true, TEXT("连杆"));
-	//m_Toolbar2.AddGroup(3, ID_NEW, true, NULL);
-	//m_Toolbar2.ShowToolbar();
+	_tcscpy(szFileName, TEXT(""));
 
 	//默认初始化
-	this->OnCommand(MAKELONG(ID_NEW, 0), 0);
+	this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);
 
 }
 
@@ -124,6 +117,38 @@ void TMainWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 }
 
+bool GetFileExists(TCHAR filename[])
+{
+	WIN32_FIND_DATA FindFileData;
+	HANDLE hFind;
+
+	hFind = FindFirstFile(filename, &FindFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		return false;
+	}
+	else {
+		FindClose(hFind);
+		return true;
+	}
+}
+
+void InitialOpenFileName(OPENFILENAME *ofn, HWND hwnd, TCHAR szFile[], DWORD nMaxFile = MAX_PATH)
+{
+	// Initialize OPENFILENAME
+	ZeroMemory(ofn, sizeof(OPENFILENAME));
+	ofn->lStructSize = sizeof(OPENFILENAME);
+	ofn->hwndOwner = hwnd;
+	ofn->lpstrFile = szFile;
+	ofn->lpstrFile[0] = TEXT('\0');
+	ofn->nMaxFile = nMaxFile;
+	ofn->lpstrFilter = TEXT("机构设计文件(*.mds)\0*.mds\0\0");
+	ofn->nFilterIndex = 1;
+	ofn->lpstrFileTitle = NULL;
+	ofn->nMaxFileTitle = 0;
+	ofn->lpstrInitialDir = NULL;
+}
+
 void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	int wmId = LOWORD(wParam);
@@ -132,6 +157,14 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (wmId)
 	{
 	case ID_NEW:
+		if (wmEvent != ID_NEW_NOCHECK)
+			if (_tcslen(szFileName) > 0 || m_Shape.Element.size()>0)
+			{
+				if (MessageBox(m_hWnd, TEXT("是否新建文件？"), TEXT(""), MB_YESNO) == IDNO)
+					break;
+			}
+		_tcscpy(szFileName, TEXT(""));
+		SetText(szName);
 		m_ManageTool.CloseCurTool();
 		m_Shape.ReleaseAll();
 		RightWindow.TreeViewContent.DeleteAllItems();
@@ -143,11 +176,200 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
 		break;
 	case ID_OPEN:
+		if (m_Shape.Element.size() > 0 && _tcslen(szFileName) > 0)//有数据且已有当前文件名
+		{
+			if (MessageBox(m_hWnd, TEXT("文件未保存，仍然要打开文件？"), NULL, MB_YESNO) == IDNO)
+				return;
+		}
+		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//无条件初始化
+
+		OPENFILENAME ofn;
+		HANDLE hf;
+
+		InitialOpenFileName(&ofn, m_hWnd, szFileName);
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+		if (GetOpenFileName(&ofn) == TRUE)
+		{
+			hf = CreateFile(ofn.lpstrFile,
+				GENERIC_READ,
+				0,
+				(LPSECURITY_ATTRIBUTES)NULL,
+				OPEN_EXISTING,
+				FILE_ATTRIBUTE_NORMAL,
+				(HANDLE)NULL);
+			if (GetLastError() != 0)
+			{
+				ShowMessage(TEXT("Error:%d"), GetLastError());
+				return;
+			}
+
+			DWORD *now_pos = new DWORD;
+			int size;
+			ReadFile(hf, &size, sizeof(int), now_pos, NULL);
+			if (GetLastError() != 0)
+			{
+				ShowMessage(TEXT("Error:%d"), GetLastError());
+				return;
+			}
+			*now_pos += sizeof(int);
+
+			EnumElementType eType;
+			for (int i = 0; i < size; i++)
+			{
+				ReadFile(hf, &eType, sizeof(EnumElementType), now_pos, NULL);
+				if (GetLastError() != 0)
+				{
+					ShowMessage(TEXT("Error:%d"), GetLastError());
+					return;
+				}
+				*now_pos += sizeof(EnumElementType);
+
+				switch (eType)
+				{
+				case ELEMENT_BAR:
+				{
+					TBar *temp = new TBar;
+					ReadFile(hf, temp, m_Shape.GetSizeOfElement(eType), now_pos, NULL);
+					if (GetLastError() != 0)
+					{
+						ShowMessage(TEXT("Error:%d"), GetLastError());
+						return;
+					}
+					m_Shape.AddBar(temp);
+					delete temp;
+					break;
+				}
+				case ELEMENT_REALLINE:
+				{
+					TRealLine *temp = new TRealLine;
+					ReadFile(hf, temp, m_Shape.GetSizeOfElement(eType), now_pos, NULL);
+					if (GetLastError() != 0)
+					{
+						ShowMessage(TEXT("Error:%d"), GetLastError());
+						return;
+					}
+					m_Shape.AddRealLine(*temp);
+					delete temp;
+					break;
+				}
+				case ELEMENT_FRAMEPOINT:
+				{
+					TFramePoint *temp = new TFramePoint;
+					ReadFile(hf, temp, m_Shape.GetSizeOfElement(eType), now_pos, NULL);
+					if (GetLastError() != 0)
+					{
+						ShowMessage(TEXT("Error:%d"), GetLastError());
+						return;
+					}
+					m_Shape.AddFramePoint(*temp);
+					delete temp;
+					break;
+				}
+				case CONSTRAINT_COINCIDE:
+				{
+					TConstraintCoincide *temp = new TConstraintCoincide;
+					ReadFile(hf, temp, m_Shape.GetSizeOfElement(eType), now_pos, NULL);
+					if (GetLastError() != 0)
+					{
+						ShowMessage(TEXT("Error:%d"), GetLastError());
+						return;
+					}
+					m_Shape.AddCoincide(*temp);
+					delete temp;
+					break;
+				}
+				}
+			}
+
+			CloseHandle(hf);
+			delete now_pos;
+			RightWindow.TreeViewContent.AddAllItem();
+			SetText(TEXT("%s - %s"), szName, szFileName);
+		}
 		break;
 	case ID_SAVE:
-		break;
+	{
+		if (wmEvent != ID_SAVE_NOCHECK)
+			if (_tcslen(szFileName) == 0 || GetFileExists(szFileName) == false)//没有当前文件或者当前文件已失效
+			{
+				OPENFILENAME ofn;
+				InitialOpenFileName(&ofn, m_hWnd, szFileName);
+
+				ofn.Flags = OFN_PATHMUSTEXIST;
+				ofn.lpstrDefExt = TEXT("mds");
+
+				if (GetSaveFileName(&ofn) == FALSE)
+					return;
+			}
+
+		//无弹窗直接存储
+		HANDLE hf;
+		hf = CreateFile(szFileName,
+			GENERIC_WRITE,
+			0,
+			(LPSECURITY_ATTRIBUTES)NULL,
+			CREATE_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL,
+			(HANDLE)NULL);
+		if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+		{
+			ShowMessage(TEXT("Error:%d"), GetLastError());
+			return;
+		}
+		DWORD *now_pos = new DWORD;
+		*now_pos = 0;
+
+		//写入元素数量
+		int size = m_Shape.Element.size();
+		WriteFile(hf, &size, sizeof(int), now_pos, NULL);
+		*now_pos += sizeof(int);
+		if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+		{
+			ShowMessage(TEXT("Error:%d"), GetLastError());
+			return;
+		}
+
+		for (int i = 0; i < m_Shape.Element.size(); i++)
+		{
+			//写入类型标记
+			WriteFile(hf, &(m_Shape.Element[i]->eType), sizeof(EnumElementType), now_pos, NULL);
+			*now_pos += sizeof(EnumElementType);
+			if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+			{
+				ShowMessage(TEXT("Error:%d"), GetLastError());
+				return;
+			}
+
+			//写入数据
+			WriteFile(hf, m_Shape.Element[i], m_Shape.GetSizeOfElement(m_Shape.Element[i]->eType), now_pos, NULL);
+			*now_pos += m_Shape.GetSizeOfElement(m_Shape.Element[i]->eType);
+			if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+			{
+				ShowMessage(TEXT("Error:%d"), GetLastError());
+				return;
+			}
+		}
+		delete now_pos;
+		CloseHandle(hf);
+		ShowMessage(TEXT("保存%s成功。"), szFileName);
+		SetText(TEXT("%s - %s"), szName, szFileName);
+
+	}
+	break;
 	case ID_SAVEAS:
+	{
+		OPENFILENAME ofn;
+		InitialOpenFileName(&ofn, m_hWnd, szFileName);
+
+		ofn.Flags = OFN_PATHMUSTEXIST;
+		ofn.lpstrDefExt = TEXT("mds");
+
+		if (GetSaveFileName(&ofn) == FALSE)
+			return;
+		this->OnCommand(MAKELONG(ID_SAVE, ID_SAVE_NOCHECK), 0);
 		break;
+	}
 	case ID_EXIT:
 		PostMessage(m_hWnd, WM_CLOSE, 0, 0);
 		break;
@@ -158,8 +380,36 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		p_Managetool->SetCurActiveTool(wmId);
 		break;
 	case ID_ANALYZE_MECHANISM:
-		int nb;
-		
+	{
+		//TWindow w;	
+		//w.CreateEx(0, TEXT("j"), TEXT("j"),
+		//	WS_OVERLAPPEDWINDOW,
+		//	CW_USEDEFAULT,
+		//	CW_USEDEFAULT,
+		//	CW_USEDEFAULT,
+		//	CW_USEDEFAULT,
+		//	m_hWnd, (HMENU)0, m_hInst);
+		//w.ShowWindow(SW_SHOW);
+		//w.UpdateWindow();
+		//w.MessageLoop();
+		TSolve Solve;
+		Solve.Solute();
+
+		break;
+	}
+	case ID_VIEW_SUITABLE:
+		DPOINT center;
+		double left, right, top, bottom;
+		for (int i = 0; i < m_Shape.Element.size(); i++)
+		{
+			switch (m_Shape.Element[i]->eType)
+			{
+			case ELEMENT_BAR:
+			case ELEMENT_REALLINE:
+
+				break;
+			}
+		}
 		break;
 	}
 }
@@ -194,19 +444,19 @@ void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 	SetRightWindowPos();
 
 
-		//记录下坐标原点相对比例，Canvas变动后再按比例恢复坐标位置
-		DPOINT OrgProportion;
-		if (Canvas.ClientRect.right != 0 && Canvas.ClientRect.bottom != 0)
-		{
-			OrgProportion.x = (double)m_Configuration.GetOrg().x / (double)Canvas.ClientRect.right;
-			OrgProportion.y = (double)m_Configuration.GetOrg().y / (double)Canvas.ClientRect.bottom;
-		}
-		else
-			OrgProportion = { 1.0, 1.0 };
+	//记录下坐标原点相对比例，Canvas变动后再按比例恢复坐标位置
+	DPOINT OrgProportion;
+	if (Canvas.ClientRect.right != 0 && Canvas.ClientRect.bottom != 0)
+	{
+		OrgProportion.x = (double)m_Configuration.GetOrg().x / (double)Canvas.ClientRect.right;
+		OrgProportion.y = (double)m_Configuration.GetOrg().y / (double)Canvas.ClientRect.bottom;
+	}
+	else
+		OrgProportion = { 1.0, 1.0 };
 
 	SetCanvasPos();
 
-		m_Configuration.SetOrg((LONG)(OrgProportion.x*Canvas.ClientRect.right), (LONG)(OrgProportion.y*Canvas.ClientRect.bottom));
+	m_Configuration.SetOrg((LONG)(OrgProportion.x*Canvas.ClientRect.right), (LONG)(OrgProportion.y*Canvas.ClientRect.bottom));
 
 	::InvalidateRect(Canvas.m_hWnd, &Canvas.ClientRect, FALSE);
 }

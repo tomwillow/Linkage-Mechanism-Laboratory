@@ -8,6 +8,7 @@ class TLine:public TElement
 {
 public:
 	POINT ptBegin, ptEnd;
+	double dAngle;
 	double dLength;
 	TLine *pNext = NULL;
 	TLine();

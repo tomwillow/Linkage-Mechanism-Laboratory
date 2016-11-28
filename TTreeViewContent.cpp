@@ -34,6 +34,14 @@ void TTreeViewContent::DeleteById(int id)
 	}
 }
 
+void TTreeViewContent::AddAllItem()
+{
+	for (int i = 0; i < pShape->Element.size(); i++)
+	{
+		AddItem(pShape->Element[i], pShape->Element[i]->id);
+	}
+}
+
 void TTreeViewContent::AddItem(TElement *Element, int id)
 {
 	HTREEITEM temp;

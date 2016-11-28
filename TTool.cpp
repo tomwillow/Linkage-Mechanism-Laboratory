@@ -3,11 +3,10 @@
 
 #include "TMainWindow.h"
 
-#include "TTreeViewContent.h"
-
 extern TMainWindow win;
 TTool::TTool()
 {
+	//pwin = &win;
 	hwndWin = win.m_hWnd;
 	pConfig = &(win.m_Configuration);
 	pCanvas = &(win.Canvas);
@@ -20,8 +19,3 @@ TTool::TTool()
 TTool::~TTool()
 {
 }
-
-//void TTool::RefreshTreeViewContent()
-//{
-//	pTreeViewContent->RefreshItem();
-//}

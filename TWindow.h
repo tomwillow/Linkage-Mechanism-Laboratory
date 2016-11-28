@@ -45,7 +45,7 @@ protected:
 	bool    m_bMainWindow;
 
 public:
-
+	TCHAR *szName;
 	HWND m_hWnd;
 	HWND m_hParent;
 	HINSTANCE m_hInst;
@@ -60,10 +60,13 @@ public:
 		m_bMainWindow  = false;
 		m_bDoubleBuffer = false;
 		m_hTitleIcon = NULL;
+		szName = NULL;
 	}
 
 	virtual ~TWindow(void)
 	{
+		if (szName != NULL)
+			delete[] szName;
 		if ( m_hPalette )
 		{
 			DeleteObject(m_hPalette);

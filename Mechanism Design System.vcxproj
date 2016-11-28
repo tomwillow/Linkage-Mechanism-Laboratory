@@ -78,6 +78,7 @@
     <ClCompile Include="TDraw.cpp" />
     <ClCompile Include="TEdit.cpp" />
     <ClCompile Include="TElement.cpp" />
+    <ClCompile Include="TExpressionTree.cpp" />
     <ClCompile Include="TFramePoint.cpp" />
     <ClCompile Include="TFramePointTool.cpp" />
     <ClCompile Include="TLineEdit.cpp" />
@@ -90,6 +91,7 @@
     <ClCompile Include="TRightWindow.cpp" />
     <ClCompile Include="TSelectTool.cpp" />
     <ClCompile Include="TShape.cpp" />
+    <ClCompile Include="TSolve.cpp" />
     <ClCompile Include="TStatus.cpp" />
     <ClCompile Include="TTool.cpp" />
     <ClCompile Include="TToolbar.cpp" />
@@ -113,6 +115,7 @@
     <ClInclude Include="TDraw.h" />
     <ClInclude Include="TEdit.h" />
     <ClInclude Include="TElement.h" />
+    <ClInclude Include="TExpressionTree.h" />
     <ClInclude Include="TFramePoint.h" />
     <ClInclude Include="TFramePointTool.h" />
     <ClInclude Include="TLineEdit.h" />
@@ -125,6 +128,7 @@
     <ClInclude Include="TRightWindow.h" />
     <ClInclude Include="TSelectTool.h" />
     <ClInclude Include="TShape.h" />
+    <ClInclude Include="TSolve.h" />
     <ClInclude Include="TStatus.h" />
     <ClInclude Include="TTool.h" />
     <ClInclude Include="TToolbar.h" />

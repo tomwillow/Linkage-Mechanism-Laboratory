@@ -182,21 +182,25 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 					angle = TDraw::GetAngleFromPointReal(RealLine.ptBegin, MoveLine->ptEnd);
 					RealLine.SetPoint(RealLine.ptBegin, num, angle);
 					break;
-				case 1:
+				case 1://¡ú
 					RealLine.ptEnd = { RealLine.ptBegin.x + num, RealLine.ptBegin.y };
 					RealLine.dLength = num;
+					RealLine.dAngle = 0;
 					break;
-				case 3:
+				case 3://¡û
 					RealLine.ptEnd = { RealLine.ptBegin.x - num, RealLine.ptBegin.y };
 					RealLine.dLength = num;
+					RealLine.dAngle = M_PI;
 					break;
-				case 2:
+				case 2://¡ü
 					RealLine.ptEnd = { RealLine.ptBegin.x, RealLine.ptBegin.y + num };
 					RealLine.dLength = num;
+					RealLine.dAngle = M_PI/2;
 					break;
-				case 4:
+				case 4://¡ı
 					RealLine.ptEnd = { RealLine.ptBegin.x, RealLine.ptBegin.y - num };
 					RealLine.dLength = num;
+					RealLine.dAngle = 1.5*M_PI;
 					break;
 				}
 				RealLine.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);

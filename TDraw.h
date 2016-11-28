@@ -11,6 +11,7 @@
 class TFramePoint;
 class TDraw
 {
+#define REG2DEG(a) a/M_PI*180.0
 #define FRAMEPOINT_R 6//半径
 #define FRAMEPOINT_H 20//高-圆心到地线距离
 #define FRAMEPOINT_B 30//底边长

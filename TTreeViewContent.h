@@ -30,5 +30,6 @@ public:
 	void TTreeViewContent::DeleteById(int id);
 	void TTreeViewContent::SelectNull();
 	void TTreeViewContent::RefreshAvailableItem();
+	void TTreeViewContent::AddAllItem();//仅用于读入文件时使用
 };
 
