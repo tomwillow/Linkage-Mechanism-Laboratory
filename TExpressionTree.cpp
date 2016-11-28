@@ -35,39 +35,39 @@ TExpressionTree::enumError TExpressionTree::BuildExpressionTree()
 	//逐个识别PostOrder序列，构建表达式树
 	for (int i = 0; i < PostOrder.size(); i++)
 	{
-		switch (PostOrder[i].eType)
+		switch (PostOrder[i]->eType)
 		{
 		case NODE_NUMBER:
 		case NODE_VARIABLE:
-			tempStack.push(&(PostOrder[i]));
+			tempStack.push(PostOrder[i]);
 			break;
 		case NODE_FUNCTION:
 		case NODE_OPERATOR:
-			if (GetOperateNum(PostOrder[i].eOperator) == 2)
+			if (GetOperateNum(PostOrder[i]->eOperator) == 2)
 			{
-				PostOrder[i].right = tempStack.top();
-				tempStack.top()->parent = &PostOrder[i];
+				PostOrder[i]->right = tempStack.top();
+				tempStack.top()->parent = PostOrder[i];
 				tempStack.pop();
-				PostOrder[i].left = tempStack.top();
-				tempStack.top()->parent = &PostOrder[i];
+				PostOrder[i]->left = tempStack.top();
+				tempStack.top()->parent = PostOrder[i];
 				tempStack.pop();
 
-				tempStack.push(&PostOrder[i]);
+				tempStack.push(PostOrder[i]);
 			}
 			else
 			{
-				PostOrder[i].left = tempStack.top();
-				tempStack.top()->parent = &PostOrder[i];
+				PostOrder[i]->left = tempStack.top();
+				tempStack.top()->parent = PostOrder[i];
 				tempStack.pop();
 
-				tempStack.push(&PostOrder[i]);
+				tempStack.push(PostOrder[i]);
 			}
 			break;
 		}
 	}
 
 	//找出root
-	head = &PostOrder[0];
+	head = PostOrder[0];
 	while (head->parent != NULL)
 	{
 		head = head->parent;
@@ -186,16 +186,16 @@ bool TExpressionTree::isBaseOperator(TCHAR c)
 {
 	switch (c)
 	{
-	case TCHAR('('):
-	case TCHAR(')'):
-	case TCHAR('+'):
-	case TCHAR('-'):
-	case TCHAR('*'):
-	case TCHAR('/'):
-	case TCHAR('^'):
-	case TCHAR('&'):
-	case TCHAR('|'):
-	case TCHAR('%'):return true;
+	case TEXT('('):
+	case TEXT(')'):
+	case TEXT('+'):
+	case TEXT('-'):
+	case TEXT('*'):
+	case TEXT('/'):
+	case TEXT('^'):
+	case TEXT('&'):
+	case TEXT('|'):
+	case TEXT('%'):return true;
 	}
 	return false;
 }
@@ -279,25 +279,25 @@ TExpressionTree::enumMathOperator TExpressionTree::BaseOperatorCharToEnum(TCHAR 
 {
 	switch (c)
 	{
-	case TCHAR('('):
+	case TEXT('('):
 		return MATH_LEFT_PARENTHESIS;
-	case TCHAR(')'):
+	case TEXT(')'):
 		return MATH_RIGHT_PARENTHESIS;
-	case TCHAR('+'):
+	case TEXT('+'):
 		return MATH_ADD;
-	case TCHAR('-'):
+	case TEXT('-'):
 		return MATH_SUBSTRACT;
-	case TCHAR('*'):
+	case TEXT('*'):
 		return MATH_MULTIPLY;
-	case TCHAR('/'):
+	case TEXT('/'):
 		return MATH_DIVIDE;
-	case TCHAR('^'):
+	case TEXT('^'):
 		return MATH_POWER;
-	case TCHAR('&'):
+	case TEXT('&'):
 		return MATH_AND;
-	case TCHAR('|'):
+	case TEXT('|'):
 		return MATH_OR;
-	case TCHAR('%'):
+	case TEXT('%'):
 		return MATH_MOD;
 	default:
 		return MATH_NOT_AVAILIALBE;
@@ -347,8 +347,8 @@ bool TExpressionTree::isLegal(TCHAR c)
 /* 字符是a-zA-z或_ */
 bool TExpressionTree::isAlphaCharOrUnderline(TCHAR c)
 {
-	if ((c >= TCHAR('a') && c <= TCHAR('z')) || (c >= TCHAR('A') && c <= TCHAR('Z'))
-		|| c == TCHAR('_'))
+	if ((c >= TEXT('a') && c <= TEXT('z')) || (c >= TEXT('A') && c <= TEXT('Z'))
+		|| c == TEXT('_'))
 		return true;
 	else
 		return false;
@@ -357,7 +357,7 @@ bool TExpressionTree::isAlphaCharOrUnderline(TCHAR c)
 /* 字符是0-9或. */
 bool TExpressionTree::isDoubleChar(TCHAR c)
 {
-	if ((c >= TCHAR('0') && c <= TCHAR('9')) || c == TCHAR('.'))
+	if ((c >= TEXT('0') && c <= TEXT('9')) || c == TEXT('.'))
 		return true;
 	else
 		return false;
@@ -368,17 +368,17 @@ bool TExpressionTree::isDoubleChar(TCHAR c)
 TExpressionTree::enumError TExpressionTree::InQueue2PostQueue()//返回0:正常 1:括号不配对
 {
 	int parenthesis_num = 0;
-	std::stack<TNode> temp;
+	std::stack<TNode *> temp;
 	while (InOrder.size() > 0)
 	{
-		if (InOrder.front().eType == NODE_NUMBER || InOrder.front().eType == NODE_VARIABLE)
+		if (InOrder.front()->eType == NODE_NUMBER || InOrder.front()->eType == NODE_VARIABLE)
 		{
 			PostOrder.push_back(InOrder.front());//数字直接入栈
 			InOrder.pop();
 		}
 		else
 		{
-			if (InOrder.front().eOperator == MATH_LEFT_PARENTHESIS) //(左括号直接入栈
+			if (InOrder.front()->eOperator == MATH_LEFT_PARENTHESIS) //(左括号直接入栈
 			{
 				temp.push(InOrder.front());
 				InOrder.pop();
@@ -386,12 +386,12 @@ TExpressionTree::enumError TExpressionTree::InQueue2PostQueue()//返回0:正常 1:括
 			}
 			else
 			{
-				if (InOrder.front().eOperator == MATH_RIGHT_PARENTHESIS)//)出现右括号
+				if (InOrder.front()->eOperator == MATH_RIGHT_PARENTHESIS)//)出现右括号
 				{
 					//pop至左括号
 					while (temp.size() > 0)
 					{
-						if (temp.top().eOperator == MATH_LEFT_PARENTHESIS)//(
+						if (temp.top()->eOperator == MATH_LEFT_PARENTHESIS)//(
 						{
 							temp.pop();//扔掉左括号
 							parenthesis_num--;
@@ -405,7 +405,7 @@ TExpressionTree::enumError TExpressionTree::InQueue2PostQueue()//返回0:正常 1:括
 					}
 
 					//取出函数
-					if (temp.top().eType == NODE_FUNCTION)
+					if (temp.top()->eType == NODE_FUNCTION)
 					{
 						PostOrder.push_back(temp.top());
 						temp.pop();
@@ -414,7 +414,7 @@ TExpressionTree::enumError TExpressionTree::InQueue2PostQueue()//返回0:正常 1:括
 					//pop所有取正取负
 					while (temp.size() > 0)
 					{
-						if (temp.top().eOperator == MATH_POSITIVE || temp.top().eOperator == MATH_NEGATIVE)
+						if (temp.top()->eOperator == MATH_POSITIVE || temp.top()->eOperator == MATH_NEGATIVE)
 						{
 							PostOrder.push_back(temp.top());
 							temp.pop();
@@ -426,21 +426,21 @@ TExpressionTree::enumError TExpressionTree::InQueue2PostQueue()//返回0:正常 1:括
 				}
 				else//InOrder.front()不是括号
 				{
-					if (InOrder.front().eOperator == MATH_POSITIVE || InOrder.front().eOperator == MATH_NEGATIVE)
+					if (InOrder.front()->eOperator == MATH_POSITIVE || InOrder.front()->eOperator == MATH_NEGATIVE)
 					{
 						temp.push(InOrder.front());
 						InOrder.pop();
 					}
 					else//不是括号也不是正负号
 					{
-						if (temp.size() > 0 && isLeft2Right(temp.top().eOperator) == true)//左结合
-							while (temp.size() > 0 && Rank(InOrder.front().eOperator) <= Rank(temp.top().eOperator))//临时栈有内容，且新进符号优先级低，则挤出高优先级及同优先级符号
+						if (temp.size() > 0 && isLeft2Right(temp.top()->eOperator) == true)//左结合
+							while (temp.size() > 0 && Rank(InOrder.front()->eOperator) <= Rank(temp.top()->eOperator))//临时栈有内容，且新进符号优先级低，则挤出高优先级及同优先级符号
 							{
 								PostOrder.push_back(temp.top());//符号进入post队列
 								temp.pop();
 							}
 						else//右结合
-							while (temp.size() > 0 && Rank(InOrder.front().eOperator) < Rank(temp.top().eOperator))//临时栈有内容，且新进符号优先级低，则挤出高优先级，但不挤出同优先级符号（因为右结合）
+							while (temp.size() > 0 && Rank(InOrder.front()->eOperator) < Rank(temp.top()->eOperator))//临时栈有内容，且新进符号优先级低，则挤出高优先级，但不挤出同优先级符号（因为右结合）
 							{
 								PostOrder.push_back(temp.top());//符号进入post队列
 								temp.pop();
@@ -557,17 +557,22 @@ TCHAR * TExpressionTree::OutputStr()
 
 TCHAR * TExpressionTree::OutputPostOrderStr()
 {
-	TCHAR buffer[MAX_VAR_NAME];
-	if (szPostOrder != NULL)
-		delete[] szPostOrder;
-	szPostOrder = new TCHAR[MAX_VAR_NAME * PostOrder.size()];
-	szPostOrder[0] = TEXT('\0');
-	for (int i = 0; i < PostOrder.size(); i++)
+	if (eError == ERROR_NO)
 	{
-		Node2Str(PostOrder[i], buffer);
-		_tcscat(szPostOrder, buffer);
+		TCHAR buffer[MAX_VAR_NAME];
+		if (szPostOrder != NULL)
+			delete[] szPostOrder;
+		szPostOrder = new TCHAR[MAX_VAR_NAME * PostOrder.size()];
+		szPostOrder[0] = TEXT('\0');
+		for (int i = 0; i < PostOrder.size(); i++)
+		{
+			Node2Str(*PostOrder[i], buffer);
+			_tcscat(szPostOrder, buffer);
+		}
+		return szPostOrder;
 	}
-	return szPostOrder;
+	else
+		return GetErrorInfo(eError);
 }
 
 TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression)
@@ -634,8 +639,8 @@ TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression)
 
 	//二次切分：切分出4类元素
 	//并送入Pre In order
-	std::vector<TNode> PreInOrder;
-	TNode tempNode;
+	std::vector<TNode *> PreInOrder;
+	TNode *tempNode;
 	TCHAR *tempTChar = NULL;
 	enumMathOperator tempeOperator;
 	for (UINT i = 0; i < Data.size(); i++)
@@ -645,9 +650,10 @@ TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression)
 			now = Data[i].start;
 			while (now < Data[i].end)
 			{
-				ZeroMemory(&tempNode, sizeof(tempNode));
-				tempNode.eType = NODE_OPERATOR;
-				tempNode.eOperator = BaseOperatorCharToEnum(*now);
+				tempNode = new TNode;
+				ZeroMemory(tempNode, sizeof(TNode));
+				tempNode->eType = NODE_OPERATOR;
+				tempNode->eOperator = BaseOperatorCharToEnum(*now);
 				PreInOrder.push_back(tempNode);
 				now++;
 			}
@@ -669,18 +675,20 @@ TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression)
 
 			if (isDouble)//数字
 			{
-				ZeroMemory(&tempNode, sizeof(tempNode));
-				tempNode.eType = NODE_NUMBER;
-				tempNode.ValueOrName.value = TTransfer::TCHAR2double(Data[i].start, Data[i].end);
+				tempNode = new TNode;
+				ZeroMemory(tempNode, sizeof(TNode));
+				tempNode->eType = NODE_NUMBER;
+				tempNode->ValueOrName.value = TTransfer::TCHAR2double(Data[i].start, Data[i].end);
 				PreInOrder.push_back(tempNode);
 			}
 			else
 			{
 				if ((tempeOperator = Str2Function(Data[i].start, Data[i].end)) != MATH_NOT_AVAILIALBE)//识别出函数
 				{
-					ZeroMemory(&tempNode, sizeof(tempNode));
-					tempNode.eType = NODE_FUNCTION;
-					tempNode.eOperator = tempeOperator;
+					tempNode = new TNode;
+					ZeroMemory(tempNode, sizeof(TNode));
+					tempNode->eType = NODE_FUNCTION;
+					tempNode->eOperator = tempeOperator;
 					PreInOrder.push_back(tempNode);
 				}
 				else//变量
@@ -688,6 +696,7 @@ TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression)
 					if (isAlphaCharOrUnderline(Data[i].start[0]) == false)//变量名首字符需为下划线或字母
 						return ERROR_INVALID_VARNAME;
 
+					//变量名存入tempTChar
 					int len = Data[i].end - Data[i].start;
 					tempTChar = new TCHAR[len + 1];
 					_tcsncpy(tempTChar, Data[i].start, len);
@@ -695,9 +704,10 @@ TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression)
 
 					VariableTable.push_back(tempTChar);
 
-					ZeroMemory(&tempNode, sizeof(tempNode));
-					tempNode.eType = NODE_VARIABLE;
-					tempNode.ValueOrName.varname = tempTChar;
+					tempNode = new TNode;
+					ZeroMemory(tempNode, sizeof(TNode));
+					tempNode->eType = NODE_VARIABLE;
+					tempNode->ValueOrName.varname = tempTChar;
 					PreInOrder.push_back(tempNode);
 
 					tempTChar = NULL;
@@ -710,30 +720,30 @@ TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression)
 	bool bFirstOrParenFirst = false;
 	bool bAferOneOperator = false;
 	int i = 0;
-	if (PreInOrder[0].eOperator == MATH_ADD)
+	if (PreInOrder[0]->eOperator == MATH_ADD)
 	{
-		PreInOrder[0].eOperator = MATH_POSITIVE;
+		PreInOrder[0]->eOperator = MATH_POSITIVE;
 		i++;
 	}
-	if (PreInOrder[0].eOperator == MATH_SUBSTRACT)
+	if (PreInOrder[0]->eOperator == MATH_SUBSTRACT)
 	{
-		PreInOrder[0].eOperator = MATH_NEGATIVE;
+		PreInOrder[0]->eOperator = MATH_NEGATIVE;
 		i++;
 	}
 	for (; i < PreInOrder.size();)
 	{
-		if (PreInOrder[i].eType == NODE_OPERATOR && PreInOrder[i].eOperator != MATH_RIGHT_PARENTHESIS)
+		if (PreInOrder[i]->eType == NODE_OPERATOR && PreInOrder[i]->eOperator != MATH_RIGHT_PARENTHESIS)
 		{
 			i++;
-			if (PreInOrder[i].eOperator == MATH_ADD)
+			if (PreInOrder[i]->eOperator == MATH_ADD)
 			{
-				PreInOrder[i].eOperator = MATH_POSITIVE;
+				PreInOrder[i]->eOperator = MATH_POSITIVE;
 				i++;
 				continue;
 			}
-			if (PreInOrder[i].eOperator == MATH_SUBSTRACT)
+			if (PreInOrder[i]->eOperator == MATH_SUBSTRACT)
 			{
-				PreInOrder[i].eOperator = MATH_NEGATIVE;
+				PreInOrder[i]->eOperator = MATH_NEGATIVE;
 				i++;
 				continue;
 			}
@@ -778,89 +788,102 @@ TCHAR * TExpressionTree::GetErrorInfo(TExpressionTree::enumError eError)
 	return ErrorInfo;
 }
 
-TExpressionTree::TNode TExpressionTree::CalcNode(TNode *Operator, TNode *Node1, TNode *Node2=NULL)
+void TExpressionTree::CalcNode(TNode *Operator, TNode *Node1, TNode *Node2 = NULL)
 {
-	TNode temp;
-	ZeroMemory(&temp, sizeof(temp));
-	temp.eType = NODE_NUMBER;
+	Operator->eType = NODE_NUMBER;
 	switch (Operator->eOperator)
 	{
 	case MATH_SQRT:
-		temp.ValueOrName.value = sqrt(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = sqrt(Node1->ValueOrName.value);
 		break;
 	case MATH_SIN:
-		temp.ValueOrName.value = sin(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = sin(Node1->ValueOrName.value);
 		break;
 	case MATH_COS:
-		temp.ValueOrName.value = cos(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = cos(Node1->ValueOrName.value);
 		break;
 	case MATH_TAN:
-		temp.ValueOrName.value = tan(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = tan(Node1->ValueOrName.value);
 		break;
 	case MATH_ARCSIN:
-		temp.ValueOrName.value = asin(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = asin(Node1->ValueOrName.value);
 		break;
 	case MATH_ARCCOS:
-		temp.ValueOrName.value = acos(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = acos(Node1->ValueOrName.value);
 		break;
 	case MATH_ARCTAN:
-		temp.ValueOrName.value = atan(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = atan(Node1->ValueOrName.value);
 		break;
 	case MATH_POSITIVE:
 		break;
 	case MATH_NEGATIVE:
-		temp.ValueOrName.value = -Node1->ValueOrName.value;
+		Operator->ValueOrName.value = -Node1->ValueOrName.value;
 		break;
 
 	case MATH_MOD://%
-		temp.ValueOrName.value = (int)Node1->ValueOrName.value % (int)Node2->ValueOrName.value;
+		Operator->ValueOrName.value = (int)Node1->ValueOrName.value % (int)Node2->ValueOrName.value;
 		break;
 	case MATH_AND://&
-		temp.ValueOrName.value = (int)Node1->ValueOrName.value & (int)Node2->ValueOrName.value;
+		Operator->ValueOrName.value = (int)Node1->ValueOrName.value & (int)Node2->ValueOrName.value;
 		break;
 	case MATH_OR://|
-		temp.ValueOrName.value = (int)Node1->ValueOrName.value | (int)Node2->ValueOrName.value;
+		Operator->ValueOrName.value = (int)Node1->ValueOrName.value | (int)Node2->ValueOrName.value;
 		break;
 
 	case MATH_POWER://^
-		temp.ValueOrName.value = pow(Node1->ValueOrName.value, Node2->ValueOrName.value);
+		Operator->ValueOrName.value = pow(Node1->ValueOrName.value, Node2->ValueOrName.value);
 		break;
 
 	case MATH_MULTIPLY:
-		temp.ValueOrName.value = Node1->ValueOrName.value * Node2->ValueOrName.value;
+		Operator->ValueOrName.value = Node1->ValueOrName.value * Node2->ValueOrName.value;
 		break;
 	case MATH_DIVIDE:
-		temp.ValueOrName.value = Node1->ValueOrName.value / Node2->ValueOrName.value;
+		Operator->ValueOrName.value = Node1->ValueOrName.value / Node2->ValueOrName.value;
 		break;
 
 	case MATH_ADD:
-		temp.ValueOrName.value = Node1->ValueOrName.value + Node2->ValueOrName.value;
+		Operator->ValueOrName.value = Node1->ValueOrName.value + Node2->ValueOrName.value;
 		break;
 	case MATH_SUBSTRACT:
-		temp.ValueOrName.value = Node1->ValueOrName.value - Node2->ValueOrName.value;
+		Operator->ValueOrName.value = Node1->ValueOrName.value - Node2->ValueOrName.value;
 		break;
 	}
-	return temp;
+}
+
+void TExpressionTree::Simplify(TNode *now)
+{
+	if (now->left != NULL)
+		Simplify(now->left);
+
+
+	if (now->right != NULL)
+		Simplify(now->right);
+
+	if (GetOperateNum(now->eOperator) == 2)
+	{
+		if (now->left->eType == NODE_NUMBER && now->right->eType == NODE_NUMBER)
+		{
+			CalcNode(now, now->left, now->right);
+			delete now->left;
+			delete now->right;
+			now->eOperator = MATH_NOT_AVAILIALBE;
+			now->left = NULL;
+			now->right = NULL;
+		}
+	}
 }
 
 TCHAR * TExpressionTree::Simplify()
 {
-	std::vector<TNode *> DeleteList;
-	for (int i = 0; i < PostOrder.size(); i++)
+	if (eError == ERROR_NO)
 	{
-		if (GetOperateNum(PostOrder[i].eOperator) == 2)
-		{
-			if (PostOrder[i].left->eType == NODE_NUMBER && PostOrder[i].right->eType == NODE_NUMBER)
-			{
-				DeleteList.push_back(PostOrder[i].left);
-				DeleteList.push_back(PostOrder[i].right);
-				PostOrder[i] = CalcNode(&PostOrder[i],PostOrder[i].left,PostOrder[i].right);
-				continue;
-			}
-		}
-	}
+		TNode *temp = head;
+		Simplify(head);
 
-	return OutputStr();
+		return OutputStr();
+	}
+	else
+		return GetErrorInfo(eError);
 }
 
 TCHAR * TExpressionTree::Read(TCHAR *expression)

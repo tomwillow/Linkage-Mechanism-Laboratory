@@ -59,8 +59,8 @@ private:
 
 	TCHAR *szPostOrder,*szInOrder;
 	std::vector<TCHAR *> VariableTable;
-	std::queue<TNode> InOrder;// , PostOrder;
-	std::vector<TNode> PostOrder;
+	std::queue<TNode *> InOrder;// , PostOrder;
+	std::vector<TNode *> PostOrder;
 	TNode *head;
 	int TExpressionTree::Rank(enumMathOperator eOperator);
 	enumError TExpressionTree::InQueue2PostQueue();
@@ -68,13 +68,14 @@ private:
 	void TExpressionTree::Node2Str(TNode &node, TCHAR *result);
 	TExpressionTree::enumError TExpressionTree::BuildExpressionTree();
 	void TExpressionTree::TraverseInOrder(TNode *now, TCHAR *output, TCHAR *buffer);
-	TExpressionTree::TNode TExpressionTree::CalcNode(TNode *Operator, TNode *Node1, TNode *Node2);
+	void TExpressionTree::CalcNode(TNode *Operator, TNode *Node1, TNode *Node2);
+	void TExpressionTree::Simplify(TNode *now);
 public:
 	TCHAR * TExpressionTree::Read(TCHAR *expression);//返回0为出错，出错信息保存在ErrorInfo中。
 	TCHAR * TExpressionTree::OutputStr();//输出表达式
 	TCHAR * TExpressionTree::OutputPostOrderStr();//输出PostOrder表达式
 	TCHAR * TExpressionTree::Simplify();//化简
-	void TExpressionTree::Output(TCHAR *buffer){};
+	//void TExpressionTree::Output(TCHAR *buffer){};
 
 	TExpressionTree();
 	~TExpressionTree();

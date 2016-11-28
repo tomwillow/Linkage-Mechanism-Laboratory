@@ -45,6 +45,6 @@ void TSolve::Solute()
 	_tcscpy(buffer2, TEXT("x1+-5*-sin(7^2^3+2*5)-cos (x2-7)"));
 	ShowMessage(ex.Read(buffer2));
 	ShowMessage(ex.Simplify());
-	//ShowMessage(ex.OutputStr());
+	//ShowMessage(ex.OutputPostOrderStr());
 	//ShowMessage(buffer);
 }
