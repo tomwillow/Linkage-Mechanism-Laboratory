@@ -73,6 +73,8 @@
     <ClCompile Include="TCanvas.cpp" />
     <ClCompile Include="TConfiguration.cpp" />
     <ClCompile Include="DPOINT.cpp" />
+    <ClCompile Include="TConsole.cpp" />
+    <ClCompile Include="TConsoleEdit.cpp" />
     <ClCompile Include="TConstraintCoincide.cpp" />
     <ClCompile Include="TControl.cpp" />
     <ClCompile Include="TDraw.cpp" />
@@ -110,6 +112,8 @@
     <ClInclude Include="TCanvas.h" />
     <ClInclude Include="TConfiguration.h" />
     <ClInclude Include="DPOINT.h" />
+    <ClInclude Include="TConsole.h" />
+    <ClInclude Include="TConsoleEdit.h" />
     <ClInclude Include="TConstraintCoincide.h" />
     <ClInclude Include="TControl.h" />
     <ClInclude Include="TDraw.h" />

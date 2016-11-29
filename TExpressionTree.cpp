@@ -14,22 +14,64 @@ TExpressionTree::TExpressionTree()
 
 TExpressionTree::~TExpressionTree()
 {
+	Release();
+}
+
+void TExpressionTree::Release()
+{
 	if (ErrorInfo != NULL)
 		delete[] ErrorInfo;
+	ErrorInfo = NULL;
 
 	if (szPostOrder != NULL)
 		delete[] szPostOrder;
+	szPostOrder = NULL;
 
 	if (szInOrder != NULL)
 		delete[] szInOrder;
+	szInOrder = NULL;
 
 	for (UINT i = 0; i < VariableTable.size(); i++)
 	{
 		delete[] VariableTable[i];
 	}
+	VariableTable.clear();
+
+	DeleteNode(head);
+	head = NULL;
 }
 
-TExpressionTree::enumError TExpressionTree::BuildExpressionTree()
+void TExpressionTree::DeleteNode(TNode *node)//删除node指向对象但不重置node指针
+{
+	if (node != NULL)
+	{
+		std::vector<TNode *> DeleteList;
+		DeleteNode(node, DeleteList);
+
+		if (node->parent != NULL)
+		{
+			if (node->parent->left == node)
+				node->parent->left = NULL;
+			if (node->parent->right == node)
+				node->parent->right = NULL;
+		}
+		for (int i = 0; i < DeleteList.size(); i++)
+		{
+			delete DeleteList[i];
+		}
+	}
+}
+
+void TExpressionTree::DeleteNode(TNode *node, std::vector<TNode *> DeleteList)
+{
+	if (node->left != NULL)
+		DeleteNode(node->left);
+	if (node->right != NULL)
+		DeleteNode(node->right);
+	DeleteList.push_back(node);
+}
+
+TExpressionTree::enumError TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder)
 {
 	std::stack<TNode *> tempStack;
 	//逐个识别PostOrder序列，构建表达式树
@@ -365,7 +407,7 @@ bool TExpressionTree::isDoubleChar(TCHAR c)
 
 
 /*由in order队列得到post order队列*/
-TExpressionTree::enumError TExpressionTree::InQueue2PostQueue()//返回0:正常 1:括号不配对
+TExpressionTree::enumError TExpressionTree::InQueue2PostQueue(std::queue<TNode *> &InOrder, std::vector<TNode *> &PostOrder)
 {
 	int parenthesis_num = 0;
 	std::stack<TNode *> temp;
@@ -469,7 +511,10 @@ void TExpressionTree::Node2Str(TNode &node, TCHAR *result)
 	switch (node.eType)
 	{
 	case NODE_NUMBER:
-		_stprintf(result, TEXT("%f"), node.ValueOrName.value);
+		if (abs(node.ValueOrName.value - (int)node.ValueOrName.value) < MIN_DOUBLE)
+			_stprintf(result, TEXT("%d"), (int)node.ValueOrName.value);
+		else
+			_stprintf(result, TEXT("%f"), node.ValueOrName.value);
 		break;
 	case NODE_VARIABLE:
 		_tcscpy(result, node.ValueOrName.varname);
@@ -538,6 +583,27 @@ void TExpressionTree::TraverseInOrder(TNode *now, TCHAR *output, TCHAR *buffer)
 	}
 }
 
+void TExpressionTree::GetNodeNum(TNode *now, int &n)
+{
+	if (now->left != NULL)
+		GetNodeNum(now->left, n);
+	if (now->right != NULL)
+		GetNodeNum(now->right, n);
+	n++;
+}
+
+int TExpressionTree::GetNodeNum(TNode *head)
+{
+	int num = 0;
+	if (head != 0)
+	{
+		GetNodeNum(head, num);
+		return num;
+	}
+	else
+		return 0;
+}
+
 TCHAR * TExpressionTree::OutputStr()
 {
 	if (eError == ERROR_NO)
@@ -545,7 +611,7 @@ TCHAR * TExpressionTree::OutputStr()
 		TCHAR buffer[MAX_VAR_NAME];
 		if (szInOrder != NULL)
 			delete[] szInOrder;
-		szInOrder = new TCHAR[MAX_VAR_NAME * PostOrder.size()];
+		szInOrder = new TCHAR[MAX_VAR_NAME * GetNodeNum(head)];
 		szInOrder[0] = TEXT('\0');
 		if (head != NULL)
 			TraverseInOrder(head, szInOrder, buffer);
@@ -562,20 +628,20 @@ TCHAR * TExpressionTree::OutputPostOrderStr()
 		TCHAR buffer[MAX_VAR_NAME];
 		if (szPostOrder != NULL)
 			delete[] szPostOrder;
-		szPostOrder = new TCHAR[MAX_VAR_NAME * PostOrder.size()];
+		szPostOrder = new TCHAR[MAX_VAR_NAME * GetNodeNum(head)];
 		szPostOrder[0] = TEXT('\0');
-		for (int i = 0; i < PostOrder.size(); i++)
-		{
-			Node2Str(*PostOrder[i], buffer);
-			_tcscat(szPostOrder, buffer);
-		}
+		//for (int i = 0; i < PostOrder.size(); i++)
+		//{
+		//	Node2Str(*PostOrder[i], buffer);
+		//	_tcscat(szPostOrder, buffer);
+		//}
 		return szPostOrder;
 	}
 	else
 		return GetErrorInfo(eError);
 }
 
-TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression)
+TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> &InOrder)
 {
 	if (_tcslen(expression) == 0)
 		return ERROR_EMPTY_INPUT;
@@ -773,16 +839,22 @@ TCHAR * TExpressionTree::GetErrorInfo(TExpressionTree::enumError eError)
 		_tcscpy(ErrorInfo, TEXT("没有错误。"));
 		break;
 	case ERROR_ILLEGALCHAR:
-		_tcscpy(ErrorInfo, TEXT("出现非法字符。"));
+		_tcscpy(ErrorInfo, TEXT("错误：出现非法字符。"));
 		break;
 	case ERROR_PARENTHESIS_NOT_MATCH:
-		_tcscpy(ErrorInfo, TEXT("括号不匹配。"));
+		_tcscpy(ErrorInfo, TEXT("错误：括号不匹配。"));
 		break;
 	case ERROR_INVALID_VARNAME:
-		_tcscpy(ErrorInfo, TEXT("不正确的变量名（必须以下划线\"_\"或英文字母开头）。"));
+		_tcscpy(ErrorInfo, TEXT("错误：不正确的变量名（必须以下划线\"_\"或英文字母开头）。"));
 		break;
 	case ERROR_EMPTY_INPUT:
 		_tcscpy(ErrorInfo, TEXT("表达式为空。"));
+		break;
+	case ERROR_DIVIDE_ZERO:
+		_tcscpy(ErrorInfo, TEXT("错误：不得除以0。"));
+		break;
+	case ERROR_UNKNOWN_VARIABLE:
+		_tcscpy(ErrorInfo, TEXT("错误：出现未知变量。"));
 		break;
 	}
 	return ErrorInfo;
@@ -850,17 +922,202 @@ void TExpressionTree::CalcNode(TNode *Operator, TNode *Node1, TNode *Node2 = NUL
 	}
 }
 
-void TExpressionTree::Simplify(TNode *now)
-{
-	if (now->left != NULL)
-		Simplify(now->left);
 
+TExpressionTree::TNode * TExpressionTree::CopyNodeTree(TNode *oldNode)
+{
+	TNode *newNode;
+	newNode = new TNode;
+	ZeroMemory(newNode, sizeof(TNode));
+	newNode->eType = oldNode->eType;
+	newNode->eOperator = oldNode->eOperator;
+	newNode->ValueOrName = oldNode->ValueOrName;
+
+	if (oldNode->left != NULL)
+	{
+		newNode->left=CopyNodeTree(oldNode->left);
+		newNode->left->parent = newNode;
+	}
+	if (oldNode->right != NULL)
+	{
+		newNode->right = CopyNodeTree(oldNode->right);
+		newNode->right->parent = newNode;
+	}
+
+	return newNode;
+}
+
+void TExpressionTree::Diff(TNode *now, TCHAR *var)//var为指向变量的指针，一定位于变量表内
+{
+	switch (now->eType)
+	{
+	case NODE_VARIABLE:
+		ZeroMemory(now, sizeof(TNode));
+		now->eType = NODE_NUMBER;
+		if (now->ValueOrName.varname == var)
+			now->ValueOrName.value = 1;
+		else
+			now->ValueOrName.value = 0;
+		return;
+	case NODE_NUMBER:
+		now->ValueOrName.value = 0;
+		return;
+	case NODE_OPERATOR:
+		switch (now->eOperator)
+		{
+		case MATH_ADD:
+		case MATH_SUBSTRACT:
+			if (now->left != NULL)
+				Diff(now->left, var);
+			if (now->right != NULL)
+				Diff(now->right, var);
+			return;
+		case MATH_MULTIPLY:
+		{
+			TNode *plus;
+			plus = new TNode;
+			ZeroMemory(plus, sizeof(TNode));
+			plus->eType = NODE_OPERATOR;
+			plus->eOperator = MATH_ADD;
+			if (now!=head)
+			{
+				//plus上下行连接
+				if (now->parent->left == now)
+					now->parent->left = plus;
+				if (now->parent->right == now)
+					now->parent->right = plus;
+				plus->parent = now->parent;
+			}
+			else
+			{
+				head = plus;
+			}
+				now->parent = plus;
+				plus->left = now;
+				TNode *newRight;
+				newRight=CopyNodeTree(now);
+
+				plus->right = newRight;
+				newRight->parent = plus;
+
+				Diff(plus->left->left, var);
+				Diff(plus->right->right, var);
+		}
+		}
+	}
+}
+
+TCHAR * TExpressionTree::Diff(TCHAR *var, int n, bool bOutput)
+{
+	if (eError == ERROR_NO)
+	{
+		TCHAR *Variable;
+		for (int i = 0; i < VariableTable.size(); i++)
+			if (_tcscmp(var, VariableTable[i]) == 0)
+				Variable = VariableTable[i];
+			else
+				return GetErrorInfo(eError = ERROR_UNKNOWN_VARIABLE);
+
+		for (int i = 0; i < n; i++)
+		{
+			Diff(head, Variable);
+		}
+		//return Simplify(bOutput);
+		return OutputStr();
+	}
+
+	return GetErrorInfo(eError);
+}
+
+TExpressionTree::enumError TExpressionTree::Simplify(TNode *now)
+{
+	TExpressionTree::enumError nowError = ERROR_NO;
+	if (now->left != NULL)
+		nowError = Simplify(now->left);
 
 	if (now->right != NULL)
-		Simplify(now->right);
+		nowError = Simplify(now->right);
+
+	if (nowError != ERROR_NO)
+		return nowError;
 
 	if (GetOperateNum(now->eOperator) == 2)
 	{
+		bool LChildIsZero = (now->left->eType == NODE_NUMBER && abs(now->left->ValueOrName.value) < MIN_DOUBLE);
+		bool RChildIsZero = (now->right->eType == NODE_NUMBER && abs(now->right->ValueOrName.value) < MIN_DOUBLE);
+
+		//若左右儿子中出现0
+		if (LChildIsZero || RChildIsZero)
+		{
+			switch (now->eOperator)
+			{
+			case MATH_DIVIDE:
+				if (RChildIsZero)
+					return ERROR_DIVIDE_ZERO;
+			case MATH_MULTIPLY:
+			{
+				TNode *temp = now;
+				//新建一个0节点替换掉当前运算符，这个0节点将在回溯时处理
+				temp = new TNode;
+				ZeroMemory(temp, sizeof(TNode));
+				temp->eType = NODE_NUMBER;
+				temp->ValueOrName.value = 0;
+				if (now->parent != NULL)
+				{
+					if (now->parent->left == now)
+						now->parent->left = temp;
+					if (now->parent->right == now)
+						now->parent->right = temp;
+				}
+				else
+					head = temp;
+				DeleteNode(now);
+				return ERROR_NO;
+			}
+			case MATH_ADD:
+			case MATH_SUBSTRACT:
+				if (now->parent != NULL)
+				{
+					if (now->parent->left == now)//当前节点为上一级的左节点
+					{
+						if (LChildIsZero)
+							now->parent->left = now->right;
+						if (RChildIsZero)
+							now->parent->left = now->left;
+					}
+					if (now->parent->right == now)//当前节点为上一级的右节点
+					{
+						if (LChildIsZero)
+							now->parent->right = now->right;
+						if (RChildIsZero)
+							now->parent->right = now->left;
+					}
+
+					if (LChildIsZero)
+						delete now->left;
+					if (RChildIsZero)
+						delete now->right;
+					delete now;
+					return ERROR_NO;
+				}
+				else
+				{
+					if (LChildIsZero)
+					{
+						head = now->right;
+						delete now->left;
+					}
+					if (RChildIsZero)
+					{
+						head = now->left;
+						delete now->right;
+					}
+					delete now;
+					return ERROR_NO;
+				}
+			}
+		}
+
+		//若左右儿子都是数字
 		if (now->left->eType == NODE_NUMBER && now->right->eType == NODE_NUMBER)
 		{
 			CalcNode(now, now->left, now->right);
@@ -871,27 +1128,45 @@ void TExpressionTree::Simplify(TNode *now)
 			now->right = NULL;
 		}
 	}
+	return nowError;
 }
 
-TCHAR * TExpressionTree::Simplify()
+TCHAR * TExpressionTree::OutputEmptyStr()
+{
+	szInOrder = new TCHAR[1];
+	_tcscpy(szInOrder, TEXT(""));
+	return szInOrder;
+}
+
+TCHAR * TExpressionTree::Simplify(bool bOutput)
 {
 	if (eError == ERROR_NO)
 	{
 		TNode *temp = head;
-		Simplify(head);
-
-		return OutputStr();
+		if ((eError = Simplify(head)) == ERROR_NO)
+			if (bOutput)
+				return OutputStr();
+			else
+				return OutputEmptyStr();
 	}
-	else
-		return GetErrorInfo(eError);
+
+	return GetErrorInfo(eError);
 }
 
-TCHAR * TExpressionTree::Read(TCHAR *expression)
+TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput)
 {
-	if ((eError = ReadToInOrder(expression)) == ERROR_NO)
-		if ((eError = InQueue2PostQueue()) == ERROR_NO)
-			if ((eError = BuildExpressionTree()) == ERROR_NO)
-				return OutputStr();
+	std::queue<TNode *> InOrder;// , PostOrder;
+	std::vector<TNode *> PostOrder;
+
+	if ((eError = ReadToInOrder(expression, InOrder)) == ERROR_NO)
+		if ((eError = InQueue2PostQueue(InOrder, PostOrder)) == ERROR_NO)
+			if ((eError = BuildExpressionTree(PostOrder)) == ERROR_NO)
+			{
+				if (bOutput)
+					return OutputStr();
+				else
+					return OutputEmptyStr();
+			}
 
 	return GetErrorInfo(eError);
 }
@@ -917,7 +1192,7 @@ int Replace(TCHAR *src, TCHAR *sub, TCHAR *dest)
 	if (pos.size() == 0) return 0;
 	int newsize = srclen + pos.size()*(destlen - sublen) + 1;//新串的大小，加上末尾的\0
 	TCHAR *newsrc = (TCHAR *)malloc(newsize*sizeof(TCHAR));
-	newsrc[0] = TEXT('');
+	newsrc[0] = TEXT('\0');
 	TCHAR *prevpos = src;
 	for (UINT i = 0; i < pos.size(); i++)
 	{

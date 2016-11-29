@@ -14,7 +14,9 @@ private:
 		ERROR_ILLEGALCHAR,//出现非法字符
 		ERROR_PARENTHESIS_NOT_MATCH,//括号不匹配
 		ERROR_INVALID_VARNAME,//不正确的变量名
-		ERROR_EMPTY_INPUT
+		ERROR_EMPTY_INPUT,
+		ERROR_DIVIDE_ZERO,
+		ERROR_UNKNOWN_VARIABLE
 	} eError;
 	enum enumMathOperator{
 		MATH_NOT_AVAILIALBE,
@@ -43,6 +45,8 @@ private:
 		TNode *left, *right;
 	};
 
+	void TExpressionTree::Release();
+
 	TCHAR *ErrorInfo;
 	TCHAR * TExpressionTree::GetErrorInfo(TExpressionTree::enumError eError);
 
@@ -59,22 +63,28 @@ private:
 
 	TCHAR *szPostOrder,*szInOrder;
 	std::vector<TCHAR *> VariableTable;
-	std::queue<TNode *> InOrder;// , PostOrder;
-	std::vector<TNode *> PostOrder;
 	TNode *head;
 	int TExpressionTree::Rank(enumMathOperator eOperator);
-	enumError TExpressionTree::InQueue2PostQueue();
-	TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression);
+	TExpressionTree::enumError TExpressionTree::InQueue2PostQueue(std::queue<TNode *> &InOrder, std::vector<TNode *> &PostOrder);
+	TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> &InOrder);
 	void TExpressionTree::Node2Str(TNode &node, TCHAR *result);
-	TExpressionTree::enumError TExpressionTree::BuildExpressionTree();
+	TExpressionTree::enumError TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder);
 	void TExpressionTree::TraverseInOrder(TNode *now, TCHAR *output, TCHAR *buffer);
 	void TExpressionTree::CalcNode(TNode *Operator, TNode *Node1, TNode *Node2);
-	void TExpressionTree::Simplify(TNode *now);
+	TExpressionTree::enumError TExpressionTree::Simplify(TNode *now);
+	void TExpressionTree::GetNodeNum(TNode *now, int &n);
+	int TExpressionTree::GetNodeNum(TNode *head);
+	void TExpressionTree::DeleteNode(TNode *node, std::vector<TNode *> DeleteList);
+	void TExpressionTree::DeleteNode(TNode *node);
+	TCHAR * TExpressionTree::OutputEmptyStr();
+	void TExpressionTree::Diff(TNode *now, TCHAR *var);
+	TExpressionTree::TNode * TExpressionTree::CopyNodeTree(TNode *oldNode);
 public:
-	TCHAR * TExpressionTree::Read(TCHAR *expression);//返回0为出错，出错信息保存在ErrorInfo中。
+	TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput);
 	TCHAR * TExpressionTree::OutputStr();//输出表达式
 	TCHAR * TExpressionTree::OutputPostOrderStr();//输出PostOrder表达式
-	TCHAR * TExpressionTree::Simplify();//化简
+	TCHAR * TExpressionTree::Simplify(bool bOutput);//化简
+	TCHAR * TExpressionTree::Diff(TCHAR *var, int n, bool bOutput);//对变量求导
 	//void TExpressionTree::Output(TCHAR *buffer){};
 
 	TExpressionTree();

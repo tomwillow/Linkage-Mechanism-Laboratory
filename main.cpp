@@ -17,6 +17,8 @@
 #pragma comment(lib,"user32.lib")
 #pragma comment(lib,"gdi32.lib")
 #pragma comment(lib,"comctl32.lib")//样式使用
+#pragma comment(lib,"Comdlg32.lib")
+
 
 TMainWindow win;
 

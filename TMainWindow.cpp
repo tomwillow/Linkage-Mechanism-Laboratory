@@ -1,8 +1,10 @@
 #pragma once
+#include <process.h>
 #include "TMainWindow.h"
 
 #include "TConstraintCoincide.h" 
 #include "TSolve.h"
+#include "TConsole.h"
 
 TMainWindow::TMainWindow()
 {
@@ -78,6 +80,9 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	Canvas.SetDoubleBuffer(true);
 	Canvas.ShowWindow(TRUE);
 	Canvas.UpdateWindow();
+
+
+
 
 	_tcscpy(szFileName, TEXT(""));
 
@@ -381,19 +386,19 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_ANALYZE_MECHANISM:
 	{
-		//TWindow w;	
-		//w.CreateEx(0, TEXT("j"), TEXT("j"),
-		//	WS_OVERLAPPEDWINDOW,
-		//	CW_USEDEFAULT,
-		//	CW_USEDEFAULT,
-		//	CW_USEDEFAULT,
-		//	CW_USEDEFAULT,
-		//	m_hWnd, (HMENU)0, m_hInst);
-		//w.ShowWindow(SW_SHOW);
-		//w.UpdateWindow();
-		//w.MessageLoop();
-		TSolve Solve;
-		Solve.Solute();
+
+		TConsole Console;
+		Console.CreateEx(0, TEXT("Console"), TEXT("Console"),
+			WS_OVERLAPPEDWINDOW,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			m_hWnd, (HMENU)0, m_hInst);
+		Console.ShowWindow(SW_SHOW);
+		Console.UpdateWindow();
+		Console.MessageLoop();
+
 
 		break;
 	}

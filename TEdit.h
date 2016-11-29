@@ -19,6 +19,7 @@ protected:
 	//接收字符按键，返回值决定是否调用默认消息处理
 	virtual bool TEdit::OnChar(WPARAM wParam, LPARAM lParam){ return true; };
 public:
+	bool bMultiLine,bAutoHScrol,bAutoVScrol;
 	HFONT m_hFont;
 	HWND m_hWnd;
 	HINSTANCE m_hInst;
@@ -28,6 +29,7 @@ public:
 	void TEdit::SetPos(int x, int y, int width, int height);//设置大小及位置
 	void TEdit::SetPos(RECT rect);//设置大小及位置
 	void TEdit::SetVisible(bool bShow);//设置可见性
+	void TEdit::SetDefaultGuiFont();
 	void CDECL TEdit::SetText(TCHAR szFormat[], ...);//设置内容
 	void TEdit::GetText(TCHAR text[]);
 	int TEdit::GetLength();//获取字符串长度
