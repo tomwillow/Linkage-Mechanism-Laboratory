@@ -99,6 +99,7 @@
     <ClCompile Include="TToolbar.cpp" />
     <ClCompile Include="TTreeView.cpp" />
     <ClCompile Include="TTreeViewContent.cpp" />
+    <ClCompile Include="TVariableTable.cpp" />
     <ClCompile Include="TWindow.cpp" />
     <ClCompile Include="TTrackbar.cpp" />
     <ClCompile Include="TTransfer.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="TToolbar.h" />
     <ClInclude Include="TTreeView.h" />
     <ClInclude Include="TTreeViewContent.h" />
+    <ClInclude Include="TVariableTable.h" />
     <ClInclude Include="TWindow.h" />
     <ClInclude Include="TTrackbar.h" />
     <ClInclude Include="TTransfer.h" />

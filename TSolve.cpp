@@ -82,9 +82,10 @@ void TSolve::Solute()
 	}
 	//Output(buffer);
 	TExpressionTree ex;
-	_tcscpy(buffer2, TEXT("x*sin(4*x)*x"));
-	Output(ex.Read(buffer2, false));
-	Output(ex.Simplify(false));
-	Output(ex.Diff(TEXT("x"),1,true));
-	//ShowMessage(ex.OutputPostOrderStr());
+	Output(ex.Read(TEXT("x^sin(x)"), true));
+	Output(ex.Simplify(true));
+	Output(ex.Diff(TEXT("x"), 1, true));
+	Output(ex.Simplify(true));
+	Output(ex.Subs(TEXT("x,y"), TEXT(" 1.24*y,2.1 ")));
+	Output(ex.Simplify(true));
 }

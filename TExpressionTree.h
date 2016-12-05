@@ -16,13 +16,16 @@ private:
 		ERROR_INVALID_VARNAME,//不正确的变量名
 		ERROR_EMPTY_INPUT,
 		ERROR_DIVIDE_ZERO,
-		ERROR_UNKNOWN_VARIABLE
+		ERROR_UNKNOWN_VARIABLE,
+		ERROR_ZERO_POWEROF_ZERO,
+		ERROR_SUBS_NOT_EQUAL
 	} eError;
 	enum enumMathOperator{
 		MATH_NOT_AVAILIALBE,
 		MATH_POSITIVE, MATH_NEGATIVE,
 		MATH_SIN, MATH_COS, MATH_TAN,
 		MATH_ARCSIN, MATH_ARCCOS, MATH_ARCTAN,MATH_SQRT,
+		MATH_LN,MATH_LOG10,MATH_EXP,
 		MATH_POWER,MATH_AND,MATH_OR,MATH_MOD,
 		MATH_ADD, MATH_SUBSTRACT, 
 		MATH_MULTIPLY, MATH_DIVIDE,
@@ -63,7 +66,6 @@ private:
 
 	TCHAR *szPostOrder,*szInOrder;
 	std::vector<TCHAR *> VariableTable;
-	TNode *head;
 	int TExpressionTree::Rank(enumMathOperator eOperator);
 	TExpressionTree::enumError TExpressionTree::InQueue2PostQueue(std::queue<TNode *> &InOrder, std::vector<TNode *> &PostOrder);
 	TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> &InOrder);
@@ -79,13 +81,22 @@ private:
 	TCHAR * TExpressionTree::OutputEmptyStr();
 	void TExpressionTree::Diff(TNode *now, TCHAR *var);
 	TExpressionTree::TNode * TExpressionTree::CopyNodeTree(TNode *oldNode);
+	TCHAR * TExpressionTree::FindVariableTable(TCHAR *varstr);//查找变量是否在变量表中，没有则返回NULL
+	TCHAR * TExpressionTree::FindVariableTableFrom(TCHAR *varstr,std::vector<TCHAR *> newVariableTable);//查找变量是否在变量表中，没有则返回NULL
+	void TExpressionTree::GetVariablePos(TNode *now, const TCHAR *var, std::vector<TNode *> &VarsPos);
+	void TExpressionTree::GetVariablePos(const TCHAR *var, std::vector<TNode *> &VarsPos);
+	void TExpressionTree::CopyVariableTable(std::vector<TCHAR *> &Dest, const std::vector<TCHAR *> source);
+	void TExpressionTree::ReplaceNodeVariable(TNode *now, std::vector<TCHAR *> &newVariableTable);
 public:
+	TNode *head;
 	TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput);
 	TCHAR * TExpressionTree::OutputStr();//输出表达式
 	TCHAR * TExpressionTree::OutputPostOrderStr();//输出PostOrder表达式
 	TCHAR * TExpressionTree::Simplify(bool bOutput);//化简
 	TCHAR * TExpressionTree::Diff(TCHAR *var, int n, bool bOutput);//对变量求导
-	//void TExpressionTree::Output(TCHAR *buffer){};
+	TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums);//vars为被替换变量，nums为替换表达式，以逗号分隔
+	bool TExpressionTree::CanCalc();
+	TCHAR * TExpressionTree::Calc(double *result);
 
 	TExpressionTree();
 	~TExpressionTree();
@@ -95,3 +106,5 @@ public:
 //返回替换过的数量
 //src大小需自行保证，函数内不验证指针越界
 int Replace(TCHAR *src, TCHAR *sub, TCHAR *dest);
+
+void Split(TCHAR *src, std::vector<TCHAR *> &result, TCHAR *sub);

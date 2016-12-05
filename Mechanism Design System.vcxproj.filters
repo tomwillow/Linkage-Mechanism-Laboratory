@@ -123,6 +123,9 @@
     <ClCompile Include="TConsoleEdit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TVariableTable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -234,6 +237,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TConsoleEdit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TVariableTable.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
