@@ -6,6 +6,7 @@
 class TEdit
 {
 protected:
+	HWND hParent;
 	bool bVisible;
 	static WNDPROC oldEditProc;
 	static LRESULT CALLBACK subEditProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam); 
@@ -19,7 +20,7 @@ protected:
 	//接收字符按键，返回值决定是否调用默认消息处理
 	virtual bool TEdit::OnChar(WPARAM wParam, LPARAM lParam){ return true; };
 public:
-	bool bMultiLine,bAutoHScrol,bAutoVScrol;
+	bool bMultiLine,bAutoHScrol,bAutoVScrol,bNoHideSel;
 	HFONT m_hFont;
 	HWND m_hWnd;
 	HINSTANCE m_hInst;

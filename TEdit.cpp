@@ -5,6 +5,7 @@
 TEdit::TEdit()
 {
 	m_hWnd = NULL;
+	hParent = NULL;
 	m_hInst = NULL;
 	bVisible = false;
 	m_hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
@@ -12,6 +13,7 @@ TEdit::TEdit()
 	bMultiLine = false;
 	bAutoHScrol = false;
 	bAutoVScrol = false;
+	bNoHideSel = false;
 }
 
 
@@ -49,12 +51,17 @@ LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 }
 
-void TEdit::CreateEditEx(HWND hParent,UINT id,HINSTANCE hInst,DWORD dwStyle)
+void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle)
 {
 	m_hInst = hInst;
-	m_hWnd=::CreateWindowEx(dwStyle,//WS_EX_CLIENTEDGE
+	this->hParent = hParent;
+	m_hWnd = ::CreateWindowEx(dwStyle,//WS_EX_CLIENTEDGE
 		TEXT("Edit"), 0,
-		WS_CHILD |(bMultiLine?ES_MULTILINE:0),//|ES_RIGHT | ES_AUTOHSCROLL | WS_VISIBLE
+		WS_CHILD |
+		(bMultiLine ? ES_MULTILINE : 0) |
+		(bAutoHScrol ? ES_AUTOHSCROLL|WS_HSCROLL : 0)|
+		(bAutoVScrol?ES_AUTOVSCROLL|WS_VSCROLL:0)|
+		(bNoHideSel?ES_NOHIDESEL:0),//|ES_RIGHT | WS_VISIBLE
 		0, 0, 0, 0, hParent,(HMENU)id, hInst,0);
 
 	//SetFont(m_hFont);

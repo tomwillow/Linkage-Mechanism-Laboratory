@@ -2,13 +2,13 @@
 #include "TExpressionTree.h"
 #include <Windows.h>
 #include "TTransfer.h"
+#include "TMyString.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 TExpressionTree::TExpressionTree()
 {
-	head = NULL;
-	ErrorInfo = NULL;
-	szPostOrder = NULL;
-	szInOrder = NULL;
+	Reset();
 }
 
 
@@ -17,28 +17,29 @@ TExpressionTree::~TExpressionTree()
 	Release();
 }
 
+void TExpressionTree::Reset()
+{
+	head = NULL;
+	ErrorInfo = NULL;
+	szOutput = NULL;
+	pVariableTable = NULL;
+	eError = ERROR_NO;
+}
+
 void TExpressionTree::Release()
 {
 	if (ErrorInfo != NULL)
 		delete[] ErrorInfo;
-	ErrorInfo = NULL;
 
-	if (szPostOrder != NULL)
-		delete[] szPostOrder;
-	szPostOrder = NULL;
-
-	if (szInOrder != NULL)
-		delete[] szInOrder;
-	szInOrder = NULL;
-
-	for (UINT i = 0; i < VariableTable.size(); i++)
-	{
-		delete[] VariableTable[i];
-	}
-	VariableTable.clear();
+	if (szOutput != NULL)
+		delete[] szOutput;
 
 	DeleteNode(head);
-	head = NULL;
+}
+
+int TExpressionTree::GetError()
+{
+	return eError;
 }
 
 void TExpressionTree::DeleteNode(TNode *node)//É¾³ýnodeÖ¸Ïò¶ÔÏóµ«²»ÖØÖÃnodeÖ¸Õë
@@ -71,7 +72,7 @@ void TExpressionTree::DeleteNode(TNode *node, std::vector<TNode *> DeleteList)
 	DeleteList.push_back(node);
 }
 
-TExpressionTree::enumError TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder)
+enumError TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder)
 {
 	std::stack<TNode *> tempStack;
 	//Öð¸öÊ¶±ðPostOrderÐòÁÐ£¬¹¹½¨±í´ïÊ½Ê÷
@@ -217,6 +218,8 @@ int TExpressionTree::GetOperateNum(TExpressionTree::enumMathOperator eOperator)
 
 	case MATH_LEFT_PARENTHESIS:
 	case MATH_RIGHT_PARENTHESIS:
+		return 0;
+	default:
 		return 0;
 	}
 }
@@ -405,19 +408,10 @@ bool TExpressionTree::isLegal(TCHAR c)
 {
 	if (isDoubleChar(c)) return true;
 	if (isBaseOperator(c)) return true;
-	if (isAlphaCharOrUnderline(c)) return true;
+	if (TMyString::isAlphaCharOrUnderline(c)) return true;
 	return false;
 }
 
-/* ×Ö·ûÊÇa-zA-z»ò_ */
-bool TExpressionTree::isAlphaCharOrUnderline(TCHAR c)
-{
-	if ((c >= TEXT('a') && c <= TEXT('z')) || (c >= TEXT('A') && c <= TEXT('Z'))
-		|| c == TEXT('_'))
-		return true;
-	else
-		return false;
-}
 
 /* ×Ö·ûÊÇ0-9»ò. */
 bool TExpressionTree::isDoubleChar(TCHAR c)
@@ -430,7 +424,7 @@ bool TExpressionTree::isDoubleChar(TCHAR c)
 
 
 /*ÓÉin order¶ÓÁÐµÃµ½post order¶ÓÁÐ*/
-TExpressionTree::enumError TExpressionTree::InQueue2PostQueue(std::queue<TNode *> &InOrder, std::vector<TNode *> &PostOrder)
+enumError TExpressionTree::InQueue2PostQueue(std::queue<TNode *> &InOrder, std::vector<TNode *> &PostOrder)
 {
 	int parenthesis_num = 0;
 	std::stack<TNode *> temp;
@@ -577,11 +571,11 @@ void TExpressionTree::TraverseInOrder(TNode *now, TCHAR *output, TCHAR *buffer)
 	{
 		if (now->eType == NODE_OPERATOR)//±¾¼¶ÎªÔËËã·û
 			//¸¸ÔËËã·û´æÔÚ£¬Îª¶þÔª£¬ÇÒÓÅÏÈ¼¶¸ßÓÚ±¾¼¶£¬ÔòÌí¼ÓÀ¨ºÅ
-			if ((now->parent != NULL && GetOperateNum(now->parent->eOperator) == 2 && 
+			if ((now->parent != NULL && GetOperateNum(now->parent->eOperator) == 2 &&
 				(
-				Rank(now->parent->eOperator) > Rank(now->eOperator) 
+				Rank(now->parent->eOperator) > Rank(now->eOperator)
 				||//Á½¼¶¶¼ÊÇÓÒ½áºÏÇÒÓÅÏÈ¼¶ÏàµÈ
-				(Rank(now->parent->eOperator)==Rank(now->eOperator) && (isLeft2Right(now->parent->eOperator)==false && isLeft2Right(now->eOperator)==false))
+				(Rank(now->parent->eOperator) == Rank(now->eOperator) && (isLeft2Right(now->parent->eOperator) == false && isLeft2Right(now->eOperator) == false))
 				)
 				)
 				||
@@ -638,21 +632,21 @@ int TExpressionTree::GetNodeNum(TNode *head)
 		return 0;
 }
 
-TCHAR * TExpressionTree::OutputStr()
+TCHAR * TExpressionTree::OutputStr(bool bIgnoreError)
 {
-	if (eError == ERROR_NO)
+	if (eError == ERROR_NO || bIgnoreError)
 	{
 		TCHAR buffer[MAX_VAR_NAME];
-		if (szInOrder != NULL)
-			delete[] szInOrder;
-		szInOrder = new TCHAR[MAX_VAR_NAME * GetNodeNum(head)];
-		szInOrder[0] = TEXT('\0');
+		if (szOutput != NULL)
+			delete[] szOutput;
+		szOutput = new TCHAR[MAX_VAR_NAME * GetNodeNum(head)];
+		szOutput[0] = TEXT('\0');
 		if (head != NULL)
-			TraverseInOrder(head, szInOrder, buffer);
-		return szInOrder;
+			TraverseInOrder(head, szOutput, buffer);
+		return szOutput;
 	}
 	else
-		return GetErrorInfo(eError);
+		return GetErrorInfo();
 }
 
 TCHAR * TExpressionTree::OutputPostOrderStr()
@@ -660,38 +654,34 @@ TCHAR * TExpressionTree::OutputPostOrderStr()
 	if (eError == ERROR_NO)
 	{
 		TCHAR buffer[MAX_VAR_NAME];
-		if (szPostOrder != NULL)
-			delete[] szPostOrder;
-		szPostOrder = new TCHAR[MAX_VAR_NAME * GetNodeNum(head)];
-		szPostOrder[0] = TEXT('\0');
+		if (szOutput != NULL)
+			delete[] szOutput;
+		szOutput = new TCHAR[MAX_VAR_NAME * GetNodeNum(head)];
+		szOutput[0] = TEXT('\0');
 		//for (int i = 0; i < PostOrder.size(); i++)
 		//{
 		//	Node2Str(*PostOrder[i], buffer);
 		//	_tcscat(szPostOrder, buffer);
 		//}
-		return szPostOrder;
+		return szOutput;
 	}
 	else
-		return GetErrorInfo(eError);
+		return GetErrorInfo();
 }
 
-TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> &InOrder)
+enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> &InOrder)
 {
 	if (_tcslen(expression) == 0)
 		return ERROR_EMPTY_INPUT;
-	Replace(expression, TEXT(" "), TEXT(""));
-	Replace(expression, TEXT("\t"), TEXT(""));
-	Replace(expression, TEXT("\r"), TEXT(""));
-	Replace(expression, TEXT("\n"), TEXT(""));
+	TMyString::Replace(expression, TEXT(" "), TEXT(""));
+	TMyString::Replace(expression, TEXT("\t"), TEXT(""));
+	TMyString::Replace(expression, TEXT("\r"), TEXT(""));
+	TMyString::Replace(expression, TEXT("\n"), TEXT(""));
 
 	//¹ýÂËµôËùÓÐ¶àÓàµÄ¼Ó¼õ
-	while (1)
-	{
-		if (Replace(expression, TEXT("--"), TEXT("+")) == 0 &&
-			Replace(expression, TEXT("+-"), TEXT("-")) == 0 &&
-			Replace(expression, TEXT("-+"), TEXT("-")) == 0)
-			break;
-	}
+	TMyString::ReplaceLoop(expression, TEXT("--"), TEXT("+"));
+	TMyString::ReplaceLoop(expression, TEXT("+-"), TEXT("-"));
+	TMyString::ReplaceLoop(expression, TEXT("-+"), TEXT("-"));
 
 	TCHAR *start = expression;
 	TCHAR *end = expression + _tcslen(expression);
@@ -794,7 +784,9 @@ TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std
 				}
 				else//±äÁ¿
 				{
-					if (isAlphaCharOrUnderline(Data[i].start[0]) == false)//±äÁ¿ÃûÊ××Ö·ûÐèÎªÏÂ»®Ïß»ò×ÖÄ¸
+					if (pVariableTable == NULL)
+						return ERROR_NOT_LINK_VARIABLETABLE;
+					if (TMyString::isAlphaCharOrUnderline(Data[i].start[0]) == false)//±äÁ¿ÃûÊ××Ö·ûÐèÎªÏÂ»®Ïß»ò×ÖÄ¸
 						return ERROR_INVALID_VARNAME;
 
 					//±äÁ¿Ãû´æÈëtempTChar
@@ -805,13 +797,16 @@ TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std
 
 					//
 					TCHAR *foundvar = NULL;
-					if (foundvar = FindVariableTable(tempTChar))
+					if (foundvar = pVariableTable->FindVariableTable(tempTChar))
 					{
 						delete[] tempTChar;
 						tempTChar = foundvar;
 					}
 					else
-						VariableTable.push_back(tempTChar);
+					{
+						delete[] tempTChar;
+						return ERROR_UNDEFINED_VARIABLE;
+					}
 
 					tempNode = new TNode;
 					ZeroMemory(tempNode, sizeof(TNode));
@@ -871,7 +866,7 @@ TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std
 	return ERROR_NO;
 }
 
-TCHAR * TExpressionTree::GetErrorInfo(TExpressionTree::enumError eError)
+TCHAR * TExpressionTree::GetErrorInfo()
 {
 	if (ErrorInfo != NULL)
 		delete[] ErrorInfo;
@@ -879,7 +874,7 @@ TCHAR * TExpressionTree::GetErrorInfo(TExpressionTree::enumError eError)
 	switch (eError)
 	{
 	case ERROR_NO:
-		_tcscpy(ErrorInfo, TEXT("Ã»ÓÐ´íÎó¡£"));
+		_tcscpy(ErrorInfo, TEXT("²Ù×÷³É¹¦Íê³É¡£"));
 		break;
 	case ERROR_ILLEGALCHAR:
 		_tcscpy(ErrorInfo, TEXT("´íÎó£º³öÏÖ·Ç·¨×Ö·û¡£"));
@@ -896,88 +891,148 @@ TCHAR * TExpressionTree::GetErrorInfo(TExpressionTree::enumError eError)
 	case ERROR_DIVIDE_ZERO:
 		_tcscpy(ErrorInfo, TEXT("´íÎó£º²»µÃ³ýÒÔ0¡£"));
 		break;
-	case ERROR_UNKNOWN_VARIABLE:
-		_tcscpy(ErrorInfo, TEXT("´íÎó£º³öÏÖÎ´Öª±äÁ¿¡£"));//±¾À´ÔÚÇóµ¼ÖÐ±¨´í£¬ÏÖÒÑÆúÓÃ
+	case ERROR_UNDEFINED_VARIABLE:
+		_tcscpy(ErrorInfo, TEXT("´íÎó£ºÎ´¶¨ÒåµÄ±äÁ¿¡£"));
 		break;
 	case ERROR_ZERO_POWEROF_ZERO:
 		_tcscpy(ErrorInfo, TEXT("´íÎó£º0µÄ0´Î·½¡£"));
 		break;
 	case ERROR_SUBS_NOT_EQUAL:
 		_tcscpy(ErrorInfo, TEXT("´íÎó£ºÌæ»»Óë±»Ìæ»»ÊýÄ¿²»µÈ¡£"));
-		break; 
+		break;
+	case ERROR_NOT_LINK_VARIABLETABLE:
+		_tcscpy(ErrorInfo, TEXT("³ÌÐò´íÎó£ºÎ´Á´½Ó±äÁ¿±í¡£"));
+		break;
+	case ERROR_OUTOF_DOMAIN:
+		_tcscpy(ErrorInfo, TEXT("´íÎó£º³¬³ö¶¨ÒåÓò¡£"));
+		break;
+		
 	}
 	return ErrorInfo;
 }
 
 void TExpressionTree::CalcNode(TNode *Operator, TNode *Node1, TNode *Node2 = NULL)
 {
+	double value1 = Node1->ValueOrName.value;
+	double value2 = (Node2 != NULL ? Node2->ValueOrName.value:0.0);
 	Operator->eType = NODE_NUMBER;
 	switch (Operator->eOperator)
 	{
 	case MATH_SQRT:
-		Operator->ValueOrName.value = sqrt(Node1->ValueOrName.value);
+		if (value1 < 0.0)
+		{
+			//»Ö¸´ÐÞ¸Ä²¢Å×³öÒì³£
+			Operator->eType = NODE_FUNCTION;
+			throw eError=ERROR_OUTOF_DOMAIN;
+		}
+		Operator->ValueOrName.value = sqrt(value1);
 		break;
 	case MATH_SIN:
-		Operator->ValueOrName.value = sin(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = sin(value1);
 		break;
 	case MATH_COS:
-		Operator->ValueOrName.value = cos(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = cos(value1);
 		break;
 	case MATH_TAN:
-		Operator->ValueOrName.value = tan(Node1->ValueOrName.value);
+	{
+		//x!=k*pi+pi/2 -> 2*x/pi != 2*k+1(odd)
+		double value = value1*2.0 / M_PI;
+		if (abs(value - (int)value) < MIN_DOUBLE && (int)value % 2 != 1)
+		{
+			//»Ö¸´ÐÞ¸Ä²¢Å×³öÒì³£
+			Operator->eType = NODE_FUNCTION;
+			throw eError=ERROR_OUTOF_DOMAIN;
+		}
+		Operator->ValueOrName.value = tan(value1);
 		break;
+	}
 	case MATH_ARCSIN:
-		Operator->ValueOrName.value = asin(Node1->ValueOrName.value);
+		if (value1 < -1.0 || value1 > 1.0)
+		{
+			//»Ö¸´ÐÞ¸Ä²¢Å×³öÒì³£
+			Operator->eType = NODE_FUNCTION;
+			throw eError = ERROR_OUTOF_DOMAIN;
+		}
+		Operator->ValueOrName.value = asin(value1);
 		break;
 	case MATH_ARCCOS:
-		Operator->ValueOrName.value = acos(Node1->ValueOrName.value);
+		if (value1 < -1.0 || value1 > 1.0)
+		{
+			//»Ö¸´ÐÞ¸Ä²¢Å×³öÒì³£
+			Operator->eType = NODE_FUNCTION;
+			throw eError = ERROR_OUTOF_DOMAIN;
+		}
+		Operator->ValueOrName.value = acos(value1);
 		break;
 	case MATH_ARCTAN:
-		Operator->ValueOrName.value = atan(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = atan(value1);
 		break;
 	case MATH_LN:
-		Operator->ValueOrName.value = log(Node1->ValueOrName.value);
+		if (value1 < MIN_DOUBLE)
+		{
+			//»Ö¸´ÐÞ¸Ä²¢Å×³öÒì³£
+			Operator->eType = NODE_FUNCTION;
+			throw eError = ERROR_OUTOF_DOMAIN;
+		}
+		Operator->ValueOrName.value = log(value1);
 		break;
 	case MATH_LOG10:
-		Operator->ValueOrName.value = log10(Node1->ValueOrName.value);
+		if (value1 < MIN_DOUBLE)
+		{
+			//»Ö¸´ÐÞ¸Ä²¢Å×³öÒì³£
+			Operator->eType = NODE_FUNCTION;
+			throw eError = ERROR_OUTOF_DOMAIN;
+		}
+		Operator->ValueOrName.value = log10(value1);
 		break;
 	case MATH_EXP:
-		Operator->ValueOrName.value = exp(Node1->ValueOrName.value);
+		Operator->ValueOrName.value = exp(value1);
 		break;
 	case MATH_POSITIVE:
 		break;
 	case MATH_NEGATIVE:
-		Operator->ValueOrName.value = -Node1->ValueOrName.value;
+		Operator->ValueOrName.value = -value1;
 		break;
 
 	case MATH_MOD://%
-		Operator->ValueOrName.value = (int)Node1->ValueOrName.value % (int)Node2->ValueOrName.value;
+		Operator->ValueOrName.value = (int)value1 % (int)value2;
 		break;
 	case MATH_AND://&
-		Operator->ValueOrName.value = (int)Node1->ValueOrName.value & (int)Node2->ValueOrName.value;
+		Operator->ValueOrName.value = (int)value1 & (int)value2;
 		break;
 	case MATH_OR://|
-		Operator->ValueOrName.value = (int)Node1->ValueOrName.value | (int)Node2->ValueOrName.value;
+		Operator->ValueOrName.value = (int)value1 | (int)value2;
 		break;
 
 	case MATH_POWER://^
-		Operator->ValueOrName.value = pow(Node1->ValueOrName.value, Node2->ValueOrName.value);
+		if (abs(value1) < MIN_DOUBLE && abs(value2) < MIN_DOUBLE)
+		{
+			Operator->eType = NODE_OPERATOR;
+			throw eError = ERROR_ZERO_POWEROF_ZERO;
+		}
+		Operator->ValueOrName.value = pow(value1, value2);
 		break;
 
 	case MATH_MULTIPLY:
-		Operator->ValueOrName.value = Node1->ValueOrName.value * Node2->ValueOrName.value;
+		Operator->ValueOrName.value = value1 * value2;
 		break;
 	case MATH_DIVIDE:
-		Operator->ValueOrName.value = Node1->ValueOrName.value / Node2->ValueOrName.value;
+		if (abs(value2)<MIN_DOUBLE)
+		{
+			Operator->eType = NODE_OPERATOR;
+			throw eError = ERROR_DIVIDE_ZERO;
+		}
+		Operator->ValueOrName.value = value1 / value2;
 		break;
 
 	case MATH_ADD:
-		Operator->ValueOrName.value = Node1->ValueOrName.value + Node2->ValueOrName.value;
+		Operator->ValueOrName.value = value1 + value2;
 		break;
 	case MATH_SUBSTRACT:
-		Operator->ValueOrName.value = Node1->ValueOrName.value - Node2->ValueOrName.value;
+		Operator->ValueOrName.value = value1 - value2;
 		break;
 	}
+	Operator->eOperator = MATH_NOT_AVAILIALBE;
 }
 
 
@@ -1004,6 +1059,16 @@ TExpressionTree::TNode * TExpressionTree::CopyNodeTree(TNode *oldNode)
 	return newNode;
 }
 
+TExpressionTree::TNode * TExpressionTree::NewNode(enumNodeType eType, enumMathOperator eOperator)
+{
+	TNode *newNode = new TNode;
+	ZeroMemory(newNode, sizeof(TNode));
+	newNode->eType = eType;
+	newNode->eOperator = eOperator;
+	return newNode;
+}
+
+//Î´Íê³ÉÇóµ¼£ºtan,arcsin,arccos,arctan
 void TExpressionTree::Diff(TNode *now, TCHAR *var)//varÎªÖ¸Ïò±äÁ¿µÄÖ¸Õë£¬Ò»¶¨Î»ÓÚ±äÁ¿±íÄÚ
 {
 	switch (now->eType)
@@ -1163,12 +1228,81 @@ void TExpressionTree::Diff(TNode *now, TCHAR *var)//varÎªÖ¸Ïò±äÁ¿µÄÖ¸Õë£¬Ò»¶¨Î»Ó
 				return;
 			}
 		case MATH_POWER:
+		{
+			bool LChildIsNumber = now->left->eType == NODE_NUMBER;
+			bool RChildIsNumber = now->right->eType == NODE_NUMBER;
+			if (LChildIsNumber && RChildIsNumber)
+			{
+				delete now->left;
+				delete now->right;
+				now->left = NULL;
+				now->right = NULL;
+				now->eType = NODE_NUMBER;
+				now->eOperator = MATH_NOT_AVAILIALBE;
+				now->ValueOrName.value = 0.0;
+				return;
+			}
+
+			TNode *multiply1 = NewNode(NODE_OPERATOR, MATH_MULTIPLY);
+			TNode *multiply2 = NewNode(NODE_OPERATOR, MATH_MULTIPLY);
+			TNode *power = now;
+			TNode *u = now->left;
+			TNode *v = now->right;
+			TNode *u2 = CopyNodeTree(u);
+			TNode *v2 = CopyNodeTree(v);
+
+			if (power == head)
+			{
+				head = multiply1;
+			}
+			else
+			{
+				if (power->parent->left == power)
+					power->parent->left = multiply1;
+				if (power->parent->right == power)
+					power->parent->right = multiply1;
+				multiply1->parent = power->parent;
+			}
+
+			if (RChildIsNumber)
+				v->ValueOrName.value -= 1.0;
+
+			multiply1->left = power;
+			power->parent = multiply1;
+
+			multiply1->right = multiply2;
+			multiply2->parent = multiply1;
+
+			multiply2->left = v2;
+			v2->parent = multiply2;
+
+			if (RChildIsNumber)
+			{
+				multiply2->right = u2;
+				u2->parent = multiply2;
+				Diff(u2, var);
+				return;
+			}
+			else
+			{
+				TNode *ln = NewNode(NODE_FUNCTION, MATH_LN);
+
+				multiply2->right = ln;
+				ln->parent = multiply2;
+
+				ln->left = u2;
+				u2->parent = ln;
+
+				Diff(multiply2, var);
+				return;
+			}
 			return;
+		}
 		}
 	case NODE_FUNCTION:
 	{
 		//²»¿¼ÂÇ¶¨ÒåÓò
-		//º¯ÊýÄÚÎªÊý×Öµ¼Îª0
+		//º¯ÊýÄÚÎªÊý×ÖÔòµ¼Îª0
 		if (now->left->eType == NODE_NUMBER)
 		{
 			now->eType = NODE_NUMBER;
@@ -1181,6 +1315,150 @@ void TExpressionTree::Diff(TNode *now, TCHAR *var)//varÎªÖ¸Ïò±äÁ¿µÄÖ¸Õë£¬Ò»¶¨Î»Ó
 		TNode *function = now;
 		switch (function->eOperator)
 		{
+		case MATH_SQRT:
+		{
+			//×ª»¯ÎªÃÝÇóµ¼
+			TNode *u = function->left;
+			TNode *power = NewNode(NODE_OPERATOR, MATH_POWER);
+			TNode *num1half = NewNode(NODE_NUMBER);
+			num1half->ValueOrName.value = 0.5;
+
+			power->left = u;
+			u->parent = power;
+
+			power->right = num1half;
+			num1half->parent = power;
+
+			if (function == head)
+				head = power;
+			else
+			{
+				if (function->parent->left == function)
+					function->parent->left = power;
+				if (function->parent->right == function)
+					function->parent->right = power;
+				power->parent = function->parent;
+			}
+
+			delete function;
+			Diff(power, var);
+
+			return;
+		}
+		case MATH_LN:
+		case MATH_LOG10:
+		{
+			TNode *divide = NewNode(NODE_OPERATOR, MATH_DIVIDE);
+			TNode *num1 = NewNode(NODE_NUMBER);
+			num1->ValueOrName.value = 1.0;
+
+			divide->left = num1;
+			num1->parent = divide;
+
+			TNode *u = function->left;
+
+			if (function->eOperator == MATH_LN)//ln(x)=1/x
+			{
+				divide->right = u;
+				u->parent = divide;
+			}
+			else
+			{
+				//log10(x)=1/(x*ln(10))
+				TNode *multiply2 = NewNode(NODE_OPERATOR, MATH_MULTIPLY);
+
+				divide->right = multiply2;
+				multiply2->parent = divide;
+
+				multiply2->left = u;
+				u->parent = multiply2;
+
+				TNode *ln = NewNode(NODE_FUNCTION, MATH_LN);
+
+				multiply2->right = ln;
+				ln->parent = multiply2;
+
+				TNode *num10 = NewNode(NODE_NUMBER);
+				num10->ValueOrName.value = 10.0;
+
+				ln->left = num10;
+				num10->parent = ln;
+			}
+
+			TNode *top = divide;
+			TNode *u2 = NULL;
+			if (u->eType != NODE_VARIABLE)
+			{
+				TNode *multiply1 = NewNode(NODE_OPERATOR, MATH_MULTIPLY);
+				u2 = CopyNodeTree(u);
+
+				multiply1->left = divide;
+				divide->parent = multiply1;
+
+				multiply1->right = u2;
+				u2->parent = multiply1;
+
+				top = multiply1;
+			}
+
+			if (function == head)
+			{
+				head = top;
+			}
+			else
+			{
+				if (function->parent->left == function)
+				{
+					function->parent->left = top;
+					top->parent = function->parent;
+				}
+				if (function->parent->right == function)
+				{
+					function->parent->right = top;
+					top->parent = function->parent;
+				}
+			}
+			delete function;
+
+			if (u->eType != NODE_VARIABLE)
+				Diff(u2, var);
+
+			return;
+		}
+		case MATH_EXP:
+		{
+			if (function->left->eType == NODE_VARIABLE)//e^x=e^x
+				return;
+			TNode *multiply = NewNode(NODE_OPERATOR, MATH_MULTIPLY);
+			TNode *u2 = CopyNodeTree(function->left);
+
+			if (function == head)
+			{
+				head = multiply;
+			}
+			else
+			{
+				if (function->parent->left == function)
+				{
+					function->parent->left = multiply;
+					multiply->parent = function->parent;
+				}
+				if (function->parent->right == function)
+				{
+					function->parent->right = multiply;
+					multiply->parent = function->parent;
+				}
+			}
+
+			multiply->left = function;
+			function->parent = multiply;
+
+			multiply->right = u2;
+			u2->parent = multiply;
+
+			Diff(u2, var);
+			return;
+		}
 		case MATH_COS:
 			TNode *negative;
 			negative = new TNode;
@@ -1274,7 +1552,7 @@ TCHAR * TExpressionTree::Diff(TCHAR *var, int n, bool bOutput)
 {
 	if (eError == ERROR_NO)
 	{
-		TCHAR *Variable = FindVariableTable(var);
+		TCHAR *Variable = pVariableTable->FindVariableTable(var);
 		//Ã»ÓÐÕÒµ½¶ÔÓ¦±äÁ¿ÔòÉèÖÃÎª¿Õ£¬¼´ÎÞ¹Ø±äÁ¿µ¼³É0
 
 		for (int i = 0; i < n; i++)
@@ -1285,20 +1563,69 @@ TCHAR * TExpressionTree::Diff(TCHAR *var, int n, bool bOutput)
 		return OutputStr();
 	}
 
-	return GetErrorInfo(eError);
+	return GetErrorInfo();
 }
 
-TExpressionTree::enumError TExpressionTree::Simplify(TNode *now)
+void TExpressionTree::LinkParent(TNode *child, TNode *ignore)
 {
-	TExpressionTree::enumError nowError = ERROR_NO;
+	if (ignore == head)
+	{
+		head = child;
+		child->parent = NULL;
+	}
+	else
+	{
+		if (ignore->parent->left == ignore)
+			ignore->parent->left = child;
+		if (ignore->parent->right == ignore)
+			ignore->parent->right = child;
+		child->parent = ignore->parent;
+	}
+}
+
+enumError TExpressionTree::Simplify(TNode *now)
+{
+	enumError nowError = ERROR_NO;
 	if (now->left != NULL)
 		nowError = Simplify(now->left);
+
+	if (nowError != ERROR_NO)
+		return nowError;
 
 	if (now->right != NULL)
 		nowError = Simplify(now->right);
 
 	if (nowError != ERROR_NO)
 		return nowError;
+
+	if (GetOperateNum(now->eOperator) == 1)
+	{
+		bool ChildIs0 = (now->left->eType == NODE_NUMBER && abs(now->left->ValueOrName.value) < MIN_DOUBLE);
+		bool ChildIs1 = (now->left->eType == NODE_NUMBER && abs(now->left->ValueOrName.value - 1) < MIN_DOUBLE);
+
+		if (now->eOperator == MATH_SIN && ChildIs0)
+		{
+			LinkParent(now->left, now);
+			now->left->ValueOrName.value = 0;
+			delete now;
+		}
+
+		if (now->eOperator == MATH_COS && ChildIs0)
+		{
+			LinkParent(now->left, now);
+			now->left->ValueOrName.value = 1;
+			delete now;
+		}
+
+		if (now->eOperator == MATH_NEGATIVE && now->left->eType == NODE_NUMBER)
+		{
+			TNode *negative = now;
+			TNode *num = now->left;
+			LinkParent(num, negative);
+			num->ValueOrName.value = -num->ValueOrName.value;
+			delete negative;
+		}
+	}
 
 	if (GetOperateNum(now->eOperator) == 2)
 	{
@@ -1311,11 +1638,11 @@ TExpressionTree::enumError TExpressionTree::Simplify(TNode *now)
 
 		//±»³ýÊýÎª0
 		if (now->eOperator == MATH_DIVIDE && RChildIs0)
-			return ERROR_DIVIDE_ZERO;
+			return nowError = ERROR_DIVIDE_ZERO;
 
 		//0µÄ0´Î·½
 		if (now->eOperator == MATH_POWER && LChildIs0 && RChildIs0)
-			return ERROR_ZERO_POWEROF_ZERO;
+			return nowError = ERROR_ZERO_POWEROF_ZERO;
 
 		//Èô×óÓÒ¶ù×Ó¶¼ÊÇÊý×Ö£¬Ôò¼ÆËã³öÀ´
 		if (now->left->eType == NODE_NUMBER && now->right->eType == NODE_NUMBER)
@@ -1459,9 +1786,9 @@ TExpressionTree::enumError TExpressionTree::Simplify(TNode *now)
 
 TCHAR * TExpressionTree::OutputEmptyStr()
 {
-	szInOrder = new TCHAR[1];
-	_tcscpy(szInOrder, TEXT(""));
-	return szInOrder;
+	szOutput = new TCHAR[1];
+	_tcscpy(szOutput, TEXT(""));
+	return szOutput;
 }
 
 TCHAR * TExpressionTree::Simplify(bool bOutput)
@@ -1476,7 +1803,7 @@ TCHAR * TExpressionTree::Simplify(bool bOutput)
 				return OutputEmptyStr();
 	}
 
-	return GetErrorInfo(eError);
+	return GetErrorInfo();
 }
 
 TCHAR * TExpressionTree::FindVariableTableFrom(TCHAR *varstr, std::vector<TCHAR *> newVariableTable)
@@ -1484,14 +1811,6 @@ TCHAR * TExpressionTree::FindVariableTableFrom(TCHAR *varstr, std::vector<TCHAR 
 	for (int i = 0; i < newVariableTable.size(); i++)
 		if (_tcscmp(varstr, newVariableTable[i]) == 0)
 			return newVariableTable[i];
-	return NULL;
-}
-
-TCHAR * TExpressionTree::FindVariableTable(TCHAR *varstr)
-{
-	for (int i = 0; i < VariableTable.size(); i++)
-		if (_tcscmp(varstr, VariableTable[i]) == 0)
-			return VariableTable[i];
 	return NULL;
 }
 
@@ -1511,7 +1830,7 @@ void TExpressionTree::GetVariablePos(const TCHAR *var, std::vector<TNode *> &Var
 	GetVariablePos(head, var, VarsPos);
 }
 
-void TExpressionTree::GetVariablePos(TNode *now,const TCHAR *var, std::vector<TNode *> &VarsPos)
+void TExpressionTree::GetVariablePos(TNode *now, const TCHAR *var, std::vector<TNode *> &VarsPos)
 {
 	if (now->eType == NODE_VARIABLE && now->ValueOrName.varname == var)
 		VarsPos.push_back(now);
@@ -1528,79 +1847,138 @@ void TExpressionTree::CopyVariableTable(std::vector<TCHAR *> &Dest, const std::v
 		Dest.push_back(source[i]);
 }
 
-TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums)
+TCHAR * TExpressionTree::Subs(std::vector<TCHAR *> VarsVector, std::vector<double> NumsVector,bool output)
+{
+	if (eError == ERROR_NO)
+	{
+		if (VarsVector.size() == NumsVector.size())//Ìæ»»Óë±»Ìæ»»ÔªËØÊýÄ¿ÏàµÈ
+		{
+			for (int i = 0; i < VarsVector.size(); i++)//±éÀú±»Ìæ»»±äÁ¿
+			{
+				//²é±íÊ¶±ð±»Ìæ»»±äÁ¿
+				TCHAR *var = pVariableTable->FindVariableTable(VarsVector[i]);
+				if (var != NULL)//ÒÑÊ¶±ð³ö
+				{
+					//¹¹½¨Ìæ»»½ÚµãÊ÷
+					TExpressionTree Expr;
+					Expr.LinkVariableTable(pVariableTable);
+					Expr.Read(NumsVector[i], false);
+					if (Expr.eError == ERROR_NO)
+					{
+
+						//µÃµ½ËùÓÐ±»Ìæ»»±äÁ¿µÄÎ»ÖÃ
+						std::vector<TNode *> VarsPos;
+						GetVariablePos(var, VarsPos);
+						for (int j = 0; j < VarsPos.size(); j++)
+						{
+							TNode *newNode = CopyNodeTree(Expr.head);
+							//ReplaceNodeVariable(newNode, newVariableTable);
+
+							//Á¬½Óµ½ÐÂ½Úµã
+							if (VarsPos[j] != head)
+							{
+								if (VarsPos[j]->parent->left != NULL && VarsPos[j]->parent->left == VarsPos[j])
+									VarsPos[j]->parent->left = newNode;
+								if (VarsPos[j]->parent->right != NULL && VarsPos[j]->parent->right == VarsPos[j])
+									VarsPos[j]->parent->right = newNode;
+								newNode->parent = VarsPos[j]->parent;
+							}
+							else
+								head = newNode;
+
+							//É¾µô¾É½Úµã
+							delete VarsPos[j];
+						}
+					}
+					else
+						eError = Expr.eError;
+				}
+			}
+		}
+		else
+			eError = ERROR_SUBS_NOT_EQUAL;
+
+		if (eError == ERROR_NO)
+		{
+			if (output)
+				return OutputStr();
+			else
+				return OutputEmptyStr();
+		}
+	}
+	return GetErrorInfo();
+}
+
+TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums,bool output)
 {
 	if (eError == ERROR_NO)
 	{
 		if (_tcslen(vars) == 0 || _tcslen(nums) == 0)
-			return GetErrorInfo(eError = ERROR_EMPTY_INPUT);
+		{
+			eError = ERROR_EMPTY_INPUT;
+			return GetErrorInfo();
+		}
 		TCHAR *nVars = new TCHAR[_tcslen(vars) + 1];
 		TCHAR *nNums = new TCHAR[_tcslen(nums) + 1];
 		_tcscpy(nVars, vars);
 		_tcscpy(nNums, nums);
-		Replace(nVars, TEXT(" "), TEXT(""));
-		Replace(nNums, TEXT(" "), TEXT(""));
+		TMyString::Trim(nVars);
+		TMyString::Trim(nNums);
+		TMyString::ReplaceLoop(nVars, TEXT("  "), TEXT(" "));
+		TMyString::ReplaceLoop(nNums, TEXT("  "), TEXT(" "));
 		std::vector<TCHAR *> VarsVector;
 		std::vector<TCHAR *> NumsVector;
-		Split(nVars, VarsVector, TEXT(","));
-		Split(nNums, NumsVector, TEXT(","));
+		TMyString::Split(nVars, VarsVector, TEXT(" "));
+		TMyString::Split(nNums, NumsVector, TEXT(" "));
 
 		if (VarsVector.size() == NumsVector.size())//Ìæ»»Óë±»Ìæ»»ÔªËØÊýÄ¿ÏàµÈ
 		{
 			for (int i = 0; i < VarsVector.size(); i++)//±éÀú±»Ìæ»»±äÁ¿
 			{
 				//²é±íÊ¶±ð±»Ìæ»»±äÁ¿
-				TCHAR *var = FindVariableTable(VarsVector[i]);
+				TCHAR *var = pVariableTable->FindVariableTable(VarsVector[i]);
 				if (var != NULL)//ÒÑÊ¶±ð³ö
 				{
-						//¹¹½¨Ìæ»»½ÚµãÊ÷
-						TExpressionTree Expr;
-						Expr.Read(NumsVector[i], false);
-						std::vector<TCHAR *> newVariableTable;
-						TCHAR *temp = NULL;
-						for (int n = 0; n < Expr.VariableTable.size(); n++)
+					//¹¹½¨Ìæ»»½ÚµãÊ÷
+					TExpressionTree Expr;
+					Expr.LinkVariableTable(pVariableTable);
+					Expr.Read(NumsVector[i], false);
+					if (Expr.eError == ERROR_NO)
+					{
+
+						//µÃµ½ËùÓÐ±»Ìæ»»±äÁ¿µÄÎ»ÖÃ
+						std::vector<TNode *> VarsPos;
+						GetVariablePos(var, VarsPos);
+						for (int j = 0; j < VarsPos.size(); j++)
 						{
-							if (temp = FindVariableTable(Expr.VariableTable[n]))
+							TNode *newNode = CopyNodeTree(Expr.head);
+							//ReplaceNodeVariable(newNode, newVariableTable);
+
+							//Á¬½Óµ½ÐÂ½Úµã
+							if (VarsPos[j] != head)
 							{
-								newVariableTable.push_back(temp);
+								if (VarsPos[j]->parent->left != NULL && VarsPos[j]->parent->left == VarsPos[j])
+									VarsPos[j]->parent->left = newNode;
+								if (VarsPos[j]->parent->right != NULL && VarsPos[j]->parent->right == VarsPos[j])
+									VarsPos[j]->parent->right = newNode;
+								newNode->parent = VarsPos[j]->parent;
 							}
 							else
-							{
-								eError = ERROR_UNKNOWN_VARIABLE;//Ìæ»»Á¿ÖÐ³öÏÖÔ­±äÁ¿±íÖÐÃ»ÓÐµÄ±äÁ¿½«±¨´í
-								//Expr.Release();//Ìø×ªÊ±»áÎö¹¹£¬ËùÒÔ²»ÓÃÈË¹¤Îö¹¹
-								goto FinishSubs;
-							}
-						}
-					//µÃµ½ËùÓÐ±»Ìæ»»±äÁ¿µÄÎ»ÖÃ
-					std::vector<TNode *> VarsPos;
-					GetVariablePos(var,VarsPos);
-					for (int j = 0; j < VarsPos.size(); j++)
-					{
-						TNode *newNode = CopyNodeTree(Expr.head);
-						ReplaceNodeVariable(newNode, newVariableTable);
+								head = newNode;
 
-						//Á¬½Óµ½ÐÂ½Úµã
-						if (VarsPos[j] != head)
-						{
-							if (VarsPos[j]->parent->left != NULL && VarsPos[j]->parent->left == VarsPos[j])
-								VarsPos[j]->parent->left = newNode;
-							if (VarsPos[j]->parent->right != NULL && VarsPos[j]->parent->right == VarsPos[j])
-								VarsPos[j]->parent->right = newNode;
-							newNode->parent = VarsPos[j]->parent;
+							//É¾µô¾É½Úµã
+							delete VarsPos[j];
 						}
-						else
-							head = newNode;
-
-						//É¾µô¾É½Úµã
-						delete VarsPos[j];
 					}
-				}//Î´ÔÚ±äÁ¿±íÖÐµÄ±äÁ¿²»×÷´¦Àí
+					else
+						eError = Expr.eError;
+				}
 			}
 		}
 		else
 			eError = ERROR_SUBS_NOT_EQUAL;
 
-		FinishSubs:
+		//FinishSubs:
 		delete[] nVars;
 		delete[] nNums;
 		for (int i = 0; i < VarsVector.size(); i++)
@@ -1608,10 +1986,32 @@ TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums)
 		for (int i = 0; i < NumsVector.size(); i++)
 			delete[] NumsVector[i];
 
-		if (eError==ERROR_NO)
-			return OutputStr();
+		if (eError == ERROR_NO)
+		{
+			if (output)
+				return OutputStr();
+			else
+				return OutputEmptyStr();
+		}
 	}
-		return GetErrorInfo(eError);
+	return GetErrorInfo();
+}
+
+TCHAR * TExpressionTree::LinkVariableTable(TVariableTable *p)
+{
+	if (eError == ERROR_NO)
+		pVariableTable = p;
+	return GetErrorInfo();
+}
+
+TCHAR * TExpressionTree::Read(double num, bool bOutput)
+{
+	head = NewNode(NODE_NUMBER);
+	head->ValueOrName.value = num;
+	if (bOutput)
+		return OutputStr();
+	else
+		return OutputEmptyStr();
 }
 
 TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput)
@@ -1634,66 +2034,119 @@ TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput)
 			}
 
 	delete[] expr;
-	return GetErrorInfo(eError);
+	return GetErrorInfo();
 }
 
-void Split(TCHAR *src, std::vector<TCHAR *> &result, TCHAR *sub)
+bool TExpressionTree::CanCalc(TNode *now)
 {
-	int srclen = _tcslen(src);
-	int sublen = _tcslen(sub);
-	TCHAR *end = src + srclen;
+	if (now->left != NULL)
+		if (CanCalc(now->left) == false)
+			return false;
+	if (now->right != NULL)
+		if (CanCalc(now->right) == false)
+			return false;
 
-	//µÃµ½ËùÓÐÎ»ÖÃ
-	TCHAR *tempstr = NULL;
-	TCHAR *prev = src;
-	TCHAR *now = NULL;
-	while ((now = _tcsstr(prev, sub)) != NULL)
-	{
-		tempstr = new TCHAR[now - prev+1];
-		_tcsncpy(tempstr, prev, now - prev);
-		tempstr[now - prev] = TEXT('\0');
-		result.push_back(tempstr);
-		prev = now + sublen;
-	}
-	tempstr = new TCHAR[end - prev + 1];
-	_tcsncpy(tempstr, prev, end - prev);
-	tempstr[end - prev] = TEXT('\0');
-	result.push_back(tempstr);
+	if (now->eType == NODE_VARIABLE)
+		return false;
+	return true;
 }
 
-int Replace(TCHAR *src, TCHAR *sub, TCHAR *dest)
+bool TExpressionTree::CanCalc()
 {
-	int srclen = _tcslen(src);
-	if (srclen == 0) return 0;
-	int sublen = _tcslen(sub);
-	if (sublen == 0) return 0;
-	int destlen = _tcslen(dest);
-	std::vector<TCHAR *> pos;//±£´æÑ°ÕÒµ½µÄÎ»ÖÃ
+	return CanCalc(head);
+}
 
-	//µÃµ½ËùÓÐÎ»ÖÃ
-	TCHAR *temp = src;
-	TCHAR *now = NULL;
-	while ((now = _tcsstr(temp, sub)) != NULL)
+//µü´ú¼ÆËã£¬×îÖÕÊ£ÏÂ1¸ö½Úµã
+void TExpressionTree::Calc(TNode *now)
+{
+	if (now->left != NULL)
+		Calc(now->left);
+	if (now->right != NULL)
+		Calc(now->right);
+
+	if (GetOperateNum(now->eOperator) == 1 && now->left->eType == NODE_NUMBER)
 	{
-		pos.push_back(now);
-		temp = now + sublen;
+		try
+		{
+			CalcNode(now, now->left);
+		}
+		catch (enumError &err)
+		{
+			throw err;
+		}
+		delete now->left;
+		now->left = NULL;
 	}
 
-	if (pos.size() == 0) return 0;
-	int newsize = srclen + pos.size()*(destlen - sublen) + 1;//ÐÂ´®µÄ´óÐ¡£¬¼ÓÉÏÄ©Î²µÄ\0
-	TCHAR *newsrc = (TCHAR *)malloc(newsize*sizeof(TCHAR));
-	newsrc[0] = TEXT('\0');
-	TCHAR *prevpos = src;
-	for (UINT i = 0; i < pos.size(); i++)
+	if (GetOperateNum(now->eOperator) == 2 && now->left->eType == NODE_NUMBER && now->right->eType == NODE_NUMBER)
 	{
-		_tcsncat(newsrc, prevpos, pos[i] - prevpos);
-		_tcsncat(newsrc, dest, destlen);
-		prevpos = pos[i] + sublen;
+		try
+		{
+			CalcNode(now, now->left, now->right);
+		}
+		catch (enumError &err)
+		{
+			throw err;
+		}
+		delete now->left;
+		delete now->right;
+		now->left = NULL;
+		now->right = NULL;
 	}
-	_tcsncat(newsrc, prevpos, srclen - (prevpos - src));
-	//´Ë´¦newsrcÒÑÈ«²¿¿½Íê
+}
 
-	_tcscpy(src, newsrc);
-	free(newsrc);
-	return pos.size();
+double TExpressionTree::Value(bool operateHeadNode)
+{
+	if (eError == ERROR_NO)
+	{
+		TNode *pNode = NULL;
+		if (operateHeadNode)
+			pNode = head;
+		else
+			pNode = CopyNodeTree(head);
+		try
+		{
+			Calc(pNode);
+		}
+		catch (enumError &err)
+		{
+			//É¾µô½ÚµãÊ÷²¢Ìá½»¸øÉÏ¼¶
+			if (operateHeadNode==false)
+				DeleteNode(pNode);
+			throw err;
+		}
+		double num=pNode->ValueOrName.value;
+		if (operateHeadNode==false)
+			delete pNode;
+		return num;
+	}
+}
+
+TCHAR * TExpressionTree::Calc(double *result)
+{
+	if (eError == ERROR_NO)
+	{
+		if (CanCalc())
+		{
+			TNode *Duplicate = CopyNodeTree(head);
+			Calc(Duplicate);
+			if (result != NULL)
+				*result = Duplicate->ValueOrName.value;
+			Node2Str(*Duplicate, szOutput);
+			delete Duplicate;
+			return szOutput;
+		}
+		else
+			return OutputStr();
+	}
+	return GetErrorInfo();
+}
+
+TExpressionTree& TExpressionTree::operator=(TExpressionTree &expr)
+{
+	Release();
+	Reset();
+	head = CopyNodeTree(expr.head);
+	LinkVariableTable(expr.pVariableTable);
+	return *this;
 }

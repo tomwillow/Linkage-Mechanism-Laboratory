@@ -193,11 +193,31 @@ int TShape::DOF()
 	return nc() - nh();
 }
 
+void TShape::GetCoordinate(int id, double *x, double *y, double *theta)
+{
+	TElement *temp = GetElementById(id);
+	switch (temp->eType)
+	{
+	case ELEMENT_BAR:
+		*x = ((TBar *)temp)->ptBegin.x;
+		*y = ((TBar *)temp)->ptBegin.y;
+		*theta = ((TBar *)temp)->dAngle;
+		break;
+	case ELEMENT_FRAMEPOINT:
+		*x = ((TFramePoint *)temp)->dpt.x;
+		*y = ((TFramePoint *)temp)->dpt.y;
+		*theta = 0;
+		break;
+	}
+}
+
+//SiP={xi'P,yi'P}
 void TShape::GetSijP(int index,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 {
 	TConstraintCoincide *pCoincide = (TConstraintCoincide *)Element[index];
 	*i = pCoincide->ElementId1;
 	*j = pCoincide->ElementId2;
+	//节点i
 	switch (pCoincide->eElementType1)
 	{
 	case ELEMENT_BAR:
@@ -211,6 +231,7 @@ void TShape::GetSijP(int index,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 		break;
 	}
 
+	//节点j
 	switch (pCoincide->eElementType2)
 	{
 	case ELEMENT_BAR:

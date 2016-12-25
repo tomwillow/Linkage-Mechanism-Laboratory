@@ -3,7 +3,7 @@
 #include "TMainWindow.h"
 
 #include "TConstraintCoincide.h" 
-#include "TSolve.h"
+#include "TSolver.h"
 #include "TConsole.h"
 
 TMainWindow::TMainWindow()

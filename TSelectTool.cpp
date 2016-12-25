@@ -10,6 +10,8 @@
 #include "TDraw.h"
 #include "TConfiguration.h"
 
+#include "TSolver.h"
+
 TSelectTool::TSelectTool()
 {
 	iPickIndex = -1;
@@ -84,6 +86,22 @@ void TSelectTool::OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos)
 
 void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {	
+	if (nFlags& MK_LBUTTON)
+	{
+
+		::SetCursor(::LoadCursor(NULL, IDC_HAND));
+		if (iPickIndex != -1)
+		{
+			//if (pShape->Element[iPickIndex]->eType == ELEMENT_BAR)
+			//{
+				TSolver Solver;
+				Solver.AddMouseConstraint(iPickIndex, pConfig->ScreenToReal(ptPos));
+				Solver.Solute();
+			//}
+		}
+		return;
+	}
+
 	RestoreHoveredLineStyle();
 	iHoverIndex = -1;
 

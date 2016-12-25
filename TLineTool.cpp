@@ -12,6 +12,7 @@
 #include "TLineEdit.h"
 #include "TAttach.h"
 #include "TConstraintCoincide.h"
+#include "TTransfer.h"
 
 TLineTool::TLineTool()
 {
@@ -337,7 +338,6 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	if (LineEdit->m_hWnd == NULL)
 	{
 		LineEdit->CreateEditEx(pCanvas->m_hWnd, IDR_LineEdit, pCanvas->m_hInst);
-		LineEdit->Load(hWnd);
 	}
 	else
 		LineEdit->SetVisible(false);//避免在画完线后还显示Edit

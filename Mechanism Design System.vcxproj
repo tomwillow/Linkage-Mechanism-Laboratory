@@ -66,6 +66,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="TEquations.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TAttach.cpp" />
     <ClCompile Include="TBar.cpp" />
@@ -89,11 +90,12 @@
     <ClCompile Include="TListView.cpp" />
     <ClCompile Include="TMainWindow.cpp" />
     <ClCompile Include="TManageTool.cpp" />
+    <ClCompile Include="TMyString.cpp" />
     <ClCompile Include="TRealLine.cpp" />
     <ClCompile Include="TRightWindow.cpp" />
     <ClCompile Include="TSelectTool.cpp" />
     <ClCompile Include="TShape.cpp" />
-    <ClCompile Include="TSolve.cpp" />
+    <ClCompile Include="TSolver.cpp" />
     <ClCompile Include="TStatus.cpp" />
     <ClCompile Include="TTool.cpp" />
     <ClCompile Include="TToolbar.cpp" />
@@ -106,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ControlStyle.h" />
+    <ClInclude Include="TEquations.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TAttach.h" />
     <ClInclude Include="TBar.h" />
@@ -129,11 +132,12 @@
     <ClInclude Include="TListView.h" />
     <ClInclude Include="TMainWindow.h" />
     <ClInclude Include="TManageTool.h" />
+    <ClInclude Include="TMyString.h" />
     <ClInclude Include="TRealLine.h" />
     <ClInclude Include="TRightWindow.h" />
     <ClInclude Include="TSelectTool.h" />
     <ClInclude Include="TShape.h" />
-    <ClInclude Include="TSolve.h" />
+    <ClInclude Include="TSolver.h" />
     <ClInclude Include="TStatus.h" />
     <ClInclude Include="TTool.h" />
     <ClInclude Include="TToolbar.h" />
@@ -143,6 +147,7 @@
     <ClInclude Include="TWindow.h" />
     <ClInclude Include="TTrackbar.h" />
     <ClInclude Include="TTransfer.h" />
+    <ClInclude Include="enumError.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Mechanism Design System.rc" />

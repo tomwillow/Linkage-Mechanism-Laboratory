@@ -4,17 +4,11 @@
 
 TLineEdit::TLineEdit()
 {
-	hParent = NULL;
 }
 
 
 TLineEdit::~TLineEdit()
 {
-}
-
-void TLineEdit::Load(HWND hParent)
-{
-	this->hParent = hParent;
 }
 
 bool TLineEdit::OnKeyDown(WPARAM wParam, LPARAM lParam)

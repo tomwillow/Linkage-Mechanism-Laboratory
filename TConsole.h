@@ -8,6 +8,7 @@ class TConsole :
 private:
 	TEdit Edit;
 	void TConsole::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
+	void TConsole::OnSize(WPARAM wParam, LPARAM lParam);
 public:
 	TConsole();
 	~TConsole();

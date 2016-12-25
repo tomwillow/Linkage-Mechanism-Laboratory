@@ -114,9 +114,6 @@
     <ClCompile Include="TExpressionTree.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TSolve.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TConsole.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -124,6 +121,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TVariableTable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TMyString.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TEquations.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TSolver.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -230,9 +236,6 @@
     <ClInclude Include="TExpressionTree.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TSolve.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TConsole.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -240,6 +243,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TVariableTable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TMyString.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TEquations.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="enumError.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TSolver.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
