@@ -1,4 +1,6 @@
 #pragma once
+#include "DetectMemoryLeak.h"
+
 #include "TEquations.h"
 #include <Windows.h>
 
@@ -23,19 +25,46 @@ TEquations::~TEquations()
 		delete[] szStr;
 }
 
-TCHAR * TEquations::AddEquation(TCHAR *input, bool output)
+void TEquations::RemoveTempEquations()
+{
+	int i;
+	i = EquationIsTemp.size() - 1;
+	for (; i >-1; i--)
+	{
+		if (EquationIsTemp[i] == true)
+		{
+			std::vector<bool>::iterator iter1=EquationIsTemp.begin()+i;
+			std::vector<TExpressionTree *>::iterator iter2=Equations.begin()+i;
+			EquationIsTemp.erase(iter1);
+
+			delete Equations[i];
+			Equations.erase(iter2);
+		}
+	}
+}
+
+size_t TEquations::GetEquationsCount()
+{
+	return Equations.size();
+}
+
+TCHAR * TEquations::AddEquation(bool output,TCHAR *szInput, bool istemp)
 {
 	TExpressionTree *temp;
 	temp = new TExpressionTree;
 	temp->LinkVariableTable(&VariableTable);
-	temp->Read(input, false);
-	if (temp->GetError() != NULL)
-		return temp->GetErrorInfo();
+	temp->Read(szInput, false);
 	temp->Simplify(false);
-	if (temp->GetError() != NULL)
+
+	if (temp->GetError() != ERROR_NO)
+	{
+		delete temp;
 		return temp->GetErrorInfo();
+	}
 
 	Equations.push_back(temp);
+	EquationIsTemp.push_back(istemp);
+
 	if (output)
 		return temp->OutputStr();
 	else
@@ -44,16 +73,25 @@ TCHAR * TEquations::AddEquation(TCHAR *input, bool output)
 
 const TCHAR * TEquations::BuildJacobi(bool bOutput,TCHAR *subsVar,TCHAR *subsValue)
 {
+	//释放旧的雅可比
+	for (int i = 0; i < Jacobi.size(); i++)
+		for (int j = 0; j < Jacobi[i].size(); j++)
+			delete Jacobi[i][j];
+
 	TExpressionTree *temp;
 	TVariableTable exceptVars;
-	if (subsVar!=NULL) exceptVars.Define(subsVar);
+	//若输入了替换变量，则进行定义
+	if (subsVar!=NULL)
+		exceptVars.Define(bOutput,subsVar);
 
 	//构建雅可比矩阵
+	Jacobi.clear();
 	Jacobi.resize(Equations.size());
 	for (int i = 0; i < Equations.size(); i++)
 	{
 		//替换掉机架点坐标
-		if (subsVar!=NULL && _tcslen(subsVar)>0) Equations[i]->Subs(subsVar, subsValue,false);
+		if (subsVar!=NULL && _tcslen(subsVar)>0)
+			Equations[i]->Subs(subsVar, subsValue,false);
 
 		Equations[i]->Simplify(false);
 		for (int j = 0; j < VariableTable.VariableTable.size(); j++)
@@ -122,6 +160,7 @@ void TEquations::Output(Matrix& m)
 	}
 	Str += TEXT("]");
 
+	delete[] temp;
 }
 
 void TEquations::Output(Vector& v)
@@ -143,18 +182,16 @@ void TEquations::CalcJacobiValue(Matrix &JacobiValue,const Vector &Q)
 {
 	JacobiValue.clear();
 	JacobiValue.resize(Jacobi.size());
-	for (int i = 0; i < Jacobi.size(); i++)
+	TExpressionTree *temp;
+	for (size_t i = 0; i < Jacobi.size();i++)
 	{
-		for (int j = 0; j < Jacobi[i].size(); j++)
+		for (auto exprJacobi:Jacobi[i])
 		{
-			TExpressionTree *temp = new TExpressionTree;
-			*temp = *Jacobi[i][j];
-			temp->Subs(VariableTable.VariableTable, Q, false);
-#ifdef _DEBUG
-			//temp->OutputStr();
-#endif
+			temp = new TExpressionTree;
+			*temp = *exprJacobi;
 			try
 			{
+				temp->Vpa(false);
 				JacobiValue[i].push_back(temp->Value(true));//得到临时表达式值存入雅可比
 			}
 			catch (enumError& err)
@@ -175,13 +212,14 @@ void TEquations::CalcJacobiValue(Matrix &JacobiValue,const Vector &Q)
 void TEquations::CalcPhiValue(Vector &PhiValue,const Vector &Q)
 {
 	PhiValue.clear();
-	for (int i = 0; i < Equations.size(); i++)
+	TExpressionTree *temp;
+	for (auto PhiExpr : Equations)
 	{
-			TExpressionTree *temp = new TExpressionTree;
-			*temp = *Equations[i];
-			temp->Subs(VariableTable.VariableTable, Q, false);
+			temp = new TExpressionTree;
+			*temp = *PhiExpr;
 			try
 			{
+				temp->Vpa(false);
 				PhiValue.push_back(-temp->Value(true));//得到临时表达式值存入
 			}
 			catch (enumError& err)
@@ -299,15 +337,15 @@ bool TEquations::VectorAdd(Vector &Va, const Vector &Vb)
 	return true;
 }
 
-const TCHAR * TEquations::Solve(bool bOutput)
+const TCHAR * TEquations::SolveEquations(bool bOutput)
 {
+	hasSolved = false;
+
 	Matrix JacobiValue;
-	Vector PhiValue, DeltaQ, Q;
+	Vector PhiValue, DeltaQ, &Q = VariableTable.VariableValue;
 	TCHAR *buffer = new TCHAR[20];
 	int n = 0;
 
-	Q.resize(VariableTable.VariableValue.size());
-	Q = VariableTable.VariableValue;
 	Str = TEXT("");
 
 
@@ -329,6 +367,7 @@ const TCHAR * TEquations::Solve(bool bOutput)
 		catch (enumError& err)
 		{
 			Str += TEXT("无法计算。\r\n");
+			delete[] buffer;
 			return Str.c_str();
 		}
 		if (bOutput)
@@ -347,6 +386,7 @@ const TCHAR * TEquations::Solve(bool bOutput)
 		catch (enumError& err)
 		{
 			Str += TEXT("无法计算。\r\n");
+			delete[] buffer;
 			return Str.c_str();
 		}
 		if (bOutput)
@@ -360,7 +400,8 @@ const TCHAR * TEquations::Solve(bool bOutput)
 
 		if (SolveLinear(JacobiValue, DeltaQ, PhiValue) == false)//矩阵奇异
 		{
-			Str+=TEXT("Jacobi矩阵奇异。\r\n");
+			Str += TEXT("Jacobi矩阵奇异。\r\n");
+			delete[] buffer;
 			return Str.c_str();
 		}
 
@@ -379,9 +420,15 @@ const TCHAR * TEquations::Solve(bool bOutput)
 			break;
 
 		if (n > 100)//
-			break;
+		{
+			Str += TEXT("超过100步仍未收敛。\r\n");
+			delete[] buffer;
+			return Str.c_str();
+		}
 		n++;
 	}
+
+	hasSolved = true;
 	VariableTable.VariableValue = Q;
 
 	Str += TEXT("\r\n得到结果：\r\n");

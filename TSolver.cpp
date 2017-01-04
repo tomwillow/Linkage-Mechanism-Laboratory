@@ -1,3 +1,11 @@
+#pragma once
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NON_CONFORMING_SWPRINTFS
+#include "DetectMemoryLeak.h"
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include "TSolver.h"
 
 #include "DPOINT.h"
@@ -11,19 +19,14 @@ TSolver::TSolver()
 {
 	bOutput = false;
 	hwndOutput = NULL;
-	//str = NULL;
-	str = (TCHAR *)malloc(1 * sizeof(TCHAR));
-	str[0] = TEXT('\0');
+	Equations = NULL;
+	Str = TEXT("");
 }
 
 
 TSolver::~TSolver()
 {
-	if (str != NULL)
-		free(str);
-
-	for (int i = 0; i < InputConstraintStr.size(); i++)
-		delete[] InputConstraintStr[i];
+	delete Equations;
 }
 
 void TSolver::SetHwnd(HWND hwnd)
@@ -37,27 +40,17 @@ void TSolver::Outputln(const TCHAR *szFormat, ...)
 		return;
 	if (szFormat != NULL && _tcslen(szFormat) > 0)
 	{
-		TCHAR *szBuffer = NULL;
-		szBuffer = new TCHAR[_tcslen(szFormat) + 1024];
-		//TCHAR szBuffer[102400];
+		TCHAR *szBuffer = new TCHAR[_tcslen(szFormat) + 1024];
 		va_list pArgList;
 		va_start(pArgList, szFormat);
 		_vsntprintf(szBuffer, _tcslen(szFormat) + 1024, szFormat, pArgList);
 		va_end(pArgList);
 
 		//追加换行
-		int str_num = 0;
-		if (str == NULL)
-			str_num = 0;
-		else
-			str_num = _tcslen(str);
-		int buffer_num = _tcslen(szBuffer);
-		str = (TCHAR *)realloc(str, (str_num + buffer_num + 3)*sizeof(TCHAR));
-		_tcscat(str, szBuffer);
-		_tcscat(str, TEXT("\r\n"));
+		Str += szBuffer;
+		Str+=TEXT("\r\n");
 
 		delete[] szBuffer;
-		if (hwndOutput) SetWindowText(hwndOutput, str);
 	}
 }
 
@@ -71,16 +64,7 @@ void TSolver::Output(TCHAR *szFormat, ...)
 	_vsntprintf(szBuffer, sizeof(szBuffer) / sizeof(TCHAR), szFormat, pArgList);
 	va_end(pArgList);
 
-	int str_num = 0;
-	if (str == NULL)
-		str_num = 0;
-	else
-		str_num = _tcslen(str);
-	int buffer_num = _tcslen(szBuffer);
-	str = (TCHAR *)realloc(str, (str_num + buffer_num + 1)*sizeof(TCHAR));
-	_tcscat(str, szBuffer);
-
-	if (hwndOutput) SetWindowText(hwndOutput, str);
+	Str += szBuffer;
 }
 
 int TSolver::GetIdFromVariableStr(TCHAR varname[])
@@ -104,61 +88,52 @@ int TSolver::GetIdFromVariableStr(TCHAR varname[])
 	return i;
 }
 
-void TSolver::AddMouseConstraint(int index, DPOINT dpt)
+void TSolver::ClearConstraint()
+{
+	Equations->RemoveTempEquations();
+}
+
+void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt)
 {
 	if (pShape->Element[index]->eType == ELEMENT_BAR)
 	{
-		TCHAR *temp = new TCHAR[200];
+		TCHAR temp[200];
 		TBar *bar = (TBar *)pShape->Element[index];
-		double xi = bar->ptBegin.x;
-		double yi = bar->ptBegin.y;
-		double l = bar->dLength;
 		double xm = dpt.x;
 		double ym = dpt.y;
-		int id = bar->id;
+		int i = bar->id;
 
-		_stprintf(temp, TEXT("(%f-%f)*(%f-%f*sin(phi%d))-(%f-%f*cos(phi%d))*(%f-%f)"), xi, xm, yi, l, id, xi, l, id, yi, ym);
+		//_stprintf(temp, TEXT("(x%d-%f)*(y%d-%f*sin(phi%d))-(x%d-%f*cos(phi%d))*(y%d-%f)"), i, xm, i, l, i, i, l, i, i, ym);
+		_stprintf(temp, TEXT("(x%d-%f)*sin(phi%d)-(y%d-%f)*cos(phi%d)"),  i,xm, i,  i,ym, i);
 		//TEXT("10*-48*sin(phi1)+48*cos(phi1)*-10")
-		InputConstraintStr.push_back(temp);
+
+		Outputln(Equations->AddEquation(bOutput,temp,true));//phi9约40度phi11-0.5(40-x11)^2+(30-y11)^2-40^2
+
 	}
 }
 
-void TSolver::Solute(bool Output)
+void TSolver::RefreshEquations(bool Output)
 {
 	bOutput = Output;
-	Outputln(TEXT("DOF=nc-nh: %d=%d-%d"), pShape->DOF(), pShape->nc(), pShape->nh());
+	Str = TEXT("");
+	_tcscpy(subsVar, TEXT(""));
+	_tcscpy(subsValue, TEXT(""));
+	if (Equations != NULL)
+		delete Equations;
+	Equations = new TEquations;
+
+	Outputln(TEXT("自由度: DOF = nc-nh = %d - %d = %d"), pShape->nc(), pShape->nh(), pShape->DOF());
 	int i, j;
 	DPOINT SiP, SjP;
 	TCHAR buffer1[100], buffer2[100];
 
-	TEquations Equations;
+	Outputln(TEXT("\r\n约束方程:"));
 
-	TCHAR subsVar[1000] = { TEXT("\0") }, subsValue[1000] = { TEXT("\0") };
-
-	//TEquations Eq;
-	//Outputln(Eq.VariableTable.Define(TEXT("phi9 x11 y11 x13 y13 phi13"), TEXT("")));
-	//Outputln(Eq.AddEquation(TEXT("x11 - 40*cos(phi9)"), true));
-	//Outputln(Eq.AddEquation(TEXT("y11 + 40*sin(phi9)"), true));
-	//Outputln(Eq.AddEquation(TEXT("x13 - x11 - 80*cos(0.5)"), true));
-	//Outputln(Eq.AddEquation(TEXT("y13 - y11 + 80*sin(0.5)"), true));
-	//Outputln(Eq.AddEquation(TEXT("x13 + 40*cos(phi13) - 160"), true));
-	//Outputln(Eq.AddEquation(TEXT("y13 + 40*sin(phi13)"), true));
-	//Outputln(Eq.BuildJacobi(true, NULL, NULL));
-	//Outputln(Eq.Solve(true));
-
-	//TEquations Eq;
-	//Outputln(Eq.VariableTable.Define(TEXT("x"), TEXT("1.5")));
-	//Outputln(Eq.AddEquation(TEXT("ln(x+sin(x))"),true));
-	//Outputln(Eq.BuildJacobi(true,NULL, NULL));
-	//Outputln(Eq.Solve(true));
-
-	Outputln(TEXT("生成方程:"));
-
-	for (unsigned int index = 0; index < pShape->Element.size(); index++)
+	for (auto element : pShape->Element)
 	{
-		if (pShape->Element[index]->eType == CONSTRAINT_COINCIDE)
+		if (element->eType == CONSTRAINT_COINCIDE)
 		{
-			pShape->GetSijP(index, &SiP, &SjP, &i, &j);
+			pShape->GetSijP(element, &SiP, &SjP, &i, &j);
 
 			//得到2个重合构件的广义坐标
 			double xi, yi, phii, xj, yj, phij;
@@ -168,86 +143,151 @@ void TSolver::Solute(bool Output)
 			//定义变量及其初始值
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
-			Equations.VariableTable.Define(buffer1, buffer2);
+			Equations->VariableTable.Define(Output,buffer1, buffer2);
 
 			//读入方程
+			TElement *elementi = pShape->GetElementById(i);
+			TElement *elementj = pShape->GetElementById(j);
+			double length = 0.0;
+			if (elementi->eType == ELEMENT_FRAMEPOINT)
+			{
+				if (elementj->eType == ELEMENT_BAR)
+					length = ((TBar *)elementj)->dLength;
+				_stprintf(buffer1, TEXT("x%d-%f"),j,SiP.x);
+				_stprintf(buffer2, TEXT("y%d-%f"), j,SiP.y);
+				Outputln(Equations->AddEquation(Output, buffer1, false));
+				Outputln(Equations->AddEquation(Output, buffer2, false));
+				continue;
+			}
+			if (elementj ->eType == ELEMENT_FRAMEPOINT)
+			{
+				if (elementi->eType == ELEMENT_BAR)
+					length = ((TBar *)elementi)->dLength;
+				_stprintf(buffer1, TEXT("x%d-%f"), i, SjP.x);
+				_stprintf(buffer2, TEXT("y%d-%f"), i, SjP.y);
+				Outputln(Equations->AddEquation(Output, buffer1, false));
+				Outputln(Equations->AddEquation(Output, buffer2, false));
+				continue;
+			}
+
+			//_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
+			//_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d+%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
 			_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
-			_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d+%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
-			Outputln(Equations.AddEquation(buffer1, Output));
-			Outputln(Equations.AddEquation(buffer2, Output));
+			_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d-%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
+			Outputln(Equations->AddEquation(Output, buffer1, false));
+			Outputln(Equations->AddEquation(Output,buffer2, false));
 
 		}
-		if (pShape->Element[index]->eType == ELEMENT_FRAMEPOINT)
+		if (element->eType == ELEMENT_FRAMEPOINT)
 		{
-			int id = pShape->Element[index]->id;
+			int id = element->id;
 
 			_stprintf(subsVar, TEXT("%s x%d y%d phi%d"), subsVar, id, id, id);
 
-			_stprintf(subsValue, TEXT("%s %f %f %f"), subsValue, ((TFramePoint *)(pShape->Element[index]))->dpt.x, ((TFramePoint *)(pShape->Element[index]))->dpt.y, 0.0);
+			_stprintf(subsValue, TEXT("%s %f %f %f"), subsValue, ((TFramePoint *)(element))->dpt.x, ((TFramePoint *)(element))->dpt.y, 0.0);
 
 		}
 	}
 
-	for (int i = 0; i < InputConstraintStr.size(); i++)
-		Outputln(Equations.AddEquation(InputConstraintStr[i], Output));//phi9约40度phi11-0.5(40-x11)^2+(30-y11)^2-40^2
+	if (Equations->GetEquationsCount() == 0)
+		Outputln(TEXT("\r\n无约束。\r\n"));
 
-	Outputln(Equations.BuildJacobi(Output, subsVar, subsValue));
-	Outputln(Equations.VariableTable.Output());
-	Outputln(Equations.Solve(Output));
+	if (pShape->DOF() == 1)
+		Outputln(TEXT("\r\n可以拖动。"));
+	else
+	if (pShape->DOF() > 1)
+		Outputln(TEXT("\r\n欠约束。"));
 
-	for (int i = 0; i < Equations.VariableTable.VariableTable.size(); i++)
+	if (Output)
+		RefreshWindowText();
+}
+
+void TSolver::ClearOutput()
+{
+	Str = TEXT("");
+}
+
+void TSolver::RefreshWindowText()
+{
+	SetWindowText(hwndOutput, Str.c_str()); 
+
+	//SetFocus(Edit.m_hWnd);
+
+	int len=::GetWindowTextLength(hwndOutput);
+	::PostMessage(hwndOutput, EM_SETSEL, len, len);
+	PostMessage(hwndOutput, EM_SCROLLCARET, 0, 0);
+}
+
+void TSolver::Solve(bool Output)
+{
+	bOutput = Output;
+
+	Outputln(Equations->BuildJacobi(Output, subsVar, subsValue));
+	Outputln(Equations->VariableTable.Output());
+	Outputln(Equations->SolveEquations(Output));
+
+	if (Equations->hasSolved)
 	{
-		enum enumQType{ x, y, phi } eQType;
-		switch (Equations.VariableTable.VariableTable[i][0])
+		for (size_t i = 0; i < Equations->VariableTable.VariableTable.size(); i++)
 		{
-		case TEXT('x'):
-			eQType = x;
-			break;
-		case TEXT('y'):
-			eQType = y;
-			break;
-		case TEXT('p'):
-			eQType = phi;
-			break;
-		}
-		int id = GetIdFromVariableStr(Equations.VariableTable.VariableTable[i]);
-		TElement *element = pShape->GetElementById(id);
-		double data = Equations.VariableTable.VariableValue[i];
-
-		switch (element->eType)
-		{
-		case ELEMENT_BAR:
-		{
-			TBar *bar = (TBar *)element;
-			switch (eQType)
+			enum enumQType{ x, y, phi } eQType;
+			switch (Equations->VariableTable.VariableTable[i][0])
 			{
-			case x:
-				((TBar *)bar)->ptBegin.x = data;
+			case TEXT('x'):
+				eQType = x;
 				break;
-			case y:
-				((TBar *)bar)->ptBegin.y = data;
+			case TEXT('y'):
+				eQType = y;
 				break;
-			case phi:
-				//bar->dAngle = data;
-				bar->SetPoint(bar->ptBegin, bar->dLength, data);
+			case TEXT('p'):
+				eQType = phi;
 				break;
 			}
-			break;
-		}
+			int id = GetIdFromVariableStr(Equations->VariableTable.VariableTable[i]);
+			TElement *element = pShape->GetElementById(id);
+			double &data = Equations->VariableTable.VariableValue[i];
+
+			switch (element->eType)
+			{
+			case ELEMENT_BAR:
+			{
+				TBar *bar = (TBar *)element;
+				switch (eQType)
+				{
+				case x:
+					((TBar *)bar)->ptBegin.x = data;
+					break;
+				case y:
+					((TBar *)bar)->ptBegin.y = data;
+					break;
+				case phi:
+					//bar->dAngle = data;
+					if (abs(data) > 2 * M_PI)
+						data = abs(data / M_PI / 2 - (int)(data / M_PI / 2)) * 2 * M_PI;
+					bar->SetPoint(bar->ptBegin, bar->dLength, data);
+					break;
+				}
+				break;
+			}
+			}
 		}
 	}
 
 
-	//TExpressionTree ex;
-	//TVariableTable VarTable;
-	//Outputln(VarTable.Define(TEXT("  x   y z   ")));
-	//Outputln(ex.LinkVariableTable(&VarTable));
-	//Outputln(ex.Read(TEXT("sqrt(x/y)"), true));
-	//Outputln(ex.Simplify(true));
-	//Outputln(ex.Diff(TEXT("x"), 1, true));
-	//Outputln(ex.Simplify(true));
-	//Outputln(ex.Subs(TEXT("x y"), TEXT(" y 0.1 "), true));
-	//Outputln(ex.Simplify(true));
-	//Outputln(TEXT("%f"), ex.Value(true));
+	if (Output) RefreshWindowText();
+}
 
+void TSolver::Demo()
+{
+	TExpressionTree ex;
+	TVariableTable VarTable;
+	Outputln(VarTable.Define(true,TEXT("  x   y z   ")));
+	Outputln(ex.LinkVariableTable(&VarTable));
+	Outputln(ex.Read(TEXT("sqrt(x/y)"), true));
+	Outputln(ex.Simplify(true));
+	Outputln(ex.Diff(TEXT("x"), 1, true));
+	Outputln(ex.Simplify(true));
+	Outputln(ex.Subs(TEXT("x y"), TEXT(" y 0.1 "), true));
+	Outputln(ex.Simplify(true));
+	Outputln(TEXT("%f"), ex.Value(true));
 }

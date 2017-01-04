@@ -45,5 +45,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine
 
 	win.UpdateWindow();
 
+
 	return win.MessageLoop();
 }

@@ -13,6 +13,8 @@ TTool::TTool()
 	pShape = &(win.m_Shape);
 	pListView = &(win.RightWindow.ListView);
 	pTreeViewContent = &(win.RightWindow.TreeViewContent);
+	//pSolver = &(win.m_Solver);
+	pSolver = win.pSolver;
 }
 
 

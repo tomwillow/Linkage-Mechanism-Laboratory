@@ -1,4 +1,6 @@
 #pragma once
+#include "DetectMemoryLeak.h"
+
 #include <process.h>
 #include "TMainWindow.h"
 
@@ -9,11 +11,22 @@
 TMainWindow::TMainWindow()
 {
 	m_iRightWindowWidth = 200;
+	pConsole = NULL;
+	pSolver = new TSolver;
 }
 
 
 TMainWindow::~TMainWindow()
 {
+	if (pConsole != NULL)
+	{
+		delete pConsole;
+	}
+
+	if (pSolver != NULL)
+		delete pSolver;
+
+	_CrtDumpMemoryLeaks();
 }
 
 void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -34,7 +47,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.AddButton(1, ID_DRAW_FRAME, true, TEXT("机架"));
 	m_Toolbar.AddButton(2, ID_DRAW_BAR, true, TEXT("连杆"));
 	m_Toolbar.AddButton(3, ID_DRAW_LINE, true, TEXT("线"));
-	m_Toolbar.AddButton(4, ID_ANALYZE_MECHANISM, true, TEXT("分析机构"));
+	m_Toolbar.AddButton(4, ID_SET_DRIVER, true, TEXT("设为原动件"));
 	m_Toolbar.ShowToolbar();
 
 	//创建状态栏
@@ -80,9 +93,6 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	Canvas.SetDoubleBuffer(true);
 	Canvas.ShowWindow(TRUE);
 	Canvas.UpdateWindow();
-
-
-
 
 	_tcscpy(szFileName, TEXT(""));
 
@@ -178,6 +188,9 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		RightWindow.TreeViewContent.Initial();
 		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);
 		m_ManageTool.SetCurActiveTool(ID_SELECT);
+
+		//m_Solver.RefreshEquations(true);
+		pSolver->RefreshEquations(true);
 		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
 		break;
 	case ID_OPEN:
@@ -291,6 +304,8 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			delete now_pos;
 			RightWindow.TreeViewContent.AddAllItem();
 			SetText(TEXT("%s - %s"), szName, szFileName);
+			//m_Solver.RefreshEquations(true);
+			pSolver->RefreshEquations(true);
 		}
 		break;
 	case ID_SAVE:
@@ -385,23 +400,48 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		p_Managetool->SetCurActiveTool(wmId);
 		break;
 	case ID_ANALYZE_MECHANISM:
+		if (pConsole == NULL)
+			OnCommand(ID_SHOW_CONSOLE, 0);
+		pSolver->RefreshEquations(true);
+		break;
+	case ID_SHOW_CONSOLE:
 	{
-
-		TConsole Console;
-		Console.CreateEx(0, TEXT("Console"), TEXT("Console"),
-			WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			m_hWnd, (HMENU)0, m_hInst);
-		Console.ShowWindow(SW_SHOW);
-		Console.UpdateWindow();
-		Console.MessageLoop();
-
+		if (pConsole != NULL)
+			pConsole->ShowWindow(SW_SHOWNORMAL);
+		else
+		{
+			pConsole = new TConsole;
+			//pConsole->pSolver = &m_Solver;
+			pConsole->pSolver = pSolver;
+			pConsole->CreateEx(0, TEXT("Console"), TEXT("Console"),
+				WS_OVERLAPPEDWINDOW,
+				CW_USEDEFAULT,
+				CW_USEDEFAULT,
+				CW_USEDEFAULT,
+				CW_USEDEFAULT,
+				m_hWnd, (HMENU)0, m_hInst);
+			pConsole->ShowWindow(SW_SHOWNORMAL);
+			pConsole->UpdateWindow();
+			//pConsole->MessageLoop();
+		}
 
 		break;
 	}
+	case ID_SET_DRIVER:
+		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT)
+		{
+			//m_ManageTool.
+		}
+		else
+			ShowMessage(TEXT("请先使用选择工具选择一个元素，再设为原动件。"));
+		break;
+	case ID_CONSOLE:
+		if (pConsole != NULL)
+		{
+			delete pConsole;
+			pConsole = NULL;
+		}
+		break;
 	case ID_VIEW_SUITABLE:
 		DPOINT center;
 		double left, right, top, bottom;

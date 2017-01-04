@@ -14,8 +14,11 @@
 
 TSelectTool::TSelectTool()
 {
+	bDrag = false;
 	iPickIndex = -1;
+	iPrevPickIndex = -1;
 	iHoverIndex = -1;
+	Cursor = IDC_ARROW;
 }
 
 //由TTool的虚析构函数重载
@@ -64,15 +67,18 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			std::vector<int> InfluenceId;// = pShape->GetInfluenceId(id);
 
 			pTreeViewContent->DeleteById(pShape->Element[iPickIndex]->id);
-			InfluenceId=pShape->DeleteElement(iPickIndex);
+			InfluenceId = pShape->DeleteElement(iPickIndex);
 
 			for (int i = 0; i < InfluenceId.size(); i++)
 				pTreeViewContent->DeleteById(InfluenceId[i]);
 
 			iPickIndex = -1;
+			iPrevPickIndex = -1;
 			iHoverIndex = -1;
 
 			CancelTreeViewAndListView();
+
+			pSolver->RefreshEquations(true);
 		}
 		return;
 	}
@@ -80,25 +86,19 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void TSelectTool::OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	::SetCursor(::LoadCursor(NULL, IDC_ARROW));
+	::SetCursor(::LoadCursor(NULL, Cursor));
 }
 
 
 void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
-{	
-	if (nFlags& MK_LBUTTON)
+{
+	//::SetCursor(::LoadCursor(NULL, IDC_WAIT));
+	if (bDrag)
 	{
-
-		::SetCursor(::LoadCursor(NULL, IDC_HAND));
-		if (iPickIndex != -1)
-		{
-			//if (pShape->Element[iPickIndex]->eType == ELEMENT_BAR)
-			//{
-				TSolver Solver;
-				Solver.AddMouseConstraint(iPickIndex, pConfig->ScreenToReal(ptPos));
-				Solver.Solute();
-			//}
-		}
+		pSolver->ClearOutput();
+		pSolver->ClearConstraint();
+		pSolver->AddMouseConstraint(false, iPickIndex, pConfig->ScreenToReal(ptPos));
+		pSolver->Solve(true);
 		return;
 	}
 
@@ -141,16 +141,16 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 bool TSelectTool::PickRealLine(POINT ptPos, TElement *Element)
 {
 	TRealLine *pRealLine = (TRealLine *)(Element);
-		POINT pt1 = pConfig->RealToScreen(pRealLine->ptBegin);
-		POINT pt2 = pConfig->RealToScreen(pRealLine->ptEnd);
-		double length = TDraw::Distance(pt1, pt2);
-		double length1 = TDraw::Distance(ptPos, pt1);
-		double length2 = TDraw::Distance(ptPos, pt2);
+	POINT pt1 = pConfig->RealToScreen(pRealLine->ptBegin);
+	POINT pt2 = pConfig->RealToScreen(pRealLine->ptEnd);
+	double length = TDraw::Distance(pt1, pt2);
+	double length1 = TDraw::Distance(ptPos, pt1);
+	double length2 = TDraw::Distance(ptPos, pt2);
 
-		if (length1 + length2 - length <= 0.5)//容差
-			return true;
-		else
-			return false;
+	if (length1 + length2 - length <= 0.5)//容差
+		return true;
+	else
+		return false;
 }
 
 void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
@@ -160,11 +160,31 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	iPickIndex = -1;
 
 	//遍历所有
-	for (int i = 0; i < pShape->Element.size(); i++)
+	for (size_t i = 0; i < pShape->Element.size(); i++)
 	{
 		switch (pShape->Element[i]->eType)
 		{
 		case ELEMENT_BAR:
+			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
+			{
+				iPickIndex = i;
+				if (bDrag)
+				{
+					iPrevPickIndex = -1;
+					bDrag = false;
+					Cursor = IDC_ARROW;
+				}
+				else
+				{
+					if (iPrevPickIndex != -1 && iPrevPickIndex == iPickIndex)
+					{
+						bDrag = true;
+						Cursor = IDC_HAND;
+					}
+					iPrevPickIndex = i;
+				}
+			}
+			break;
 		case ELEMENT_REALLINE:
 			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
 			{
@@ -200,7 +220,7 @@ void TSelectTool::SelectById(int id)
 	RestorePickedLineStyle();
 	iPickIndex = -1;
 
-	for (int i = 0; i < pShape->Element.size(); i++)
+	for (size_t i = 0; i < pShape->Element.size(); i++)
 	{
 		if (pShape->Element[i]->id == id)
 		{
@@ -229,6 +249,13 @@ void TSelectTool::CancelTreeViewAndListView()
 
 void TSelectTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
+	if (bDrag)
+	{
+		iPrevPickIndex = -1;
+		bDrag = false;
+		Cursor = IDC_ARROW;
+	}
+
 	for (int i = 0; i < pShape->Element.size(); i++)
 	{
 		switch (pShape->Element[i]->eType)
@@ -279,8 +306,8 @@ void TSelectTool::Draw(HDC hdc)
 			}
 			break;
 		}
-			//由于线型变化，且画线位于工具绘制之前，所以需要刷新一次
-			::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
+		//由于线型变化，且画线位于工具绘制之前，所以需要刷新一次
+		::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
 
 	}
 }

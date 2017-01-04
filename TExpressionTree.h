@@ -55,18 +55,19 @@ private:
 
 	TCHAR *szOutput;
 	TVariableTable *pVariableTable;
+	bool TExpressionTree::IsIntAndEven(double n);
 	int TExpressionTree::Rank(enumMathOperator eOperator);
 	TExpressionTree::enumError TExpressionTree::InQueue2PostQueue(std::queue<TNode *> &InOrder, std::vector<TNode *> &PostOrder);
 	TExpressionTree::enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> &InOrder);
-	void TExpressionTree::Node2Str(TNode &node, TCHAR *result);
+	void TExpressionTree::Node2Str(const TNode &node, TCHAR *result);
 	TExpressionTree::enumError TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder);
 	void TExpressionTree::TraverseInOrder(TNode *now, TCHAR *output, TCHAR *buffer);
-	void TExpressionTree::CalcNode(TNode *Operator, TNode *Node1, TNode *Node2);//计算节点值，支持所有运算符和函数，结果存进Operator
+	void TExpressionTree::CalcNode(TNode *Operator,const TNode *Node1,const TNode *Node2);//计算节点值，支持所有运算符和函数，结果存进Operator
 	TExpressionTree::enumError TExpressionTree::Simplify(TNode *now);
 	void TExpressionTree::GetNodeNum(TNode *now, int &n);
 	int TExpressionTree::GetNodeNum(TNode *head);
-	void TExpressionTree::DeleteNode(TNode *node, std::vector<TNode *> DeleteList);
 	void TExpressionTree::DeleteNode(TNode *node);
+	void TExpressionTree::DeleteNodeTraversal(TNode *node);
 	TCHAR * TExpressionTree::OutputEmptyStr();
 	void TExpressionTree::Diff(TNode *now, TCHAR *var);
 	TExpressionTree::TNode * TExpressionTree::CopyNodeTree(TNode *oldNode);
@@ -79,17 +80,19 @@ private:
 	void TExpressionTree::Calc(TNode *now);
 	void TExpressionTree::LinkParent(TNode *child, TNode *ignore);
 	TExpressionTree::TNode * TExpressionTree::NewNode(enumNodeType eType, enumMathOperator eOperator=MATH_NOT_AVAILIALBE);
+	void TExpressionTree::ReleaseVectorTNode(std::vector<TNode *> vec);
+	void TExpressionTree::Vpa_inner(TNode *now);
 public:
 	TNode *head;
-	int TExpressionTree::GetError();
+	enumError TExpressionTree::GetError();
 	TCHAR * TExpressionTree::GetErrorInfo();
 	TExpressionTree& operator=(TExpressionTree &expr);
 	void TExpressionTree::Reset();
+	TCHAR * TExpressionTree::Vpa(bool bOutput);
 	TCHAR * TExpressionTree::LinkVariableTable(TVariableTable *p);//链接变量表
 	TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput);
 	TCHAR * TExpressionTree::Read(double num, bool bOutput);//读入只有1个数字的表达式
 	TCHAR * TExpressionTree::OutputStr(bool bIgnoreError=false);
-	TCHAR * TExpressionTree::OutputPostOrderStr();//输出PostOrder表达式
 	TCHAR * TExpressionTree::Simplify(bool bOutput);//化简
 	TCHAR * TExpressionTree::Diff(TCHAR *var, int n, bool bOutput);//对变量求导
 	TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums,bool output);//vars为被替换变量，nums为替换表达式，以逗号分隔

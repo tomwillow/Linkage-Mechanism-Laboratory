@@ -212,9 +212,9 @@ void TShape::GetCoordinate(int id, double *x, double *y, double *theta)
 }
 
 //SiP={xi'P,yi'P}
-void TShape::GetSijP(int index,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
+void TShape::GetSijP(TElement *element,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 {
-	TConstraintCoincide *pCoincide = (TConstraintCoincide *)Element[index];
+	TConstraintCoincide *pCoincide = (TConstraintCoincide *)element;
 	*i = pCoincide->ElementId1;
 	*j = pCoincide->ElementId2;
 	//½Úµãi

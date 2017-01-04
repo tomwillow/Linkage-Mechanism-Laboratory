@@ -107,7 +107,8 @@
     <ClCompile Include="TTransfer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ControlStyle.h" />
+    <ClInclude Include="DetectMemoryLeak.h" />
+    <ClInclude Include="String.h" />
     <ClInclude Include="TEquations.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TAttach.h" />

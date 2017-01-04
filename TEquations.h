@@ -9,16 +9,13 @@ class TEquations
 private:
 	const double epsilon = 1e-6;
 
-#ifdef _UNICODE
-#define String wstring
-#else
-#define String string
-#endif
 	std::String Str;
 	TCHAR *szStr;
 	typedef std::vector<std::vector<double>> Matrix;
 	typedef std::vector<double> Vector;
+	std::vector<std::vector<TExpressionTree *>> Jacobi;
 	std::vector<TExpressionTree *> Equations;
+	std::vector<bool> EquationIsTemp;
 	void TEquations::CalcPhiValue(Vector &PhiValue, const Vector &Q);
 	void TEquations::CalcJacobiValue(Matrix &JacobiValue,const Vector &Q);
 	int TEquations::GetMaxAbsRowIndex(const Matrix &A, int RowStart, int RowEnd, int Col);
@@ -30,11 +27,13 @@ private:
 public:
 	TEquations();
 	~TEquations();
+	bool hasSolved;
 	TVariableTable VariableTable; 
-	std::vector<std::vector<TExpressionTree *>> Jacobi;
-	TCHAR * TEquations::AddEquation(TCHAR *input, bool output);
+	size_t TEquations::GetEquationsCount();
+	TCHAR * TEquations::AddEquation(bool output, TCHAR *input, bool istemp);
+	void TEquations::RemoveTempEquations();
 	const TCHAR * TEquations::BuildJacobi(bool bOutput, TCHAR *subsVar, TCHAR *subsValue);
 	bool TEquations::SolveLinear(Matrix &A, Vector &x, Vector &b);
-	const TCHAR * TEquations::Solve(bool bOutput);
+	const TCHAR * TEquations::SolveEquations(bool bOutput);
 };
 

@@ -20,6 +20,7 @@ protected:
 	virtual void OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
 	virtual void OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
 	virtual void OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){ }
+	virtual bool OnClose(){ return true;}
 	virtual void OnSetCursor(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		//WM_SETCURSOR事件捕捉后，系统将不处理光标变化。程序若不自行设置，光标将变成“忙”光标。

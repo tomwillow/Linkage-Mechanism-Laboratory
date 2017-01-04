@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mechanism Design System", "Mechanism Design System.vcxproj", "{265569DC-34A0-49B3-9BE3-5133199DB24D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EquationsSolver", "..\EquationsSolver\EquationsSolver.vcxproj", "{766594B9-B7B4-4827-9C6B-A11240060D1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,6 +17,10 @@ Global
 		{265569DC-34A0-49B3-9BE3-5133199DB24D}.Debug|Win32.Build.0 = Debug|Win32
 		{265569DC-34A0-49B3-9BE3-5133199DB24D}.Release|Win32.ActiveCfg = Release|Win32
 		{265569DC-34A0-49B3-9BE3-5133199DB24D}.Release|Win32.Build.0 = Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.Debug|Win32.Build.0 = Debug|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.Release|Win32.ActiveCfg = Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

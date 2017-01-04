@@ -13,6 +13,7 @@
 #include "TAttach.h"
 #include "TConstraintCoincide.h"
 #include "TTransfer.h"
+#include "TSolver.h"
 
 TLineTool::TLineTool()
 {
@@ -217,6 +218,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 					CoincideBegin->ElementId2 = iPrevLineId;
 					AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
 					pShape->AddCoincide(*CoincideBegin);
+					pSolver->RefreshEquations(true);
 
 					delete CoincideBegin;
 					CoincideBegin = NULL;
@@ -290,6 +292,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			CoincideBegin->ElementId2 = iPrevLineId;
 			AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
 			pShape->AddCoincide(*CoincideBegin);
+			pSolver->RefreshEquations(true);
 			//RefreshTreeViewContent();
 			delete CoincideBegin;
 			CoincideBegin = NULL;
@@ -310,6 +313,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			//终点连接入库
 			AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
 			pShape->AddCoincide(*CoincideBegin);
+			pSolver->RefreshEquations(true);
 
 			delete CoincideBegin;
 			CoincideBegin = NULL;

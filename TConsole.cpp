@@ -1,4 +1,5 @@
 #pragma once
+#include "resource.h"
 #include "TConsole.h"
 #include "TSolver.h"
 
@@ -9,6 +10,8 @@ TConsole::TConsole()
 
 TConsole::~TConsole()
 {
+	DestroyWindow(m_hWnd);
+	pSolver->SetHwnd(NULL);
 }
 
 void TConsole::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -23,12 +26,12 @@ void TConsole::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	Edit.SetVisible(true);
 
 
-	TSolver Solver;
-	Solver.SetHwnd(Edit.m_hWnd);
-	Solver.Solute(true);
+	pSolver->SetHwnd(Edit.m_hWnd);
+	pSolver->RefreshWindowText();
+	//pSolver->Demo();
+	//pSolver->RefreshWindowText();
 
 	SetFocus(Edit.m_hWnd);
-	//Edit.SetSelectAll();
 	Edit.SetSelect(Edit.GetLength(), Edit.GetLength());
 	PostMessage(Edit.m_hWnd, EM_SCROLLCARET, 0, 0);
 }
@@ -36,4 +39,11 @@ void TConsole::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 void TConsole::OnSize(WPARAM wParam, LPARAM lParam)
 {
 	Edit.SetPos(ClientRect);
+}
+
+bool TConsole::OnClose()
+{
+	//ShowWindow(SW_HIDE);
+	PostMessage(m_hParent, WM_COMMAND, ID_CONSOLE, 0);
+	return true;
 }

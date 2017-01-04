@@ -6,9 +6,11 @@ class TElement;
 class TSelectTool:public TTool
 {
 private:
-	std::stack<int> PickedLineId,HoveredLineId;
-	int iPickIndex;
+	LPWSTR Cursor;
+	bool bDrag;
+	int iPickIndex,iPrevPickIndex;
 	int iHoverIndex;
+	std::stack<int> PickedLineId,HoveredLineId;
 	void TSelectTool::Draw(HDC hdc);
 	void OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam);
 	void OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos);

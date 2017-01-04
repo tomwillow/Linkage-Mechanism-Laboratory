@@ -8,6 +8,7 @@ class TShape;
 class TConfiguration;
 class TListView;
 class TTreeViewContent;
+class TSolver;
 class TTool
 {
 private:
@@ -19,6 +20,7 @@ protected:
 	TConfiguration *pConfig;
 	TListView *pListView;
 	TTreeViewContent *pTreeViewContent;
+	TSolver *pSolver;
 	//void TTool::RefreshTreeViewContent();
 public:
 	TTool();

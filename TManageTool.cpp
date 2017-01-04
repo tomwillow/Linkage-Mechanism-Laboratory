@@ -54,13 +54,14 @@ void TManageTool::SetCurActiveTool(UINT id)
 
 void TManageTool::SetCursor(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-		POINT ptPos;
+	POINT ptPos;
 
-		ptPos.x = LOWORD(lParam);
-		ptPos.y = HIWORD(lParam);
+	ptPos.x = LOWORD(lParam);
+	ptPos.y = HIWORD(lParam);
+
 	if (m_pCurrentTool != NULL)
 	{
-		m_pCurrentTool->OnSetCursor(hWnd, message,ptPos);
+		m_pCurrentTool->OnSetCursor(hWnd, message, ptPos);
 	}
 	else
 	{

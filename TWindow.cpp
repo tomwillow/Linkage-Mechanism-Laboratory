@@ -1,6 +1,7 @@
 #pragma once
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <windows.h>
 #include <assert.h>
@@ -104,6 +105,11 @@ LRESULT TWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if ( m_bMainWindow )
 				PostQuitMessage(0); // main window only
 			return 0;
+		case WM_CLOSE:
+			if (OnClose())
+				break;//Quit
+			else
+				return 0;
 	}
 
    return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -211,10 +217,10 @@ WPARAM TWindow::MessageLoop(void)
 	while ( GetMessage(&msg, NULL, 0, 0) )
 	{
 #ifdef _DEBUG
-		TCHAR temp[MAX_PATH];
+		//TCHAR temp[MAX_PATH];
 
-		wsprintf(temp, _T("Message(0x%x, 0x%x, 0x%x, 0x%x)\n"), msg.hwnd, msg.message, msg.wParam, msg.lParam);
-		OutputDebugString(temp);
+		//wsprintf(temp, _T("Message(0x%x, 0x%x, 0x%x, 0x%x)\n"), msg.hwnd, msg.message, msg.wParam, msg.lParam);
+		//OutputDebugString(temp);
 #endif
 		if (!TranslateAccelerator(msg.hwnd, m_hAccelTable, &msg))
 		{

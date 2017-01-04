@@ -1,19 +1,24 @@
 #pragma once
+#include <string>
 #include <vector>
 #include <iostream>
 #include "TTool.h"
 
+#include "String.h"
 #include "DPOINT.h"
 
 enum enumConditionType {CONDITION_COINCIDE,CONDITION_FRAMEPOINT};
+class TEquations;
 class TSolver:public TTool
 {
 private:
+	std::String Str;
 	bool bOutput;
 	HWND hwndOutput;
-	TCHAR *str;
+	//TCHAR *str;
+	TEquations *Equations;
+	TCHAR subsVar[1000], subsValue[1000];
 	std::vector<int> idOrder;
-	std::vector<TCHAR *> InputConstraintStr;
 	double *Phi, *Phip;
 	struct TCondition
 	{
@@ -27,8 +32,13 @@ private:
 public:
 	TSolver();
 	~TSolver();
-	void Solute(bool Output=false);
-	void TSolver::AddMouseConstraint(int index, DPOINT dpt);
+	void TSolver::Solve(bool Output = false);
+	void TSolver::ClearOutput();
+	void TSolver::RefreshEquations(bool Output = false);
+	void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt);
 	void TSolver::SetHwnd(HWND hwnd);
+	void TSolver::RefreshWindowText();
+	void TSolver::ClearConstraint();
+	void TSolver::Demo();
 };
 

@@ -137,9 +137,6 @@
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ControlStyle.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TManageTool.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -255,6 +252,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TSolver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectMemoryLeak.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="String.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
