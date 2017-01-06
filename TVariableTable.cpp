@@ -27,7 +27,7 @@ void TVariableTable::ReleaseVariableTable(std::vector<TCHAR *> &input)
 	{
 		delete[] szStr;
 	}
-
+	input.clear();
 }
 
 double TVariableTable::GetValueFromVarPoint(TCHAR *pVar)
@@ -75,13 +75,13 @@ const TCHAR * TVariableTable::Remove(const TCHAR input_str[])
 	TMyString::Trim(input);
 	TMyString::ReplaceLoop(input, TEXT("  "), TEXT(" "));
 	TMyString::Split(input, temp, TEXT(" "));
-	for (int i = 0; i < temp.size(); i++)
+	for (auto szInputVar: temp)
 	{
-		if (TMyString::isVariableName(temp[i]) == false)
+		if (TMyString::isVariableName(szInputVar) == false)
 		{
 			//出现不合法的变量名
 			str = TEXT("不合法的变量");
-			str += temp[i];
+			str += szInputVar;
 			str += TEXT("。");
 			eError = ERROR_INVALID_VARNAME;
 			ReleaseVariableTable(temp);
@@ -179,7 +179,7 @@ const TCHAR * TVariableTable::Define(bool bOutput,TCHAR *input_str,TCHAR *input_
 		}
 
 	if (bOutput)
-		return Output();
+		return Output();//输出变量情况
 	else
 	{
 		str = TEXT("");
@@ -190,18 +190,19 @@ const TCHAR * TVariableTable::Define(bool bOutput,TCHAR *input_str,TCHAR *input_
 const TCHAR * TVariableTable::Output()
 {
 	str = TEXT("已定义变量(");
-	//std::ostringstream convert;   // stream used for the conversion
-	//
-	//convert << VariableTable.size();
-	//std::wstringstream ss;
-	//ss << VariableTable.size();
-	//ss >> str;
+
+	TCHAR tc[8];
+	_itow(VariableTable.size(), tc, 10);
+	str += tc;
+
 	str += TEXT("个):");
-	for (unsigned int i = 0; i < VariableTable.size(); i++)
+	for (auto Var: VariableTable)
 	{
 		str += TEXT(" ");
-		str+=VariableTable[i];
+		str+=Var;
 	}
+
+	str += TEXT("\r\n");
 
 	return str.c_str();
 }

@@ -6,7 +6,7 @@
 
 TEquations::TEquations()
 {
-	szStr = NULL;
+	eError = ERROR_NO;
 }
 
 
@@ -20,9 +20,6 @@ TEquations::~TEquations()
 	for (int i = 0; i < Jacobi.size(); i++)
 		for (int j = 0; j < Jacobi[i].size(); j++)
 			delete Jacobi[i][j];
-
-	if (szStr != NULL)
-		delete[] szStr;
 }
 
 void TEquations::RemoveTempEquations()
@@ -48,7 +45,7 @@ size_t TEquations::GetEquationsCount()
 	return Equations.size();
 }
 
-TCHAR * TEquations::AddEquation(bool output,TCHAR *szInput, bool istemp)
+const TCHAR * TEquations::AddEquation(bool output,TCHAR *szInput, bool istemp)
 {
 	TExpressionTree *temp;
 	temp = new TExpressionTree;
@@ -56,10 +53,11 @@ TCHAR * TEquations::AddEquation(bool output,TCHAR *szInput, bool istemp)
 	temp->Read(szInput, false);
 	temp->Simplify(false);
 
-	if (temp->GetError() != ERROR_NO)
+	if ((eError=temp->GetError()) != ERROR_NO)
 	{
+		Str += temp->GetErrorInfo();
 		delete temp;
-		return temp->GetErrorInfo();
+		return Str.c_str();
 	}
 
 	Equations.push_back(temp);
@@ -73,6 +71,9 @@ TCHAR * TEquations::AddEquation(bool output,TCHAR *szInput, bool istemp)
 
 const TCHAR * TEquations::BuildJacobi(bool bOutput,TCHAR *subsVar,TCHAR *subsValue)
 {
+	if (eError != ERROR_NO)
+		return Str.c_str();
+
 	//释放旧的雅可比
 	for (int i = 0; i < Jacobi.size(); i++)
 		for (int j = 0; j < Jacobi[i].size(); j++)
@@ -115,7 +116,7 @@ const TCHAR * TEquations::BuildJacobi(bool bOutput,TCHAR *subsVar,TCHAR *subsVal
 	//
 	if (bOutput)
 	{
-		Str = TEXT("Phi=\r\n[");
+		Str = TEXT("\r\nPhi=\r\n[");
 		for (int i = 0; i < Equations.size(); i++)
 		{
 			Str += Equations[i]->OutputStr();
@@ -124,7 +125,7 @@ const TCHAR * TEquations::BuildJacobi(bool bOutput,TCHAR *subsVar,TCHAR *subsVal
 		}
 		Str += TEXT("]\r\n");
 
-		Str += TEXT("Jacobi=\r\n[");
+		Str += TEXT("\r\nJacobi=\r\n[");
 		for (int ii = 0; ii < Jacobi.size(); ii++)
 		{
 			for (int jj = 0; jj < Jacobi[ii].size(); jj++)
@@ -238,7 +239,7 @@ void TEquations::CalcPhiValue(Vector &PhiValue,const Vector &Q)
 int TEquations::GetMaxAbsRowIndex(const Matrix &A,int RowStart,int RowEnd, int Col)
 {
 	double max = 0.0;
-	int index = 0;
+	int index = RowStart;
 	for (int i = RowStart; i <=RowEnd; i++)
 	{
 		if (abs(A[i][Col])>max)
@@ -252,6 +253,8 @@ int TEquations::GetMaxAbsRowIndex(const Matrix &A,int RowStart,int RowEnd, int C
 
 void TEquations::SwapRow(Matrix &A,Vector &b, int i, int j)
 {
+	if (i == j)
+		return;
 	Vector temp(A[i].size());
 	temp = A[i];
 	A[i] = A[j];
@@ -263,38 +266,61 @@ void TEquations::SwapRow(Matrix &A,Vector &b, int i, int j)
 	b[j] = n;
 }
 
-bool TEquations::SolveLinear(Matrix &A,Vector &x, Vector &b)
+enumError TEquations::SolveLinear(Matrix &A,Vector &x, Vector &b)
 {
-	int n = A.size();
-	if (x.size() != n) x.resize(n);
-	if (n != b.size())
-		return false;
+	auto m = A.size();//行数
+	auto n = m;//列数=未知数个数
+	
+	auto RankA = m, RankAb = m;//初始值
+
+	if (x.size() != m) x.resize(m);//仅对方阵成立
+	
+	if (m != b.size())//Jacobi行数不等于Phi行数
+		return ERROR_JACOBI_ROW_NOT_EQUAL_PHI_ROW;
+
+	if (m>0)
+		if (A[0].size()!=m)//不是方阵
+		{
+			n = A[0].size();
+			x.resize(n);
+			//return ERROR_INDETERMINATE_EQUATION;
+		}
 
 	//列主元消元法
-	for (int i = 0; i < n; i++)
+	for (decltype(m) i = 0; i < m; i++)
 	{
-		if (A[i].size() != n)//不是方阵
-			return false;
+		//if (A[i].size() != m)
 
-		SwapRow(A,b, i, GetMaxAbsRowIndex(A,i,n-1, i)); 
+		//交换本行与最大行
+		SwapRow(A,b, i, GetMaxAbsRowIndex(A,i,m-1, i)); 
 
 		if (abs(A[i][i]) < epsilon)//最大值为0，矩阵奇异
-			return false;
+		{
+			RankA = i;
+			if (abs(b[i]) < epsilon)
+				RankAb = i;
 
-		double m = A[i][i];
-		for (int j = i; j < n; j++)
-			A[i][j] /= m;
-		b[i] /= m;
+			if (RankA != RankAb)//奇异，且系数矩阵及增广矩阵秩不相等->无解
+				return ERROR_SINGULAR_MATRIX;
+			else
+				break;//跳出for，得到特解
+		}
+
+		//主对角线化为1
+		double m_num = A[i][i];
+		for (decltype(m) j = i; j < m; j++)
+			A[i][j] /= m_num;
+		b[i] /= m_num;
 
 		//每行化为0
-		for (int row = i+1; row < n; row++)
+		for (decltype(m) row = i+1; row < m; row++)
 		{
 			if (abs(A[row][i]) < epsilon)
 				;
 			else
 			{
 				double mi = A[row][i];
-				for (int col = i; col < n; col++)
+				for (int col = i; col < m; col++)
 				{
 					A[row][col] -= A[i][col] * mi;
 				}
@@ -303,17 +329,39 @@ bool TEquations::SolveLinear(Matrix &A,Vector &x, Vector &b)
 		}
 	}
 
+	bool bIndeterminateEquation = false;
+
+	//若为不定方程组，空缺行全填0继续运算
+	if (m != n)
+	{
+		A.resize(n);
+		for (auto i = m ; i < n; i++)
+			A[i].resize(n);
+		b.resize(n);
+		m = n;
+		bIndeterminateEquation = true;
+	}
+
 	//后置换得到x
-	for (int i = n - 1; i >= 0; i--)
+	for (int i = m - 1; i >= 0; i--)//最后1行->第1行
 	{
 		double sum_others = 0.0;
-		for (int j = i + 1; j < n; j++)
+		for (decltype(m) j = i +1; j < m; j++)//本列 后的元素乘以已知x 加总
 		{
 			sum_others += A[i][j] * x[j];
 		}
 		x[i] = b[i] - sum_others;
 	}
-	return true;
+
+	if (RankA < n && RankA == RankAb)
+	{
+		if (bIndeterminateEquation)
+			return ERROR_INDETERMINATE_EQUATION;
+		else
+			return ERROR_INFINITY_SOLUTIONS;
+	}
+
+	return ERROR_NO;
 }
 
 bool TEquations::AllIs0(Vector &V)
@@ -339,6 +387,8 @@ bool TEquations::VectorAdd(Vector &Va, const Vector &Vb)
 
 const TCHAR * TEquations::SolveEquations(bool bOutput)
 {
+	if (eError != ERROR_NO)
+		return Str.c_str();
 	hasSolved = false;
 
 	Matrix JacobiValue;
@@ -370,6 +420,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 			delete[] buffer;
 			return Str.c_str();
 		}
+
 		if (bOutput)
 		{
 			Str += TEXT("Jacobi(");
@@ -398,11 +449,23 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 			Str += TEXT("\r\n");
 		}
 
-		if (SolveLinear(JacobiValue, DeltaQ, PhiValue) == false)//矩阵奇异
+		switch (SolveLinear(JacobiValue, DeltaQ, PhiValue))
 		{
-			Str += TEXT("Jacobi矩阵奇异。\r\n");
+		case ERROR_SINGULAR_MATRIX:
+			//矩阵奇异
+			Str += TEXT("Jacobi矩阵奇异且无解（存在矛盾方程）。\r\n");
 			delete[] buffer;
 			return Str.c_str();
+		case ERROR_INDETERMINATE_EQUATION:
+			Str += TEXT("不定方程组。返回一组特解。\r\n");
+			break;
+		case ERROR_JACOBI_ROW_NOT_EQUAL_PHI_ROW:
+			Str += TEXT("Jacobi矩阵与Phi向量行数不等，程序出错。\r\n");
+			delete[] buffer;
+			return Str.c_str(); 
+		case ERROR_INFINITY_SOLUTIONS:
+			Str += TEXT("Jacobi矩阵奇异，但有无穷多解（存在等价方程）。返回一组特解。\r\n");
+			break;
 		}
 
 		if (bOutput)//输出DeltaQ

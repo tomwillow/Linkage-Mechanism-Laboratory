@@ -7,6 +7,9 @@
 #include "TConstraintCoincide.h" 
 #include "TSolver.h"
 #include "TConsole.h"
+#include "TSelectTool.h"
+
+#include "DialogAddDriver.h"
 
 TMainWindow::TMainWindow()
 {
@@ -173,7 +176,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	{
 	case ID_NEW:
 		if (wmEvent != ID_NEW_NOCHECK)
-			if (_tcslen(szFileName) > 0 || m_Shape.Element.size()>0)
+			if (_tcslen(szFileName) > 0 || m_Shape.Element.size() > 0)
 			{
 				if (MessageBox(m_hWnd, TEXT("是否新建文件？"), TEXT(""), MB_YESNO) == IDNO)
 					break;
@@ -430,10 +433,16 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_SET_DRIVER:
 		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT)
 		{
-			//m_ManageTool.
+			//if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
+				if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), NULL, DlgAddDriverProc))
+				{
+					MessageBox(NULL, TEXT("窗口打开失败。"),TEXT(""), MB_ICONERROR);
+				}
+				else
+					break;
 		}
-		else
-			ShowMessage(TEXT("请先使用选择工具选择一个元素，再设为原动件。"));
+
+		MessageBox(m_hWnd,TEXT("请先使用选择工具选择一个元素，再设为原动件。"),TEXT(""),MB_ICONINFORMATION);
 		break;
 	case ID_CONSOLE:
 		if (pConsole != NULL)

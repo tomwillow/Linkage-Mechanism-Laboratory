@@ -27,6 +27,7 @@ TCanvas::~TCanvas()
 void TCanvas::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	Config = &(win.m_Configuration);
+	m_hWnd = hWnd;
 }
 
 void TCanvas::DealMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -179,6 +180,7 @@ void TCanvas::OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	::InvalidateRect(m_hWnd, &ClientRect, false);
 }
 
+
 void TCanvas::OnDraw(HDC hdc)
 {
 	SetBkMode(hdc, TRANSPARENT);
@@ -193,9 +195,9 @@ void TCanvas::OnDraw(HDC hdc)
 	TDraw::DrawAxes(hdc, Config->GetOrg().x, Config->GetOrg().y, Config->crCoordinate);
 
 	//图形绘制
-	for (unsigned int i = 0; i < win.m_Shape.Element.size(); i++)
+	for (auto pElement: win.m_Shape.Element)
 	{
-		TDraw::DrawElement(hdc, win.m_Shape.Element[i], Config);
+		TDraw::DrawElement(hdc, pElement, Config);
 	}
 
 	//工具类绘制

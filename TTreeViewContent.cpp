@@ -22,23 +22,23 @@ void TTreeViewContent::DeleteAllItems()
 
 void TTreeViewContent::DeleteById(int id)
 {
-	for (int i = 0; i < Item.size(); i++)
+	for (auto i = Item.begin(); i != Item.end();i++)
 	{
-		if (Item[i].ObjectId == id)
+		if (i->ObjectId == id)
 		{
 			SelectNull();
-			TreeView_DeleteItem(m_hWnd, Item[i].hTreeItem);
-			std::vector<TItem>::iterator iter = Item.begin() + i;
-			Item.erase(iter);
+			TreeView_DeleteItem(m_hWnd, i->hTreeItem);
+			Item.erase(i);
+			break;
 		}
 	}
 }
 
 void TTreeViewContent::AddAllItem()
 {
-	for (int i = 0; i < pShape->Element.size(); i++)
+	for (auto pElement: pShape->Element)
 	{
-		AddItem(pShape->Element[i], pShape->Element[i]->id);
+		AddItem(pElement, pElement->id);
 	}
 }
 
@@ -86,23 +86,22 @@ void TTreeViewContent::SelectNull()
 
 void TTreeViewContent::SelectById(int id)
 {
-	for (int i = 0; i < Item.size(); i++)
+	for (auto item:Item)
 	{
-		if (Item[i].ObjectId == id)
+		if (item.ObjectId == id)
 		{
-			//SetFocus(m_hWnd);
-			TreeView_Select(m_hWnd, Item[i].hTreeItem, TVGN_CARET);
+			TreeView_Select(m_hWnd, item.hTreeItem, TVGN_CARET);
 		}
 	}
 }
 
 HTREEITEM TTreeViewContent::GetHTreeItemFromId(int id)
 {
-	for (int i = 0; i < Item.size(); i++)
+	for (auto item: Item)
 	{
-		if (Item[i].ObjectId==id)
+		if (item.ObjectId==id)
 		{
-			return Item[i].hTreeItem;
+			return item.hTreeItem;
 		}
 	}
 	return NULL;
@@ -110,11 +109,11 @@ HTREEITEM TTreeViewContent::GetHTreeItemFromId(int id)
 
 int TTreeViewContent::GetIdFromHTreeView(HTREEITEM hTreeItem)
 {
-	for (int i = 0; i < Item.size(); i++)
+	for (auto item: Item)
 	{
-		if (Item[i].hTreeItem == hTreeItem)
+		if (item.hTreeItem == hTreeItem)
 		{
-			return Item[i].ObjectId;
+			return item.ObjectId;
 		}
 	}
 	return -1;

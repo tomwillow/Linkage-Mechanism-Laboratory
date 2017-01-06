@@ -14,7 +14,9 @@
 
 TSelectTool::TSelectTool()
 {
+	bShowTips = false;
 	bDrag = false;
+	bMove = false;
 	iPickIndex = -1;
 	iPrevPickIndex = -1;
 	iHoverIndex = -1;
@@ -69,8 +71,8 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			pTreeViewContent->DeleteById(pShape->Element[iPickIndex]->id);
 			InfluenceId = pShape->DeleteElement(iPickIndex);
 
-			for (int i = 0; i < InfluenceId.size(); i++)
-				pTreeViewContent->DeleteById(InfluenceId[i]);
+			for (auto i: InfluenceId)
+				pTreeViewContent->DeleteById(i);
 
 			iPickIndex = -1;
 			iPrevPickIndex = -1;
@@ -158,6 +160,12 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	CancelTreeViewAndListView();
 	RestorePickedLineStyle();
 	iPickIndex = -1;
+	if (bDrag)
+	{
+		iPrevPickIndex = -1;
+		bDrag = false;
+		Cursor = IDC_ARROW;
+	}
 
 	//遍历所有
 	for (size_t i = 0; i < pShape->Element.size(); i++)
@@ -168,16 +176,11 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
 			{
 				iPickIndex = i;
-				if (bDrag)
-				{
-					iPrevPickIndex = -1;
-					bDrag = false;
-					Cursor = IDC_ARROW;
-				}
-				else
+				if (bDrag==false)
 				{
 					if (iPrevPickIndex != -1 && iPrevPickIndex == iPickIndex)
 					{
+						//非拾取状态再次点击同一对象进入拾取
 						bDrag = true;
 						Cursor = IDC_HAND;
 					}
@@ -310,4 +313,13 @@ void TSelectTool::Draw(HDC hdc)
 		::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
 
 	}
+}
+
+bool TSelectTool::CanBeDriver()
+{
+	if (iPickIndex != -1 && pShape->Element[iPickIndex]->eType == ELEMENT_BAR)
+	{
+		return true;
+	}
+	return false;
 }

@@ -132,6 +132,9 @@
     <ClCompile Include="TSolver.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DialogAddDriver.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -258,6 +261,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="String.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogAddDriver.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

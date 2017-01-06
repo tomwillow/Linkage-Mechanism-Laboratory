@@ -1,13 +1,19 @@
 #pragma once
 #include <stack>
 #include "TTool.h"
+#include "String.h"
 
 class TElement;
 class TSelectTool:public TTool
 {
 private:
+	String sTips;
+	bool bShowTips;
+	POINT ptTips;
+
 	LPWSTR Cursor;
 	bool bDrag;
+	bool bMove;
 	int iPickIndex,iPrevPickIndex;
 	int iHoverIndex;
 	std::stack<int> PickedLineId,HoveredLineId;
@@ -24,6 +30,7 @@ private:
 public:
 	TSelectTool();
 	~TSelectTool();
+	bool TSelectTool::CanBeDriver();
 	void TSelectTool::SelectById(int id);
 };
 

@@ -9,8 +9,8 @@ class TEquations
 private:
 	const double epsilon = 1e-6;
 
+	enumError eError;
 	std::String Str;
-	TCHAR *szStr;
 	typedef std::vector<std::vector<double>> Matrix;
 	typedef std::vector<double> Vector;
 	std::vector<std::vector<TExpressionTree *>> Jacobi;
@@ -30,10 +30,10 @@ public:
 	bool hasSolved;
 	TVariableTable VariableTable; 
 	size_t TEquations::GetEquationsCount();
-	TCHAR * TEquations::AddEquation(bool output, TCHAR *input, bool istemp);
+	const TCHAR * TEquations::AddEquation(bool output, TCHAR *input, bool istemp);
 	void TEquations::RemoveTempEquations();
 	const TCHAR * TEquations::BuildJacobi(bool bOutput, TCHAR *subsVar, TCHAR *subsValue);
-	bool TEquations::SolveLinear(Matrix &A, Vector &x, Vector &b);
+	enumError TEquations::SolveLinear(Matrix &A, Vector &x, Vector &b);
 	const TCHAR * TEquations::SolveEquations(bool bOutput);
 };
 

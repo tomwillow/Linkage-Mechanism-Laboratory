@@ -3,6 +3,8 @@
 #define _CRT_NON_CONFORMING_SWPRINTFS
 #include "DetectMemoryLeak.h"
 
+#include <time.h>
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -209,18 +211,26 @@ void TSolver::ClearOutput()
 
 void TSolver::RefreshWindowText()
 {
-	SetWindowText(hwndOutput, Str.c_str()); 
+	if (hwndOutput != NULL)
+	{
+		SetWindowText(hwndOutput, Str.c_str());
 
-	//SetFocus(Edit.m_hWnd);
+		//SetFocus(Edit.m_hWnd);
 
-	int len=::GetWindowTextLength(hwndOutput);
-	::PostMessage(hwndOutput, EM_SETSEL, len, len);
-	PostMessage(hwndOutput, EM_SCROLLCARET, 0, 0);
+		int len = ::GetWindowTextLength(hwndOutput);
+		::PostMessage(hwndOutput, EM_SETSEL, len, len);
+		PostMessage(hwndOutput, EM_SCROLLCARET, 0, 0);
+	}
 }
 
 void TSolver::Solve(bool Output)
 {
 	bOutput = Output;
+
+	clock_t start, stop;//clock_t是clock()函数返回类型
+	double duration;
+
+	start = clock();
 
 	Outputln(Equations->BuildJacobi(Output, subsVar, subsValue));
 	Outputln(Equations->VariableTable.Output());
@@ -273,6 +283,10 @@ void TSolver::Solve(bool Output)
 		}
 	}
 
+	stop = clock();
+	duration = ((double)(stop - start)) / CLK_TCK;
+
+	Outputln(TEXT("\r\n耗时 %f ms"), duration);
 
 	if (Output) RefreshWindowText();
 }
