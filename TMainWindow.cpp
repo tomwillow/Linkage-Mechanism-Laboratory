@@ -431,18 +431,20 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	case ID_SET_DRIVER:
-		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT)
-		{
-			//if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
-				if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), NULL, DlgAddDriverProc))
-				{
-					MessageBox(NULL, TEXT("窗口打开失败。"),TEXT(""), MB_ICONERROR);
-				}
-				else
-					break;
-		}
-
-		MessageBox(m_hWnd,TEXT("请先使用选择工具选择一个元素，再设为原动件。"),TEXT(""),MB_ICONINFORMATION);
+		//if (m_ManageTool.m_uiCurActiveTool == ID_SELECT)
+		//{
+		//	//if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
+		//		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DlgAddDriverProc))
+		//		{
+		//			MessageBox(NULL, TEXT("窗口打开失败。"),TEXT(""), MB_ICONERROR);
+		//		}
+		//		else
+		//			break;
+		//}
+		//Sleep(1000);
+		m_ManageTool.bReceiveMsg = false;
+		MessageBox(m_hWnd, TEXT("请先使用选择工具选择一个元素，再设为原动件。"), TEXT(""), MB_ICONINFORMATION);
+		m_ManageTool.bReceiveMsg = true;
 		break;
 	case ID_CONSOLE:
 		if (pConsole != NULL)

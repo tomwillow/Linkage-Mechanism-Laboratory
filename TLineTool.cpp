@@ -384,7 +384,7 @@ void TLineTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			CoincideBegin = NULL;
 		}
 
-		dptHit.swap(std::vector<DPOINT>());
+		dptHit.clear();
 
 		::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), false);
 

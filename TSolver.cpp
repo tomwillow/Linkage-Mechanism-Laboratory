@@ -97,7 +97,7 @@ void TSolver::ClearConstraint()
 
 void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt)
 {
-	if (pShape->Element[index]->eType == ELEMENT_BAR)
+	if (pShape->Element[index]->eType == ELEMENT_BAR || pShape->Element[index]->eType == ELEMENT_REALLINE)
 	{
 		TCHAR temp[200];
 		TBar *bar = (TBar *)pShape->Element[index];
@@ -139,8 +139,8 @@ void TSolver::RefreshEquations(bool Output)
 
 			//得到2个重合构件的广义坐标
 			double xi, yi, phii, xj, yj, phij;
-			pShape->GetCoordinate(i, &xi, &yi, &phii);
-			pShape->GetCoordinate(j, &xj, &yj, &phij);
+			pShape->GetCoordinateById(i, &xi, &yi, &phii);
+			pShape->GetCoordinateById(j, &xj, &yj, &phij);
 
 			//定义变量及其初始值
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
@@ -148,29 +148,29 @@ void TSolver::RefreshEquations(bool Output)
 			Equations->VariableTable.Define(Output,buffer1, buffer2);
 
 			//读入方程
-			TElement *elementi = pShape->GetElementById(i);
-			TElement *elementj = pShape->GetElementById(j);
-			double length = 0.0;
-			if (elementi->eType == ELEMENT_FRAMEPOINT)
-			{
-				if (elementj->eType == ELEMENT_BAR)
-					length = ((TBar *)elementj)->dLength;
-				_stprintf(buffer1, TEXT("x%d-%f"),j,SiP.x);
-				_stprintf(buffer2, TEXT("y%d-%f"), j,SiP.y);
-				Outputln(Equations->AddEquation(Output, buffer1, false));
-				Outputln(Equations->AddEquation(Output, buffer2, false));
-				continue;
-			}
-			if (elementj ->eType == ELEMENT_FRAMEPOINT)
-			{
-				if (elementi->eType == ELEMENT_BAR)
-					length = ((TBar *)elementi)->dLength;
-				_stprintf(buffer1, TEXT("x%d-%f"), i, SjP.x);
-				_stprintf(buffer2, TEXT("y%d-%f"), i, SjP.y);
-				Outputln(Equations->AddEquation(Output, buffer1, false));
-				Outputln(Equations->AddEquation(Output, buffer2, false));
-				continue;
-			}
+			//TElement *elementi = pShape->GetElementById(i);
+			//TElement *elementj = pShape->GetElementById(j);
+			//double length = 0.0;
+			//if (elementi->eType == ELEMENT_FRAMEPOINT)
+			//{
+			//	if (elementj->eType == ELEMENT_BAR)
+			//		length = ((TBar *)elementj)->dLength;
+			//	_stprintf(buffer1, TEXT("x%d-%f"),j,SiP.x);
+			//	_stprintf(buffer2, TEXT("y%d-%f"), j,SiP.y);
+			//	Outputln(Equations->AddEquation(Output, buffer1, false));
+			//	Outputln(Equations->AddEquation(Output, buffer2, false));
+			//	continue;
+			//}
+			//if (elementj ->eType == ELEMENT_FRAMEPOINT)
+			//{
+			//	if (elementi->eType == ELEMENT_BAR)
+			//		length = ((TBar *)elementi)->dLength;
+			//	_stprintf(buffer1, TEXT("x%d-%f"), i, SjP.x);
+			//	_stprintf(buffer2, TEXT("y%d-%f"), i, SjP.y);
+			//	Outputln(Equations->AddEquation(Output, buffer1, false));
+			//	Outputln(Equations->AddEquation(Output, buffer2, false));
+			//	continue;
+			//}
 
 			//_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
 			//_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d+%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
@@ -260,6 +260,7 @@ void TSolver::Solve(bool Output)
 			switch (element->eType)
 			{
 			case ELEMENT_BAR:
+			case ELEMENT_REALLINE:
 			{
 				TBar *bar = (TBar *)element;
 				switch (eQType)

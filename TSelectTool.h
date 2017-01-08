@@ -7,13 +7,20 @@ class TElement;
 class TSelectTool:public TTool
 {
 private:
+	enum enumSelectMode{ SELECT_MOVE, SELECT_DRAG };
+	enumSelectMode eMode;
+
 	String sTips;
 	bool bShowTips;
 	POINT ptTips;
 
 	LPWSTR Cursor;
+
 	bool bDrag;
+
 	bool bMove;
+	POINT ptMouseClick;
+
 	int iPickIndex,iPrevPickIndex;
 	int iHoverIndex;
 	std::stack<int> PickedLineId,HoveredLineId;
@@ -27,6 +34,8 @@ private:
 	void TSelectTool::CancelTreeViewAndListView();
 	void TSelectTool::RestorePickedLineStyle();
 	void TSelectTool::RestoreHoveredLineStyle();
+	void TSelectTool::EndDrag();
+	void TSelectTool::EndMove();
 public:
 	TSelectTool();
 	~TSelectTool();

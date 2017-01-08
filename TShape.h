@@ -35,7 +35,10 @@ public:
 	int TShape::nh();
 	int TShape::DOF();
 	void TShape::GetSijP(TElement *element, DPOINT *SiP, DPOINT *SjP, int *i, int *j);
-	void TShape::GetCoordinate(int id, double *x, double *y, double *theta);
+	void TShape::GetCoordinateById(int id, double *x, double *y, double *theta);
+	void TShape::GetCoordinateByIndex(int index, double *x, double *y, double *theta);
+	void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, double *theta);
 	DWORD TShape::GetSizeOfElement(EnumElementType eType);
+	void TShape::ChangePos(int index, DPOINT dptDelta);
 };
 

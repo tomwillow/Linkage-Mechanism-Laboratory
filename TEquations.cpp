@@ -279,26 +279,44 @@ enumError TEquations::SolveLinear(Matrix &A,Vector &x, Vector &b)
 		return ERROR_JACOBI_ROW_NOT_EQUAL_PHI_ROW;
 
 	if (m>0)
-		if (A[0].size()!=m)//不是方阵
+		if ((n=A[0].size())!=m)//不是方阵
 		{
-			n = A[0].size();
+			if (m > n)
+				return ERROR_OVER_DETERMINED_EQUATIONS;
 			x.resize(n);
 			//return ERROR_INDETERMINATE_EQUATION;
 		}
 
+	std::vector<decltype(m)> TrueRowNumber(n);
+
 	//列主元消元法
-	for (decltype(m) i = 0; i < m; i++)
+	for (decltype(m) y = 0,x=0; y < m; y++,x++)
 	{
 		//if (A[i].size() != m)
 
 		//交换本行与最大行
-		SwapRow(A,b, i, GetMaxAbsRowIndex(A,i,m-1, i)); 
+		SwapRow(A,b, y, GetMaxAbsRowIndex(A,y,m-1, x)); 
 
-		if (abs(A[i][i]) < epsilon)//最大值为0，矩阵奇异
+		while (abs(A[y][x]) < epsilon)//x一直递增到非0
 		{
-			RankA = i;
-			if (abs(b[i]) < epsilon)
-				RankAb = i;
+			x++;
+			if (x == n)
+				break;
+
+			//交换本行与最大行
+			SwapRow(A, b, y, GetMaxAbsRowIndex(A, y, m - 1, x));
+		}
+
+		if (x!=n && x > y)
+		{
+			TrueRowNumber[y] = x;//补齐方程时 当前行应换到x行
+		}
+
+		if (x == n)//本行全为0
+		{
+			RankA = y;
+			if (abs(b[y]) < epsilon)
+				RankAb = y;
 
 			if (RankA != RankAb)//奇异，且系数矩阵及增广矩阵秩不相等->无解
 				return ERROR_SINGULAR_MATRIX;
@@ -307,39 +325,48 @@ enumError TEquations::SolveLinear(Matrix &A,Vector &x, Vector &b)
 		}
 
 		//主对角线化为1
-		double m_num = A[i][i];
-		for (decltype(m) j = i; j < m; j++)
-			A[i][j] /= m_num;
-		b[i] /= m_num;
+		double m_num = A[y][x];
+		for (decltype(m) j = y; j < n; j++)//y行第j个->第n个
+			A[y][j] /= m_num;
+		b[y] /= m_num;
 
 		//每行化为0
-		for (decltype(m) row = i+1; row < m; row++)
+		for (decltype(m) row = y+1; row < m; row++)//下1行->最后1行
 		{
-			if (abs(A[row][i]) < epsilon)
+			if (abs(A[row][x]) < epsilon)
 				;
 			else
 			{
-				double mi = A[row][i];
-				for (int col = i; col < m; col++)
+				double mi = A[row][x];
+				for (int col = x; col < n; col++)//row行第x个->第n个
 				{
-					A[row][col] -= A[i][col] * mi;
+					A[row][col] -= A[y][col] * mi;
 				}
-				b[row] -= b[i] * mi;
+				b[row] -= b[y] * mi;
 			}
 		}
 	}
 
-	bool bIndeterminateEquation = false;
+	bool bIndeterminateEquation = false;//设置此变量是因为后面m将=n，标记以判断是否为不定方程组
 
 	//若为不定方程组，空缺行全填0继续运算
 	if (m != n)
 	{
-		A.resize(n);
-		for (auto i = m ; i < n; i++)
+		A.resize(n);//A改为n行
+		for (auto i = m ; i < n; i++)//A从m行开始每行n个数
 			A[i].resize(n);
 		b.resize(n);
 		m = n;
 		bIndeterminateEquation = true;
+
+		//调整顺序
+		for (int i = m - 1; i >= 0;i--)
+		{
+			if (TrueRowNumber[i]!=0)
+			{
+				SwapRow(A, b, i, TrueRowNumber[i]);
+			}
+		}
 	}
 
 	//后置换得到x
@@ -393,6 +420,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 
 	Matrix JacobiValue;
 	Vector PhiValue, DeltaQ, &Q = VariableTable.VariableValue;
+	Vector VariableValueBackup = VariableTable.VariableValue;
 	TCHAR *buffer = new TCHAR[20];
 	int n = 0;
 
@@ -417,7 +445,8 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 		catch (enumError& err)
 		{
 			Str += TEXT("无法计算。\r\n");
-			delete[] buffer;
+			delete[] buffer; 
+			VariableTable.VariableValue = VariableValueBackup;
 			return Str.c_str();
 		}
 
@@ -438,6 +467,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 		{
 			Str += TEXT("无法计算。\r\n");
 			delete[] buffer;
+			VariableTable.VariableValue = VariableValueBackup;
 			return Str.c_str();
 		}
 		if (bOutput)
@@ -455,6 +485,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 			//矩阵奇异
 			Str += TEXT("Jacobi矩阵奇异且无解（存在矛盾方程）。\r\n");
 			delete[] buffer;
+			VariableTable.VariableValue = VariableValueBackup;
 			return Str.c_str();
 		case ERROR_INDETERMINATE_EQUATION:
 			Str += TEXT("不定方程组。返回一组特解。\r\n");
@@ -462,10 +493,16 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 		case ERROR_JACOBI_ROW_NOT_EQUAL_PHI_ROW:
 			Str += TEXT("Jacobi矩阵与Phi向量行数不等，程序出错。\r\n");
 			delete[] buffer;
-			return Str.c_str(); 
+			VariableTable.VariableValue = VariableValueBackup;
+			return Str.c_str();
 		case ERROR_INFINITY_SOLUTIONS:
 			Str += TEXT("Jacobi矩阵奇异，但有无穷多解（存在等价方程）。返回一组特解。\r\n");
 			break;
+		case ERROR_OVER_DETERMINED_EQUATIONS:
+			Str += TEXT("矛盾方程组，无法求解。\r\n");
+			delete[] buffer;
+			VariableTable.VariableValue = VariableValueBackup;
+			return Str.c_str();
 		}
 
 		if (bOutput)//输出DeltaQ
@@ -482,17 +519,17 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 		if (AllIs0(DeltaQ))
 			break;
 
-		if (n > 100)//
+		if (n > 19)//
 		{
-			Str += TEXT("超过100步仍未收敛。\r\n");
+			Str += TEXT("超过20步仍未收敛。\r\n");
 			delete[] buffer;
+			VariableTable.VariableValue = VariableValueBackup;
 			return Str.c_str();
 		}
 		n++;
 	}
 
 	hasSolved = true;
-	VariableTable.VariableValue = Q;
 
 	Str += TEXT("\r\n得到结果：\r\n");
 	for (int i = 0;i< VariableTable.VariableTable.size(); i++)

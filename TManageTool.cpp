@@ -10,6 +10,7 @@
 
 TManageTool::TManageTool()
 {
+	bReceiveMsg = true;
 	m_pCurrentTool = NULL;
 	m_uiCurActiveTool = 0;
 }
@@ -73,6 +74,7 @@ void TManageTool::SetCursor(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 void TManageTool::Message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	if (bReceiveMsg == false) return;
 	if (m_pCurrentTool == NULL) return;
 
 	POINT ptPos;

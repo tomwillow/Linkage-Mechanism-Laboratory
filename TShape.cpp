@@ -193,12 +193,42 @@ int TShape::DOF()
 	return nc() - nh();
 }
 
-void TShape::GetCoordinate(int id, double *x, double *y, double *theta)
+void TShape::GetCoordinateById(int id, double *x, double *y, double *theta)
 {
 	TElement *temp = GetElementById(id);
+	GetCoordinateByElement(temp, x, y, theta);
+}
+
+void TShape::ChangePos(int index, DPOINT dptDelta)
+{
+	TElement *temp = Element[index];
+	switch (temp->eType)
+	{
+	case ELEMENT_FRAMEPOINT:
+		((TFramePoint *)temp)->dpt.x += dptDelta.x;
+		((TFramePoint *)temp)->dpt.y += dptDelta.y;
+		break;
+	case ELEMENT_BAR:
+	case ELEMENT_REALLINE:
+		((TRealLine *)temp)->ptBegin.x += dptDelta.x;
+		((TRealLine *)temp)->ptBegin.y += dptDelta.y;
+		((TRealLine *)temp)->ptEnd.x += dptDelta.x;
+		((TRealLine *)temp)->ptEnd.y += dptDelta.y;
+		break;
+	}
+}
+
+void TShape::GetCoordinateByIndex(int index, double *x, double *y, double *theta)
+{
+	GetCoordinateByElement(Element[index], x, y, theta);
+}
+void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, double *theta)
+{
+	TElement *temp = element;
 	switch (temp->eType)
 	{
 	case ELEMENT_BAR:
+	case ELEMENT_REALLINE:
 		*x = ((TBar *)temp)->ptBegin.x;
 		*y = ((TBar *)temp)->ptBegin.y;
 		*theta = ((TBar *)temp)->dAngle;
@@ -221,13 +251,14 @@ void TShape::GetSijP(TElement *element,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 	switch (pCoincide->eElementType1)
 	{
 	case ELEMENT_BAR:
+	case ELEMENT_REALLINE:
 		if (pCoincide->Element1PointIndex == 1)//ptBegin
 			*SiP = { 0, 0 };
 		else
 			*SiP = { ((TBar *)GetElementById(*i))->dLength, 0 };
 		break;
 	case ELEMENT_FRAMEPOINT:
-		*SiP = { ((TFramePoint *)GetElementById(*i))->dpt.x, ((TFramePoint *)GetElementById(*i))->dpt.y };
+		*SiP = { 0,0 };
 		break;
 	}
 
@@ -241,7 +272,7 @@ void TShape::GetSijP(TElement *element,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 			*SjP = { ((TBar *)GetElementById(*j))->dLength, 0 };
 		break;
 	case ELEMENT_FRAMEPOINT:
-		*SjP = { ((TFramePoint *)GetElementById(*j))->dpt.x, ((TFramePoint *)GetElementById(*j))->dpt.y };
+		*SjP = { 0,0 };
 		break;
 	}
 }
