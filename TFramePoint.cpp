@@ -4,8 +4,6 @@
 #include "TListView.h"
 TFramePoint::TFramePoint()
 {
-	dpt.x = 0;
-	dpt.y = 0;
 	_tcscpy(Name, TEXT(""));
 	eType = ELEMENT_FRAMEPOINT;
 }

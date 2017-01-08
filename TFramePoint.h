@@ -8,7 +8,6 @@ class TFramePoint:public TElement
 public:
 	TFramePoint();
 	~TFramePoint();
-	DPOINT dpt;
 	void TFramePoint::NoticeListView(TListView *pListView);
 };
 

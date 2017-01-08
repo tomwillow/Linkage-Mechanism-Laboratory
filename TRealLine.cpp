@@ -4,7 +4,7 @@
 #include "TDraw.h"
 #include "TListView.h"
 
-TRealLine::TRealLine()
+TRealLine::TRealLine() :ptBegin(dpt)
 {
 	TRealLine::dLength = 0;
 	_tcscpy(Name, TEXT(""));

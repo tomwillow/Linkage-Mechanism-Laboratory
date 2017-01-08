@@ -453,6 +453,14 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			pConsole = NULL;
 		}
 		break;
+	case ID_REFRESH:
+		pSolver->RefreshEquations(true);
+		pSolver->ClearOutput();
+		pSolver->ClearConstraint();
+		//pSolver->AddMouseConstraint(false, iPickIndex, pConfig->ScreenToReal(ptPos));
+		pSolver->Solve(true);
+		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
+		break;
 	case ID_VIEW_SUITABLE:
 		DPOINT center;
 		double left, right, top, bottom;

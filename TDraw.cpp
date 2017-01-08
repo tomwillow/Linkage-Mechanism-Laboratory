@@ -42,6 +42,14 @@ void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
 	case ELEMENT_BAR:
 		DrawBar(hdc, ((TBar *)Element)->ptBegin, ((TBar *)Element)->ptEnd, ((TBar *)Element)->logpenStyleShow, pConfig);
 		break;
+	case CONSTRAINT_COINCIDE:
+		TConstraintCoincide *temp = (TConstraintCoincide *)Element;
+		POINT p1, p2;
+		//得到p1,p2
+		//if (temp->Element1PointIndex!=2)
+
+		//比较p1,p2，距离大则画虚线
+		break;
 	}
 }
 

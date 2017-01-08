@@ -6,6 +6,8 @@
 #include "TBar.h"
 #include "TLine.h"
 #include "TRealLine.h"
+#include "TConstraintCoincide.h"
+
 #include "TConfiguration.h"
 
 class TFramePoint;

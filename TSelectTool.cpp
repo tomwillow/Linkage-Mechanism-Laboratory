@@ -14,7 +14,7 @@
 
 TSelectTool::TSelectTool()
 {
-	eMode = SELECT_DRAG;
+	eMode = SELECT_MOVE;
 	bShowTips = false;
 	bDrag = false;
 	bMove = false;

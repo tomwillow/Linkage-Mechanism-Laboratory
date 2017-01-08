@@ -8,6 +8,9 @@ TElement::TElement() :available(true)
 {
 	id = -1;
 	eType = ELEMENT_NULL;
+	dpt = { 0, 0 };
+	angle = 0.0;
+
 	_tcscpy(Name,TEXT("undefined"));
 }
 

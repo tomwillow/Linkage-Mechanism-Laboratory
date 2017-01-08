@@ -5,7 +5,7 @@
 #include "TDraw.h"
 #include "TLine.h"
 
-TLine::TLine()
+TLine::TLine() :dAngle(angle)
 {
 	TLine::dLength = 0;
 	_tcscpy(Name, TEXT("TLine"));
