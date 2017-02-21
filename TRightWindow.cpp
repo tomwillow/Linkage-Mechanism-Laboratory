@@ -81,7 +81,8 @@ void TRightWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			int id = TreeViewContent.GetIdFromHTreeView(pnmtv->itemNew.hItem);
 
 				//结束当前工具，使用选择工具
-				if (win.m_ManageTool.m_uiCurActiveTool != ID_SELECT)
+				if (win.m_ManageTool.m_uiCurActiveTool != ID_SELECT &&
+					win.m_ManageTool.m_uiCurActiveTool!=ID_DRAG)
 					win.m_ManageTool.SetCurActiveTool(ID_SELECT);
 
 
@@ -93,7 +94,7 @@ void TRightWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				win.m_Shape.GetElementById(id)->NoticeListView(&ListView);
 
 				//刷新显示
-				::InvalidateRect(win.Canvas.m_hWnd, &(win.Canvas.ClientRect), FALSE);
+				win.Canvas.Invalidate();
 			
 			break;
 		}
@@ -137,5 +138,5 @@ void TRightWindow::OnSize(WPARAM wParam, LPARAM lParam)
 {
 	SetTreeViewPos();
 	SetListViewPos();
-	::InvalidateRect(m_hWnd, &ClientRect, FALSE);
+	Invalidate();
 }

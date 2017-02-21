@@ -3,16 +3,19 @@
 #include "TTool.h"
 #include "String.h"
 
+#include "DPOINT.h"
+
 class TElement;
 class TSelectTool:public TTool
 {
-private:
+protected:
 	enum enumSelectMode{ SELECT_MOVE, SELECT_DRAG };
 	enumSelectMode eMode;
+protected:
 
-	String sTips;
-	bool bShowTips;
-	POINT ptTips;
+	//String sTips;
+	//bool bShowTips;
+	//POINT ptTips;
 
 	LPWSTR Cursor;
 
@@ -31,9 +34,12 @@ private:
 	void OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	bool TSelectTool::PickRealLine(POINT ptPos, TElement *Element);
+	bool TSelectTool::PickRealLine(POINT &ptPos, DPOINT &dptBegin, DPOINT &dptEnd);
+	bool TSelectTool::PickConstraintCoincide(POINT ptPos, TElement *element);
 	void TSelectTool::CancelTreeViewAndListView();
 	void TSelectTool::RestorePickedLineStyle();
 	void TSelectTool::RestoreHoveredLineStyle();
+	void TSelectTool::SelectNull();
 	void TSelectTool::EndDrag();
 	void TSelectTool::EndMove();
 public:

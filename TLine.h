@@ -13,6 +13,6 @@ public:
 	TLine *pNext = NULL;
 	TLine();
 	~TLine();
-	void TLine::CalcLength();
+	//void TLine::CalcLength();
 };
 

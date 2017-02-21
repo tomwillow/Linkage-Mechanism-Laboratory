@@ -1,4 +1,5 @@
 #pragma once
+#include "DetectMemoryLeak.h"
 #include "TDraw.h"
 
 #include "TFramePoint.h"
@@ -12,19 +13,31 @@ TDraw::~TDraw()
 {
 }
 
-//画直线
+//画直线，不带样式
 void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos)
 {
 	::MoveToEx(hdc, ptFirstPos.x, ptFirstPos.y, NULL);
 	::LineTo(hdc, ptSecondPos.x, ptSecondPos.y);
 }
 
+//画直线，带样式，以logpenStyle为准
 void TDraw::DrawLine(HDC hdc, TLine Line)
 {
 	HPEN hPen;
 	hPen = ::CreatePenIndirect(&Line.logpenStyle);
 	::SelectObject(hdc, hPen);
 	DrawLine(hdc, Line.ptBegin, Line.ptEnd);
+
+	::DeleteObject(hPen);
+}
+
+//画直线，带样式
+void TDraw::DrawPolyline(HDC hdc, const POINT *apt,int count,LOGPEN &logpen)
+{
+	HPEN hPen;
+	hPen = ::CreatePenIndirect(&logpen);
+	::SelectObject(hdc, hPen);
+	Polyline(hdc, apt, count);
 
 	::DeleteObject(hPen);
 }
@@ -42,13 +55,24 @@ void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
 	case ELEMENT_BAR:
 		DrawBar(hdc, ((TBar *)Element)->ptBegin, ((TBar *)Element)->ptEnd, ((TBar *)Element)->logpenStyleShow, pConfig);
 		break;
+	case ELEMENT_SLIDEWAY:
+		DrawSlideway(hdc, (TSlideway *)Element, pConfig);
+		break;
 	case CONSTRAINT_COINCIDE:
-		TConstraintCoincide *temp = (TConstraintCoincide *)Element;
-		POINT p1, p2;
-		//得到p1,p2
-		//if (temp->Element1PointIndex!=2)
 
 		//比较p1,p2，距离大则画虚线
+		if (ShowConstraintCoincideDotLine(Element,pConfig))
+		{
+			TConstraintCoincide *temp = (TConstraintCoincide *)Element;
+			TLine Line;
+			Line.logpenStyle = temp->logpenStyleShow;
+			Line.ptBegin = pConfig->RealToScreen(*(temp->pDpt1));
+			Line.ptEnd = pConfig->RealToScreen(*(temp->pDpt2));
+			DrawLine(hdc, Line);
+		}
+		break;
+	default:
+		assert(0);
 		break;
 	}
 }
@@ -97,29 +121,6 @@ void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin,DPOINT ptEnd,LOGPEN logpen,TCon
 
 bool TDraw::PointInRgn(POINT *ptRgn,int RgnCount, POINT pt)
 {
-	//double sum=0,angle,p1, p2;
-	//double angledeg = 0;
-	//for (int i = 0; i < RgnCount-1; i++)
-	//{
-	//	p1 = GetAngleFromPointScreen(pt, ptRgn[i]);
-	//	p2 = GetAngleFromPointScreen(pt, ptRgn[i + 1]);
-	//	angle = p2 - p1;
-	//	if (angle > M_PI) angle = 2 * M_PI - angle;
-	//	if (angle < -M_PI) angle = 2 * M_PI + angle;
-	//	angledeg = angle / M_PI * 180;
-	//	sum += angle;
-	//}
-	//p1 = GetAngleFromPointScreen(pt, ptRgn[RgnCount - 1]);
-	//p2 = GetAngleFromPointScreen(pt, ptRgn[0]);
-	//angle = p2 - p1;
-	//if (angle > M_PI) angle = 2 * M_PI - angle;
-	//if (angle < -M_PI) angle = 2 * M_PI + angle;
-	//sum += angle;
-
-	//if (abs(sum) < 0.001)//sum==0
-	//	return false;//在多边形外
-	//else
-	//	return true;
 	int   i, j = RgnCount - 1;
 	bool  oddNodes = false;
 
@@ -194,10 +195,146 @@ void TDraw::DrawFramePoint(HDC hdc,DPOINT dpt, LOGPEN logpen, TConfiguration *Co
 	::DeleteObject(hBrush);
 }
 
-//画剖面线：d为垂直间距，angleDEG为角度
-void TDraw::DrawSection(HDC hdc, int x1,int y1,int x2,int y2,int d, int angleDEG)
+void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config)
 {
-	double angle = angleDEG / 180.0*M_PI;
+	HPEN hPen;
+	HBRUSH hBrush;
+	hPen = ::CreatePenIndirect(&Slideway->logpenStyleShow);
+	hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
+	::SelectObject(hdc, hPen);
+	::SelectObject(hdc, hBrush);
+
+	DrawRealLine(hdc, Slideway->ptBegin, Slideway->ptEnd, Slideway->logpenStyleShow, Config);
+
+	double angleDEG = REG2DEG(Slideway->dAngle)+45;
+	POINT pt[4];
+	switch (Slideway->ShadowQuadrant)
+	{
+	case 1:
+		pt[0] = Config->RealToScreen(Slideway->ptEnd);
+		pt[1] = { pt[0].x, pt[0].y + FRAMEPOINT_SECTION_H };
+		pt[2] = { pt[1].x - Slideway->ShadowLength,pt[1].y };
+		pt[3] = { pt[2].x, pt[0].y };
+		break;
+	case 2:
+		pt[0] = Config->RealToScreen(Slideway->ptBegin);
+		pt[1] = { pt[0].x, pt[0].y + FRAMEPOINT_SECTION_H };
+		pt[2] = { pt[1].x + Slideway->ShadowLength, pt[1].y };
+		pt[3] = { pt[2].x, pt[0].y };
+		break;
+	case 3:
+		pt[0] = Config->RealToScreen(Slideway->ptBegin);
+		pt[1] = { pt[0].x, pt[0].y - FRAMEPOINT_SECTION_H };
+		pt[2] = { pt[1].x + Slideway->ShadowLength, pt[1].y };
+		pt[3] = { pt[2].x, pt[0].y };
+		break;
+	case 4:
+		pt[0] = Config->RealToScreen(Slideway->ptEnd);
+		pt[1] = { pt[0].x, pt[0].y - FRAMEPOINT_SECTION_H };
+		pt[2] = { pt[1].x - Slideway->ShadowLength, pt[1].y };
+		pt[3] = { pt[2].x, pt[0].y };
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	Rotate(pt, 4, pt[0].x, pt[0].y, Slideway->dAngle);
+	MirrorX(pt, 4, pt[0].y);
+	//Rotate(pt, 4, Slideway->ptBegin.x, Slideway->ptEnd.y, Slideway->dAngle);
+	
+	DrawSection(hdc, pt, 4, 10, angleDEG);
+
+	::DeleteObject(hPen);
+	::DeleteObject(hBrush);
+}
+
+void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect,bool YPlusIsUP)
+{
+	int xmin, ymin, xmax, ymax;
+	if (apt_num > 0)
+	{
+		xmax = xmin = apt[0].x;
+		ymax = ymin = apt[0].y;
+	}
+
+	for (int i = 1; i < apt_num; i++)
+	{
+		if (apt[i].x > xmax) xmax = apt[i].x;
+		if (apt[i].x < xmin) xmin = apt[i].x;
+		if (apt[i].y > ymax) ymax = apt[i].y;
+		if (apt[i].y < ymin) ymin = apt[i].y;
+	}
+	rect->left = xmin;
+	rect->right = xmax;
+	if (YPlusIsUP)
+	{
+		rect->top = ymax;
+		rect->bottom = ymin;
+	}
+	else
+	{
+		rect->top = ymin;
+		rect->bottom = ymax;
+	}
+}
+
+//画剖面线：d为垂直间距，angleDEG为角度，传入参数以Y方向向上为正
+void TDraw::DrawSection(HDC hdc, POINT apt[],int apt_num, int d, int angleDEG)
+{
+	HRGN hRgn;
+	hRgn = ::CreatePolygonRgn(apt, apt_num, ALTERNATE);
+	::SelectClipRgn(hdc, hRgn);
+
+	RECT rect;
+	GetBoundingBox(apt, apt_num, &rect, true);
+
+	//包围盒外接圆直径
+	double r = sqrt(pow(double(rect.right - rect.left), 2) + pow(double(rect.top - rect.bottom), 2))/2;
+
+	POINT center = { (rect.right + rect.left) / 2, (rect.top + rect.bottom) / 2 };
+
+	RECT nrect;
+	nrect.left = center.x - r;
+	nrect.right = center.x + r;
+	nrect.top = center.y + r;
+	nrect.bottom = center.y - r;
+
+	double angle = DEG2REG(angleDEG);
+
+	POINT *pt1,*pt2;
+	int pt_num = 2 * r / d;
+	pt1 = new POINT[pt_num];
+	pt2 = new POINT[pt_num];
+
+	for (int i = 0; i < pt_num; i++)
+	{
+		pt1[i].x = nrect.left;
+		pt1[i].y = nrect.bottom + i*d;
+		pt2[i].x = nrect.right;
+		pt2[i].y = pt1[i].y;
+	}
+
+	Rotate(pt1, pt_num, center.x, center.y, angle);
+	Rotate(pt2, pt_num, center.x, center.y, angle);
+	MirrorX(pt1, pt_num, center.y);
+	MirrorX(pt2, pt_num, center.y);
+
+	for (int i = 0; i < pt_num; i++)
+	{
+		DrawLine(hdc, pt1[i], pt2[i]);
+	}
+
+	delete[] pt1, pt2;
+
+	::SelectClipRgn(hdc, NULL);
+	::DeleteObject(hRgn);
+}
+
+//画剖面线：d为垂直间距，angleDEG为角度
+void TDraw::DrawSection(HDC hdc, int x1, int y1, int x2, int y2, int d, int angleDEG)
+{
+	double angle = DEG2REG(angleDEG);
 	int dx= d / sin(angle);
 	int h = y2-y1;
 	POINT pt1,pt2;
@@ -372,7 +509,7 @@ void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor)
 	::DeleteObject(hBrush);
 }
 
-//画网格
+//画网格，使用颜色crGridSmall,crGridBig
 void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config)
 {
 	int minGrid = 10;
@@ -444,6 +581,26 @@ double TDraw::Distance(POINT pt1, POINT pt2)
 	return sqrt(double((pt1.x - pt2.x)*(pt1.x - pt2.x) + (pt1.y - pt2.y)*(pt1.y - pt2.y)));
 }
 
+double TDraw::DistanceReal(DPOINT *pdpt1, DPOINT *pdpt2,TConfiguration *pConfig)
+{
+	POINT p1 = pConfig->RealToScreen(*pdpt1);
+	POINT p2 = pConfig->RealToScreen(*pdpt2);
+	return Distance(p1, p2);
+}
+
+bool TDraw::ShowConstraintCoincideDotLine(TElement *element,TConfiguration *pConfig)
+{
+	TConstraintCoincide *temp = (TConstraintCoincide *)element;
+
+	//比较p1,p2，距离大则画虚线
+	if (DistanceReal(temp->pDpt1, temp->pDpt2, pConfig) > 4)
+	{
+		return true;
+	}
+	else
+		return false;
+}
+
 void TDraw::DrawRect(HDC hdc, RECT &rect,LOGPEN &logpen)
 {
 	HPEN hPen = ::CreatePenIndirect(&logpen);
@@ -474,6 +631,7 @@ void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt)
 	pt->y += rect.top;
 }
 
+//根据边缘量更改rect
 void TDraw::GetMarginRect(RECT *rect, int margin)
 {
 	rect->left += margin;
@@ -482,11 +640,26 @@ void TDraw::GetMarginRect(RECT *rect, int margin)
 	rect->bottom -= margin;
 }
 
+//根据边缘量更改rect，不更改原来的recct
 RECT TDraw::GetMarginRect(RECT rect, int margin)
 {
 	RECT rc=rect;
 	GetMarginRect(&rc, margin);
 	return rc;
+}
+
+POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max, RECT &rect)
+{
+	int X = rect.left + (rect.right - rect.left)*(dpt.x - x_min) / (x_max - x_min);
+	int Y = rect.top + (rect.bottom - rect.top)*(y_max - dpt.y) / (y_max - y_min);
+	return{ X, Y };
+}
+
+DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, double y_max, RECT &rect)
+{
+	double x = x_min+(x_max-x_min)*(pt.x-rect.left)/(rect.right-rect.left);
+	double y = y_max-(y_max-y_min)*(pt.y-rect.top)/(rect.bottom-rect.top);
+	return { x, y };
 }
 
 void TDraw::DrawTextAdvance(HDC hdc, TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format)

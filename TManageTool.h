@@ -7,7 +7,6 @@
 class TManageTool
 {
 public:
-	bool bReceiveMsg;
 	UINT m_uiCurActiveTool;
 	TTool *m_pCurrentTool;
 

@@ -1,3 +1,6 @@
+#pragma once
+#include "DetectMemoryLeak.h"
+
 #include "TTreeViewContent.h"
 
 #include "TMainWindow.h"
@@ -57,6 +60,7 @@ void TTreeViewContent::AddItem(TElement *Element, int id)
 	case ELEMENT_REALLINE:
 	case ELEMENT_FRAMEPOINT:
 	case ELEMENT_BAR:
+	case ELEMENT_SLIDEWAY:
 		temp = InsertTreeviewItem(buffer, hPrevObject);
 		TreeView_Expand(m_hWnd, hPrevObject, TVE_EXPAND);
 		tempItem.ObjectId = id;
@@ -69,6 +73,9 @@ void TTreeViewContent::AddItem(TElement *Element, int id)
 		tempItem.ObjectId = id;
 		tempItem.hTreeItem = temp;
 		Item.push_back(tempItem);
+		break;
+	default:
+		assert(0);
 		break;
 	}
 }

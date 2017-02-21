@@ -53,6 +53,14 @@ void TMyString::Trim(TCHAR *str)
 	str[end - start+1] = TEXT('\0');
 }
 
+void TMyString::ReleaseVectorTCHAR(std::vector<TCHAR *> &szVector)
+{
+	for (auto &sz:szVector)
+	{
+		delete[] sz;
+	}
+}
+
 void TMyString::ReplaceLoop(TCHAR *src, TCHAR *sub, TCHAR *dest)
 {
 	while (1)

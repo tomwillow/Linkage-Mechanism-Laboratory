@@ -11,6 +11,10 @@
 
 #include "DialogAddDriver.h"
 
+#include "TGraph.h"
+
+#define _CRT_SECURE_NO_WARNINGS
+
 TMainWindow::TMainWindow()
 {
 	m_iRightWindowWidth = 200;
@@ -29,7 +33,11 @@ TMainWindow::~TMainWindow()
 	if (pSolver != NULL)
 		delete pSolver;
 
-	_CrtDumpMemoryLeaks();
+	for (auto iter = vecpGraph.begin(); iter != vecpGraph.end(); ++iter)
+	{
+		delete *iter;
+	}
+	//_CrtDumpMemoryLeaks();
 }
 
 void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -46,21 +54,25 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.CreateToolbar(hWnd, m_hInst);
 	m_Toolbar.LoadImageList(32, 32, IDR_TOOLBAR_MAIN, RGB(255, 255, 255));
 	m_Toolbar.AddButton(0, ID_SELECT, true, TEXT("选择"));
+	m_Toolbar.AddButton(1, ID_DRAG, true, TEXT("拖动"));
+	m_Toolbar.AddButton(2, ID_REFRESH, true, TEXT("刷新"));
 	m_Toolbar.AddSeparator(0);
-	m_Toolbar.AddButton(1, ID_DRAW_FRAME, true, TEXT("机架"));
-	m_Toolbar.AddButton(2, ID_DRAW_BAR, true, TEXT("连杆"));
-	m_Toolbar.AddButton(3, ID_DRAW_LINE, true, TEXT("线"));
-	m_Toolbar.AddButton(4, ID_SET_DRIVER, true, TEXT("设为原动件"));
+	m_Toolbar.AddButton(3, ID_DRAW_FRAME, true, TEXT("机架"));
+	m_Toolbar.AddButton(4, ID_DRAW_BAR, true, TEXT("连杆"));
+	//m_Toolbar.AddButton(5, ID_DRAW_LINE, true, TEXT("线"));
+	m_Toolbar.AddButton(6, ID_DRAW_SLIDEWAY, true, TEXT("滑道"));
+	m_Toolbar.AddButton(7, ID_SET_DRIVER, true, TEXT("滑块"));
+	m_Toolbar.AddButton(8, ID_SET_DRIVER, true, TEXT("设为原动件"));
 	m_Toolbar.ShowToolbar();
 
 	//创建状态栏
 	m_Status.Create(hWnd, IDR_STATUS, m_hInst, 24);
-	m_Status.AddPart(IDR_STATUS_COORDINATE, 160, PT_FIXED);
+	m_Status.AddPart(IDR_STATUS_COORDINATE, 160, PT_FIXED);//坐标
 	m_Status.AddPart(0, 0, PT_NONE);
-	m_Status.AddPart(IDR_STATUS_PROPORTIONNAME, 40, PT_FIXED);
-	m_Status.AddPart(IDR_STATUS_TRACKBAR, 120, PT_FIXED);
-	m_Status.AddPart(IDR_STATUS_PROPORTION, 60, PT_FIXED);
-	m_Status.AddPart(0, 6, PT_FIXED);
+	m_Status.AddPart(IDR_STATUS_PROPORTIONNAME, 40, PT_FIXED);//比例：
+	m_Status.AddPart(IDR_STATUS_TRACKBAR, 120, PT_FIXED);//
+	m_Status.AddPart(IDR_STATUS_PROPORTION, 60, PT_FIXED);//100%
+	m_Status.AddPart(0, 6, PT_FIXED);//留给拖动三角的
 	m_Status.FreshSize();
 
 	m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("比例："), m_Configuration.GetProportion() * 100);
@@ -202,8 +214,8 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			if (MessageBox(m_hWnd, TEXT("文件未保存，仍然要打开文件？"), NULL, MB_YESNO) == IDNO)
 				return;
 		}
-		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//无条件初始化
 
+		//准备打开对话框
 		OPENFILENAME ofn;
 		HANDLE hf;
 
@@ -212,6 +224,11 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		if (GetOpenFileName(&ofn) == TRUE)
 		{
+			TCHAR szFileNameBackup[MAX_PATH];
+			_tcscpy(szFileNameBackup, szFileName);
+			this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//无条件初始化
+			_tcscpy(szFileName, szFileNameBackup);
+
 			hf = CreateFile(ofn.lpstrFile,
 				GENERIC_READ,
 				0,
@@ -225,19 +242,22 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 				return;
 			}
 
-			DWORD *now_pos = new DWORD;
+			//读入元素数量
+			DWORD real_pos = 0;
+			DWORD *now_pos = &real_pos;
 			int size;
-			ReadFile(hf, &size, sizeof(int), now_pos, NULL);
+			ReadFile(hf, &size, sizeof(size), now_pos, NULL);
 			if (GetLastError() != 0)
 			{
 				ShowMessage(TEXT("Error:%d"), GetLastError());
 				return;
 			}
-			*now_pos += sizeof(int);
+			*now_pos += sizeof(size);
 
 			EnumElementType eType;
 			for (int i = 0; i < size; i++)
 			{
+				//读入类型
 				ReadFile(hf, &eType, sizeof(EnumElementType), now_pos, NULL);
 				if (GetLastError() != 0)
 				{
@@ -246,6 +266,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 				}
 				*now_pos += sizeof(EnumElementType);
 
+				//按照类型读入元素
 				switch (eType)
 				{
 				case ELEMENT_BAR:
@@ -255,9 +276,9 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 					if (GetLastError() != 0)
 					{
 						ShowMessage(TEXT("Error:%d"), GetLastError());
-						return;
 					}
-					m_Shape.AddBar(temp);
+					else
+						m_Shape.AddBar(temp);
 					delete temp;
 					break;
 				}
@@ -268,9 +289,9 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 					if (GetLastError() != 0)
 					{
 						ShowMessage(TEXT("Error:%d"), GetLastError());
-						return;
 					}
-					m_Shape.AddRealLine(*temp);
+					else
+						m_Shape.AddRealLine(*temp);
 					delete temp;
 					break;
 				}
@@ -281,9 +302,22 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 					if (GetLastError() != 0)
 					{
 						ShowMessage(TEXT("Error:%d"), GetLastError());
-						return;
 					}
-					m_Shape.AddFramePoint(*temp);
+					else
+						m_Shape.AddFramePoint(*temp);
+					delete temp;
+					break;
+				}
+				case ELEMENT_SLIDEWAY:
+				{
+					TSlideway *temp = new TSlideway;
+					ReadFile(hf, temp, m_Shape.GetSizeOfElement(eType), now_pos, NULL);
+					if (GetLastError() != 0)
+					{
+						ShowMessage(TEXT("Error:%d"), GetLastError());
+					}
+					else
+						m_Shape.AddSlideway(temp);
 					delete temp;
 					break;
 				}
@@ -294,17 +328,31 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 					if (GetLastError() != 0)
 					{
 						ShowMessage(TEXT("Error:%d"), GetLastError());
-						return;
 					}
-					m_Shape.AddCoincide(*temp);
+					else
+					{
+						//如果是约束则读入两连接件id
+						int id1, id2;
+						ReadFile(hf, &id1, sizeof(id1), now_pos, NULL);
+						ReadFile(hf, &id2, sizeof(id2), now_pos, NULL);
+
+						temp->pElement1 = m_Shape.GetElementById(id1);
+						temp->pElement2 = m_Shape.GetElementById(id2);
+
+						temp->BuildpDpt();
+
+						m_Shape.AddCoincide(*temp, &m_Configuration);
+					}
 					delete temp;
 					break;
 				}
+				default:
+					assert(0);
+					break;
 				}
 			}
 
 			CloseHandle(hf);
-			delete now_pos;
 			RightWindow.TreeViewContent.AddAllItem();
 			SetText(TEXT("%s - %s"), szName, szFileName);
 			//m_Solver.RefreshEquations(true);
@@ -313,9 +361,10 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_SAVE:
 	{
-		if (wmEvent != ID_SAVE_NOCHECK)
+		if (wmEvent != ID_SAVE_NOCHECK)//无条件保存不弹对话框，略过此if
 			if (_tcslen(szFileName) == 0 || GetFileExists(szFileName) == false)//没有当前文件或者当前文件已失效
 			{
+				//弹出对话框
 				OPENFILENAME ofn;
 				InitialOpenFileName(&ofn, m_hWnd, szFileName);
 
@@ -340,23 +389,24 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			ShowMessage(TEXT("Error:%d"), GetLastError());
 			return;
 		}
-		DWORD *now_pos = new DWORD;
-		*now_pos = 0;
+		DWORD real_pos = 0;
+		DWORD *now_pos = &real_pos;
 
 		//写入元素数量
 		int size = m_Shape.Element.size();
-		WriteFile(hf, &size, sizeof(int), now_pos, NULL);
-		*now_pos += sizeof(int);
+		WriteFile(hf, &size, sizeof(size), now_pos, NULL);
+		*now_pos += sizeof(size);
 		if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
 		{
 			ShowMessage(TEXT("Error:%d"), GetLastError());
 			return;
 		}
 
-		for (int i = 0; i < m_Shape.Element.size(); i++)
+		//逐条写入Element
+		for (auto element : m_Shape.Element)
 		{
 			//写入类型标记
-			WriteFile(hf, &(m_Shape.Element[i]->eType), sizeof(EnumElementType), now_pos, NULL);
+			WriteFile(hf, &(element->eType), sizeof(EnumElementType), now_pos, NULL);
 			*now_pos += sizeof(EnumElementType);
 			if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
 			{
@@ -365,15 +415,25 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			}
 
 			//写入数据
-			WriteFile(hf, m_Shape.Element[i], m_Shape.GetSizeOfElement(m_Shape.Element[i]->eType), now_pos, NULL);
-			*now_pos += m_Shape.GetSizeOfElement(m_Shape.Element[i]->eType);
+			WriteFile(hf, element, m_Shape.GetSizeOfElement(element->eType), now_pos, NULL);
+			*now_pos += m_Shape.GetSizeOfElement(element->eType);
 			if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
 			{
 				ShowMessage(TEXT("Error:%d"), GetLastError());
 				return;
 			}
+
+			//如果是约束则写入两连接件id
+			if (element->eType == CONSTRAINT_COINCIDE)
+			{
+				TConstraintCoincide *temp = (TConstraintCoincide *)element;
+				WriteFile(hf, &(temp->pElement1->id), sizeof(temp->pElement1->id), now_pos, NULL);
+				*now_pos += sizeof(temp->pElement1->id);
+				WriteFile(hf, &(temp->pElement2->id), sizeof(temp->pElement2->id), now_pos, NULL);
+				*now_pos += sizeof(temp->pElement2->id);
+			}
+
 		}
-		delete now_pos;
 		CloseHandle(hf);
 		ShowMessage(TEXT("保存%s成功。"), szFileName);
 		SetText(TEXT("%s - %s"), szName, szFileName);
@@ -390,16 +450,20 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		if (GetSaveFileName(&ofn) == FALSE)
 			return;
+
 		this->OnCommand(MAKELONG(ID_SAVE, ID_SAVE_NOCHECK), 0);
+
 		break;
 	}
 	case ID_EXIT:
 		PostMessage(m_hWnd, WM_CLOSE, 0, 0);
 		break;
 	case ID_SELECT:
+	case ID_DRAG:
 	case ID_DRAW_BAR:
 	case ID_DRAW_FRAME:
 	case ID_DRAW_LINE:
+	case ID_DRAW_SLIDEWAY:
 		p_Managetool->SetCurActiveTool(wmId);
 		break;
 	case ID_ANALYZE_MECHANISM:
@@ -430,23 +494,69 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		break;
 	}
-	case ID_SET_DRIVER:
-		//if (m_ManageTool.m_uiCurActiveTool == ID_SELECT)
+	case ID_DRAW_GRAPH:
+	{
+		TGraph *pGraph = new TGraph(&m_Configuration);
+		pGraph->CreateEx(0, TEXT("图表"), TEXT("图表"),
+			WS_OVERLAPPEDWINDOW,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			m_hWnd, (HMENU)0, m_hInst);
+		pGraph->SetDoubleBuffer(true);
+		pGraph->ShowWindow(SW_SHOWNORMAL);
+		pGraph->UpdateWindow();
+
+		vecpGraph.push_back(pGraph);
+
+		std::vector<DPOINT> dptVector;
+		DPOINT dpt;
+		double y;
+		//for (double t = 0; t < 1000; ++t)
 		//{
-		//	//if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
-		//		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DlgAddDriverProc))
-		//		{
-		//			MessageBox(NULL, TEXT("窗口打开失败。"),TEXT(""), MB_ICONERROR);
-		//		}
-		//		else
-		//			break;
+		//	dpt.x = t / 10 * cos(t / 10);
+		//	dpt.y = t / 10 * sin(t / 10);
+		//	dptVector.push_back(dpt);
 		//}
-		//Sleep(1000);
-		m_ManageTool.bReceiveMsg = false;
-		MessageBox(m_hWnd, TEXT("请先使用选择工具选择一个元素，再设为原动件。"), TEXT(""), MB_ICONINFORMATION);
-		m_ManageTool.bReceiveMsg = true;
+		for (double x = 0; x < 1000; ++x)
+		{
+			dpt.x = x;
+			dpt.y = sin(x / 50);
+			dptVector.push_back(dpt);
+		}
+		pGraph->InputDptVector(dptVector);
 		break;
-	case ID_CONSOLE:
+	}
+	case ID_SET_DRIVER:
+	{
+		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT)
+		{
+			if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
+				//选择工具 且 选中元素可驱动 则弹出原动件对话框
+				if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DlgAddDriverProc))
+				{
+					MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
+				}
+				else
+					break;
+		}
+
+		MessageBox(m_hWnd, TEXT("请先使用选择工具选择一个元素，再设为原动件。"), TEXT(""), MB_ICONINFORMATION);
+		break;
+	}
+	case ID_DELETE_GRAPH:
+		for (auto iter = vecpGraph.begin(); iter != vecpGraph.end(); ++iter)
+		{
+			if (*iter == (TGraph *)lParam)
+			{
+				delete *iter;
+				vecpGraph.erase(iter);
+				break;
+			}
+		}
+		break;
+	case ID_DELETE_CONSOLE:
 		if (pConsole != NULL)
 		{
 			delete pConsole;
@@ -462,18 +572,9 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
 		break;
 	case ID_VIEW_SUITABLE:
-		DPOINT center;
-		double left, right, top, bottom;
-		for (int i = 0; i < m_Shape.Element.size(); i++)
-		{
-			switch (m_Shape.Element[i]->eType)
-			{
-			case ELEMENT_BAR:
-			case ELEMENT_REALLINE:
+		//DPOINT center;
+		//double left, right, top, bottom;
 
-				break;
-			}
-		}
 		break;
 	}
 }

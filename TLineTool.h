@@ -15,7 +15,8 @@ class TLineTool :public TTool
 {
 private:
 	POINT ptPrevPos;
-	int iPrevLineId;
+	//int iPrevLineId;
+	TElement *pPrevLine;
 	TAttach *Attach;
 	std::vector<DPOINT> dptHit;//每次的点击位置
 	TRealLine *MoveLine;//显示点的位置
@@ -23,6 +24,9 @@ private:
 	POINT pt1, pt2;
 	TLine *Line1, *Line2, *LineDim;
 	TConstraintCoincide *CoincideBegin;
+
+	//bool bShowDptText;
+	//DPOINT dptText;
 
 	TLineEdit *LineEdit;
 	void OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos);
@@ -35,8 +39,9 @@ private:
 	void Draw(HDC hdc);
 protected:
 	EnumElementType myElementType;
-	virtual void TLineTool::AddIntoShape(TRealLine &RealLine);
+	virtual TElement * TLineTool::AddIntoShape(TRealLine &RealLine);
 	virtual void TLineTool::AddIntoTreeViewContent(TElement *Element, int id);
+	virtual void TLineTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig);//所有加入约束经过此处
 public:
 	TLineTool();
 	~TLineTool();

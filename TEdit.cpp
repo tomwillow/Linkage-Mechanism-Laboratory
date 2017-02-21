@@ -47,6 +47,11 @@ LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 		else
 			return 0;
+	case WM_KILLFOCUS:
+		if (OnKillFocus(wParam, lParam))
+			return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
+		else
+			return 0;
 	}
 	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "DetectMemoryLeak.h"
 #include <stdio.h>
 
 #include "TElement.h"
@@ -19,6 +20,7 @@ TElement::~TElement()
 	
 }
 
+//自动设置logpenStyle和logpenStyleShow
 void TElement::SetStyle(int iStyle, int iWidth, COLORREF crColor)
 {
 	logpenStyle.lopnStyle = iStyle;
@@ -41,10 +43,15 @@ TCHAR * TElement::GetElementTypeName(TCHAR name[])
 	case ELEMENT_BAR:
 		_tcscpy(name, TEXT("连杆"));
 		break;
+	case ELEMENT_SLIDEWAY:
+		_tcscpy(name, TEXT("滑道"));
+		break;
 	case CONSTRAINT_COINCIDE:
 		_tcscpy(name, TEXT("重合"));
 		break;
-
+	default:
+		assert(0);
+		break;
 	}
 	return name;
 }
@@ -67,6 +74,9 @@ TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[])
 		break;
 	case PS_DASHDOTDOT:
 		_tcscpy(name, TEXT("双点划线"));
+		break;
+	default:
+		assert(0);
 		break;
 	}
 	return name;

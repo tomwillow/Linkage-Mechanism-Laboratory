@@ -16,6 +16,7 @@
 #include "TExpressionTree.h"
 #include "TVariableTable.h"
 #include "TEquations.h"
+#include "TConstraintCoincide.h"
 
 TSolver::TSolver()
 {
@@ -100,16 +101,19 @@ void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt)
 	if (pShape->Element[index]->eType == ELEMENT_BAR || pShape->Element[index]->eType == ELEMENT_REALLINE)
 	{
 		TCHAR temp[200];
-		TBar *bar = (TBar *)pShape->Element[index];
+		TElement *element = pShape->Element[index];
 		double xm = dpt.x;
 		double ym = dpt.y;
-		int i = bar->id;
+		int i = element->id;
 
-		//_stprintf(temp, TEXT("(x%d-%f)*(y%d-%f*sin(phi%d))-(x%d-%f*cos(phi%d))*(y%d-%f)"), i, xm, i, l, i, i, l, i, i, ym);
 		_stprintf(temp, TEXT("(x%d-%f)*sin(phi%d)-(y%d-%f)*cos(phi%d)"),  i,xm, i,  i,ym, i);
-		//TEXT("10*-48*sin(phi1)+48*cos(phi1)*-10")
 
-		Outputln(Equations->AddEquation(bOutput,temp,true));//phi9约40度phi11-0.5(40-x11)^2+(30-y11)^2-40^2
+		TCHAR szVar[100], szValue[100];
+		_stprintf(szVar, TEXT("x%d y%d phi%d"), i, i, i);
+		_stprintf(szValue, TEXT("%f %f %f"), element->dpt.x, element->dpt.y, element->angle);
+
+		Outputln(Equations->VariableTable.Define(true, szVar, szValue));
+		Outputln(Equations->AddEquation(bOutput,temp,true));
 
 	}
 }
@@ -139,8 +143,8 @@ void TSolver::RefreshEquations(bool Output)
 
 			//得到2个重合构件的广义坐标
 			double xi, yi, phii, xj, yj, phij;
-			pShape->GetCoordinateById(i, &xi, &yi, &phii);
-			pShape->GetCoordinateById(j, &xj, &yj, &phij);
+			pShape->GetCoordinateByElement(((TConstraintCoincide *)element)->pElement1, &xi, &yi, &phii);
+			pShape->GetCoordinateByElement(((TConstraintCoincide *)element)->pElement2, &xj, &yj, &phij);
 
 			//定义变量及其初始值
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
@@ -148,32 +152,6 @@ void TSolver::RefreshEquations(bool Output)
 			Equations->VariableTable.Define(Output,buffer1, buffer2);
 
 			//读入方程
-			//TElement *elementi = pShape->GetElementById(i);
-			//TElement *elementj = pShape->GetElementById(j);
-			//double length = 0.0;
-			//if (elementi->eType == ELEMENT_FRAMEPOINT)
-			//{
-			//	if (elementj->eType == ELEMENT_BAR)
-			//		length = ((TBar *)elementj)->dLength;
-			//	_stprintf(buffer1, TEXT("x%d-%f"),j,SiP.x);
-			//	_stprintf(buffer2, TEXT("y%d-%f"), j,SiP.y);
-			//	Outputln(Equations->AddEquation(Output, buffer1, false));
-			//	Outputln(Equations->AddEquation(Output, buffer2, false));
-			//	continue;
-			//}
-			//if (elementj ->eType == ELEMENT_FRAMEPOINT)
-			//{
-			//	if (elementi->eType == ELEMENT_BAR)
-			//		length = ((TBar *)elementi)->dLength;
-			//	_stprintf(buffer1, TEXT("x%d-%f"), i, SjP.x);
-			//	_stprintf(buffer2, TEXT("y%d-%f"), i, SjP.y);
-			//	Outputln(Equations->AddEquation(Output, buffer1, false));
-			//	Outputln(Equations->AddEquation(Output, buffer2, false));
-			//	continue;
-			//}
-
-			//_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
-			//_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d+%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
 			_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
 			_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d-%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
 			Outputln(Equations->AddEquation(Output, buffer1, false));

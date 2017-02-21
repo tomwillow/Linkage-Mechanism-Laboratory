@@ -5,8 +5,10 @@
 #include "TBar.h"
 #include "TRealLine.h"
 #include "TFramePoint.h"
+#include "TSlideway.h"
 #include "DPOINT.h"
 
+class TConfiguration;
 class TConstraintCoincide;
 class TShape
 {
@@ -21,14 +23,13 @@ public:
 	~TShape();
 	void TShape::ReleaseAll();
 	std::vector<int> TShape::DeleteElement(int index);
-	void TShape::AddRealLine(TRealLine &realline);
-	void TShape::AddBar(TBar *bar);
-	void TShape::AddFramePoint(TFramePoint &framepoint);
+	TElement * TShape::AddRealLine(TRealLine &realline);
+	TElement * TShape::AddBar(TBar *bar);
+	TElement * TShape::AddFramePoint(TFramePoint &framepoint);
 	void TShape::AddElement(TElement *element);
+	TElement * TShape::AddSlideway(TSlideway *slideway);
 
-	void TShape::AddCoincide(TConstraintCoincide &coincide);
-	std::vector<int> TShape::GetInfluenceId(int id);
-	//void TShape::DeleteById(std::vector<int> IdArray);
+	void TShape::AddCoincide(TConstraintCoincide &coincide, TConfiguration *pConfig);
 	TElement * GetElementById(int id);
 	int TShape::CalcFrameNum();
 	int TShape::nc();

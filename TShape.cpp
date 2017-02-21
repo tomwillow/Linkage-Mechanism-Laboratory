@@ -1,5 +1,8 @@
 #pragma once
+#include "DetectMemoryLeak.h"
+
 #include "TShape.h"
+#include "TConfiguration.h"
 
 #include "TConstraintCoincide.h"
 
@@ -16,7 +19,7 @@ TShape::~TShape()
 	ReleaseAll();
 }
 
-void TShape::AddCoincide(TConstraintCoincide &coincide)
+void TShape::AddCoincide(TConstraintCoincide &coincide,TConfiguration *pConfig)
 {
 	TConstraintCoincide *tempcoincide = new TConstraintCoincide;
 	*tempcoincide = coincide;
@@ -24,12 +27,16 @@ void TShape::AddCoincide(TConstraintCoincide &coincide)
 		tempcoincide->id = iNextId;
 	else
 		iNextId = tempcoincide->id;
+
+	tempcoincide->BuildpDpt();//连接2个指针点
+	tempcoincide->SetStyle(PS_DOT, 1, pConfig->crPen);
+
 	Element.push_back(tempcoincide);
 	iNextId++;
 	iCoincideNum++;
 }
 
-void TShape::AddRealLine(TRealLine &realline)
+TElement * TShape::AddRealLine(TRealLine &realline)
 {
 	TRealLine *tempRealLine = new TRealLine;
 	*tempRealLine = realline;
@@ -39,9 +46,11 @@ void TShape::AddRealLine(TRealLine &realline)
 		iNextId = tempRealLine->id;
 	Element.push_back(tempRealLine);
 	iNextId++;
+
+	return tempRealLine;
 }
 
-void TShape::AddBar(TBar *bar)
+TElement * TShape::AddBar(TBar *bar)
 {
 	TBar *tempBar = new TBar;
 	*tempBar = *bar;
@@ -53,9 +62,11 @@ void TShape::AddBar(TBar *bar)
 	iNextId++;
 
 	nb++;
+
+	return tempBar;
 }
 
-void TShape::AddFramePoint(TFramePoint &framepoint)
+TElement * TShape::AddFramePoint(TFramePoint &framepoint)
 {
 	TFramePoint *tempFramePoint = new TFramePoint;
 	*tempFramePoint = framepoint;
@@ -70,6 +81,27 @@ void TShape::AddFramePoint(TFramePoint &framepoint)
 		hasFrame = 1;
 		nb++;
 	}
+
+	return tempFramePoint;
+}
+
+TElement * TShape::AddSlideway(TSlideway *slideway)
+{
+	TSlideway *tempSlideway = new TSlideway;
+	*tempSlideway = *slideway;
+	if (tempSlideway->id == -1)
+		tempSlideway->id = iNextId;
+	else
+		iNextId = tempSlideway->id;
+	Element.push_back(tempSlideway);
+	iNextId++;
+	if (hasFrame == 0)//只加一次
+	{
+		hasFrame = 1;
+		nb++;
+	}
+
+	return tempSlideway;
 }
 
 TElement * TShape::GetElementById(int id)
@@ -80,29 +112,6 @@ TElement * TShape::GetElementById(int id)
 			return Element[i];
 	}
 }
-
-std::vector<int> TShape::GetInfluenceId(int id)
-{
-	std::vector<int> InfluenceId;
-	for (int i = 0; i < Element.size(); i++)
-	{
-		switch (Element[i]->eType)
-		{
-		case CONSTRAINT_COINCIDE:
-			if (((TConstraintCoincide *)Element[i])->ElementId1 == id ||
-				((TConstraintCoincide *)Element[i])->ElementId2 == id)
-			{
-				InfluenceId.push_back(Element[i]->id);
-			}
-		}
-	}
-	return InfluenceId;
-}
-
-//void TShape::DeleteById(std::vector<int> IdArray)
-//{
-//	
-//}
 
 int TShape::CalcFrameNum()
 {
@@ -132,39 +141,32 @@ std::vector<int> TShape::DeleteElement(int index)
 		break;
 	}
 
-	//先记下id，否则删掉就失效了
-	int id = Element[index]->id;
+	std::vector<int> DeletedId = { Element[index]->id };
 
-	//删掉元素
+	TElement *pDeleted = Element[index];//得到被删元素的地址
 	delete Element[index];
-	std::vector<TElement *>::iterator iter = Element.begin() + index;
+	auto iter = Element.begin() + index;
 	Element.erase(iter);
 
-	//清除掉和该元素相关的约束
-	std::vector<int> InfluenceId;
-
-	int i = Element.size()-1;
-	while (i >=0)
+	//依次比对 约束 中是否有被删元素地址，有则删掉约束
+	for (auto iter = Element.begin(); iter != Element.end();)
 	{
-		switch (Element[i]->eType)
-		{
-		case CONSTRAINT_COINCIDE:
-			if (((TConstraintCoincide *)Element[i])->ElementId1 == id ||
-				((TConstraintCoincide *)Element[i])->ElementId2 == id)
+		if ((*iter)->eType==CONSTRAINT_COINCIDE)
+			if (((TConstraintCoincide *)*iter)->pElement1 == pDeleted ||
+				((TConstraintCoincide *)*iter)->pElement2 == pDeleted
+				)
 			{
-				InfluenceId.push_back(Element[i]->id);
-
-				delete Element[i];
-				std::vector<TElement *>::iterator iter = Element.begin() + i;
-				Element.erase(iter);
-
 				iCoincideNum--;
+				DeletedId.push_back((*iter)->id);
+
+				delete *iter;
+				iter=Element.erase(iter);
+				continue;
 			}
-			break;
-		}
-		i--;
+		iter++;
 	}
-	return InfluenceId;
+
+	return DeletedId;
 }
 
 void TShape::ReleaseAll()
@@ -210,10 +212,14 @@ void TShape::ChangePos(int index, DPOINT dptDelta)
 		break;
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
+	case ELEMENT_SLIDEWAY:
 		((TRealLine *)temp)->ptBegin.x += dptDelta.x;
 		((TRealLine *)temp)->ptBegin.y += dptDelta.y;
 		((TRealLine *)temp)->ptEnd.x += dptDelta.x;
 		((TRealLine *)temp)->ptEnd.y += dptDelta.y;
+		break;
+	default:
+		assert(0);
 		break;
 	}
 }
@@ -222,6 +228,7 @@ void TShape::GetCoordinateByIndex(int index, double *x, double *y, double *theta
 {
 	GetCoordinateByElement(Element[index], x, y, theta);
 }
+
 void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, double *theta)
 {
 	TElement *temp = element;
@@ -245,10 +252,10 @@ void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, dou
 void TShape::GetSijP(TElement *element,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 {
 	TConstraintCoincide *pCoincide = (TConstraintCoincide *)element;
-	*i = pCoincide->ElementId1;
-	*j = pCoincide->ElementId2;
+	*i = pCoincide->pElement1->id;
+	*j = pCoincide->pElement2->id;
 	//节点i
-	switch (pCoincide->eElementType1)
+	switch (pCoincide->pElement1->eType)
 	{
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
@@ -263,7 +270,7 @@ void TShape::GetSijP(TElement *element,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 	}
 
 	//节点j
-	switch (pCoincide->eElementType2)
+	switch (pCoincide->pElement2->eType)
 	{
 	case ELEMENT_BAR:
 		if (pCoincide->Element2PointIndex == 1)//ptBegin
@@ -287,7 +294,12 @@ DWORD TShape::GetSizeOfElement(EnumElementType eType)
 		return sizeof(TRealLine);
 	case ELEMENT_FRAMEPOINT:
 		return sizeof(TFramePoint);
+	case ELEMENT_SLIDEWAY:
+		return sizeof(TSlideway);
 	case CONSTRAINT_COINCIDE:
 		return sizeof(TConstraintCoincide);
+	default:
+		assert(0);
+		break;
 	}
 }

@@ -1,11 +1,11 @@
 #pragma once
+#include "MyMath.h"
 #include <Windows.h>
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 #include "TBar.h"
 #include "TLine.h"
 #include "TRealLine.h"
+#include "TSlideway.h"
 #include "TConstraintCoincide.h"
 
 #include "TConfiguration.h"
@@ -13,7 +13,6 @@
 class TFramePoint;
 class TDraw
 {
-#define REG2DEG(a) a/M_PI*180.0
 #define FRAMEPOINT_R 6//半径
 #define FRAMEPOINT_H 20//高-圆心到地线距离
 #define FRAMEPOINT_B 30//底边长
@@ -24,9 +23,13 @@ public:
 	~TDraw();
 
 	static void TDraw::Move(POINT apt[], int apt_num, double angle, double dist);
-	static void Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta);
+	static void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta);
 	static void TDraw::MirrorX(POINT apt[], int apt_num, int Oy);
+	static void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect, bool YPlusIsUP);
 	static double TDraw::Distance(POINT pt1, POINT pt2);
+	static double TDraw::DistanceReal(DPOINT *pdpt1, DPOINT *pdpt2, TConfiguration *pConfig);
+
+	static bool TDraw::ShowConstraintCoincideDotLine(TElement *element, TConfiguration *pConfig);
 	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt);
 	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);
 	static RECT TDraw::GetMarginRect(RECT rect, int margin);
@@ -37,11 +40,13 @@ public:
 	static void TDraw::DrawBar(HDC hdc, DPOINT dptBegin, DPOINT dptEnd, LOGPEN logpen, TConfiguration *Config);
 	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config);
 	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, TConfiguration *Config);
+	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config);
 
 	static void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen);
 	static void TDraw::DrawPickSquare(HDC hdc, POINT pt);
-	static void DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos);
+	static void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos);
 	static void TDraw::DrawLine(HDC hdc, TLine Line);
+	static void TDraw::DrawPolyline(HDC hdc, const POINT *apt, int count, LOGPEN &logpen);
 
 	static void TDraw::DrawCircle(HDC hdc, POINT pt, int r);
 	static void TDraw::DrawCross(HDC hdc, POINT pt, int size, LOGPEN Style);
@@ -53,8 +58,11 @@ public:
 	static void TDraw::DrawTextAdvance(HDC hdc, TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format);
 
 	static void TDraw::DrawSection(HDC hdc, int x1, int y1, int x2, int y2, int d, int angleDEG);
+	static void TDraw::DrawSection(HDC hdc, POINT apt[], int apt_num, int d, int angleDEG);
 	static double TDraw::GetAngleFromPointReal(DPOINT ptO, DPOINT pt);
 	static double TDraw::GetAngleFromPointScreen(POINT pt0, POINT pt);
 	static void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt);
+	static POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max, RECT &rect);
+	static DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, double y_max, RECT &rect);
 };
 

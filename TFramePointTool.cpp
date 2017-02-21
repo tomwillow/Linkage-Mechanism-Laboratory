@@ -12,6 +12,8 @@ TFramePointTool::TFramePointTool()
 	Attach = new TAttach(pCanvas->m_hWnd, pShape, pConfig);
 
 	tempFramePoint.SetStyle(PS_SOLID, 1, pConfig->crPen);
+
+	pPrevFramePoint = NULL;
 }
 
 
@@ -32,21 +34,24 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	tempFramePoint.dpt = Attach->dptAttach;
 
 	pTreeViewContent->AddItem(&tempFramePoint, pShape->iNextId);
-	pShape->AddFramePoint(tempFramePoint);
+	pPrevFramePoint=pShape->AddFramePoint(tempFramePoint);
 
-	if (Attach->iAttachElementId != -1)
+	if (Attach->pAttachElement != NULL)
 	{
 		TConstraintCoincide coincide;
-		coincide.eElementType1 = Attach->eAttachElementType;
-		coincide.ElementId1 = Attach->iAttachElementId;
+		//coincide.eElementType1 = Attach->eAttachElementType;
+		coincide.pElement1 = Attach->pAttachElement;
 		coincide.Element1PointIndex = Attach->iAttachElementPointIndex;
 
-		coincide.eElementType2 = ELEMENT_FRAMEPOINT;
-		coincide.ElementId2 = pShape->iNextId-1;
+		//coincide.eElementType2 = ELEMENT_FRAMEPOINT;
+		//coincide.ElementId2 = pShape->iNextId-1;
+		coincide.pElement2 = pPrevFramePoint;
 		coincide.Element2PointIndex = 0;
 
 		pTreeViewContent->AddItem(&coincide, pShape->iNextId);
-		pShape->AddCoincide(coincide);
+
+		pShape->AddCoincide(coincide, pConfig);//Ô¼ÊøÈë¿â
+
 		pSolver->RefreshEquations(true);
 	}
 

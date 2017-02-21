@@ -18,8 +18,7 @@ TAttach::TAttach(HWND hCanvas, TShape *shape, TConfiguration *config)
 	XAssistLine->SetStyle(PS_DOT, 1, Config->crDot);
 	YAssistLine->SetStyle(PS_DOT, 1, Config->crDot);
 
-	//bAttachPoint = false;
-	iAttachElementId = -1;
+	pAttachElement = NULL;
 	iAttachElementPointIndex = -1;
 }
 
@@ -41,7 +40,7 @@ void TAttach::InitialLine(POINT ptPos)
 void TAttach::Draw(HDC hdc)
 {
 
-	if (iAttachElementId != -1)
+	if (pAttachElement)
 	{
 		TDraw::DrawCross(hdc, Config->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, Config->crPen });
 	}
@@ -146,7 +145,7 @@ bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos)
 //读取Shape中的RealLine进行吸附，使用前应设置dptAttach
 void TAttach::AttachPoint(DPOINT dptPos)
 {
-	iAttachElementId = -1;
+	pAttachElement = NULL;
 	for (int i = 0; i < Shape->Element.size(); i++)
 	{
 		eAttachElementType = Shape->Element[i]->eType;
@@ -159,7 +158,7 @@ void TAttach::AttachPoint(DPOINT dptPos)
 			//吸附起点
 			if (DPTisApproached(dptPos, pRealLine->ptBegin, 10))
 			{
-				iAttachElementId = Shape->Element[i]->id;
+				pAttachElement = pRealLine;
 				iAttachElementPointIndex = 1;
 				dptAttach = pRealLine->ptBegin;
 				return;
@@ -168,7 +167,7 @@ void TAttach::AttachPoint(DPOINT dptPos)
 			//吸附终点
 			if (DPTisApproached(dptPos, pRealLine->ptEnd, 10))
 			{
-				iAttachElementId = Shape->Element[i]->id;
+				pAttachElement = pRealLine;
 				iAttachElementPointIndex = 2;
 				dptAttach = pRealLine->ptEnd;
 				return;
@@ -181,7 +180,7 @@ void TAttach::AttachPoint(DPOINT dptPos)
 			//吸附机架点
 			if (DPTisApproached(dptPos, pFramePoint->dpt, 10))
 			{
-				iAttachElementId = Shape->Element[i]->id;
+				pAttachElement = pFramePoint;
 				iAttachElementPointIndex = 0;
 				dptAttach = pFramePoint->dpt;
 				return;

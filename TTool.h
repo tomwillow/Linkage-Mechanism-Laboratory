@@ -9,6 +9,7 @@ class TConfiguration;
 class TListView;
 class TTreeViewContent;
 class TSolver;
+
 class TTool
 {
 private:
@@ -22,6 +23,7 @@ protected:
 	TTreeViewContent *pTreeViewContent;
 	TSolver *pSolver;
 	//void TTool::RefreshTreeViewContent();
+	POINT ptMouse;
 public:
 	TTool();
 	virtual ~TTool();

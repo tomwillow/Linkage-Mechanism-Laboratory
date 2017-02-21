@@ -85,6 +85,7 @@ public:
 	void SetAccel(UINT id);
 	void SetDoubleBuffer(bool bDoubleBuffer);
 	void CDECL TWindow::SetText(TCHAR szFormat[], ...);
+	void TWindow::Invalidate();
 	BOOL ShowWindow(int nCmdShow) const
 	{
 		return ::ShowWindow(m_hWnd, nCmdShow);

@@ -18,7 +18,7 @@ private:
 	bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2, int distance);
 public:
 	EnumElementType eAttachElementType;
-	int iAttachElementId;
+	TElement *pAttachElement;
 	int iAttachElementPointIndex;
 	DPOINT dptAttach;
 	TAttach(HWND hCanvas, TShape *shape, TConfiguration *config);

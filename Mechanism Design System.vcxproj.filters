@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\Tool">
+      <UniqueIdentifier>{fda0539a-277c-4a6e-872b-d3b728fc2a65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Element">
+      <UniqueIdentifier>{f52d9c24-d884-4e28-87ca-96eb25572d42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Element">
+      <UniqueIdentifier>{e6acfb16-e147-42a4-8f5c-e66d8790995a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Tool">
+      <UniqueIdentifier>{b8e063d9-c3f8-4ce0-96b7-99e01bf0a374}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -21,28 +33,16 @@
     <ClCompile Include="TManageTool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TTool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TLineTool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TCanvas.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TMainWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TSelectTool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TDraw.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TShape.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TLine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TConfiguration.cpp">
@@ -60,9 +60,6 @@
     <ClCompile Include="DPOINT.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TRealLine.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TEdit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -75,19 +72,10 @@
     <ClCompile Include="TAttach.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TFramePoint.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TFramePointTool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TBar.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TBarTool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TRightWindow.cpp">
@@ -97,12 +85,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TTreeView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TElement.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TConstraintCoincide.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TTreeViewContent.cpp">
@@ -135,6 +117,51 @@
     <ClCompile Include="DialogAddDriver.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TGraph.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TListViewEdit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TBar.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="TFramePoint.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="TLine.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="TSlideway.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="TElement.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="TBarTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="TDragTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="TLineTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="TSelectTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="TSlidewayTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="TTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="TConstraintCoincide.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="TRealLine.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -143,28 +170,16 @@
     <ClInclude Include="TManageTool.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TTool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TLineTool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TCanvas.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TMainWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TSelectTool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TDraw.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TShape.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TLine.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TConfiguration.h">
@@ -182,9 +197,6 @@
     <ClInclude Include="DPOINT.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TRealLine.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TEdit.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -197,19 +209,7 @@
     <ClInclude Include="TAttach.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TFramePoint.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TWindow.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TFramePointTool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TBar.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TBarTool.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TRightWindow.h">
@@ -219,9 +219,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TTreeView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TElement.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TConstraintCoincide.h">
@@ -265,6 +262,57 @@
     </ClInclude>
     <ClInclude Include="DialogAddDriver.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TGraph.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TListViewEdit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="enumCtrlType.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyMath.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TSelectTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="TSlidewayTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="TTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="TLineTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="TFramePointTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="TDragTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="TBarTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="TElement.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="TLine.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="TRealLine.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="TSlideway.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="TFramePoint.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="TBar.h">
+      <Filter>头文件\Element</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

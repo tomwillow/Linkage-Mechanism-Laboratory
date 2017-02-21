@@ -1,16 +1,18 @@
 #pragma once
+#include "DetectMemoryLeak.h"
 #include "TManageTool.h"
 
 #include "resource.h"
 
 #include "TSelectTool.h"
+#include "TDragTool.h"
 #include "TBarTool.h"
 #include "TLineTool.h"
 #include "TFramePointTool.h"
+#include "TSlidewayTool.h"
 
 TManageTool::TManageTool()
 {
-	bReceiveMsg = true;
 	m_pCurrentTool = NULL;
 	m_uiCurActiveTool = 0;
 }
@@ -32,6 +34,7 @@ void TManageTool::CloseCurTool()
 
 void TManageTool::SetCurActiveTool(UINT id)
 {
+	UINT uiPrevTool = m_uiCurActiveTool;
 	CloseCurTool();
 
 	m_uiCurActiveTool = id;
@@ -39,6 +42,9 @@ void TManageTool::SetCurActiveTool(UINT id)
 	{
 	case ID_SELECT:
 		m_pCurrentTool = new TSelectTool;
+		break;
+	case ID_DRAG:
+		m_pCurrentTool = new TDragTool;
 		break;
 	case ID_DRAW_FRAME:
 		m_pCurrentTool = new TFramePointTool;
@@ -48,6 +54,12 @@ void TManageTool::SetCurActiveTool(UINT id)
 		break;
 	case ID_DRAW_LINE:
 		m_pCurrentTool = new TLineTool;
+		break;
+	case ID_DRAW_SLIDEWAY:
+		m_pCurrentTool = new TSlidewayTool;
+		break;
+	default:
+		assert(0);
 		break;
 	}
 }
@@ -74,7 +86,6 @@ void TManageTool::SetCursor(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 void TManageTool::Message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	if (bReceiveMsg == false) return;
 	if (m_pCurrentTool == NULL) return;
 
 	POINT ptPos;

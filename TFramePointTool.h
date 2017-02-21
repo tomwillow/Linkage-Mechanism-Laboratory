@@ -11,6 +11,7 @@ class TFramePointTool:public TTool
 private:
 	TAttach *Attach;
 	TFramePoint tempFramePoint;
+	TElement *pPrevFramePoint;
 public:
 	TFramePointTool();
 	~TFramePointTool();

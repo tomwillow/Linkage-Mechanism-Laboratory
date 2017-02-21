@@ -44,6 +44,6 @@ void TConsole::OnSize(WPARAM wParam, LPARAM lParam)
 bool TConsole::OnClose()
 {
 	//ShowWindow(SW_HIDE);
-	PostMessage(m_hParent, WM_COMMAND, ID_CONSOLE, 0);
+	PostMessage(m_hParent, WM_COMMAND, ID_DELETE_CONSOLE, 0);
 	return true;
 }

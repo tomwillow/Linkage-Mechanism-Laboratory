@@ -4,7 +4,6 @@
 
 TConfiguration::TConfiguration()
 {
-
 }
 
 

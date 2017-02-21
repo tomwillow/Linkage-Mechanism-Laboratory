@@ -217,10 +217,10 @@ WPARAM TWindow::MessageLoop(void)
 	while ( GetMessage(&msg, NULL, 0, 0) )
 	{
 #ifdef _DEBUG
-		//TCHAR temp[MAX_PATH];
+		TCHAR temp[MAX_PATH];
 
-		//wsprintf(temp, _T("Message(0x%x, 0x%x, 0x%x, 0x%x)\n"), msg.hwnd, msg.message, msg.wParam, msg.lParam);
-		//OutputDebugString(temp);
+		wsprintf(temp, _T("Message(0x%x, 0x%x, 0x%x, 0x%x)\n"), msg.hwnd, msg.message, msg.wParam, msg.lParam);
+		OutputDebugString(temp);
 #endif
 		if (!TranslateAccelerator(msg.hwnd, m_hAccelTable, &msg))
 		{
@@ -326,6 +326,11 @@ void CDECL TWindow::SetText(TCHAR szFormat[], ...)
 	va_end(pArgList);
 
 	SetWindowText(m_hWnd, szBuffer);
+}
+
+void TWindow::Invalidate()
+{
+	InvalidateRect(m_hWnd, &ClientRect, FALSE);
 }
 
 void ShowMessage(TCHAR szFormat[], ...)

@@ -17,8 +17,8 @@ TLine::~TLine()
 {
 }
 
-void TLine::CalcLength()
-{
-	dLength = sqrt(pow(double(ptEnd.x - ptBegin.x), 2) + pow(double(ptEnd.y - ptBegin.y), 2));
-	dAngle = TDraw::GetAngleFromPointScreen(ptBegin, ptEnd);
-}
+//void TLine::CalcLength()
+//{
+//	dLength = sqrt(pow(double(ptEnd.x - ptBegin.x), 2) + pow(double(ptEnd.y - ptBegin.y), 2));
+//	dAngle = TDraw::GetAngleFromPointScreen(ptBegin, ptEnd);
+//}

@@ -21,5 +21,7 @@ public:
 	static bool TMyString::isNumberChar(TCHAR c);
 	static bool TMyString::isVariableName(TCHAR *varname);
 	static void TMyString::Trim(TCHAR *str);
+
+	static void TMyString::ReleaseVectorTCHAR(std::vector<TCHAR *> &szVector);
 };
 

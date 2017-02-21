@@ -1,5 +1,5 @@
 #pragma once
-//#include <vector>
+#include <vector>
 #include <Windows.h>
 
 #include <CommCtrl.h>
@@ -8,35 +8,43 @@
 #pragma comment(lib, "comctl32.lib")
 
 #include "TControl.h"
+#include "TListViewEdit.h"
+#include "DPOINT.h"
 
-enum eControl_Type {CTRLTYPE_EDIT};
-//class TEdit;
+#include "enumCtrlType.h"
+
+class TShape;
 class TListView:public TControl
 {
 private:
+	RECT rc;
+	POINT origin;
 	int iRowCount, iColumnCount;
-	//TEdit *tempEdit;
-	//std::vector<TEdit *> pEdit;
+	TListViewEdit tempEdit;
 	void TListView::DeleteAllEdit();
+	std::vector<enumCtrlType> vecCtrlType;
+	std::vector<void *> vecpContent;
+	TShape *pShape;
 protected:
-	static WNDPROC oldEditProc;
-	static LRESULT CALLBACK subEditProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static WNDPROC oldListViewProc;
+	static LRESULT CALLBACK subListViewProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	//虚拟消息处理函数，可重载
 	virtual LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 public:
 	TListView();
 	~TListView();
+	int id;
 	void TListView::CreateListViewEx(HWND hParent, UINT id, HINSTANCE hInst);//创建ListView
-	void TListView::AddColumn(TCHAR text[], int width, int styleLVCFMT = LVCFMT_LEFT);
-	void TListView::InsertColumn(int index, TCHAR text[], int width, int styleLVCFMT = LVCFMT_LEFT);
-	void CDECL TListView::InsertItem(int index, int subitem,const TCHAR szFormat[], ...);
-	void CDECL TListView::AddAttributeItem(const TCHAR szName[],const TCHAR szEditFormat[], ...);
-	void CDECL TListView::SetAttributeItemValue(int index, TCHAR szFormat[], ...);
-	void TListView::UpdateControl();
-	int TListView::GetItemCount();
-	void TListView::DeleteAllItems();
-	RECT TListView::GetGridRect(int index, int subitem);
-	RECT TListView::GetGridRectInMargin(int index, int subitem);
+	void TListView::AddColumn(TCHAR text[], int width, int styleLVCFMT = LVCFMT_LEFT);//添加列标签
+	void TListView::InsertColumn(int index, TCHAR text[], int width, int styleLVCFMT = LVCFMT_LEFT);//插入列标签
+	void CDECL TListView::InsertItem(int index, int subitem,const TCHAR szFormat[], ...);//插入项目
+	void CDECL TListView::AddAttributeItem(const TCHAR szName[],enumCtrlType eCtrlType,void *pContent,const TCHAR szEditFormat[], ...);
+	void CDECL TListView::SetAttributeItemValue(int index, TCHAR szFormat[], ...);//未用
+	int TListView::GetItemCount();//得到项目数
+	void TListView::DeleteAllItems();//清除全部项
+	RECT TListView::GetGridRect(int index, int subitem);//根据行号和列号得到格子坐标
+	RECT TListView::GetGridRectInMargin(int index, int subitem);//得到格子边框内的坐标
+	void TListView::LoadObject(int index);
 };
 

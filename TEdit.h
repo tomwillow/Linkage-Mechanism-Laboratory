@@ -19,6 +19,9 @@ protected:
 
 	//接收字符按键，返回值决定是否调用默认消息处理
 	virtual bool TEdit::OnChar(WPARAM wParam, LPARAM lParam){ return true; };
+
+	//接收字符按键，返回值决定是否调用默认消息处理
+	virtual bool TEdit::OnKillFocus(WPARAM wParam, LPARAM lParam){ return true; };
 public:
 	bool bMultiLine,bAutoHScrol,bAutoVScrol,bNoHideSel;
 	HFONT m_hFont;

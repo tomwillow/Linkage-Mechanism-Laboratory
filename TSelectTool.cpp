@@ -1,4 +1,6 @@
 #pragma once
+#include "DetectMemoryLeak.h"
+
 #include "TSelectTool.h"
 
 #include "TCanvas.h"
@@ -15,7 +17,7 @@
 TSelectTool::TSelectTool()
 {
 	eMode = SELECT_MOVE;
-	bShowTips = false;
+	//bShowTips = false;
 	bDrag = false;
 	bMove = false;
 	iPickIndex = -1;
@@ -27,6 +29,13 @@ TSelectTool::TSelectTool()
 //由TTool的虚析构函数重载
 TSelectTool::~TSelectTool()
 {
+	SelectNull();
+}
+
+
+void TSelectTool::SelectNull()
+{
+
 	if (iPickIndex != -1)
 	{
 		//恢复线型
@@ -34,6 +43,7 @@ TSelectTool::~TSelectTool()
 		RestoreHoveredLineStyle();
 
 		CancelTreeViewAndListView();
+		iPickIndex = -1;
 	}
 }
 
@@ -83,6 +93,8 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			CancelTreeViewAndListView();
 
 			pSolver->RefreshEquations(true);
+
+			pCanvas->Invalidate();
 		}
 		return;
 	}
@@ -96,7 +108,8 @@ void TSelectTool::OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos)
 
 void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	//::SetCursor(::LoadCursor(NULL, IDC_WAIT));
+	ptMouse = ptPos;
+
 	switch (eMode)
 	{
 	case SELECT_DRAG:
@@ -106,7 +119,8 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			pSolver->ClearConstraint();
 			pSolver->AddMouseConstraint(false, iPickIndex, pConfig->ScreenToReal(ptPos));
 			pSolver->Solve(true);
-			::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
+
+			pCanvas->Invalidate();
 			return;
 		}
 		break;
@@ -126,12 +140,13 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	iHoverIndex = -1;
 
 	//遍历所有以显示浮动效果
-	for (int i = 0; i < pShape->Element.size(); i++)
+	for (size_t i = 0; i < pShape->Element.size(); i++)
 	{
 		switch (pShape->Element[i]->eType)
 		{
 		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
+		case ELEMENT_SLIDEWAY:
 			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
 			{
 				iHoverIndex = i;
@@ -142,6 +157,15 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			{
 				iHoverIndex = i;
 			}
+			break;
+		case CONSTRAINT_COINCIDE:
+			if (PickConstraintCoincide(ptPos, pShape->Element[i]))
+			{
+				iHoverIndex = i;
+			}
+			break;
+		default:
+			assert(0);
 			break;
 		}
 		if (iHoverIndex != -1)
@@ -157,18 +181,36 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	}
 }
 
-//应在调用前进行类型判断，避免将非TRealLine *型元素传入
-bool TSelectTool::PickRealLine(POINT ptPos, TElement *Element)
+bool TSelectTool::PickRealLine(POINT &ptPos, DPOINT &dptBegin, DPOINT &dptEnd)
 {
-	TRealLine *pRealLine = (TRealLine *)(Element);
-	POINT pt1 = pConfig->RealToScreen(pRealLine->ptBegin);
-	POINT pt2 = pConfig->RealToScreen(pRealLine->ptEnd);
+	POINT pt1 = pConfig->RealToScreen(dptBegin);
+	POINT pt2 = pConfig->RealToScreen(dptEnd);
 	double length = TDraw::Distance(pt1, pt2);
 	double length1 = TDraw::Distance(ptPos, pt1);
 	double length2 = TDraw::Distance(ptPos, pt2);
 
 	if (length1 + length2 - length <= 0.5)//容差
 		return true;
+	else
+		return false;
+}
+
+//应在调用前进行类型判断，避免将非TRealLine *型元素传入
+bool TSelectTool::PickRealLine(POINT ptPos, TElement *Element)
+{
+	TRealLine *pRealLine = (TRealLine *)(Element);
+	return PickRealLine(ptPos, pRealLine->ptBegin, pRealLine->ptEnd);
+}
+
+bool TSelectTool::PickConstraintCoincide(POINT ptPos, TElement *element)
+{
+	TConstraintCoincide *temp = (TConstraintCoincide *)element;
+
+	//重合虚线显示，且虚线被拾取
+	if (TDraw::ShowConstraintCoincideDotLine(temp,pConfig) && PickRealLine(ptPos, *(temp->pDpt1), *(temp->pDpt2)))
+	{
+		return true;
+	}
 	else
 		return false;
 }
@@ -209,12 +251,8 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		switch (pShape->Element[i]->eType)
 		{
 		case ELEMENT_BAR:
-			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
-			{
-				iPickIndex = i;
-			}
-			break;
 		case ELEMENT_REALLINE:
+		case ELEMENT_SLIDEWAY:
 			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
 			{
 				iPickIndex = i;
@@ -225,6 +263,17 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			{
 				iPickIndex = i;
 			}
+			break;
+		case CONSTRAINT_COINCIDE:
+		{
+			if (PickConstraintCoincide(ptPos, pShape->Element[i]))
+			{
+				iPickIndex = i;
+			}
+			break;
+		}
+		default:
+			assert(0);
 			break;
 		}
 
@@ -273,6 +322,9 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			return;
 		}
 	}
+	//遍历结束
+	if (iPickIndex == -1)
+		iPrevPickIndex = -1;
 
 }
 
@@ -291,9 +343,9 @@ void TSelectTool::SelectById(int id)
 			PickedLineId.push(pShape->Element[iPickIndex]->id);
 
 			//通知ListView更新
-			//pShape->Element[iPickIndex]->NoticeListView(pListView);
+			pShape->Element[iPickIndex]->NoticeListView(pListView);
 
-			::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
+			pCanvas->Invalidate();
 			return;
 		}
 	}
@@ -310,21 +362,11 @@ void TSelectTool::CancelTreeViewAndListView()
 
 void TSelectTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	if (bDrag)
-	{
-		iPrevPickIndex = -1;
-		bDrag = false;
-		Cursor = IDC_ARROW;
-	}
+	EndDrag();
+	EndMove();
+	SelectNull();
 
-	for (int i = 0; i < pShape->Element.size(); i++)
-	{
-		switch (pShape->Element[i]->eType)
-		{
-		case ELEMENT_FRAMEPOINT:
-			break;
-		}
-	}
+	pCanvas->Invalidate();
 
 }
 
@@ -337,6 +379,7 @@ void TSelectTool::Draw(HDC hdc)
 		{
 		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
+		case ELEMENT_SLIDEWAY:
 			//画拾取方格
 			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->Element[iPickIndex])->ptBegin));
 			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->Element[iPickIndex])->ptEnd));
@@ -347,28 +390,24 @@ void TSelectTool::Draw(HDC hdc)
 			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TFramePoint *)pShape->Element[iPickIndex])->dpt));
 			break;
 		case CONSTRAINT_COINCIDE:
-			if (pShape->Element[iPickIndex]->available == true)
+		{
+			TConstraintCoincide *temp = ((TConstraintCoincide *)pShape->Element[iPickIndex]);
+			if (TDraw::ShowConstraintCoincideDotLine(temp, pConfig))
+			{
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt1)));
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt2)));
+			}
+			else
 			{
 				//画重合点
-				int id = ((TConstraintCoincide *)pShape->Element[iPickIndex])->ElementId1;
-				switch (((TConstraintCoincide *)pShape->Element[iPickIndex])->eElementType1)
-				{
-				case ELEMENT_BAR:
-				case ELEMENT_REALLINE:
-					if (((TConstraintCoincide *)pShape->Element[iPickIndex])->Element1PointIndex == 1)
-						TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->GetElementById(id))->ptBegin));
-					else
-						TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->GetElementById(id))->ptEnd));
-					break;
-				case ELEMENT_FRAMEPOINT:
-					TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TFramePoint *)pShape->GetElementById(id))->dpt));
-					break;
-				}
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt1)));
 			}
+		}
+		break;
+		default:
+			assert(0);
 			break;
 		}
-		//由于线型变化，且画线位于工具绘制之前，所以需要刷新一次
-		::InvalidateRect(pCanvas->m_hWnd, &(pCanvas->ClientRect), FALSE);
 
 	}
 
