@@ -29,7 +29,7 @@ void TShape::AddCoincide(TConstraintCoincide &coincide,TConfiguration *pConfig)
 		iNextId = tempcoincide->id;
 
 	tempcoincide->BuildpDpt();//连接2个指针点
-	tempcoincide->SetStyle(PS_DOT, 1, pConfig->crPen);
+	//tempcoincide->SetStyle(PS_DOT, 1, pConfig->crPen);
 
 	Element.push_back(tempcoincide);
 	iNextId++;

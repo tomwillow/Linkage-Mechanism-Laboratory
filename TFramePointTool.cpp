@@ -39,12 +39,10 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	if (Attach->pAttachElement != NULL)
 	{
 		TConstraintCoincide coincide;
-		//coincide.eElementType1 = Attach->eAttachElementType;
+		coincide.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 		coincide.pElement1 = Attach->pAttachElement;
 		coincide.Element1PointIndex = Attach->iAttachElementPointIndex;
 
-		//coincide.eElementType2 = ELEMENT_FRAMEPOINT;
-		//coincide.ElementId2 = pShape->iNextId-1;
 		coincide.pElement2 = pPrevFramePoint;
 		coincide.Element2PointIndex = 0;
 

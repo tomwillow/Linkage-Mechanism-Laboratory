@@ -57,7 +57,9 @@ void TConstraintCoincide::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL,NULL, TEXT("%d"), id);
 	pListView->AddAttributeItem(TEXT("名称"), CTRLTYPE_EDIT,&Name, Name);
 	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, TEXT("重合"));
-	//wsprintf(buffer, TEXT("ID:%d.P%d = ID:%d.P%d"), ElementId1,Element1PointIndex,ElementId2,Element2PointIndex);
+	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
+	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
+	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
 	wsprintf(buffer, TEXT("ID:%d.P%d = ID:%d.P%d"), CTRLTYPE_NULL, NULL, pElement1->id, Element1PointIndex, pElement2->id, Element2PointIndex);
 	pListView->AddAttributeItem(TEXT("Value"), CTRLTYPE_NULL, NULL, buffer);
 }

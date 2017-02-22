@@ -197,6 +197,8 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 			//加入连接约束：ID上一个.end=ID这个.begin
 			CoincideBegin = new TConstraintCoincide;
+			CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
+
 			CoincideBegin->pElement1 = pPrevLine;
 			CoincideBegin->Element1PointIndex = 2;//ptEnd
 
@@ -302,6 +304,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		{
 			//ID被捕捉=ID新元素.begin
 			CoincideBegin = new TConstraintCoincide;
+			CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 			CoincideBegin->pElement1 = Attach->pAttachElement;
 			CoincideBegin->Element1PointIndex = Attach->iAttachElementPointIndex;
 
@@ -341,6 +344,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		{
 			//ID被捕捉=ID这个.end
 			CoincideBegin = new TConstraintCoincide;
+			CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 			//CoincideBegin->eElementType1 = Attach->eAttachElementType;
 			CoincideBegin->pElement1 = Attach->pAttachElement;
 			CoincideBegin->Element1PointIndex = Attach->iAttachElementPointIndex;
@@ -363,6 +367,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 		//加入连接约束：ID上一个.end=ID这个.begin
 		CoincideBegin = new TConstraintCoincide;
+		CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 		//CoincideBegin->eElementType1 = myElementType;
 		CoincideBegin->pElement1 = pPrevLine;//上一条线id
 		CoincideBegin->Element1PointIndex = 2;//ptEnd

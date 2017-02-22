@@ -75,9 +75,6 @@
     <ClCompile Include="TWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TFramePointTool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TRightWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -162,6 +159,9 @@
     <ClCompile Include="TRealLine.cpp">
       <Filter>源文件\Element</Filter>
     </ClCompile>
+    <ClCompile Include="TFramePointTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -219,9 +219,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TTreeView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TConstraintCoincide.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TTreeViewContent.h">
@@ -312,6 +309,9 @@
       <Filter>头文件\Element</Filter>
     </ClInclude>
     <ClInclude Include="TBar.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="TConstraintCoincide.h">
       <Filter>头文件\Element</Filter>
     </ClInclude>
   </ItemGroup>

@@ -59,7 +59,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.AddSeparator(0);
 	m_Toolbar.AddButton(3, ID_DRAW_FRAME, true, TEXT("机架"));
 	m_Toolbar.AddButton(4, ID_DRAW_BAR, true, TEXT("连杆"));
-	//m_Toolbar.AddButton(5, ID_DRAW_LINE, true, TEXT("线"));
+	m_Toolbar.AddButton(5, ID_DRAW_LINE, true, TEXT("线"));
 	m_Toolbar.AddButton(6, ID_DRAW_SLIDEWAY, true, TEXT("滑道"));
 	m_Toolbar.AddButton(7, ID_SET_DRIVER, true, TEXT("滑块"));
 	m_Toolbar.AddButton(8, ID_SET_DRIVER, true, TEXT("设为原动件"));

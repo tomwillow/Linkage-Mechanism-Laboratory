@@ -27,13 +27,14 @@ public:
 	static void TDraw::MirrorX(POINT apt[], int apt_num, int Oy);
 	static void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect, bool YPlusIsUP);
 	static double TDraw::Distance(POINT pt1, POINT pt2);
-	static double TDraw::DistanceReal(DPOINT *pdpt1, DPOINT *pdpt2, TConfiguration *pConfig);
+	static double TDraw::DistanceScreen(DPOINT *pdpt1, DPOINT *pdpt2, TConfiguration *pConfig);
 
-	static bool TDraw::ShowConstraintCoincideDotLine(TElement *element, TConfiguration *pConfig);
 	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt);
 	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);
 	static RECT TDraw::GetMarginRect(RECT rect, int margin);
 	static void TDraw::GetMarginRect(RECT *rect, int margin);
+	static POINT TDraw::GetCenter(POINT &pt1, POINT &pt2);
+	static bool TDraw::ShowConstraintCoincideDotLine(TElement *element, TConfiguration *pConfig);
 
 	static void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig);
 	static void TDraw::DrawFramePoint(HDC hdc, DPOINT dpt, LOGPEN logpen, TConfiguration *Config);
@@ -41,6 +42,7 @@ public:
 	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config);
 	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, TConfiguration *Config);
 	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config);
+	static void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TConfiguration *pConfig);
 
 	static void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen);
 	static void TDraw::DrawPickSquare(HDC hdc, POINT pt);
@@ -49,6 +51,7 @@ public:
 	static void TDraw::DrawPolyline(HDC hdc, const POINT *apt, int count, LOGPEN &logpen);
 
 	static void TDraw::DrawCircle(HDC hdc, POINT pt, int r);
+	static void TDraw::DrawCircle(HDC hdc, POINT pt, int r, LOGPEN logpen);
 	static void TDraw::DrawCross(HDC hdc, POINT pt, int size, LOGPEN Style);
 	static void TDraw::DrawArrow(HDC hdc, POINT ptBegin, POINT ptEnd, int length, int width);
 	static void TDraw::DrawAxes(HDC hdc, int Ox, int Oy, COLORREF crColor);
