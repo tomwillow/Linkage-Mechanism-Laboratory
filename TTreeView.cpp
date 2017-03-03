@@ -56,6 +56,8 @@ void TTreeView::CreateTreeViewEx(HWND hParent, UINT id, HINSTANCE hInst)//´´½¨Tr
 
 	// Attach image lists to tree view common control
 	TreeView_SetImageList(m_hWnd, hImages, TVSIL_NORMAL);
+
+	RegisterProc();
 }
 
 void TTreeView::Initial()

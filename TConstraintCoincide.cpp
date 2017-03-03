@@ -24,6 +24,32 @@ TConstraintCoincide::~TConstraintCoincide()
 {
 }
 
+void TConstraintCoincide::RestorePointStyle()
+{
+	if (pElement1!=NULL)
+	for (auto iter = pElement1->vecIsJoint.begin(); iter != pElement1->vecIsJoint.end(); ++iter)
+		for (auto iterId = (*iter).begin(); iterId != (*iter).end(); ++iterId)
+		{
+			if ((*iterId) == id)
+			{
+				iter->erase(iterId);
+				break;
+			}
+		}
+
+	if (pElement2 != NULL)
+	for (auto iter = pElement2->vecIsJoint.begin(); iter != pElement2->vecIsJoint.end(); ++iter)
+		for (auto iterId = (*iter).begin(); iterId != (*iter).end(); ++iterId)
+		{
+			if ((*iterId) == id)
+			{
+				iter->erase(iterId);
+				break;
+			}
+		}
+
+}
+
 void TConstraintCoincide::BuildpDpt()
 {
 	switch (Element1PointIndex)
@@ -31,9 +57,12 @@ void TConstraintCoincide::BuildpDpt()
 	case 0:
 	case 1:
 		pDpt1 = &(pElement1->dpt);
+		pElement1->vecIsJoint[0].push_back(id);
 		break;
 	case 2:
 		pDpt1 = &(((TRealLine *)this->pElement1)->ptEnd);
+		pElement1->vecIsJoint[1].push_back(id);
+		break;
 	}
 
 	switch (Element2PointIndex)
@@ -41,9 +70,12 @@ void TConstraintCoincide::BuildpDpt()
 	case 0:
 	case 1:
 		pDpt2 = &(pElement2->dpt);
+		pElement2->vecIsJoint[0].push_back(id);
 		break;
 	case 2:
 		pDpt2 = &(((TRealLine *)this->pElement2)->ptEnd);
+		pElement2->vecIsJoint[1].push_back(id);
+		break;
 	}
 }
 
@@ -60,6 +92,8 @@ void TConstraintCoincide::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
 	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
 	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
-	wsprintf(buffer, TEXT("ID:%d.P%d = ID:%d.P%d"), CTRLTYPE_NULL, NULL, pElement1->id, Element1PointIndex, pElement2->id, Element2PointIndex);
+
+	wsprintf(buffer, TEXT("ID:%d.P%d = ID:%d.P%d"), pElement1->id, Element1PointIndex, pElement2->id, Element2PointIndex);
+
 	pListView->AddAttributeItem(TEXT("Value"), CTRLTYPE_NULL, NULL, buffer);
 }

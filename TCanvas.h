@@ -1,6 +1,7 @@
 #pragma once
 #include "TWindow.h"
 
+class TConfiguration;
 class TCanvas:public TWindow
 {
 private:

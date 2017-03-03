@@ -5,6 +5,7 @@
 
 #include "DPOINT.h"
 
+class TRealLine;
 class TElement;
 class TSelectTool:public TTool
 {
@@ -33,8 +34,6 @@ protected:
 	void OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
-	bool TSelectTool::PickRealLine(POINT ptPos, TElement *Element);
-	bool TSelectTool::PickRealLine(POINT &ptPos, DPOINT &dptBegin, DPOINT &dptEnd);
 	bool TSelectTool::PickConstraintCoincide(POINT ptPos, TElement *element);
 	void TSelectTool::CancelTreeViewAndListView();
 	void TSelectTool::RestorePickedLineStyle();

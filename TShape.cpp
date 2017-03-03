@@ -29,7 +29,6 @@ void TShape::AddCoincide(TConstraintCoincide &coincide,TConfiguration *pConfig)
 		iNextId = tempcoincide->id;
 
 	tempcoincide->BuildpDpt();//连接2个指针点
-	//tempcoincide->SetStyle(PS_DOT, 1, pConfig->crPen);
 
 	Element.push_back(tempcoincide);
 	iNextId++;
@@ -144,27 +143,31 @@ std::vector<int> TShape::DeleteElement(int index)
 	std::vector<int> DeletedId = { Element[index]->id };
 
 	TElement *pDeleted = Element[index];//得到被删元素的地址
-	delete Element[index];
-	auto iter = Element.begin() + index;
-	Element.erase(iter);
+	if (pDeleted->eType == CONSTRAINT_COINCIDE)
+		((TConstraintCoincide *)pDeleted)->RestorePointStyle();
 
 	//依次比对 约束 中是否有被删元素地址，有则删掉约束
 	for (auto iter = Element.begin(); iter != Element.end();)
 	{
-		if ((*iter)->eType==CONSTRAINT_COINCIDE)
+		if ((*iter)->eType==CONSTRAINT_COINCIDE)//如果是约束
 			if (((TConstraintCoincide *)*iter)->pElement1 == pDeleted ||
 				((TConstraintCoincide *)*iter)->pElement2 == pDeleted
-				)
+				)//且涉及到被删除元素，则删除此约束
 			{
 				iCoincideNum--;
 				DeletedId.push_back((*iter)->id);
 
+				((TConstraintCoincide *)(*iter))->RestorePointStyle();
 				delete *iter;
 				iter=Element.erase(iter);
 				continue;
 			}
 		iter++;
 	}
+
+	delete pDeleted;
+	auto iter = Element.begin() + index;
+	Element.erase(iter);
 
 	return DeletedId;
 }

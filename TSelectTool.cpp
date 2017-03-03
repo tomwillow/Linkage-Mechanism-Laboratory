@@ -76,6 +76,7 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			RestorePickedLineStyle();
 			RestoreHoveredLineStyle();
 
+			//得到受影响的元素id，并删掉
 			int id = pShape->Element[iPickIndex]->id;
 			std::vector<int> InfluenceId;// = pShape->GetInfluenceId(id);
 
@@ -147,7 +148,7 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
 		case ELEMENT_SLIDEWAY:
-			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
+			if (TDraw::PointInRealLine(ptPos, (TRealLine *)pShape->Element[i], pConfig))//发现拾取
 			{
 				iHoverIndex = i;
 			}
@@ -181,33 +182,12 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	}
 }
 
-bool TSelectTool::PickRealLine(POINT &ptPos, DPOINT &dptBegin, DPOINT &dptEnd)
-{
-	POINT pt1 = pConfig->RealToScreen(dptBegin);
-	POINT pt2 = pConfig->RealToScreen(dptEnd);
-	double length = TDraw::Distance(pt1, pt2);
-	double length1 = TDraw::Distance(ptPos, pt1);
-	double length2 = TDraw::Distance(ptPos, pt2);
-
-	if (length1 + length2 - length <= 0.5)//容差
-		return true;
-	else
-		return false;
-}
-
-//应在调用前进行类型判断，避免将非TRealLine *型元素传入
-bool TSelectTool::PickRealLine(POINT ptPos, TElement *Element)
-{
-	TRealLine *pRealLine = (TRealLine *)(Element);
-	return PickRealLine(ptPos, pRealLine->ptBegin, pRealLine->ptEnd);
-}
-
 bool TSelectTool::PickConstraintCoincide(POINT ptPos, TElement *element)
 {
 	TConstraintCoincide *temp = (TConstraintCoincide *)element;
 
 	//重合虚线显示，且虚线被拾取
-	if (TDraw::ShowConstraintCoincideDotLine(temp,pConfig) && PickRealLine(ptPos, *(temp->pDpt1), *(temp->pDpt2)))
+	if (TDraw::ShowConstraintCoincideDotLine(temp, pConfig) && TDraw::PointInRealLine(ptPos, *(temp->pDpt1), *(temp->pDpt2), pConfig))
 	{
 		return true;
 	}
@@ -253,7 +233,7 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
 		case ELEMENT_SLIDEWAY:
-			if (PickRealLine(ptPos, pShape->Element[i]))//发现拾取
+			if (TDraw::PointInRealLine(ptPos, (TRealLine *)pShape->Element[i], pConfig))//发现拾取
 			{
 				iPickIndex = i;
 			}

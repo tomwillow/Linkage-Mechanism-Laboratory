@@ -9,6 +9,8 @@ TRealLine::TRealLine() :ptBegin(dpt)
 	TRealLine::dLength = 0;
 	_tcscpy(Name, TEXT(""));
 	eType = ELEMENT_REALLINE;
+
+	vecIsJoint.resize(2);
 }
 
 TRealLine::~TRealLine()

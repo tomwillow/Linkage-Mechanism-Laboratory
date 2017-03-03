@@ -162,6 +162,15 @@
     <ClCompile Include="TFramePointTool.cpp">
       <Filter>源文件\Tool</Filter>
     </ClCompile>
+    <ClCompile Include="TSliderTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="TConstraintColinear.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="TSlider.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -312,6 +321,15 @@
       <Filter>头文件\Element</Filter>
     </ClInclude>
     <ClInclude Include="TConstraintCoincide.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="TSliderTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="TConstraintColinear.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="TSlider.h">
       <Filter>头文件\Element</Filter>
     </ClInclude>
   </ItemGroup>

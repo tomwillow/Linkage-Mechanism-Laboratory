@@ -1,23 +1,35 @@
 #pragma once
+#include "DetectMemoryLeak.h"
+
+#include "TCanvas.h"
 #include "TAttach.h"
 
 
-TAttach::TAttach(HWND hCanvas, TShape *shape, TConfiguration *config)
+TAttach::TAttach(TCanvas *pCanvas, TShape *pShape, TConfiguration *pConfig)
 {
-	TAttach::hCanvas = hCanvas;
-	TAttach::Shape = shape;
-	TAttach::Config = config;
+	TAttach::pCanvas = pCanvas;
+	TAttach::pShape = pShape;
+	TAttach::pConfig = pConfig;
 
 	iIvoryLine = 0;
 
+	//设置极轴线
 	bShowXAssist = false;
 	bShowYAssist = false;
 
 	XAssistLine = new TRealLine;
 	YAssistLine = new TRealLine;
-	XAssistLine->SetStyle(PS_DOT, 1, Config->crDot);
-	YAssistLine->SetStyle(PS_DOT, 1, Config->crDot);
+	XAssistLine->SetStyle(PS_DOT, 1, pConfig->crDot);
+	YAssistLine->SetStyle(PS_DOT, 1, pConfig->crDot);
 
+	//设置延长线
+	bShowExtensionLine = false;
+	ExtensionLine = new TRealLine;
+	ExtensionLine->SetStyle(PS_DOT, 1, pConfig->crDot);
+
+	//设置捕捉点
+	bAttachedEndpoint = true;
+	bShowAttachPoint = false;
 	pAttachElement = NULL;
 	iAttachElementPointIndex = -1;
 }
@@ -27,83 +39,134 @@ TAttach::~TAttach()
 {
 	delete XAssistLine;
 	delete YAssistLine;
+
+	delete ExtensionLine;
 }
 
 void TAttach::InitialLine(POINT ptPos)
 {
-	XAssistLine->ptBegin = Config->ScreenToReal(ptPos);
-	XAssistLine->ptEnd = Config->ScreenToReal(ptPos);
-	YAssistLine->ptBegin = Config->ScreenToReal(ptPos);
-	YAssistLine->ptEnd = Config->ScreenToReal(ptPos);
+	XAssistLine->ptBegin = pConfig->ScreenToReal(ptPos);
+	XAssistLine->ptEnd = pConfig->ScreenToReal(ptPos);
+	YAssistLine->ptBegin = pConfig->ScreenToReal(ptPos);
+	YAssistLine->ptEnd = pConfig->ScreenToReal(ptPos);
 }
 
 void TAttach::Draw(HDC hdc)
 {
 
-	if (pAttachElement)
+	if (bShowAttachPoint)
 	{
-		TDraw::DrawCross(hdc, Config->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, Config->crPen });
+		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, pConfig->crPen });
 	}
 	//画X辅助线
 	if (bShowXAssist)
 	{
-		TDraw::DrawRealLine(hdc, *XAssistLine, Config);//
-		TDraw::DrawCross(hdc, Config->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, Config->crPen });
+		TDraw::DrawRealLine(hdc, *XAssistLine, pConfig);//
+		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, pConfig->crPen });
 	}
 
 	//画Y辅助线
 	if (bShowYAssist)
 	{
-		TDraw::DrawRealLine(hdc, *YAssistLine, Config);//
-		TDraw::DrawCross(hdc, Config->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, Config->crPen });
+		TDraw::DrawRealLine(hdc, *YAssistLine, pConfig);//
+		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, pConfig->crPen });
+	}
+
+	if (bShowExtensionLine)
+	{
+		TDraw::DrawRealLine(hdc, *ExtensionLine, pConfig);//
 	}
 
 }
 
 void TAttach::AttachAll(POINT ptNowPos, DPOINT dptCheckPos)
 {
-	DPOINT dptPos = Config->ScreenToReal(ptNowPos);
+	DPOINT dptPos = pConfig->ScreenToReal(ptNowPos);
 	dptAttach = dptPos;
-	AttachAxis(dptPos, Config->ScreenToReal(Config->GetOrg()));
+	AttachAxis(dptPos, pConfig->ScreenToReal(pConfig->GetOrg()));//吸附原点坐标轴
 	AttachAxis(dptPos, dptCheckPos);
-	AttachPoint(dptPos);//后吸附线端点因为线端点更重要（覆盖掉辅助线点效果）
+	if (!AttachPoint(dptPos))//后吸附线端点因为线端点更重要（覆盖掉辅助线点效果）
+		AttachLine(ptNowPos);
 }
 
 void TAttach::AttachAll(POINT ptNowPos)
 {
-	DPOINT dptPos = Config->ScreenToReal(ptNowPos);
+	DPOINT dptPos = pConfig->ScreenToReal(ptNowPos);
 	dptAttach = dptPos;
-	AttachAxis(dptPos, Config->ScreenToReal(Config->GetOrg()));
-	AttachPoint(dptPos);//后吸附线端点因为线端点更重要（覆盖掉辅助线点效果）
+	AttachAxis(dptPos, pConfig->ScreenToReal(pConfig->GetOrg()));//吸附原点坐标轴
+	if (!AttachPoint(dptPos))//后吸附线端点因为线端点更重要（覆盖掉辅助线点效果）
+		AttachLine(ptNowPos);
 }
 
-//检查NowPos是否靠近CheckPos的极轴，使用前应设置dptAttach
+
+bool TAttach::AttachLine(POINT ptNowPos)
+{
+	bShowExtensionLine = false;
+	double dAngle;
+	for (auto i = pShape->Element.begin(); i != pShape->Element.end(); ++i)
+	{
+		switch ((*i)->eType)
+		{
+		case ELEMENT_REALLINE:
+		case ELEMENT_BAR:
+		case ELEMENT_SLIDEWAY:
+			int status = TDraw::PointInRealLineOrExtension(ptNowPos, dptAttach, (TRealLine *)*i, pConfig);
+			switch (status)
+			{
+			case 1:
+				bAttachedEndpoint = false;
+				bShowAttachPoint = true;
+				bShowExtensionLine = true;
+				ExtensionLine->SetPoint(((TRealLine *)*i)->ptBegin, dptAttach);
+				pAttachElement = *i;
+				return true;
+			case 2:
+				bAttachedEndpoint = false;
+				bShowAttachPoint = true;
+				bShowExtensionLine = true;
+				ExtensionLine->SetPoint(((TRealLine *)*i)->ptEnd, dptAttach);
+				pAttachElement = *i;
+				return true;
+			case 0:
+				bAttachedEndpoint = false;
+				bShowAttachPoint = true;
+				bShowExtensionLine = true;
+				ExtensionLine->SetPoint({ 0, 0 }, { 0, 0 });
+				pAttachElement = *i;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+//检查NowPos是否靠近以CheckPos为原点的极轴，使用前应设置dptAttach为当前点
 bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos)
 {
 
 	iIvoryLine = 0;
 	RECT CanvasClientRect;
-	::GetClientRect(hCanvas, &CanvasClientRect);
+	::GetClientRect(pCanvas->m_hWnd, &CanvasClientRect);
 	//检测X轴辅助线
 	XAssistLine->ptBegin = dptCheckPos;
-	if (abs(Config->LengthToScreenY(dptNowPos.y - dptCheckPos.y)) < 10)//当前点和起始点y轴偏差10像素
+	if (abs(pConfig->LengthToScreenY(dptNowPos.y - dptCheckPos.y)) < 10)//当前点和起始点y轴偏差10像素
 	{
 		bShowXAssist = true;
 
 		//设置辅助线x,y坐标
 		if (dptNowPos.x - XAssistLine->ptBegin.x > 0)//当前位置位于辅助线起始点右边
 		{
-			XAssistLine->ptEnd.x = Config->ScreenToRealX(CanvasClientRect.right);
+			XAssistLine->ptEnd.x = pConfig->ScreenToRealX(CanvasClientRect.right);
 			iIvoryLine = 1;
 		}
 		else
 		{
-			XAssistLine->ptEnd.x = Config->ScreenToRealX(CanvasClientRect.left);
+			XAssistLine->ptEnd.x = pConfig->ScreenToRealX(CanvasClientRect.left);
 			iIvoryLine = 3;
 		}
 		XAssistLine->ptEnd.y = XAssistLine->ptBegin.y;
 
-		//dptAttach.x = dptCheckPos.x;
+		//dptAttach.x = dptNowPos.x;
 		dptAttach.y = XAssistLine->ptEnd.y;//将当前点吸附到坐标轴
 	}
 	else
@@ -113,22 +176,22 @@ bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos)
 
 	//检测Y轴辅助线
 	YAssistLine->ptBegin = dptCheckPos;
-	if (abs(Config->LengthToScreenX(dptNowPos.x - dptCheckPos.x)) < 10)
+	if (abs(pConfig->LengthToScreenX(dptNowPos.x - dptCheckPos.x)) < 10)
 	{
 		bShowYAssist = true;
 		if (dptNowPos.y - YAssistLine->ptBegin.y > 0)//当前位置位于辅助线起始点上边
 		{
-			YAssistLine->ptEnd.y = Config->ScreenToRealY(CanvasClientRect.top);
+			YAssistLine->ptEnd.y = pConfig->ScreenToRealY(CanvasClientRect.top);
 			iIvoryLine = 2;
 		}
 		else
 		{
-			YAssistLine->ptEnd.y = Config->ScreenToRealY(CanvasClientRect.bottom);
+			YAssistLine->ptEnd.y = pConfig->ScreenToRealY(CanvasClientRect.bottom);
 			iIvoryLine = 4;
 		}
 		YAssistLine->ptEnd.x = YAssistLine->ptBegin.x;
 
-		//dptAttach.y = dptCheckPos.y;
+		//dptAttach.y = dptNowPos.y;
 		dptAttach.x = YAssistLine->ptEnd.x;//吸附
 	}
 	else
@@ -142,59 +205,75 @@ bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos)
 		return false;
 }
 
-//读取Shape中的RealLine进行吸附，使用前应设置dptAttach
-void TAttach::AttachPoint(DPOINT dptPos)
+//读取pShape中的RealLine进行吸附，使用前应设置dptAttach为当前点
+bool TAttach::AttachPoint(DPOINT dptPos)
 {
+	bAttachedEndpoint = false;
+	bShowAttachPoint = false;
 	pAttachElement = NULL;
-	for (int i = 0; i < Shape->Element.size(); i++)
+	for (int i = 0; i < pShape->Element.size(); i++)
 	{
-		eAttachElementType = Shape->Element[i]->eType;
-		switch (Shape->Element[i]->eType)
+		eAttachElementType = pShape->Element[i]->eType;
+		switch (pShape->Element[i]->eType)
 		{
 		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
 		{
-			TRealLine *pRealLine = (TRealLine *)(Shape->Element[i]);
+			TRealLine *pRealLine = (TRealLine *)(pShape->Element[i]);
 			//吸附起点
 			if (DPTisApproached(dptPos, pRealLine->ptBegin, 10))
 			{
+				bAttachedEndpoint = true;
+				bShowAttachPoint = true;
 				pAttachElement = pRealLine;
 				iAttachElementPointIndex = 1;
 				dptAttach = pRealLine->ptBegin;
-				return;
+				return true;
 			}
 
 			//吸附终点
 			if (DPTisApproached(dptPos, pRealLine->ptEnd, 10))
 			{
+				bAttachedEndpoint = true;
+				bShowAttachPoint = true;
 				pAttachElement = pRealLine;
 				iAttachElementPointIndex = 2;
 				dptAttach = pRealLine->ptEnd;
-				return;
+				return true;
 			}
 			break;
 		}
 		case ELEMENT_FRAMEPOINT:
 		{
-			TFramePoint *pFramePoint = (TFramePoint *)(Shape->Element[i]);
+			TFramePoint *pFramePoint = (TFramePoint *)(pShape->Element[i]);
 			//吸附机架点
 			if (DPTisApproached(dptPos, pFramePoint->dpt, 10))
 			{
+				bAttachedEndpoint = true;
+				bShowAttachPoint = true;
 				pAttachElement = pFramePoint;
 				iAttachElementPointIndex = 0;
 				dptAttach = pFramePoint->dpt;
-				return;
+				return true;
 			}
 			break;
 		}
+		case ELEMENT_SLIDEWAY:
+		case CONSTRAINT_COINCIDE:
+			break;
+		default:
+			assert(0);
+			break;
 		}
 	}
+	return false;
 }
 
+//两点屏幕距离小于distance
 bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2, int distance)
 {
-	if (abs(Config->LengthToScreenX(dpt1.x - dpt2.x)) < distance &&
-		abs(Config->LengthToScreenY(dpt1.y - dpt2.y)) < distance)
+	if (abs(pConfig->LengthToScreenX(dpt1.x - dpt2.x)) < distance &&
+		abs(pConfig->LengthToScreenY(dpt1.y - dpt2.y)) < distance)
 		return true;
 	else
 		return false;

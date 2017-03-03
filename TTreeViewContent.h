@@ -31,5 +31,6 @@ public:
 	void TTreeViewContent::SelectNull();
 	void TTreeViewContent::RefreshAvailableItem();
 	void TTreeViewContent::AddAllItem();//仅用于读入文件时使用
+	LRESULT TTreeViewContent::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 

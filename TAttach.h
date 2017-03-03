@@ -5,29 +5,39 @@
 #include "TConfiguration.h"
 #include "TDraw.h"
 
+class TCanvas;
 class TAttach
 {
 private:
 	//bool bAttachPoint;
-	HWND hCanvas;
-	TShape *Shape;
-	TConfiguration *Config;
+	TCanvas *pCanvas;
+	TShape *pShape;
+	TConfiguration *pConfig;
 	int iIvoryLine;
 	TRealLine *XAssistLine, *YAssistLine;//X,Y轴辅助线
 	bool bShowXAssist, bShowYAssist;//显示X,Y轴辅助线
+
+	TRealLine *ExtensionLine;
+
+
 	bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2, int distance);
+	bool TAttach::AttachLine(POINT ptNowPos);
 public:
+	bool bShowExtensionLine;//已拾取直线
+	bool bAttachedEndpoint;
 	EnumElementType eAttachElementType;
+
+	bool bShowAttachPoint;
 	TElement *pAttachElement;
 	int iAttachElementPointIndex;
 	DPOINT dptAttach;
-	TAttach(HWND hCanvas, TShape *shape, TConfiguration *config);
+	TAttach(TCanvas *pCanvas, TShape *shape, TConfiguration *config);
 	~TAttach();
 	void TAttach::InitialLine(POINT ptPos);
 	void TAttach::AttachAll(POINT ptNowPos, DPOINT dptCheckPos);
 	void TAttach::AttachAll(POINT ptNowPos);
 	bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos);
-	void TAttach::AttachPoint(DPOINT dptPos);
+	bool TAttach::AttachPoint(DPOINT dptPos);
 	void TAttach::Draw(HDC hdc);
 	int TAttach::GetiIvoryLine()
 	{

@@ -18,7 +18,7 @@
 
 TLineTool::TLineTool()
 {
-	Attach = new TAttach(pCanvas->m_hWnd, pShape, pConfig);
+	Attach = new TAttach(pCanvas, pShape, pConfig);
 	bShowDimLine = false;
 	MoveLine = new TRealLine;
 	MoveLine->SetStyle(PS_SOLID, 1, pConfig->crPen);
@@ -186,8 +186,6 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				CoincideBegin->pElement2 = pPrevLine;
 
 				AddCoincide(CoincideBegin, pShape->iNextId, pConfig);
-				//AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
-				//pShape->AddCoincide(*CoincideBegin, pConfig);
 
 				pSolver->RefreshEquations(true);
 
@@ -300,7 +298,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	//处理约束
 	if (dptHit.size() == 0)//第一点捕捉到的约束
 	{
-		if (Attach->pAttachElement != NULL)
+		if (Attach->bAttachedEndpoint)
 		{
 			//ID被捕捉=ID新元素.begin
 			CoincideBegin = new TConstraintCoincide;
@@ -340,7 +338,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			CoincideBegin = NULL;
 		}
 
-		if (Attach->pAttachElement != NULL)//若终点捕捉上了
+		if (Attach->bAttachedEndpoint)//若终点捕捉上了
 		{
 			//ID被捕捉=ID这个.end
 			CoincideBegin = new TConstraintCoincide;
@@ -387,7 +385,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	//创建LineEdit或隐藏
 	if (LineEdit->m_hWnd == NULL)
 	{
-		LineEdit->CreateEditEx(pCanvas->m_hWnd, IDR_LineEdit, pCanvas->m_hInst);
+		LineEdit->CreateEditEx(pCanvas->m_hWnd, IDR_LINEEDIT, pCanvas->m_hInst);
 	}
 	else
 		LineEdit->SetVisible(false);//避免在画完线后还显示Edit

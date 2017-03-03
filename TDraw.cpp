@@ -50,10 +50,10 @@ void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
 		DrawRealLine(hdc, ((TRealLine *)Element)->ptBegin, ((TRealLine *)Element)->ptEnd, ((TRealLine *)Element)->logpenStyleShow, pConfig);
 		break;
 	case ELEMENT_FRAMEPOINT:
-		DrawFramePoint(hdc, ((TFramePoint *)Element)->dpt, ((TFramePoint *)Element)->logpenStyleShow, pConfig);
+		DrawFramePoint(hdc, (TFramePoint *)Element, pConfig);
 		break;
 	case ELEMENT_BAR:
-		DrawBar(hdc, ((TBar *)Element)->ptBegin, ((TBar *)Element)->ptEnd, ((TBar *)Element)->logpenStyleShow, pConfig);
+		DrawBar(hdc, (TBar *)Element, pConfig);
 		break;
 	case ELEMENT_SLIDEWAY:
 		DrawSlideway(hdc, (TSlideway *)Element, pConfig);
@@ -69,26 +69,34 @@ void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
 	}
 }
 
-void TDraw::DrawBar(HDC hdc, DPOINT dptBegin, DPOINT dptEnd, LOGPEN logpen, TConfiguration *pConfig)
+void TDraw::DrawBar(HDC hdc, TBar *Bar, TConfiguration *pConfig)
 {
 	HPEN hPen;
 	HBRUSH hBrush;
-	hPen = ::CreatePenIndirect(&logpen);
+	hPen = ::CreatePenIndirect(&(Bar->logpenStyleShow));
 	hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
 	::SelectObject(hdc, hPen);
 	::SelectObject(hdc, hBrush);
 
 	POINT ptBegin, ptEnd;
-	ptBegin = pConfig->RealToScreen(dptBegin);
-	ptEnd = pConfig->RealToScreen(dptEnd);
-	DrawCircle(hdc, ptBegin, FRAMEPOINT_R);
-	DrawCircle(hdc, ptEnd, FRAMEPOINT_R);
+	ptBegin = pConfig->RealToScreen(Bar->ptBegin);
+	ptEnd = pConfig->RealToScreen(Bar->ptEnd);
+	//DrawCircle(hdc, ptBegin, FRAMEPOINT_R);
+	//DrawCircle(hdc, ptEnd, FRAMEPOINT_R);
 
 	POINT p1, p2;
 	double theta1 = GetAngleFromPointScreen(ptBegin, ptEnd);
 	double theta2 = GetAngleFromPointScreen(ptEnd, ptBegin);
-	p1 = { ptBegin.x + FRAMEPOINT_R*cos(theta1), ptBegin.y - FRAMEPOINT_R*sin(theta1) };
-	p2 = { ptEnd.x + FRAMEPOINT_R*cos(theta2), ptEnd.y - FRAMEPOINT_R*sin(theta2) };
+
+	if (Bar->vecIsJoint[0].size()>0)
+		p1 = { ptBegin.x + FRAMEPOINT_R*cos(theta1), ptBegin.y - FRAMEPOINT_R*sin(theta1) };
+	else
+		p1 = ptBegin;
+
+	if (Bar->vecIsJoint[1].size()>0)
+		p2 = { ptEnd.x + FRAMEPOINT_R*cos(theta2), ptEnd.y - FRAMEPOINT_R*sin(theta2) };
+	else
+		p2 = ptEnd;
 	DrawLine(hdc, p1, p2);
 
 	::DeleteObject(hPen);
@@ -165,35 +173,46 @@ void TDraw::DrawCircle(HDC hdc, POINT pt, int r)
 }
 
 //画机架点
-void TDraw::DrawFramePoint(HDC hdc, DPOINT dpt, LOGPEN logpen, TConfiguration *Config)
+void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *Config)
 {
 	HPEN hPen;
 	HBRUSH hBrush;
-	hPen = ::CreatePenIndirect(&logpen);
+	hPen = ::CreatePenIndirect(&(pFramePoint->logpenStyleShow));
 	hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
 	::SelectObject(hdc, hPen);
 	::SelectObject(hdc, hBrush);
 
-	POINT ptO = Config->RealToScreen(dpt);
+	POINT ptO = Config->RealToScreen(pFramePoint->dpt);
 	//画圆
-	::Ellipse(hdc, ptO.x - FRAMEPOINT_R, ptO.y - FRAMEPOINT_R, ptO.x + FRAMEPOINT_R, ptO.y + FRAMEPOINT_R);
+	//::Ellipse(hdc, ptO.x - FRAMEPOINT_R, ptO.y - FRAMEPOINT_R, ptO.x + FRAMEPOINT_R, ptO.y + FRAMEPOINT_R);
 
 	//设置圆下方的两个点
 	POINT ptA1, ptB1;
-	ptA1 = { ptO.x - FRAMEPOINT_R*sin(FRAMEPOINT_ANGLE / 2), ptO.y + FRAMEPOINT_R*cos(FRAMEPOINT_ANGLE / 2) };
-	ptB1 = { ptO.x + FRAMEPOINT_R*sin(FRAMEPOINT_ANGLE / 2), ptA1.y };
+
+	if (pFramePoint->vecIsJoint[0].size()>0)
+	{
+		OutputDebugString(TEXT("true"));
+		ptA1 = { ptO.x - FRAMEPOINT_R*sin(FRAMEPOINT_ANGLE / 2.0), ptO.y + FRAMEPOINT_R*cos(FRAMEPOINT_ANGLE / 2.0) };
+		ptB1 = { ptO.x + FRAMEPOINT_R*sin(FRAMEPOINT_ANGLE / 2.0), ptA1.y };
+	}
+	else
+	{
+		OutputDebugString(TEXT("false"));
+		ptA1 = ptO;
+		ptB1 = ptO;
+	}
 
 	//设置三角形的底边两个点
 	POINT ptA2, ptB2;
-	ptA2 = { ptO.x - FRAMEPOINT_H*tan(FRAMEPOINT_ANGLE / 2), ptO.y + FRAMEPOINT_H };
-	ptB2 = { ptO.x + FRAMEPOINT_H*tan(FRAMEPOINT_ANGLE / 2), ptA2.y };
+	ptA2 = { ptO.x - FRAMEPOINT_H*tan(FRAMEPOINT_ANGLE / 2.0), ptO.y + FRAMEPOINT_H };
+	ptB2 = { ptO.x + FRAMEPOINT_H*tan(FRAMEPOINT_ANGLE / 2.0), ptA2.y };
 	DrawLine(hdc, ptA1, ptA2);
 	DrawLine(hdc, ptB1, ptB2);
 
 	//设置地面线
 	POINT ptH1, ptH2;
-	ptH1 = { ptO.x - FRAMEPOINT_B / 2, ptO.y + FRAMEPOINT_H };
-	ptH2 = { ptO.x + FRAMEPOINT_B / 2, ptH1.y };
+	ptH1 = { ptO.x - FRAMEPOINT_B / 2.0, ptO.y + FRAMEPOINT_H };
+	ptH2 = { ptO.x + FRAMEPOINT_B / 2.0, ptH1.y };
 	DrawLine(hdc, ptH1, ptH2);
 
 	//画剖面线
@@ -702,4 +721,94 @@ void TDraw::DrawTextAdvance(HDC hdc, TCHAR text[], RECT *rect, long FontSize, in
 void TDraw::DrawSystemFontText(HDC hdc, TCHAR text[], RECT &rect, COLORREF color, UINT format)
 {
 	DrawTextAdvance(hdc, text, &rect, 9, 400, color, TEXT("宋体"), format);
+}
+
+//判断点是否位于直线或直线的延长线上 返回值：-1都不在 0在线段上 1在pt1一侧延长线 2在pt2一侧延长线
+int TDraw::PointInRealLineOrExtension(const POINT &ptPos,DPOINT &ptIntersection,const TRealLine *pRealLine, TConfiguration *pConfig)
+{
+	int status = -1;
+
+	POINT pt1 = pConfig->RealToScreen(pRealLine->ptBegin);
+	POINT pt2 = pConfig->RealToScreen(pRealLine->ptEnd);
+	double length = TDraw::Distance(pt1, pt2);
+	double length1 = TDraw::Distance(ptPos, pt1);
+	double length2 = TDraw::Distance(ptPos, pt2);
+
+	if (abs(length1 - (length + length2)) < 0.5)
+	{
+		status = 2;
+	}
+	else
+		if (abs(length2 - (length + length1)) < 0.5)
+			status = 1;
+		else
+			if (abs(length1 + length2 - length) < 0.5)
+				status = 0;
+
+	if (status != -1)
+	{
+		double x, y;
+		if (CanMod(pRealLine->angle + M_PI_2, M_PI, 1e-6))
+		{
+			x = pRealLine->ptBegin.x;
+			y = pConfig->ScreenToRealY(ptPos.y);
+		}
+		else
+		{
+			double k1 = tan(pRealLine->angle);
+			double k2 = (abs(k1) < 1e-6) ? M_PI_2 : -1.0 / k1;
+			double x1 = pRealLine->ptBegin.x;
+			double y1 = pRealLine->ptBegin.y;
+			double x2 = pRealLine->ptEnd.x;
+			double y2 = pRealLine->ptEnd.y;
+
+			double x0 = pConfig->ScreenToRealX(ptPos.x);
+			double y0 = pConfig->ScreenToRealY(ptPos.y);
+
+			x = (y0 - y1 - k2*x0 + k1*x1) / (k1 - k2);
+			y = k1*x + y1 - k1*x1;
+		}
+		ptIntersection = { x, y };
+	}
+	return status;
+}
+
+//判断点是否在线以内
+bool TDraw::PointInRealLine(POINT &ptPos, DPOINT &dptBegin, DPOINT &dptEnd, TConfiguration *pConfig)
+{
+	POINT pt1 = pConfig->RealToScreen(dptBegin);
+	POINT pt2 = pConfig->RealToScreen(dptEnd);
+	double length = TDraw::Distance(pt1, pt2);
+	double length1 = TDraw::Distance(ptPos, pt1);
+	double length2 = TDraw::Distance(ptPos, pt2);
+
+	if (length1 + length2 - length <= 0.5)//容差
+		return true;
+	else
+		return false;
+}
+
+//判断点是否在线以内
+bool TDraw::PointInRealLine(POINT ptPos, TRealLine *pRealLine, TConfiguration *pConfig)
+{
+	return PointInRealLine(ptPos, pRealLine->ptBegin, pRealLine->ptEnd, pConfig);
+}
+
+void TDraw::DrawSliderRect(HDC hdc, POINT &pt, double angle, LOGPEN &logpen)
+{
+	HPEN hPen;
+	hPen = ::CreatePenIndirect(&logpen);
+	::SelectObject(hdc, hPen);
+
+	POINT apt[4];
+	double c = sqrt(SLIDER_H*SLIDER_H + SLIDER_B*SLIDER_B) / 2;
+	double theta = atan(double(SLIDER_B) / SLIDER_H);
+	apt[0] = { pt.x + c*sin(angle - theta), pt.y + c*cos(angle - theta) };
+	apt[1] = { pt.x + c*sin(angle + theta), pt.y +c*cos(angle + theta) };
+	apt[2] = { pt.x - c*sin(angle - theta), pt.y - c*cos(angle - theta) };
+	apt[3] = { pt.x - c*sin(angle + theta), pt.y - c*cos(angle + theta) };
+
+	Polygon(hdc, apt, 4);
+
+	::DeleteObject(hPen);
 }

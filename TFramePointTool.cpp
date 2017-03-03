@@ -9,7 +9,7 @@
 
 TFramePointTool::TFramePointTool()
 {
-	Attach = new TAttach(pCanvas->m_hWnd, pShape, pConfig);
+	Attach = new TAttach(pCanvas, pShape, pConfig);
 
 	tempFramePoint.SetStyle(PS_SOLID, 1, pConfig->crPen);
 
@@ -19,6 +19,7 @@ TFramePointTool::TFramePointTool()
 
 TFramePointTool::~TFramePointTool()
 {
+	delete Attach;
 }
 
 
@@ -36,10 +37,11 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	pTreeViewContent->AddItem(&tempFramePoint, pShape->iNextId);
 	pPrevFramePoint=pShape->AddFramePoint(tempFramePoint);
 
-	if (Attach->pAttachElement != NULL)
+	if (Attach->bAttachedEndpoint)
 	{
 		TConstraintCoincide coincide;
 		coincide.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
+
 		coincide.pElement1 = Attach->pAttachElement;
 		coincide.Element1PointIndex = Attach->iAttachElementPointIndex;
 

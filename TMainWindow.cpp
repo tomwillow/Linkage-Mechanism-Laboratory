@@ -61,7 +61,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.AddButton(4, ID_DRAW_BAR, true, TEXT("连杆"));
 	m_Toolbar.AddButton(5, ID_DRAW_LINE, true, TEXT("线"));
 	m_Toolbar.AddButton(6, ID_DRAW_SLIDEWAY, true, TEXT("滑道"));
-	m_Toolbar.AddButton(7, ID_SET_DRIVER, true, TEXT("滑块"));
+	m_Toolbar.AddButton(7, ID_DRAW_SLIDER, true, TEXT("滑块"));
 	m_Toolbar.AddButton(8, ID_SET_DRIVER, true, TEXT("设为原动件"));
 	m_Toolbar.ShowToolbar();
 
@@ -464,6 +464,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_DRAW_FRAME:
 	case ID_DRAW_LINE:
 	case ID_DRAW_SLIDEWAY:
+	case ID_DRAW_SLIDER:
 		p_Managetool->SetCurActiveTool(wmId);
 		break;
 	case ID_ANALYZE_MECHANISM:

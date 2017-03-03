@@ -13,11 +13,13 @@
 class TFramePoint;
 class TDraw
 {
-#define FRAMEPOINT_R 6//半径
+#define FRAMEPOINT_R 6//节点圆半径
 #define FRAMEPOINT_H 20//高-圆心到地线距离
 #define FRAMEPOINT_B 30//底边长
 #define FRAMEPOINT_SECTION_H 10//剖面线区域高度
 #define FRAMEPOINT_ANGLE 60.0 / 180.0 * M_PI//三角形角度
+#define SLIDER_H 30
+#define SLIDER_B 45
 public:
 	TDraw();
 	~TDraw();
@@ -37,8 +39,8 @@ public:
 	static bool TDraw::ShowConstraintCoincideDotLine(TElement *element, TConfiguration *pConfig);
 
 	static void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig);
-	static void TDraw::DrawFramePoint(HDC hdc, DPOINT dpt, LOGPEN logpen, TConfiguration *Config);
-	static void TDraw::DrawBar(HDC hdc, DPOINT dptBegin, DPOINT dptEnd, LOGPEN logpen, TConfiguration *Config);
+	static void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *Config);
+	static void TDraw::DrawBar(HDC hdc, TBar *Bar, TConfiguration *Config);
 	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config);
 	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, TConfiguration *Config);
 	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config);
@@ -55,6 +57,7 @@ public:
 	static void TDraw::DrawCross(HDC hdc, POINT pt, int size, LOGPEN Style);
 	static void TDraw::DrawArrow(HDC hdc, POINT ptBegin, POINT ptEnd, int length, int width);
 	static void TDraw::DrawAxes(HDC hdc, int Ox, int Oy, COLORREF crColor);
+	static void TDraw::DrawSliderRect(HDC hdc, POINT &pt, double angle,LOGPEN &logpen);
 	static void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor);
 	static void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config);
 	static void TDraw::DrawSystemFontText(HDC hdc, TCHAR text[], RECT &rect, COLORREF color, UINT format);
@@ -67,5 +70,8 @@ public:
 	static void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt);
 	static POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max, RECT &rect);
 	static DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, double y_max, RECT &rect);
+	static bool TDraw::PointInRealLine(POINT ptPos, TRealLine *pRealLine, TConfiguration *pConfig);
+	static bool TDraw::PointInRealLine(POINT &ptPos, DPOINT &dptBegin, DPOINT &dptEnd, TConfiguration *pConfig);
+	static int TDraw::PointInRealLineOrExtension(const POINT &ptPos, DPOINT &ptIntersection, const TRealLine *pRealLine, TConfiguration *pConfig);
 };
 

@@ -9,6 +9,7 @@ private:
 	POINT Org;
 	double dProportion;
 public:
+	double dAnglePrecision;
 	units uUnits;
 	int iMapMode;
 	int iStyle, iWidth;

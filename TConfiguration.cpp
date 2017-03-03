@@ -23,6 +23,8 @@ void TConfiguration::Initial(HWND hwnd)
 
 	ReleaseDC(hwnd, hdc);
 
+	dAnglePrecision = 1e-1;
+
 	uUnits = UNITS_MM;
 	Org = { 0, 0 };
 	dProportion = 1.0;

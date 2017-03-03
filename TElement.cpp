@@ -13,6 +13,7 @@ TElement::TElement() :available(true)
 	angle = 0.0;
 
 	_tcscpy(Name,TEXT("undefined"));
+
 }
 
 TElement::~TElement()

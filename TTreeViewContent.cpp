@@ -17,6 +17,22 @@ TTreeViewContent::~TTreeViewContent()
 {
 }
 
+LRESULT TTreeViewContent::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_KEYDOWN:
+		if (wParam == VK_DELETE)
+		{
+			//DeleteById(GetIdFromHTreeView(TreeView_GetSelection(hWnd)));
+			win.m_ManageTool.Message(hWnd, uMsg, wParam, lParam);
+			return NULL;
+		}
+		break;
+	}
+	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
+}
+
 void TTreeViewContent::DeleteAllItems()
 {
 	TreeView_DeleteAllItems(m_hWnd);

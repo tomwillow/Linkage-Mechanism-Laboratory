@@ -6,6 +6,8 @@ TFramePoint::TFramePoint()
 {
 	_tcscpy(Name, TEXT(""));
 	eType = ELEMENT_FRAMEPOINT;
+
+	vecIsJoint.resize(1);
 }
 
 

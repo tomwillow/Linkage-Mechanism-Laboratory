@@ -9,6 +9,7 @@
 #include "TBarTool.h"
 #include "TLineTool.h"
 #include "TFramePointTool.h"
+#include "TSliderTool.h"
 #include "TSlidewayTool.h"
 
 TManageTool::TManageTool()
@@ -54,6 +55,9 @@ void TManageTool::SetCurActiveTool(UINT id)
 		break;
 	case ID_DRAW_LINE:
 		m_pCurrentTool = new TLineTool;
+		break;
+	case ID_DRAW_SLIDER:
+		m_pCurrentTool = new TSliderTool;
 		break;
 	case ID_DRAW_SLIDEWAY:
 		m_pCurrentTool = new TSlidewayTool;

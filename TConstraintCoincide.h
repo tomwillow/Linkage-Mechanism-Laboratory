@@ -13,6 +13,6 @@ public:
 	~TConstraintCoincide();
 	void TConstraintCoincide::NoticeListView(TListView *pListView);
 	void TConstraintCoincide::BuildpDpt();
-	//bool TConstraintCoincide::ShowDotLine();
+	void TConstraintCoincide::RestorePointStyle();
 };
 
