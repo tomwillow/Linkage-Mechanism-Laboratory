@@ -12,6 +12,7 @@ public:
 	double dAnglePrecision;
 	units uUnits;
 	int iMapMode;
+	LOGPEN logpen;
 	int iStyle, iWidth;
 	COLORREF crBackground, crPen,crDash,crDot,crCoordinate;
 	COLORREF crGridBig, crGridSmall;

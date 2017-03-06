@@ -1,13 +1,16 @@
 #pragma once
+#include <vector>
 #include "TTool.h"
 
+class TSlider;
 class TAttach;
 class TSliderTool :
 	public TTool
 {
 private:
-
+	std::vector<POINT> dptHit;
 	TAttach *pAttach;
+	TSlider *pSlider;
 public:
 	TSliderTool();
 	~TSliderTool();

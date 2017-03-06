@@ -1,8 +1,10 @@
 #include "TSlider.h"
 
 
+
 TSlider::TSlider()
 {
+	
 }
 
 
