@@ -3,7 +3,7 @@
 
 #include "TCanvas.h"
 #include "TAttach.h"
-
+#include "TSlider.h"
 
 TAttach::TAttach(TCanvas *pCanvas, TShape *pShape, TConfiguration *pConfig)
 {
@@ -261,6 +261,23 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 		case ELEMENT_SLIDEWAY:
 		case CONSTRAINT_COINCIDE:
 			break;
+		case ELEMENT_SLIDER:
+		{
+			TSlider *pSlider = (TSlider *)(pShape->Element[i]);
+			for (auto iter = pSlider->vecDpt.begin(); iter != pSlider->vecDpt.end(); ++iter)
+			{
+				if (DPTisApproached(dptPos, TDraw::GetAbsolute(*iter, pSlider->dpt, pSlider->angle), 10))
+				{
+					bAttachedEndpoint = true;
+					bShowAttachPoint = true;
+					pAttachElement = pSlider;
+					iAttachElementPointIndex = iter - pSlider->vecDpt.begin();
+					dptAttach = TDraw::GetAbsolute(*iter, pSlider->dpt, pSlider->angle);
+					return true;
+				}
+			}
+			break;
+		}
 		default:
 			assert(0);
 			break;

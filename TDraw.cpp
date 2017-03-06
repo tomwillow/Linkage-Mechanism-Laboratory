@@ -2,6 +2,7 @@
 #include "DetectMemoryLeak.h"
 #include "TDraw.h"
 
+#include "TSlider.h"
 #include "TFramePoint.h"
 
 TDraw::TDraw()
@@ -59,10 +60,11 @@ void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
 		DrawSlideway(hdc, (TSlideway *)Element, pConfig);
 		break;
 	case CONSTRAINT_COINCIDE:
-	{
 		DrawConstraintCoincide(hdc, (TConstraintCoincide *)Element, pConfig);
 		break;
-	}
+	case ELEMENT_SLIDER:
+		DrawSlider(hdc, (TSlider *)Element, pConfig);
+		break;
 	default:
 		assert(0);
 		break;
@@ -794,21 +796,74 @@ bool TDraw::PointInRealLine(POINT ptPos, TRealLine *pRealLine, TConfiguration *p
 	return PointInRealLine(ptPos, pRealLine->ptBegin, pRealLine->ptEnd, pConfig);
 }
 
-void TDraw::DrawSliderRect(HDC hdc, POINT &pt, double angle, LOGPEN &logpen)
+void TDraw::CalcSliderRectCoor(POINT aptResult[4],const POINT &pt, double angle)
 {
-	HPEN hPen;
-	hPen = ::CreatePenIndirect(&logpen);
-	::SelectObject(hdc, hPen);
 
-	POINT apt[4];
 	double c = sqrt(SLIDER_H*SLIDER_H + SLIDER_B*SLIDER_B) / 2;
 	double theta = atan(double(SLIDER_B) / SLIDER_H);
-	apt[0] = { pt.x + c*sin(angle - theta), pt.y + c*cos(angle - theta) };
-	apt[1] = { pt.x + c*sin(angle + theta), pt.y +c*cos(angle + theta) };
-	apt[2] = { pt.x - c*sin(angle - theta), pt.y - c*cos(angle - theta) };
-	apt[3] = { pt.x - c*sin(angle + theta), pt.y - c*cos(angle + theta) };
+	aptResult[0] = { pt.x + c*sin(angle - theta), pt.y + c*cos(angle - theta) };
+	aptResult[1] = { pt.x + c*sin(angle + theta), pt.y + c*cos(angle + theta) };
+	aptResult[2] = { pt.x - c*sin(angle - theta), pt.y - c*cos(angle - theta) };
+	aptResult[3] = { pt.x - c*sin(angle + theta), pt.y - c*cos(angle + theta) };
 
+}
+
+//相对坐标转绝对坐标 rp=r+A*s'p
+DPOINT TDraw::GetAbsolute(const DPOINT &dpt,const DPOINT &Org, double angle)
+{
+	return{ Org.x + dpt.x*cos(angle) - dpt.y*sin(angle),
+		Org.y + dpt.x*sin(angle) + dpt.y*cos(angle) };
+}
+
+//绝对坐标转相对坐标 s'p=AT*(rp-r)
+DPOINT TDraw::GetRelative(const DPOINT &dpt, const DPOINT &Org, double angle)
+{
+	return{ cos(angle)*(dpt.x - Org.x) + sin(angle)*(dpt.y - Org.y),
+		-sin(angle)*(dpt.x - Org.x) + cos(angle)*(dpt.y - Org.y) };
+}
+
+void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig)
+{
+
+	for (auto iter = pSlider->vecLine.begin(); iter != pSlider->vecLine.end(); ++iter)
+	{
+		DrawRealLine(hdc, GetAbsolute(pSlider->vecDpt[iter->index1],pSlider->dpt,pSlider->angle),
+			GetAbsolute(pSlider->vecDpt[iter->index2], pSlider->dpt, pSlider->angle), pSlider->logpenStyleShow, pConfig);
+	}
+
+	HPEN hPen;
+	hPen = ::CreatePenIndirect(&(pSlider->logpenStyleShow));
+	::SelectObject(hdc, hPen);
+
+	HBRUSH hBrush;
+	hBrush = CreateSolidBrush(pConfig->crBackground);
+	::SelectObject(hdc, hBrush);
+
+	POINT apt[4];
+	CalcSliderRectCoor(apt, pConfig->RealToScreen(pSlider->dpt), pSlider->angle);
 	Polygon(hdc, apt, 4);
 
 	::DeleteObject(hPen);
+	::DeleteObject(hBrush);
+
+}
+
+bool TDraw::PointInSlider(POINT ptPos, TSlider *pSlider, TConfiguration *pConfig)
+{
+	POINT apt[4];
+	CalcSliderRectCoor(apt, pConfig->RealToScreen(pSlider->dpt), pSlider->angle);
+
+	if (PointInRgn(apt, 4, ptPos))
+		return true;
+	else
+	{
+		for (auto iter = pSlider->vecLine.begin(); iter != pSlider->vecLine.end(); ++iter)
+		{
+			if (PointInRealLine(ptPos, GetAbsolute(pSlider->vecDpt[iter->index1], pSlider->dpt, pSlider->angle),
+				GetAbsolute(pSlider->vecDpt[iter->index2], pSlider->dpt, pSlider->angle), pConfig))
+				return true;
+		}
+	}
+
+	return false;
 }

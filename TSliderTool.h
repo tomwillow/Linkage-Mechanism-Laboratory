@@ -21,5 +21,6 @@ public:
 	void TSliderTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	void TSliderTool::OnMouseWheel(HWND hWnd, UINT nFlags, POINT ptPos);
 	void TSliderTool::Draw(HDC hdc);
+	void TSliderTool::Reset();
 };
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "DetectMemoryLeak.h"
 
+#include "TSlider.h"
+
 #include "TShape.h"
 #include "TConfiguration.h"
 
@@ -101,6 +103,22 @@ TElement * TShape::AddSlideway(TSlideway *slideway)
 	}
 
 	return tempSlideway;
+}
+
+TElement * TShape::AddSlider(TSlider *slider)
+{
+	TSlider *tempSlider = new TSlider;
+	*tempSlider = *slider;
+	if (tempSlider->id == -1)
+		tempSlider->id = iNextId;
+	else
+		iNextId = tempSlider->id;
+	Element.push_back(tempSlider);
+	iNextId++;
+
+	nb++;
+
+	return tempSlider;
 }
 
 TElement * TShape::GetElementById(int id)
@@ -209,6 +227,7 @@ void TShape::ChangePos(int index, DPOINT dptDelta)
 	TElement *temp = Element[index];
 	switch (temp->eType)
 	{
+	case ELEMENT_SLIDER:
 	case ELEMENT_FRAMEPOINT:
 		((TFramePoint *)temp)->dpt.x += dptDelta.x;
 		((TFramePoint *)temp)->dpt.y += dptDelta.y;
@@ -270,12 +289,16 @@ void TShape::GetSijP(TElement *element,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 	case ELEMENT_FRAMEPOINT:
 		*SiP = { 0,0 };
 		break;
+	default:
+		assert(0);
+		break;
 	}
 
 	//½Úµãj
 	switch (pCoincide->pElement2->eType)
 	{
 	case ELEMENT_BAR:
+	case ELEMENT_REALLINE:
 		if (pCoincide->Element2PointIndex == 1)//ptBegin
 			*SjP = { 0, 0 };
 		else
@@ -283,6 +306,9 @@ void TShape::GetSijP(TElement *element,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 		break;
 	case ELEMENT_FRAMEPOINT:
 		*SjP = { 0,0 };
+		break;
+	default:
+		assert(0);
 		break;
 	}
 }

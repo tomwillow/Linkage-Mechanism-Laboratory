@@ -8,6 +8,7 @@
 #include "TSlideway.h"
 #include "DPOINT.h"
 
+class TSlider;
 class TConfiguration;
 class TConstraintCoincide;
 class TShape
@@ -28,6 +29,7 @@ public:
 	TElement * TShape::AddFramePoint(TFramePoint &framepoint);
 	void TShape::AddElement(TElement *element);
 	TElement * TShape::AddSlideway(TSlideway *slideway);
+	TElement * TShape::AddSlider(TSlider *slider);
 
 	void TShape::AddCoincide(TConstraintCoincide &coincide, TConfiguration *pConfig);
 	TElement * GetElementById(int id);

@@ -21,6 +21,11 @@ TElement::~TElement()
 	
 }
 
+void TElement::SetStyle(const LOGPEN &logpen)//设置样式
+{
+	logpenStyleShow = logpenStyle = logpen;
+}
+
 //自动设置logpenStyle和logpenStyleShow
 void TElement::SetStyle(int iStyle, int iWidth, COLORREF crColor)
 {

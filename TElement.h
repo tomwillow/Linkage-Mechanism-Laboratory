@@ -30,6 +30,7 @@ public:
 
 	TElement();
 	virtual ~TElement();
+	void TElement::SetStyle(const LOGPEN &logpen);//设置样式
 	void TElement::SetStyle(int iStyle, int iWidth, COLORREF crColor);//设置样式
 	TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[]);//得到线型名称
 	TCHAR * TElement::GetElementTypeName(TCHAR name[]);//得到类型名称

@@ -3,6 +3,7 @@
 
 #include "TSelectTool.h"
 
+#include "TSlider.h"
 #include "TCanvas.h"
 #include "TShape.h"
 #include "TListView.h"
@@ -165,6 +166,12 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 				iHoverIndex = i;
 			}
 			break;
+		case ELEMENT_SLIDER:
+			if (TDraw::PointInSlider(ptPos, (TSlider *)pShape->Element[i], pConfig))
+			{
+				iHoverIndex = i;
+			}
+			break;
 		default:
 			assert(0);
 			break;
@@ -252,6 +259,12 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			}
 			break;
 		}
+		case ELEMENT_SLIDER:
+			if (TDraw::PointInSlider(ptPos, (TSlider *)pShape->Element[i], pConfig))
+			{
+				iPickIndex = i;
+			}
+			break;
 		default:
 			assert(0);
 			break;
@@ -384,6 +397,15 @@ void TSelectTool::Draw(HDC hdc)
 			}
 		}
 		break;
+		case ELEMENT_SLIDER:
+		{
+			TSlider *pSlider = (TSlider *)pShape->Element[iPickIndex];
+			for (auto iter = pSlider->vecDpt.begin(); iter != pSlider->vecDpt.end(); ++iter)
+
+				//»­Ê°È¡·½¸ñ
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(TDraw::GetAbsolute(*iter, pSlider->dpt, pSlider->angle)));
+		}
+			break;
 		default:
 			assert(0);
 			break;
