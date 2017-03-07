@@ -55,6 +55,9 @@ TCHAR * TElement::GetElementTypeName(TCHAR name[])
 	case CONSTRAINT_COINCIDE:
 		_tcscpy(name, TEXT("ÖØºÏ"));
 		break;
+	case ELEMENT_SLIDER:
+		_tcscpy(name, TEXT("»¬¿é"));
+		break;
 	default:
 		assert(0);
 		break;

@@ -23,6 +23,7 @@ public:
 	TCHAR Name[64];//名称
 	LOGPEN logpenStyleShow, logpenStyle;//显示样式，本身样式
 	//bool *pbIsJoint;
+	std::vector<DPOINT> vecDpt;//点集
 	std::vector<std::vector<int>> vecIsJoint;
 
 	DPOINT dpt;

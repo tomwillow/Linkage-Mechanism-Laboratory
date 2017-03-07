@@ -42,11 +42,11 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		TConstraintCoincide coincide;
 		coincide.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 
-		coincide.pElement1 = Attach->pAttachElement;
-		coincide.Element1PointIndex = Attach->iAttachElementPointIndex;
+		coincide.pElement[0] = Attach->pAttachElement;
+		coincide.PointIndexOfElement[0] = Attach->iAttachElementPointIndex;
 
-		coincide.pElement2 = pPrevFramePoint;
-		coincide.Element2PointIndex = 0;
+		coincide.pElement[1] = pPrevFramePoint;
+		coincide.PointIndexOfElement[1] = 0;
 
 		pTreeViewContent->AddItem(&coincide, pShape->iNextId);
 

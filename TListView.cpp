@@ -85,6 +85,8 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 				{
 				case CTRLTYPE_EDIT:
 				case CTRLTYPE_COOR_EDIT:
+				case CTRLTYPE_VALUE_EDIT:
+				case CTRLTYPE_ANGLE_VALUE_EDIT:
 				case CTRLTYPE_COOR_P1_EDIT:
 				case CTRLTYPE_COOR_P2_EDIT:
 				case CTRLTYPE_LEN_EDIT:
@@ -93,6 +95,7 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 
 					//…Ë÷√Edit≤¢œ‘ æ
 					tempEdit.eCtrlType = vecCtrlType[index];
+					tempEdit.pContent = vecpContent[index];
 					tempEdit.ListItemIndex = index;
 					tempEdit.SetPos(rect);
 

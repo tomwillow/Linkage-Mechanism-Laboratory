@@ -11,6 +11,7 @@ private:
 public:
 	TElement *pElement;
 	enumCtrlType eCtrlType;
+	void *pContent;
 	TCHAR *Text;
 	int ListItemIndex;
 	TListViewEdit();

@@ -6,9 +6,9 @@ class TConstraintCoincide :
 	public TElement
 {
 public:
-	TElement *pElement1, *pElement2;
-	DPOINT *pDpt1, *pDpt2;
-	int Element1PointIndex, Element2PointIndex;//0:机架 1,2:线
+	TElement *pElement[2];
+	DPOINT *pDpt[2];
+	int PointIndexOfElement[2];//0:机架 1,2:线
 	TConstraintCoincide();
 	~TConstraintCoincide();
 	void TConstraintCoincide::NoticeListView(TListView *pListView);

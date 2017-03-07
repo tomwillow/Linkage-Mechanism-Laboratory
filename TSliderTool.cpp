@@ -4,6 +4,7 @@
 #include "TCanvas.h"
 #include "resource.h"
 #include "TAttach.h"
+#include "TTreeViewContent.h"
 
 #include "TSliderTool.h"
 
@@ -94,6 +95,7 @@ void TSliderTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	case 2://第二次点 入库
 
 		//滑块入库
+		pTreeViewContent->AddItem(pSlider, pShape->iNextId);
 		pShape->AddSlider(pSlider);
 
 		//共线约束入库
@@ -147,6 +149,7 @@ void TSliderTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		pSlider->vecLine.clear();
 
 		//滑块入库
+		pTreeViewContent->AddItem(pSlider, pShape->iNextId);
 		pShape->AddSlider(pSlider);
 
 		//共线约束入库

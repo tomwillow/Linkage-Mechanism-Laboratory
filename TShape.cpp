@@ -168,8 +168,8 @@ std::vector<int> TShape::DeleteElement(int index)
 	for (auto iter = Element.begin(); iter != Element.end();)
 	{
 		if ((*iter)->eType==CONSTRAINT_COINCIDE)//如果是约束
-			if (((TConstraintCoincide *)*iter)->pElement1 == pDeleted ||
-				((TConstraintCoincide *)*iter)->pElement2 == pDeleted
+			if (((TConstraintCoincide *)*iter)->pElement[0] == pDeleted ||
+				((TConstraintCoincide *)*iter)->pElement[1] == pDeleted
 				)//且涉及到被删除元素，则删除此约束
 			{
 				iCoincideNum--;
@@ -253,19 +253,26 @@ void TShape::GetCoordinateByIndex(int index, double *x, double *y, double *theta
 
 void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, double *theta)
 {
-	TElement *temp = element;
-	switch (temp->eType)
+	switch (element->eType)
 	{
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
-		*x = ((TBar *)temp)->ptBegin.x;
-		*y = ((TBar *)temp)->ptBegin.y;
-		*theta = ((TBar *)temp)->dAngle;
+		*x = ((TBar *)element)->ptBegin.x;
+		*y = ((TBar *)element)->ptBegin.y;
+		*theta = ((TBar *)element)->dAngle;
 		break;
 	case ELEMENT_FRAMEPOINT:
-		*x = ((TFramePoint *)temp)->dpt.x;
-		*y = ((TFramePoint *)temp)->dpt.y;
+		*x = element->dpt.x;
+		*y = element->dpt.y;
 		*theta = 0;
+		break;
+	case ELEMENT_SLIDER:
+		*x = element->dpt.x;
+		*y = element->dpt.y;
+		*theta = element->angle;
+		break;
+	default:
+		assert(0);
 		break;
 	}
 }
@@ -274,14 +281,14 @@ void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, dou
 void TShape::GetSijP(TElement *element,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 {
 	TConstraintCoincide *pCoincide = (TConstraintCoincide *)element;
-	*i = pCoincide->pElement1->id;
-	*j = pCoincide->pElement2->id;
+	*i = pCoincide->pElement[0]->id;
+	*j = pCoincide->pElement[1]->id;
 	//节点i
-	switch (pCoincide->pElement1->eType)
+	switch (pCoincide->pElement[0]->eType)
 	{
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
-		if (pCoincide->Element1PointIndex == 1)//ptBegin
+		if (pCoincide->PointIndexOfElement[0] == 1)//ptBegin
 			*SiP = { 0, 0 };
 		else
 			*SiP = { ((TBar *)GetElementById(*i))->dLength, 0 };
@@ -289,23 +296,29 @@ void TShape::GetSijP(TElement *element,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
 	case ELEMENT_FRAMEPOINT:
 		*SiP = { 0,0 };
 		break;
+	case ELEMENT_SLIDER:
+		*SiP = ((TSlider *)pCoincide->pElement[0])->vecDpt[pCoincide->PointIndexOfElement[0]];
+		break;
 	default:
 		assert(0);
 		break;
 	}
 
 	//节点j
-	switch (pCoincide->pElement2->eType)
+	switch (pCoincide->pElement[1]->eType)
 	{
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
-		if (pCoincide->Element2PointIndex == 1)//ptBegin
+		if (pCoincide->PointIndexOfElement[1] == 1)//ptBegin
 			*SjP = { 0, 0 };
 		else
 			*SjP = { ((TBar *)GetElementById(*j))->dLength, 0 };
 		break;
 	case ELEMENT_FRAMEPOINT:
 		*SjP = { 0,0 };
+		break;
+	case ELEMENT_SLIDER:
+		*SjP = ((TSlider *)pCoincide->pElement[1])->vecDpt[pCoincide->PointIndexOfElement[1]];
 		break;
 	default:
 		assert(0);
@@ -327,6 +340,8 @@ DWORD TShape::GetSizeOfElement(EnumElementType eType)
 		return sizeof(TSlideway);
 	case CONSTRAINT_COINCIDE:
 		return sizeof(TConstraintCoincide);
+	case ELEMENT_SLIDER:
+		return sizeof(TSlider);
 	default:
 		assert(0);
 		break;

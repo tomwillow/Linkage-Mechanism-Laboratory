@@ -610,10 +610,10 @@ double TDraw::Distance(POINT pt1, POINT pt2)
 	return sqrt(double((pt1.x - pt2.x)*(pt1.x - pt2.x) + (pt1.y - pt2.y)*(pt1.y - pt2.y)));
 }
 
-double TDraw::DistanceScreen(DPOINT *pdpt1, DPOINT *pdpt2, TConfiguration *pConfig)
+double TDraw::DistanceScreen(const DPOINT &dpt1,const DPOINT &dpt2, TConfiguration *pConfig)
 {
-	POINT p1 = pConfig->RealToScreen(*pdpt1);
-	POINT p2 = pConfig->RealToScreen(*pdpt2);
+	POINT p1 = pConfig->RealToScreen(dpt1);
+	POINT p2 = pConfig->RealToScreen(dpt2);
 	return Distance(p1, p2);
 }
 
@@ -627,7 +627,7 @@ bool TDraw::ShowConstraintCoincideDotLine(TElement *element, TConfiguration *pCo
 	TConstraintCoincide *temp = (TConstraintCoincide *)element;
 
 	//比较p1,p2，距离大则画虚线
-	if (DistanceScreen(temp->pDpt1, temp->pDpt2, pConfig) > 4)
+	if (DistanceScreen(*(temp->pDpt[0]), *(temp->pDpt[1]), pConfig) > 4)
 		return true;
 	else
 		return false;
@@ -636,15 +636,22 @@ bool TDraw::ShowConstraintCoincideDotLine(TElement *element, TConfiguration *pCo
 void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TConfiguration *pConfig)
 {
 	//比较p1,p2，距离大则画虚线
-	if (DistanceScreen(pCoincide->pDpt1, pCoincide->pDpt2, pConfig) > 4)
+	DPOINT dpt[2];
+	for (int i = 0; i < 2; i++)
+		if (pCoincide->pElement[i]->eType == ELEMENT_SLIDER)
+			dpt[i] = GetAbsolute(*(pCoincide->pDpt[i]), pCoincide->pElement[i]->dpt, pCoincide->pElement[i]->angle);
+		else
+			dpt[i] = *(pCoincide->pDpt[i]);
+
+	if (DistanceScreen(dpt[0], dpt[1], pConfig) > 4)
 	{
 		UINT oldStyle = pCoincide->logpenStyleShow.lopnStyle;
 		pCoincide->logpenStyleShow.lopnStyle = PS_DOT;
-		DrawRealLine(hdc, *(pCoincide->pDpt1), *(pCoincide->pDpt2), pCoincide->logpenStyleShow, pConfig);
+		DrawRealLine(hdc, dpt[0],dpt[1], pCoincide->logpenStyleShow, pConfig);
 		pCoincide->logpenStyleShow.lopnStyle = oldStyle;
 	}
 	
-	DrawCircle(hdc, GetCenter(pConfig->RealToScreen(*(pCoincide->pDpt1)), pConfig->RealToScreen(*(pCoincide->pDpt2))), FRAMEPOINT_R, pCoincide->logpenStyleShow);
+	DrawCircle(hdc, GetCenter(pConfig->RealToScreen(dpt[0]), pConfig->RealToScreen(dpt[1])), FRAMEPOINT_R, pCoincide->logpenStyleShow);
 }
 
 void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen)

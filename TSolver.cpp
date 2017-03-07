@@ -96,9 +96,14 @@ void TSolver::ClearConstraint()
 	Equations->RemoveTempEquations();
 }
 
+//添加鼠标约束
 void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt)
 {
-	if (pShape->Element[index]->eType == ELEMENT_BAR || pShape->Element[index]->eType == ELEMENT_REALLINE)
+	switch (pShape->Element[index]->eType)
+	{
+	case ELEMENT_BAR:
+	case ELEMENT_REALLINE:
+	case ELEMENT_SLIDER:
 	{
 		TCHAR temp[200];
 		TElement *element = pShape->Element[index];
@@ -106,15 +111,22 @@ void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt)
 		double ym = dpt.y;
 		int i = element->id;
 
-		_stprintf(temp, TEXT("(x%d-%f)*sin(phi%d)-(y%d-%f)*cos(phi%d)"),  i,xm, i,  i,ym, i);
+		_stprintf(temp, TEXT("(x%d-%f)*sin(phi%d)-(y%d-%f)*cos(phi%d)"), i, xm, i, i, ym, i);
 
 		TCHAR szVar[100], szValue[100];
 		_stprintf(szVar, TEXT("x%d y%d phi%d"), i, i, i);
 		_stprintf(szValue, TEXT("%f %f %f"), element->dpt.x, element->dpt.y, element->angle);
 
 		Outputln(Equations->VariableTable.Define(true, szVar, szValue));
-		Outputln(Equations->AddEquation(bOutput,temp,true));
+		Outputln(Equations->AddEquation(bOutput, temp, true));
 
+		return;
+	}
+	case ELEMENT_SLIDEWAY:
+		return;
+	default:
+		assert(0);
+		return;
 	}
 }
 
@@ -143,8 +155,8 @@ void TSolver::RefreshEquations(bool Output)
 
 			//得到2个重合构件的广义坐标
 			double xi, yi, phii, xj, yj, phij;
-			pShape->GetCoordinateByElement(((TConstraintCoincide *)element)->pElement1, &xi, &yi, &phii);
-			pShape->GetCoordinateByElement(((TConstraintCoincide *)element)->pElement2, &xj, &yj, &phij);
+			pShape->GetCoordinateByElement(((TConstraintCoincide *)element)->pElement[0], &xi, &yi, &phii);
+			pShape->GetCoordinateByElement(((TConstraintCoincide *)element)->pElement[1], &xj, &yj, &phij);
 
 			//定义变量及其初始值
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
@@ -258,6 +270,25 @@ void TSolver::Solve(bool Output)
 				}
 				break;
 			}
+			case ELEMENT_SLIDER:
+			{
+				switch (eQType)
+				{
+				case x:
+					element->dpt.x = data;
+					break;
+				case y:
+					element->dpt.y = data;
+					break;
+				case phi:
+					element->angle = data;
+					break;
+				}
+				break;
+			}
+			default:
+				assert(0);
+				break;
 			}
 		}
 	}

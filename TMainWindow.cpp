@@ -336,8 +336,8 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 						ReadFile(hf, &id1, sizeof(id1), now_pos, NULL);
 						ReadFile(hf, &id2, sizeof(id2), now_pos, NULL);
 
-						temp->pElement1 = m_Shape.GetElementById(id1);
-						temp->pElement2 = m_Shape.GetElementById(id2);
+						temp->pElement[0] = m_Shape.GetElementById(id1);
+						temp->pElement[1] = m_Shape.GetElementById(id2);
 
 						temp->BuildpDpt();
 
@@ -427,10 +427,10 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			if (element->eType == CONSTRAINT_COINCIDE)
 			{
 				TConstraintCoincide *temp = (TConstraintCoincide *)element;
-				WriteFile(hf, &(temp->pElement1->id), sizeof(temp->pElement1->id), now_pos, NULL);
-				*now_pos += sizeof(temp->pElement1->id);
-				WriteFile(hf, &(temp->pElement2->id), sizeof(temp->pElement2->id), now_pos, NULL);
-				*now_pos += sizeof(temp->pElement2->id);
+				WriteFile(hf, &(temp->pElement[0]->id), sizeof(temp->pElement[0]->id), now_pos, NULL);
+				*now_pos += sizeof(temp->pElement[0]->id);
+				WriteFile(hf, &(temp->pElement[1]->id), sizeof(temp->pElement[1]->id), now_pos, NULL);
+				*now_pos += sizeof(temp->pElement[1]->id);
 			}
 
 		}

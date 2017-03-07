@@ -30,7 +30,7 @@ public:
 	static void TDraw::MirrorX(POINT apt[], int apt_num, int Oy);
 	static void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect, bool YPlusIsUP);
 	static double TDraw::Distance(POINT pt1, POINT pt2);
-	static double TDraw::DistanceScreen(DPOINT *pdpt1, DPOINT *pdpt2, TConfiguration *pConfig);
+	static double TDraw::DistanceScreen(const DPOINT &dpt1, const DPOINT &dpt2, TConfiguration *pConfig);
 	static DPOINT TDraw::GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);
 	static DPOINT TDraw::GetRelative(const DPOINT &dpt, const DPOINT &Org, double angle);
 

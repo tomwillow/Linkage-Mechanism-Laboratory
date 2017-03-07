@@ -6,6 +6,6 @@ class TConstraintColinear :
 public:
 	TConstraintColinear();
 	~TConstraintColinear();
-	TElement *pElement1, *pElement2;
+	TElement *pElement[2];
 };
 

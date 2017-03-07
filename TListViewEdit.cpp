@@ -48,7 +48,7 @@ void TListViewEdit::ChangeSource()
 			switch (eCtrlType)
 			{
 			case CTRLTYPE_COOR_EDIT:
-				pElement->dpt = dpt;
+				*((DPOINT *)pContent) = dpt;
 				break;
 			case CTRLTYPE_COOR_P1_EDIT:
 			{
@@ -70,6 +70,22 @@ void TListViewEdit::ChangeSource()
 			MessageBeep(1);
 		}
 		TMyString::ReleaseVectorTCHAR(szNums);
+		break;
+	}
+	case CTRLTYPE_VALUE_EDIT:
+	{
+		this->GetText(Text);
+
+		double value = TTransfer::TCHAR2double(Text);
+		*((double *)pContent) = value;
+		break;
+	}
+	case CTRLTYPE_ANGLE_VALUE_EDIT:
+	{
+		this->GetText(Text);
+
+		double DegAngle = TTransfer::TCHAR2double(Text);
+		*((double *)pContent) = DEG2REG(DegAngle);
 		break;
 	}
 	case CTRLTYPE_LEN_EDIT:

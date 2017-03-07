@@ -183,7 +183,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			if (CoincideBegin != NULL)
 			{
 				//上一个约束入库
-				CoincideBegin->pElement2 = pPrevLine;
+				CoincideBegin->pElement[1] = pPrevLine;
 
 				AddCoincide(CoincideBegin, pShape->iNextId, pConfig);
 
@@ -197,10 +197,10 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			CoincideBegin = new TConstraintCoincide;
 			CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 
-			CoincideBegin->pElement1 = pPrevLine;
-			CoincideBegin->Element1PointIndex = 2;//ptEnd
+			CoincideBegin->pElement[0] = pPrevLine;
+			CoincideBegin->PointIndexOfElement[0] = 2;//ptEnd
 
-			CoincideBegin->Element2PointIndex = 1;//ptBegin
+			CoincideBegin->PointIndexOfElement[1] = 1;//ptBegin
 
 			//计算得出的终点存入暂存点集
 			dptHit.push_back(RealLine.ptEnd);
@@ -303,10 +303,10 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			//ID被捕捉=ID新元素.begin
 			CoincideBegin = new TConstraintCoincide;
 			CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
-			CoincideBegin->pElement1 = Attach->pAttachElement;
-			CoincideBegin->Element1PointIndex = Attach->iAttachElementPointIndex;
+			CoincideBegin->pElement[0] = Attach->pAttachElement;
+			CoincideBegin->PointIndexOfElement[0] = Attach->iAttachElementPointIndex;
 
-			CoincideBegin->Element2PointIndex = 1;//ptBegin
+			CoincideBegin->PointIndexOfElement[1] = 1;//ptBegin
 		}
 	}
 	else//非第一点
@@ -326,7 +326,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		if (CoincideBegin != NULL)
 		{
 			//上一个约束入库
-			CoincideBegin->pElement2 = pPrevLine;
+			CoincideBegin->pElement[1] = pPrevLine;
 
 			AddCoincide(CoincideBegin, pShape->iNextId, pConfig);
 			//AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
@@ -344,12 +344,12 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			CoincideBegin = new TConstraintCoincide;
 			CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 			//CoincideBegin->eElementType1 = Attach->eAttachElementType;
-			CoincideBegin->pElement1 = Attach->pAttachElement;
-			CoincideBegin->Element1PointIndex = Attach->iAttachElementPointIndex;
+			CoincideBegin->pElement[0] = Attach->pAttachElement;
+			CoincideBegin->PointIndexOfElement[0] = Attach->iAttachElementPointIndex;
 
 			//CoincideBegin->eElementType2 = myElementType;
-			CoincideBegin->pElement2 = pPrevLine;//此处已入库，已入库元素id为nextid-1
-			CoincideBegin->Element2PointIndex = 2;//ptEnd
+			CoincideBegin->pElement[1] = pPrevLine;//此处已入库，已入库元素id为nextid-1
+			CoincideBegin->PointIndexOfElement[1] = 2;//ptEnd
 
 			//终点连接入库
 			AddCoincide(CoincideBegin, pShape->iNextId, pConfig);
@@ -367,12 +367,12 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		CoincideBegin = new TConstraintCoincide;
 		CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
 		//CoincideBegin->eElementType1 = myElementType;
-		CoincideBegin->pElement1 = pPrevLine;//上一条线id
-		CoincideBegin->Element1PointIndex = 2;//ptEnd
+		CoincideBegin->pElement[0] = pPrevLine;//上一条线id
+		CoincideBegin->PointIndexOfElement[0] = 2;//ptEnd
 
 		//CoincideBegin->eElementType2 = myElementType;
 		//CoincideBegin->ElementId2 = pShape->iNextId;//此处未入库，此为当前序号
-		CoincideBegin->Element2PointIndex = 1;//ptBegin
+		CoincideBegin->PointIndexOfElement[1] = 1;//ptBegin
 	}
 
 	//当前点存入暂存点集

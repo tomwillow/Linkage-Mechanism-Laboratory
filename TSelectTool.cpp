@@ -194,7 +194,7 @@ bool TSelectTool::PickConstraintCoincide(POINT ptPos, TElement *element)
 	TConstraintCoincide *temp = (TConstraintCoincide *)element;
 
 	//重合虚线显示，且虚线被拾取
-	if (TDraw::ShowConstraintCoincideDotLine(temp, pConfig) && TDraw::PointInRealLine(ptPos, *(temp->pDpt1), *(temp->pDpt2), pConfig))
+	if (TDraw::ShowConstraintCoincideDotLine(temp, pConfig) && TDraw::PointInRealLine(ptPos, *(temp->pDpt[0]), *(temp->pDpt[1]), pConfig))
 	{
 		return true;
 	}
@@ -387,13 +387,14 @@ void TSelectTool::Draw(HDC hdc)
 			TConstraintCoincide *temp = ((TConstraintCoincide *)pShape->Element[iPickIndex]);
 			if (TDraw::ShowConstraintCoincideDotLine(temp, pConfig))
 			{
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt1)));
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt2)));
+				//画拾取方格
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt[0])));
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt[1])));
 			}
 			else
 			{
 				//画重合点
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt1)));
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt[0])));
 			}
 		}
 		break;
@@ -417,11 +418,17 @@ void TSelectTool::Draw(HDC hdc)
 	//	TDraw::DrawTips(const TCHAR szTips[],)
 }
 
+//仅用于添加原动件时的判断
 bool TSelectTool::CanBeDriver()
 {
-	if (iPickIndex != -1 && pShape->Element[iPickIndex]->eType == ELEMENT_BAR)
+	if (iPickIndex != -1)
 	{
-		return true;
+		switch (pShape->Element[iPickIndex]->eType)
+		{
+		case ELEMENT_BAR:
+		case ELEMENT_SLIDER:
+			return true;
+		}
 	}
 	return false;
 }

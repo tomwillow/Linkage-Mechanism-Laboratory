@@ -77,6 +77,7 @@ void TTreeViewContent::AddItem(TElement *Element, int id)
 	case ELEMENT_FRAMEPOINT:
 	case ELEMENT_BAR:
 	case ELEMENT_SLIDEWAY:
+	case ELEMENT_SLIDER:
 		temp = InsertTreeviewItem(buffer, hPrevObject);
 		TreeView_Expand(m_hWnd, hPrevObject, TVE_EXPAND);
 		tempItem.ObjectId = id;
