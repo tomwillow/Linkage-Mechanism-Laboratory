@@ -19,7 +19,7 @@ DPOINT::~DPOINT()
 {
 }
 
-DPOINT& DPOINT::operator=(DPOINT &dpt)
+DPOINT& DPOINT::operator=(const DPOINT &dpt)
 {
 	x = dpt.x;
 	y = dpt.y;

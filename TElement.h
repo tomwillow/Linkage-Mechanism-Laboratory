@@ -22,7 +22,7 @@ public:
 	EnumElementType eType;//类型
 	TCHAR Name[64];//名称
 	LOGPEN logpenStyleShow, logpenStyle;//显示样式，本身样式
-	//bool *pbIsJoint;
+
 	std::vector<DPOINT> vecDpt;//点集
 	std::vector<std::vector<int>> vecIsJoint;
 
@@ -36,4 +36,5 @@ public:
 	TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[]);//得到线型名称
 	TCHAR * TElement::GetElementTypeName(TCHAR name[]);//得到类型名称
 	virtual void TElement::NoticeListView(TListView *pListView){}//
+	TElement& TElement::operator=(const TElement &element);
 };

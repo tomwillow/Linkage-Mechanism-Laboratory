@@ -21,6 +21,7 @@ TShape::~TShape()
 	ReleaseAll();
 }
 
+
 void TShape::AddCoincide(TConstraintCoincide &coincide,TConfiguration *pConfig)
 {
 	TConstraintCoincide *tempcoincide = new TConstraintCoincide;

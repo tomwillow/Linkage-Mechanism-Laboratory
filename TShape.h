@@ -1,4 +1,5 @@
 #pragma once
+#include "DetectMemoryLeak.h"
 #include <Windows.h>
 #include <vector>
 
@@ -24,10 +25,48 @@ public:
 	~TShape();
 	void TShape::ReleaseAll();
 	std::vector<int> TShape::DeleteElement(int index);
+	template <typename T>
+	T* AddElement(const T *pElement)
+	{
+		T *temp = new T;
+		*temp = *pElement;
+
+		if (temp->id == -1)
+			temp->id = iNextId;
+		else
+			iNextId = temp->id;
+
+		switch (temp->eType)
+		{
+		case CONSTRAINT_COINCIDE:
+			temp->BuildpDpt();
+			break;
+		case ELEMENT_FRAMEPOINT:
+		case ELEMENT_SLIDEWAY:
+			if (hasFrame == 0)//只加一次
+			{
+				hasFrame = 1;
+				nb++;
+			}
+			break;
+		case ELEMENT_BAR:
+		case ELEMENT_SLIDER:
+			nb++;
+			break;
+		default:
+			assert(0);
+			break;
+		}
+
+		Element.push_back(temp);
+		iNextId++;
+
+		return temp;
+	}
+	
 	TElement * TShape::AddRealLine(TRealLine &realline);
 	TElement * TShape::AddBar(TBar *bar);
 	TElement * TShape::AddFramePoint(TFramePoint &framepoint);
-	void TShape::AddElement(TElement *element);
 	TElement * TShape::AddSlideway(TSlideway *slideway);
 	TElement * TShape::AddSlider(TSlider *slider);
 

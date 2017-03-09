@@ -10,7 +10,7 @@ public:
 	~DPOINT();
 	DPOINT(double x, double y);
 
-	DPOINT& operator=(DPOINT &dpt);
+	DPOINT& operator=(const DPOINT &dpt);
 	DPOINT& operator=(std::initializer_list<double> init_list);
 	DPOINT& operator+(DPOINT &dpt);
 	DPOINT& operator-(DPOINT &dpt);

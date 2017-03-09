@@ -90,3 +90,17 @@ TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[])
 	}
 	return name;
 }
+
+TElement& TElement::operator=(const TElement &element)
+{
+	this->id = element.id;
+	this->available = element.available;
+	_tcscpy(this->Name, element.Name);
+	this->logpenStyle = element.logpenStyle;
+	this->logpenStyleShow = element.logpenStyleShow;
+	this->vecDpt = element.vecDpt;
+	this->vecIsJoint = element.vecIsJoint;
+	this->dpt = element.dpt;
+	this->angle = element.angle;
+	return *this;
+}
