@@ -96,7 +96,7 @@ void TSliderTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 		//滑块入库
 		pTreeViewContent->AddItem(pSlider, pShape->iNextId);
-		pShape->AddSlider(pSlider);
+		pShape->AddElement(pSlider);
 
 		//共线约束入库
 
@@ -150,7 +150,7 @@ void TSliderTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 		//滑块入库
 		pTreeViewContent->AddItem(pSlider, pShape->iNextId);
-		pShape->AddSlider(pSlider);
+		pShape->AddElement(pSlider);
 
 		//共线约束入库
 

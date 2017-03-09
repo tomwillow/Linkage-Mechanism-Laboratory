@@ -278,7 +278,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 						ShowMessage(TEXT("Error:%d"), GetLastError());
 					}
 					else
-						m_Shape.AddBar(temp);
+						m_Shape.AddElement(temp);
 					delete temp;
 					break;
 				}
@@ -291,7 +291,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 						ShowMessage(TEXT("Error:%d"), GetLastError());
 					}
 					else
-						m_Shape.AddRealLine(*temp);
+						m_Shape.AddElement(temp);
 					delete temp;
 					break;
 				}
@@ -304,7 +304,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 						ShowMessage(TEXT("Error:%d"), GetLastError());
 					}
 					else
-						m_Shape.AddFramePoint(*temp);
+						m_Shape.AddElement(temp); 
 					delete temp;
 					break;
 				}
@@ -317,7 +317,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 						ShowMessage(TEXT("Error:%d"), GetLastError());
 					}
 					else
-						m_Shape.AddSlideway(temp);
+						m_Shape.AddElement(temp);
 					delete temp;
 					break;
 				}
@@ -341,7 +341,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 						temp->BuildpDpt();
 
-						m_Shape.AddCoincide(*temp, &m_Configuration);
+						m_Shape.AddElement(temp);
 					}
 					delete temp;
 					break;

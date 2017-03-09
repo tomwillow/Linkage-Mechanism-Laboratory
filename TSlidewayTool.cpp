@@ -21,7 +21,7 @@ TElement * TSlidewayTool::AddIntoShape(TRealLine &RealLine)
 	RealLine.eType = myElementType;
 	TSlideway Slideway;
 	Slideway= RealLine;
-	return pShape->AddSlideway(&Slideway);
+	return pShape->AddElement(&Slideway);
 }
 
 void TSlidewayTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig)//所有加入约束经过此处

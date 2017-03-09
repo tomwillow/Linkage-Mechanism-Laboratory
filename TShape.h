@@ -40,6 +40,7 @@ public:
 		{
 		case CONSTRAINT_COINCIDE:
 			temp->BuildpDpt();
+			iCoincideNum++;
 			break;
 		case ELEMENT_FRAMEPOINT:
 		case ELEMENT_SLIDEWAY:
@@ -53,6 +54,8 @@ public:
 		case ELEMENT_SLIDER:
 			nb++;
 			break;
+		case ELEMENT_REALLINE:
+			break;
 		default:
 			assert(0);
 			break;
@@ -64,13 +67,6 @@ public:
 		return temp;
 	}
 	
-	TElement * TShape::AddRealLine(TRealLine &realline);
-	TElement * TShape::AddBar(TBar *bar);
-	TElement * TShape::AddFramePoint(TFramePoint &framepoint);
-	TElement * TShape::AddSlideway(TSlideway *slideway);
-	TElement * TShape::AddSlider(TSlider *slider);
-
-	void TShape::AddCoincide(TConstraintCoincide &coincide, TConfiguration *pConfig);
 	TElement * GetElementById(int id);
 	int TShape::CalcFrameNum();
 	int TShape::nc();

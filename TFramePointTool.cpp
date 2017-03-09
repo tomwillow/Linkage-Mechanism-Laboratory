@@ -51,7 +51,7 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 		pTreeViewContent->AddItem(&coincide, pShape->iNextId);
 
-		pShape->AddCoincide(coincide, pConfig);//约束入库
+		pShape->AddElement(&coincide);//约束入库
 
 		pSolver->RefreshEquations(true);
 	}

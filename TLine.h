@@ -10,9 +10,7 @@ public:
 	POINT ptBegin, ptEnd;
 	double &dAngle;
 	double dLength;
-	TLine *pNext = NULL;
 	TLine();
 	~TLine();
-	//void TLine::CalcLength();
 };
 

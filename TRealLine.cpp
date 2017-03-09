@@ -107,3 +107,21 @@ void TRealLine::SetPointByIvoryLine(int iIvoryLine, DPOINT dptBegin, double leng
 		break;
 	}
 }
+
+TRealLine& TRealLine::operator=(const TRealLine &realline)
+{
+	this->id = realline.id;
+	this->available = realline.available;
+	_tcscpy(this->Name, realline.Name);
+	this->logpenStyle = realline.logpenStyle;
+	this->logpenStyleShow = realline.logpenStyleShow;
+	this->vecDpt = realline.vecDpt;
+	this->vecIsJoint = realline.vecIsJoint;
+	this->dpt = realline.dpt;
+	this->angle = realline.angle;
+
+	this->dLength = realline.dLength;
+	this->ptBegin = realline.dpt;
+	this->ptEnd = realline.ptEnd;
+	return *this;
+}

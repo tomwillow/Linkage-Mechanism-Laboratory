@@ -150,7 +150,7 @@ void TLineTool::Draw(HDC hdc)
 
 TElement * TLineTool::AddIntoShape(TRealLine &RealLine)
 {
-	return pShape->AddRealLine(RealLine);
+	return pShape->AddElement(&RealLine);
 }
 
 void TLineTool::AddIntoTreeViewContent(TElement *Element, int id)
@@ -286,7 +286,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 void TLineTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig)
 {
 	AddIntoTreeViewContent(pCoincide, id);
-	pShape->AddCoincide(*pCoincide, pConfig);
+	pShape->AddElement(pCoincide);
 }
 
 

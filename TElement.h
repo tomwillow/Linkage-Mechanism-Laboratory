@@ -36,5 +36,6 @@ public:
 	TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[]);//得到线型名称
 	TCHAR * TElement::GetElementTypeName(TCHAR name[]);//得到类型名称
 	virtual void TElement::NoticeListView(TListView *pListView){}//
+	virtual void TElement::BuildpDpt(){}
 	TElement& TElement::operator=(const TElement &element);
 };
