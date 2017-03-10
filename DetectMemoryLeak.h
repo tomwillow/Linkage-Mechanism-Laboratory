@@ -1,5 +1,6 @@
 #ifdef _DEBUG
 
+#pragma once
 #define CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
@@ -7,6 +8,10 @@
 #define new VCZH_CHECK_MEMORY_LEAKS_NEW
 
 #include <assert.h>
+
+#include <tchar.h>
+void OutputDebugPrintf(const TCHAR * strOutputString, ...);
+
 #else
 #define NDEBUG
 #include <assert.h>

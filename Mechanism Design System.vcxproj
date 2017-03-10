@@ -66,6 +66,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DetectMemoryLeak.cpp" />
     <ClCompile Include="DialogAddDriver.cpp" />
     <ClCompile Include="TConstraintColinear.cpp" />
     <ClCompile Include="TDragTool.cpp" />

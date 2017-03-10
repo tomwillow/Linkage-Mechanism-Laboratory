@@ -122,7 +122,9 @@ void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt)
 
 		return;
 	}
+	case ELEMENT_FRAMEPOINT:
 	case ELEMENT_SLIDEWAY:
+	case CONSTRAINT_COINCIDE:
 		return;
 	default:
 		assert(0);

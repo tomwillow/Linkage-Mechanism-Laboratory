@@ -17,5 +17,5 @@ TBarTool::~TBarTool()
 TElement * TBarTool::AddIntoShape(TRealLine &RealLine)
 {
 	RealLine.eType = myElementType;
-	return pShape->AddElement(&RealLine);
+	return pShape->AddElement((TBar *)&RealLine);
 }

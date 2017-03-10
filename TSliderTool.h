@@ -1,7 +1,10 @@
 #pragma once
 #include <vector>
+#include <stack>
 #include "TTool.h"
+#include "String.h"
 
+class TConstraintCoincide;
 class TSlider;
 class TAttach;
 class TSliderTool :
@@ -11,6 +14,9 @@ private:
 	std::vector<POINT> dptHit;
 	TAttach *pAttach;
 	TSlider *pSlider;
+
+	std::stack<TConstraintCoincide *>stackpCoincide;
+	void TSliderTool::AddIntoShape();
 public:
 	TSliderTool();
 	~TSliderTool();

@@ -1,6 +1,7 @@
 #pragma once
 #include "TSlider.h"
 
+#include "TSolver.h"
 #include "TCanvas.h"
 #include "resource.h"
 #include "TAttach.h"
@@ -13,11 +14,7 @@ TSliderTool::TSliderTool()
 	pAttach = new TAttach(pCanvas, pShape, pConfig);
 	pSlider = NULL;
 
-
-	pSlider = new TSlider;
-	pSlider->SetStyle(pConfig->logpen);
-	pSlider->vecDpt.resize(1);
-	pSlider->vecIsJoint.resize(1);
+	Reset();
 }
 
 
@@ -41,6 +38,7 @@ void TSliderTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void TSliderTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {
+	ptMouse = ptPos;
 	pAttach->AttachAll(ptPos);
 
 	switch (dptHit.size())
@@ -56,6 +54,8 @@ void TSliderTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 		{
 			pSlider->angle = 0.0;
 		}
+
+
 		break;
 	case 1://已有块位置
 		//设置线位置
@@ -73,39 +73,67 @@ void TSliderTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 	switch (dptHit.size())
 	{
-	case 1://第一次点，设置滑块
-
-		//设置临时滑块
+	case 1://第一次点左键，设置滑块
+	{
+		//设置滑块
 		pSlider->dpt = pAttach->dptAttach;
 		pSlider->vecDpt[0] = TDraw::GetRelative(pSlider->dpt, pSlider->dpt, pSlider->angle);
 		pSlider->vecDpt.resize(2);
 		pSlider->vecIsJoint.resize(2);
 		pSlider->vecLine.resize(1);
-		if (pAttach->bShowExtensionLine)//已拾取直线
-		{
-			//设置临时直线约束
 
-			pSlider->angle = pAttach->pAttachElement->angle;
-		}
-		else
-		{
-			pSlider->angle = 0.0;
-		}
-		break;
-	case 2://第二次点 入库
-
-		//滑块入库
-		pTreeViewContent->AddItem(pSlider, pShape->iNextId);
-		pShape->AddElement(pSlider);
 
 		//共线约束入库
 
 		if (pAttach->bAttachedEndpoint)//捕捉到端点 则添加重合约束
 		{
 			//添加重合约束
+			TConstraintCoincide *pCoincide=new TConstraintCoincide;
+			pCoincide->SetStyle(pConfig->logpen);
+			pCoincide->pElement[0] = pAttach->pAttachElement;
+			pCoincide->PointIndexOfElement[0] = pAttach->iAttachElementPointIndex;
 
-			//重合约束入库
+			pCoincide->pElement[1] = pSlider;
+			pCoincide->PointIndexOfElement[1] = 0;
+
+			stackpCoincide.push(pCoincide);
 		}
+
+		if (pAttach->bShowExtensionLine)//已拾取直线
+		{
+
+			pSlider->angle = pAttach->pAttachElement->angle;
+
+			//设置共线约束
+		}
+		else
+		{
+			pSlider->angle = 0.0;
+		}
+
+		sTips = TEXT("点击以确定滑块杆位置\n单击右键可不设置滑块杆");
+		break;
+	}
+	case 2://第二次点左键
+
+
+		if (pAttach->bAttachedEndpoint)//捕捉到端点 则添加重合约束
+		{
+			//添加重合约束
+			TConstraintCoincide *pCoincide = new TConstraintCoincide;
+			pCoincide->SetStyle(pConfig->logpen);
+			pCoincide->pElement[0] = pAttach->pAttachElement;
+			pCoincide->PointIndexOfElement[0] = pAttach->iAttachElementPointIndex;
+
+			pCoincide->pElement[1] = pSlider;
+			pCoincide->PointIndexOfElement[1] = 1;
+
+			stackpCoincide.push(pCoincide);
+
+		}
+
+		//入库
+		AddIntoShape();
 
 		//重置状态
 		Reset();
@@ -118,7 +146,7 @@ void TSliderTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 void TSliderTool::Reset()
 {
 	//重设临时块
-	if (pSlider!=NULL)
+	if (pSlider != NULL)
 		delete pSlider;
 	pSlider = new TSlider;
 	pSlider->SetStyle(pConfig->logpen);
@@ -128,9 +156,30 @@ void TSliderTool::Reset()
 	//重设状态
 	dptHit.clear();
 
-	//delete pAttach;
-	//pAttach = new TAttach(pCanvas, pShape, pConfig);
+	bShowTips = true;
+	sTips = TEXT("点击以建立新滑块");
+}
 
+void TSliderTool::AddIntoShape()
+{
+		//滑块入库
+		pTreeViewContent->AddItem(pSlider, pShape->iNextId);
+		TSlider *pSavedSlider = pShape->AddElement(pSlider);
+
+		//重合约束入库
+		while (!stackpCoincide.empty())
+		{
+			stackpCoincide.top()->pElement[1] = pSavedSlider;
+
+			pTreeViewContent->AddItem(stackpCoincide.top(), pShape->iNextId);
+			pShape->AddElement(stackpCoincide.top());
+
+			delete stackpCoincide.top();
+			stackpCoincide.pop();
+		}
+
+		//刷新方程组
+		pSolver->RefreshEquations();
 }
 
 void TSliderTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
@@ -148,11 +197,9 @@ void TSliderTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		pSlider->vecIsJoint.resize(1);
 		pSlider->vecLine.clear();
 
-		//滑块入库
-		pTreeViewContent->AddItem(pSlider, pShape->iNextId);
-		pShape->AddElement(pSlider);
 
-		//共线约束入库
+		//入库
+		AddIntoShape();
 
 		//重置状态
 		Reset();
@@ -175,4 +222,7 @@ void TSliderTool::Draw(HDC hdc)
 	TDraw::DrawSlider(hdc, pSlider, pConfig);
 
 	pAttach->Draw(hdc);
+	
+	if (bShowTips)
+		TDraw::DrawTips(hdc, ptMouse, sTips.c_str(), pConfig);
 }

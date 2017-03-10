@@ -102,7 +102,6 @@ void TAttach::AttachAll(POINT ptNowPos)
 bool TAttach::AttachLine(POINT ptNowPos)
 {
 	bShowExtensionLine = false;
-	double dAngle;
 	for (auto i = pShape->Element.begin(); i != pShape->Element.end(); ++i)
 	{
 		switch ((*i)->eType)

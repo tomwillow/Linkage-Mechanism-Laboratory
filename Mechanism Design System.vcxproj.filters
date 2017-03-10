@@ -171,6 +171,9 @@
     <ClCompile Include="TSlider.cpp">
       <Filter>源文件\Element</Filter>
     </ClCompile>
+    <ClCompile Include="DetectMemoryLeak.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

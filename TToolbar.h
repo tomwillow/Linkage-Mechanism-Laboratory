@@ -4,14 +4,19 @@
 #include <tchar.h>
 #pragma comment(lib,"comctl32.lib")//样式使用
 
-class TToolbar
+#include "TControl.h"
+
+class TToolbar:public TControl
 {
 private:
 	HINSTANCE m_hInst;
 	int iButtonNum;
 	TBBUTTON *tbButtons; 
 	void TToolbar::CreateImageList(UINT uMsg, int cx, int cy, UINT BitmapID, COLORREF crMask);
-	void TToolbar::AddElement(int BitmapIndex, int idCommand, BYTE fsState, BYTE fsStyle, BYTE bReverse[], DWORD_PTR dwData, INT_PTR iString); 
+	void TToolbar::AddElement(int BitmapIndex, int idCommand, BYTE fsState, BYTE fsStyle, BYTE bReverse[], DWORD_PTR dwData, INT_PTR iString);
+	LRESULT TToolbar::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+protected:
+
 public:
 	bool bIsFlat;//浮动样式
 	bool bTextOnRight;//文本放置在右边

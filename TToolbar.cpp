@@ -19,6 +19,20 @@ TToolbar::~TToolbar()
 	free(tbButtons);
 }
 
+LRESULT TToolbar::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_COMMAND:
+	case WM_LBUTTONDOWN:
+		int i;
+		i = 10;
+		break;
+		
+	}
+		return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
+}
+
 void TToolbar::CreateToolbar(HWND hwndParent, HINSTANCE hInst)
 {
 	// Create the toolbar.
@@ -30,6 +44,8 @@ void TToolbar::CreateToolbar(HWND hwndParent, HINSTANCE hInst)
 		0, 0, 0, 0,
 		hwndParent, NULL, hInst, NULL);
 	m_hInst = hInst;
+
+	RegisterProc();
 }
 
 //内部函数：创建图片列表

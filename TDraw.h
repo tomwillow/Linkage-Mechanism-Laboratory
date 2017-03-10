@@ -19,8 +19,8 @@ class TDraw
 #define FRAMEPOINT_B 30//底边长
 #define FRAMEPOINT_SECTION_H 10//剖面线区域高度
 #define FRAMEPOINT_ANGLE 60.0 / 180.0 * M_PI//三角形角度
-#define SLIDER_H 30
 #define SLIDER_B 45
+#define SLIDER_H 30
 public:
 	TDraw();
 	~TDraw();
@@ -33,6 +33,8 @@ public:
 	static double TDraw::DistanceScreen(const DPOINT &dpt1, const DPOINT &dpt2, TConfiguration *pConfig);
 	static DPOINT TDraw::GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);
 	static DPOINT TDraw::GetRelative(const DPOINT &dpt, const DPOINT &Org, double angle);
+	static bool TDraw::GetIntersection(const POINT &ptL1Begin, const POINT &ptL1End, const POINT &ptL2Begin, const  POINT &ptL2End, POINT &ptIntersection);
+	static bool TDraw::GetIntersection(const DPOINT &dptL1Begin, const DPOINT &dptL1End, const DPOINT &dptL2Begin, const  DPOINT &dptL2End, DPOINT &dptIntersection);
 
 	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt);
 	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);
@@ -50,6 +52,7 @@ public:
 	static void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig);
 	static void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TConfiguration *pConfig);
 
+	static void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, const LOGPEN &logpen, const COLORREF &crColor);
 	static void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen);
 	static void TDraw::DrawPickSquare(HDC hdc, POINT pt);
 	static void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos);
@@ -64,12 +67,14 @@ public:
 	static void TDraw::CalcSliderRectCoor(POINT aptResult[4], const POINT &pt, double angle);
 	static void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor);
 	static void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config);
-	static void TDraw::DrawSystemFontText(HDC hdc, TCHAR text[], RECT &rect, COLORREF color, UINT format);
-	static void TDraw::DrawTextAdvance(HDC hdc, TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format);
+	static void TDraw::DrawTips(HDC hdc, POINT &ptMouse, const TCHAR text[], TConfiguration *pConfig);
+	static void TDraw::DrawSystemFontText(HDC hdc,const TCHAR text[], RECT &rect, COLORREF color, UINT format);
+	static void TDraw::DrawTextAdvance(HDC hdc,const TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format);
 
 	static void TDraw::DrawSection(HDC hdc, int x1, int y1, int x2, int y2, int d, int angleDEG);
 	static void TDraw::DrawSection(HDC hdc, POINT apt[], int apt_num, int d, int angleDEG);
 	static double TDraw::GetAngleFromPointReal(DPOINT ptO, DPOINT pt);
+	static double TDraw::GetAngleBetweenPointReal(const DPOINT &pt1,const DPOINT &ptO,const DPOINT &pt2);
 	static double TDraw::GetAngleFromPointScreen(POINT pt0, POINT pt);
 	static void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt);
 	static POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max, RECT &rect);

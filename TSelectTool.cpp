@@ -25,6 +25,8 @@ TSelectTool::TSelectTool()
 	iPrevPickIndex = -1;
 	iHoverIndex = -1;
 	Cursor = IDC_ARROW;
+
+	bShowTips = true;
 }
 
 //由TTool的虚析构函数重载
@@ -123,6 +125,9 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			pSolver->Solve(true);
 
 			pCanvas->Invalidate();
+
+			sTips = TEXT("移动鼠标可预览拖动结果");
+
 			return;
 		}
 		break;
@@ -134,6 +139,9 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			pShape->ChangePos(iPickIndex, dptDelta);
 
 			ptMouseClick = ptPos;
+
+			sTips = TEXT("点击以确定新位置");
+			return;
 		}
 		break;
 	}
@@ -176,16 +184,32 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			assert(0);
 			break;
 		}
-		if (iHoverIndex != -1)
+		if (iHoverIndex != -1)//悬停有东西
 		{
-			if (iPickIndex != iHoverIndex)//若浮过的线已被选中则不变色
+			if (iPickIndex != iHoverIndex)//浮过的线未被选中
 			{
 				//暂存当前线型并更改
 				pShape->Element[iHoverIndex]->logpenStyleShow.lopnColor = RGB(200, 200, 200);
 				HoveredLineId.push(pShape->Element[iHoverIndex]->id);
+				sTips = TEXT("点击可选中");
+				return;
 			}
-			return;
+			else
+			{
+				//若浮过的线已被选中则不变色
+				switch (eMode)
+				{
+				case SELECT_MOVE:
+				sTips = TEXT("再次点击可进行移动");
+					return;
+				case SELECT_DRAG:
+					sTips = TEXT("再次点击可进行拖动");
+					return;
+				}
+			}
 		}
+		else
+			sTips = TEXT("");
 	}
 }
 
@@ -414,8 +438,8 @@ void TSelectTool::Draw(HDC hdc)
 
 	}
 
-	//if (bShowTips)
-	//	TDraw::DrawTips(const TCHAR szTips[],)
+	if (bShowTips)
+		TDraw::DrawTips(hdc, ptMouse, sTips.c_str(), pConfig);
 }
 
 //仅用于添加原动件时的判断

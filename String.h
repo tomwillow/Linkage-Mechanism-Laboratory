@@ -1,4 +1,6 @@
 #ifdef _UNICODE
+#include <string>
+
 #define String wstring
 using std::wstring;
 #else

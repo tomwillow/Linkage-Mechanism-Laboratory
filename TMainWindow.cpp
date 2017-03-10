@@ -56,6 +56,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.AddButton(0, ID_SELECT, true, TEXT("选择"));
 	m_Toolbar.AddButton(1, ID_DRAG, true, TEXT("拖动"));
 	m_Toolbar.AddButton(2, ID_REFRESH, true, TEXT("刷新"));
+	m_Toolbar.AddGroup(1, ID_DRAG, true, TEXT("拖动"));
 	m_Toolbar.AddSeparator(0);
 	m_Toolbar.AddButton(3, ID_DRAW_FRAME, true, TEXT("机架"));
 	m_Toolbar.AddButton(4, ID_DRAW_BAR, true, TEXT("连杆"));
