@@ -8,7 +8,7 @@
 TLine::TLine() :dAngle(angle)
 {
 	TLine::dLength = 0;
-	_tcscpy(Name, TEXT("TLine"));
+	_tcscpy_s(Name, TEXT("TLine"));
 }
 
 

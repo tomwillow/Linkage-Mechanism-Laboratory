@@ -16,8 +16,8 @@ public:
 	int ListItemIndex;
 	TListViewEdit();
 	~TListViewEdit();
-	bool TListViewEdit::OnKillFocus(WPARAM wParam, LPARAM lParam);
-	bool TListViewEdit::OnChar(WPARAM wParam, LPARAM lParam);
+	bool TListViewEdit::OnKillFocus(WPARAM wParam, LPARAM lParam) override;
+	bool TListViewEdit::OnChar(WPARAM wParam, LPARAM lParam) override;
 	void CDECL TListViewEdit::SetText(TCHAR szFormat[], ...);
 	void TListViewEdit::GetText(TCHAR text[]);
 };

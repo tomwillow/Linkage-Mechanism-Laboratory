@@ -177,53 +177,55 @@ void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, dou
 	}
 }
 
-//SiP={xi'P,yi'P}
-void TShape::GetSijP(TElement *element,DPOINT *SiP,DPOINT *SjP,int *i,int *j)
+void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SQ, int &i)
 {
-	TConstraintCoincide *pCoincide = (TConstraintCoincide *)element;
-	*i = pCoincide->pElement[0]->id;
-	*j = pCoincide->pElement[1]->id;
-	//节点i
-	switch (pCoincide->pElement[0]->eType)
+	i = pElement->id;
+	switch (pElement->eType)
 	{
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
-		if (pCoincide->PointIndexOfElement[0] == 1)//ptBegin
-			*SiP = { 0, 0 };
-		else
-			*SiP = { ((TBar *)GetElementById(*i))->dLength, 0 };
-		break;
-	case ELEMENT_FRAMEPOINT:
-		*SiP = { 0,0 };
+	case ELEMENT_FRAMEPOINT://第二点
+		SQ = { ((TRealLine *)pElement)->dLength, 0 };
 		break;
 	case ELEMENT_SLIDER:
-		*SiP = ((TSlider *)pCoincide->pElement[0])->vecDpt[pCoincide->PointIndexOfElement[0]];
+		SQ = { 1, 0 };
 		break;
 	default:
 		assert(0);
 		break;
 	}
+}
 
-	//节点j
-	switch (pCoincide->pElement[1]->eType)
+void TShape::GetSP(const TElement *pElement,int PointIndexOfElement, DPOINT &SP, int &i)
+{
+	i = pElement->id;
+	switch (pElement->eType)
 	{
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
-		if (pCoincide->PointIndexOfElement[1] == 1)//ptBegin
-			*SjP = { 0, 0 };
+		if (PointIndexOfElement == 1)//ptBegin
+			SP = { 0, 0 };
 		else
-			*SjP = { ((TBar *)GetElementById(*j))->dLength, 0 };
+			SP = { ((TBar *)GetElementById(i))->dLength, 0 };
 		break;
 	case ELEMENT_FRAMEPOINT:
-		*SjP = { 0,0 };
+		SP = { 0, 0 };
 		break;
 	case ELEMENT_SLIDER:
-		*SjP = ((TSlider *)pCoincide->pElement[1])->vecDpt[pCoincide->PointIndexOfElement[1]];
+		SP = ((TSlider *)pElement)->vecDpt[PointIndexOfElement];
 		break;
 	default:
 		assert(0);
 		break;
 	}
+}
+
+//SiP={xi'P,yi'P}
+void TShape::GetSijP(const TConstraintCoincide *pCoincide, DPOINT &SiP, DPOINT &SjP, int &i, int &j)
+{
+	GetSP(pCoincide->pElement[0], pCoincide->PointIndexOfElement[0], SiP, i);
+	GetSP(pCoincide->pElement[1], pCoincide->PointIndexOfElement[1], SjP, j);
+	return;
 }
 
 DWORD TShape::GetSizeOfElement(EnumElementType eType)

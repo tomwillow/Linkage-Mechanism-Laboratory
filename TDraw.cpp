@@ -2,8 +2,13 @@
 #include "DetectMemoryLeak.h"
 #include "TDraw.h"
 
+#include "TConfiguration.h"
+
+#include "TBar.h"
 #include "TSlider.h"
+#include "TSlideway.h"
 #include "TFramePoint.h"
+#include "TConstraintCoincide.h"
 
 TDraw::TDraw()
 {
@@ -61,6 +66,9 @@ void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
 		break;
 	case CONSTRAINT_COINCIDE:
 		DrawConstraintCoincide(hdc, (TConstraintCoincide *)Element, pConfig);
+		break;
+	case CONSTRAINT_COLINEAR:
+		DrawConstraintColinear(hdc, (TConstraintColinear *)Element, pConfig);
 		break;
 	case ELEMENT_SLIDER:
 		DrawSlider(hdc, (TSlider *)Element, pConfig);
@@ -639,6 +647,11 @@ bool TDraw::ShowConstraintCoincideDotLine(TElement *element, TConfiguration *pCo
 		return false;
 }
 
+void TDraw::DrawConstraintColinear(HDC hdc, TConstraintColinear *pColinear, TConfiguration *pConfig)
+{
+
+}
+
 void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TConfiguration *pConfig)
 {
 	//比较p1,p2，距离大则画虚线
@@ -953,7 +966,7 @@ void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig)
 			ptA2 = pConfig->RealToScreen(GetAbsolute(A1, pSlider->dpt, pSlider->angle));
 		}
 		POINT ptIntersection = pConfig->RealToScreen(GetAbsolute(dptIntersection, pSlider->dpt, pSlider->angle));
-		DrawPie(hdc, ptIntersection, FRAMEPOINT_R, ptA1, ptA2, pConfig->logpen, pConfig->crPen);
+		DrawPie(hdc, ptIntersection, FRAMEPOINT_R, ptA1, ptA2, pSlider->logpenStyleShow, pSlider->logpenStyleShow.lopnColor);
 	End:
 		;
 	}

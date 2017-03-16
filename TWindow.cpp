@@ -129,8 +129,20 @@ LRESULT CALLBACK TWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	}
 	else
 		pWindow=(TWindow *)GetWindowLong(hWnd, GWL_USERDATA);
-	if ( pWindow )
+
+
+	if (pWindow)
+	{
+#ifdef _DEBUG
+	//TCHAR temp[MAX_PATH], name[MAX_PATH];
+
+	////GetWindowText(hWnd, name, MAX_PATH);
+	//wsprintf(temp, TEXT("Message(0x%x, 0x%x, 0x%x, 0x%x)\n"),hWnd, uMsg,wParam,lParam);
+	//OutputDebugString(temp);
+#endif
 		return pWindow->WndProc(hWnd, uMsg, wParam, lParam);
+
+	}
 	else
 		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

@@ -7,6 +7,8 @@
 #include "TAttach.h"
 #include "TTreeViewContent.h"
 
+#include "TConstraintCoincide.h"
+#include "TConstraintColinear.h"
 #include "TSliderTool.h"
 
 TSliderTool::TSliderTool()
@@ -82,9 +84,6 @@ void TSliderTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		pSlider->vecIsJoint.resize(2);
 		pSlider->vecLine.resize(1);
 
-
-		//共线约束入库
-
 		if (pAttach->bAttachedEndpoint)//捕捉到端点 则添加重合约束
 		{
 			//添加重合约束
@@ -105,6 +104,13 @@ void TSliderTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			pSlider->angle = pAttach->pAttachElement->angle;
 
 			//设置共线约束
+			TConstraintColinear *pColinear = new TConstraintColinear;
+			pColinear->SetStyle(pConfig->logpen);
+			pColinear->pElement[0] = pAttach->pAttachElement;
+			pColinear->pElement[1] = pSlider;
+
+			stackpColinear.push(pColinear);
+
 		}
 		else
 		{
@@ -176,6 +182,18 @@ void TSliderTool::AddIntoShape()
 
 			delete stackpCoincide.top();
 			stackpCoincide.pop();
+		}
+
+		//共线约束入库
+		while (!stackpColinear.empty())
+		{
+			stackpColinear.top()->pElement[1] = pSavedSlider;
+
+			pTreeViewContent->AddItem(stackpColinear.top(), pShape->iNextId);
+			pShape->AddElement(stackpColinear.top());
+
+			delete stackpColinear.top();
+			stackpColinear.pop();
 		}
 
 		//刷新方程组

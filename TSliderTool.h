@@ -4,6 +4,7 @@
 #include "TTool.h"
 #include "String.h"
 
+class TConstraintColinear;
 class TConstraintCoincide;
 class TSlider;
 class TAttach;
@@ -15,6 +16,7 @@ private:
 	TAttach *pAttach;
 	TSlider *pSlider;
 
+	std::stack<TConstraintColinear *>stackpColinear;
 	std::stack<TConstraintCoincide *>stackpCoincide;
 	void TSliderTool::AddIntoShape();
 public:

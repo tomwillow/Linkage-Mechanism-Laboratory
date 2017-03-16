@@ -12,19 +12,34 @@ TTreeView::~TTreeView()
 }
 
 
+//LRESULT CALLBACK TTreeView::subControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+//{
+//	TTreeView * pControl;
+//	pControl = (TTreeView *)GetWindowLong(hWnd, GWL_USERDATA);
+//
+//	if (pControl)
+//		return pControl->WndProc(oldControlProc, hWnd, uMsg, wParam, lParam);
+//	else
+//		return CallWindowProc(oldControlProc, hWnd, uMsg, wParam, lParam);
+//}
+
 void TTreeView::CreateTreeViewEx(HWND hParent, UINT id, HINSTANCE hInst)//´´½¨TreeView
 {
 
 	// Create the Treeview control
 	m_hInst = hInst;
-	m_hWnd = CreateWindowEx(0, WC_TREEVIEW, 0,
+	m_hWnd = CreateWindowEx(0, WC_TREEVIEW, TEXT("TTreeView"),
 		TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS | WS_CHILD | WS_VISIBLE |TVS_SHOWSELALWAYS,
 		0,0,0,0,
 		hParent, (HMENU)id, hInst, 0);
 
+	//CreateEx(0, WC_TREEVIEW, TEXT("TTreeView"),
+	//	TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS | WS_CHILD | WS_VISIBLE | TVS_SHOWSELALWAYS,
+	//	0, 0, 0, 0,
+	//	hParent, (HMENU)id, hInst);
 	// Store the Treeview control handle as the user data associated with the 
 	// parent window so that it can be retrieved for later use.
-	SetWindowLongPtr(m_hWnd, GWLP_USERDATA, (LONG_PTR)m_hWnd);
+	//SetWindowLongPtr(m_hWnd, GWLP_USERDATA, (LONG_PTR)m_hWnd);
 
 
 	/////////////////////////////////////////////////////////////////////////

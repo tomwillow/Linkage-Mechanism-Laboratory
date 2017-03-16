@@ -35,6 +35,7 @@ protected:
 	void OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	bool TSelectTool::PickConstraintCoincide(POINT ptPos, TElement *element);
+	bool TSelectTool::PickConstraintColinear(POINT ptPos, TElement *element);
 	void TSelectTool::CancelTreeViewAndListView();
 	void TSelectTool::RestorePickedLineStyle();
 	void TSelectTool::RestoreHoveredLineStyle();

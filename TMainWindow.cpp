@@ -53,16 +53,15 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	//m_Toolbar.bTextOnRight = true;
 	m_Toolbar.CreateToolbar(hWnd, m_hInst);
 	m_Toolbar.LoadImageList(32, 32, IDR_TOOLBAR_MAIN, RGB(255, 255, 255));
-	m_Toolbar.AddButton(0, ID_SELECT, true, TEXT("选择"));
-	m_Toolbar.AddButton(1, ID_DRAG, true, TEXT("拖动"));
-	m_Toolbar.AddButton(2, ID_REFRESH, true, TEXT("刷新"));
-	m_Toolbar.AddGroup(1, ID_DRAG, true, TEXT("拖动"));
+	m_Toolbar.AddGroup(0,0, ID_SELECT, true, TEXT("选择"));
+	m_Toolbar.AddGroup(1, 0, ID_DRAG, true, TEXT("拖动"));
+	m_Toolbar.AddButton(2,  ID_REFRESH, true, TEXT("刷新"));
 	m_Toolbar.AddSeparator(0);
-	m_Toolbar.AddButton(3, ID_DRAW_FRAME, true, TEXT("机架"));
-	m_Toolbar.AddButton(4, ID_DRAW_BAR, true, TEXT("连杆"));
-	m_Toolbar.AddButton(5, ID_DRAW_LINE, true, TEXT("线"));
-	m_Toolbar.AddButton(6, ID_DRAW_SLIDEWAY, true, TEXT("滑道"));
-	m_Toolbar.AddButton(7, ID_DRAW_SLIDER, true, TEXT("滑块"));
+	m_Toolbar.AddGroup(3, 0, ID_DRAW_FRAME, true, TEXT("机架"));
+	m_Toolbar.AddGroup(4, 0, ID_DRAW_BAR, true, TEXT("连杆"));
+	m_Toolbar.AddGroup(5, 0, ID_DRAW_LINE, true, TEXT("线"));
+	m_Toolbar.AddGroup(6, 0, ID_DRAW_SLIDEWAY, true, TEXT("滑道"));
+	m_Toolbar.AddGroup(7, 0, ID_DRAW_SLIDER, true, TEXT("滑块"));
 	m_Toolbar.AddButton(8, ID_SET_DRIVER, true, TEXT("设为原动件"));
 	m_Toolbar.ShowToolbar();
 
@@ -466,6 +465,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_DRAW_LINE:
 	case ID_DRAW_SLIDEWAY:
 	case ID_DRAW_SLIDER:
+		SendMessage(m_Toolbar.m_hWnd, WM_USER, wmId, 0);
 		p_Managetool->SetCurActiveTool(wmId);
 		break;
 	case ID_ANALYZE_MECHANISM:
@@ -625,5 +625,5 @@ void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 
 	m_Configuration.SetOrg((LONG)(OrgProportion.x*Canvas.ClientRect.right), (LONG)(OrgProportion.y*Canvas.ClientRect.bottom));
 
-	::InvalidateRect(Canvas.m_hWnd, &Canvas.ClientRect, FALSE);
+	Canvas.Invalidate();
 }

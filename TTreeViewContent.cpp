@@ -24,7 +24,6 @@ LRESULT TTreeViewContent::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM 
 	case WM_KEYDOWN:
 		if (wParam == VK_DELETE)
 		{
-			//DeleteById(GetIdFromHTreeView(TreeView_GetSelection(hWnd)));
 			win.m_ManageTool.Message(hWnd, uMsg, wParam, lParam);
 			return NULL;
 		}
@@ -84,6 +83,7 @@ void TTreeViewContent::AddItem(TElement *Element, int id)
 		tempItem.hTreeItem = temp;
 		Item.push_back(tempItem);
 		break;
+	case CONSTRAINT_COLINEAR:
 	case CONSTRAINT_COINCIDE:
 		temp = InsertTreeviewItem(buffer, hPrevConstraint);
 		TreeView_Expand(m_hWnd, hPrevConstraint, TVE_EXPAND);

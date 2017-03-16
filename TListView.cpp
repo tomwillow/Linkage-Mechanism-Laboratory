@@ -19,18 +19,31 @@ TListView::~TListView()
 {
 }
 
-WNDPROC TListView::oldListViewProc;
-LRESULT CALLBACK TListView::subListViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	TListView * pListView;
-	pListView = (TListView *)GetWindowLong(hWnd, GWL_USERDATA);
-	if (pListView)
-		return pListView->WndProc(oldListViewProc, hWnd, uMsg, wParam, lParam);
-	else
-		return CallWindowProc(oldListViewProc, hWnd, uMsg, wParam, lParam);
-}
+//WNDPROC TListView::oldListViewProc;
+//LRESULT CALLBACK TListView::subListViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+//{
+//	TListView * pListView;
+//	pListView = (TListView *)GetWindowLong(hWnd, GWL_USERDATA);
+//	if (pListView)
+//		return pListView->WndProc(oldListViewProc, hWnd, uMsg, wParam, lParam);
+//	else
+//		return CallWindowProc(oldListViewProc, hWnd, uMsg, wParam, lParam);
+//}
 
+//LRESULT CALLBACK TListView::subControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+//{
+//	TListView * pControl;
+//	pControl = (TListView *)GetWindowLong(hWnd, GWL_USERDATA);
+//
+//	if (pControl)
+//		return pControl->WndProc(oldControlProc, hWnd, uMsg, wParam, lParam);
+//	else
+//		return CallWindowProc(oldControlProc, hWnd, uMsg, wParam, lParam);
+//}
+
+WNDPROC oldListViewProc;
 LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+ //LRESULT TListView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -131,6 +144,7 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 		break;
 	}
 	}
+	//return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 }
 
@@ -183,9 +197,15 @@ void TListView::CreateListViewEx(HWND hParent, UINT id, HINSTANCE hInst)
 	m_hInst = hInst;
 	m_hWnd = ::CreateWindowEx(0,
 		WC_LISTVIEW,
-		0,
+		TEXT("TListView"),
 		WS_CHILD | WS_VISIBLE | LVS_ICON | LVS_REPORT | LVS_SINGLESEL,//|LVS_EDITLABELS|WS_BORDER
 		0, 0, 0, 0, hParent, (HMENU)id, hInst, 0);
+
+	//CreateEx(0,
+	//	WC_LISTVIEW,
+	//	TEXT("TListView"),
+	//	WS_CHILD | WS_VISIBLE | LVS_ICON | LVS_REPORT | LVS_SINGLESEL,//|LVS_EDITLABELS|WS_BORDER
+	//	0, 0, 0, 0, hParent, (HMENU)id, hInst);
 
 	//设置扩展风格：添加格子线以及整行选中
 	DWORD styles = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES;
@@ -198,9 +218,12 @@ void TListView::CreateListViewEx(HWND hParent, UINT id, HINSTANCE hInst)
 	tempEdit.SetVisible(false);
 
 	//
-	SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
-	oldListViewProc = (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subListViewProc);
+	//SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
+	//oldListViewProc = (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subListViewProc);
 
+	//SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
+	//oldControlProc = (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subControlProc);
+	RegisterProc();
 }
 
 

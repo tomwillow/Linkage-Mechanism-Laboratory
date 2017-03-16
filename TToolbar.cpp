@@ -23,8 +23,15 @@ LRESULT TToolbar::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, 
 {
 	switch (uMsg)
 	{
+	case WM_USER:
+		SetGroupChecked(wParam);
+		break;
 	case WM_COMMAND:
+		int a;
+		a = 10;
+		break;
 	case WM_LBUTTONDOWN:
+		//SetGruopChecked(2);
 		int i;
 		i = 10;
 		break;
@@ -33,17 +40,45 @@ LRESULT TToolbar::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, 
 		return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 }
 
+void TToolbar::SetGroupChecked(int idCommand)
+{
+	int iGroup = -1;
+	for (auto iter = mapGroup.begin(); iter != mapGroup.end(); ++iter)
+	{
+		if (iter->second.find(idCommand) != iter->second.end())
+		{
+			iGroup = iter->first;
+			break;
+		}
+		
+	}
+
+	if (iGroup != -1)
+	{
+		for (auto iter = mapGroup[iGroup].begin(); iter != mapGroup[iGroup].end(); ++iter)
+		{
+			if (*iter==idCommand)
+				SendMessage(m_hWnd, TB_SETSTATE, *iter, MAKELONG(TBSTATE_ENABLED | TBSTATE_CHECKED,0));
+			else
+				SendMessage(m_hWnd, TB_SETSTATE, *iter, MAKELONG(TBSTATE_ENABLED, 0));
+		}
+	}
+}
+
 void TToolbar::CreateToolbar(HWND hwndParent, HINSTANCE hInst)
 {
 	// Create the toolbar.
-	m_hWnd = CreateWindowEx(0, TOOLBARCLASSNAME, NULL,
+	m_hInst = hInst;
+	m_hWnd = CreateWindowEx(0, TOOLBARCLASSNAME,NULL,
 		WS_CHILD | WS_VISIBLE |TBSTYLE_ALTDRAG|CCS_ADJUSTABLE
 		|(bIsFlat?TBSTYLE_FLAT:0)
 		|(bTextOnRight?TBSTYLE_LIST:0)
 		|(bAutoWrap?TBSTYLE_WRAPABLE:0),
 		0, 0, 0, 0,
 		hwndParent, NULL, hInst, NULL);
-	m_hInst = hInst;
+
+
+	SetWindowText(m_hWnd, TEXT("TToolbar"));
 
 	RegisterProc();
 }
@@ -51,7 +86,6 @@ void TToolbar::CreateToolbar(HWND hwndParent, HINSTANCE hInst)
 //内部函数：创建图片列表
 void TToolbar::CreateImageList(UINT uMsg,int cx, int cy, UINT BitmapID,COLORREF crMask)
 {
-	// Create the image list.
 	HIMAGELIST m_hImageList;
 	m_hImageList = ImageList_Create(cx, cy, ILC_COLOR32 | ILC_MASK, 1, 1);//
 	HANDLE hImage = NULL;
@@ -108,8 +142,17 @@ void TToolbar::AddSeparator(int iWidth)
 	AddElement(iWidth, 0, 0, BTNS_SEP, NULL, NULL, NULL);
 }
 
-void TToolbar::AddGroup(int IconIndex, int idCommand, bool Enable, TCHAR iString[])
+//添加一个Group按钮
+void TToolbar::AddGroup(int IconIndex, int iGroupNum, int idCommand, bool Enable, TCHAR iString[])
 {
+	if (mapGroup.find(iGroupNum) != mapGroup.end())//有
+		mapGroup[iGroupNum].insert(idCommand);
+	else
+	{
+		std::set<int> setAGroup;
+		setAGroup.insert(idCommand);
+		mapGroup.insert(std::map<int, std::set<int> >::value_type(iGroupNum, setAGroup));
+	}
 	AddElement(IconIndex, idCommand, Enable ? TBSTATE_ENABLED : 0, BTNS_CHECKGROUP, NULL, NULL, (INT_PTR)iString);
 }
 

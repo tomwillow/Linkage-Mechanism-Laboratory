@@ -38,6 +38,8 @@ public:
 
 		switch (temp->eType)
 		{
+		case CONSTRAINT_COLINEAR:
+			break;
 		case CONSTRAINT_COINCIDE:
 			temp->BuildpDpt();
 			iCoincideNum++;
@@ -72,7 +74,9 @@ public:
 	int TShape::nc();
 	int TShape::nh();
 	int TShape::DOF();
-	void TShape::GetSijP(TElement *element, DPOINT *SiP, DPOINT *SjP, int *i, int *j);
+	void TShape::GetSP(const TElement *pElement, int PointIndexOfElement, DPOINT &SP, int &i);
+	void TShape::GetSijP(const TConstraintCoincide *pCoincide, DPOINT &SiP, DPOINT &SjP, int &i, int &j);
+	void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SP, int &i);
 	void TShape::GetCoordinateById(int id, double *x, double *y, double *theta);
 	void TShape::GetCoordinateByIndex(int index, double *x, double *y, double *theta);
 	void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, double *theta);

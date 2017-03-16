@@ -4,8 +4,7 @@
 class TControl
 {
 private:
-	static WNDPROC oldControlProc;
-	static LRESULT CALLBACK subControlProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK TControl::subControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 public:
 	HWND m_hWnd;
 	HINSTANCE m_hInst;
@@ -16,7 +15,6 @@ public:
 protected:
 	void TControl::RegisterProc();//创建窗口后注册
 
-	//虚拟消息处理函数，可重载
-	virtual LRESULT TControl::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-};
+	virtual LRESULT TControl::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);//虚拟消息处理函数，可覆盖
 
+};

@@ -52,11 +52,14 @@ TCHAR * TElement::GetElementTypeName(TCHAR name[])
 	case ELEMENT_SLIDEWAY:
 		_tcscpy(name, TEXT("滑道"));
 		break;
+	case ELEMENT_SLIDER:
+		_tcscpy(name, TEXT("滑块"));
+		break;
 	case CONSTRAINT_COINCIDE:
 		_tcscpy(name, TEXT("重合"));
 		break;
-	case ELEMENT_SLIDER:
-		_tcscpy(name, TEXT("滑块"));
+	case CONSTRAINT_COLINEAR:
+		_tcscpy(name, TEXT("共线"));
 		break;
 	default:
 		assert(0);

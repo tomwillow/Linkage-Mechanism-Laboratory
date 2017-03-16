@@ -1,4 +1,6 @@
 #pragma once
+#include <set>
+#include <map>
 #include <Windows.h>
 #include <CommCtrl.h>
 #include <tchar.h>
@@ -9,19 +11,18 @@
 class TToolbar:public TControl
 {
 private:
-	HINSTANCE m_hInst;
+	std::map<int, std::set<int>> mapGroup;
 	int iButtonNum;
-	TBBUTTON *tbButtons; 
+	TBBUTTON *tbButtons;
 	void TToolbar::CreateImageList(UINT uMsg, int cx, int cy, UINT BitmapID, COLORREF crMask);
 	void TToolbar::AddElement(int BitmapIndex, int idCommand, BYTE fsState, BYTE fsStyle, BYTE bReverse[], DWORD_PTR dwData, INT_PTR iString);
-	LRESULT TToolbar::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT TToolbar::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 protected:
 
 public:
 	bool bIsFlat;//浮动样式
 	bool bTextOnRight;//文本放置在右边
 	bool bAutoWrap;//按钮自动换行
-	HWND m_hWnd;//工具栏句柄
 	TToolbar();
 	~TToolbar();
 	void TToolbar::CreateToolbar(HWND hwndParent, HINSTANCE hInst);
@@ -29,11 +30,12 @@ public:
 	void TToolbar::LoadHotImageList(int cx, int cy, UINT BitmapID, COLORREF crMask);
 	void TToolbar::LoadDisabledImageList(int cx, int cy, UINT BitmapID, COLORREF crMask);
 	void TToolbar::AddButton(int IconIndex, int idCommand, bool Enable, TCHAR iString[]); 
-	void TToolbar::AddGroup(int IconIndex, int idCommand, bool Enable, TCHAR iString[]);
+	void TToolbar::AddGroup(int IconIndex,int iGroupNum, int idCommand, bool Enable, TCHAR iString[]);
 	void TToolbar::AddCheck(int IconIndex, int idCommand, bool Enable, TCHAR iString[]);
 	void TToolbar::AddSeparator(int iWidth);
 	void TToolbar::ShowToolbar();
 	void TToolbar::FreshSize();
 	RECT TToolbar::GetClientRect();
+	void TToolbar::SetGroupChecked(int idCommand);
 };
 

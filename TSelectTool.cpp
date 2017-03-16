@@ -168,14 +168,20 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 				iHoverIndex = i;
 			}
 			break;
+		case ELEMENT_SLIDER:
+			if (TDraw::PointInSlider(ptPos, (TSlider *)pShape->Element[i], pConfig))
+			{
+				iHoverIndex = i;
+			}
+			break;
 		case CONSTRAINT_COINCIDE:
 			if (PickConstraintCoincide(ptPos, pShape->Element[i]))
 			{
 				iHoverIndex = i;
 			}
 			break;
-		case ELEMENT_SLIDER:
-			if (TDraw::PointInSlider(ptPos, (TSlider *)pShape->Element[i], pConfig))
+		case CONSTRAINT_COLINEAR:
+			if (PickConstraintColinear(ptPos, pShape->Element[i]))
 			{
 				iHoverIndex = i;
 			}
@@ -211,6 +217,12 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 		else
 			sTips = TEXT("");
 	}
+}
+
+
+bool TSelectTool::PickConstraintColinear(POINT ptPos, TElement *element)
+{
+	return false;
 }
 
 bool TSelectTool::PickConstraintCoincide(POINT ptPos, TElement *element)
@@ -275,16 +287,20 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 				iPickIndex = i;
 			}
 			break;
+		case ELEMENT_SLIDER:
+			if (TDraw::PointInSlider(ptPos, (TSlider *)pShape->Element[i], pConfig))
+			{
+				iPickIndex = i;
+			}
+			break;
 		case CONSTRAINT_COINCIDE:
-		{
 			if (PickConstraintCoincide(ptPos, pShape->Element[i]))
 			{
 				iPickIndex = i;
 			}
 			break;
-		}
-		case ELEMENT_SLIDER:
-			if (TDraw::PointInSlider(ptPos, (TSlider *)pShape->Element[i], pConfig))
+		case CONSTRAINT_COLINEAR:
+			if (PickConstraintColinear(ptPos, pShape->Element[i]))
 			{
 				iPickIndex = i;
 			}
@@ -430,6 +446,10 @@ void TSelectTool::Draw(HDC hdc)
 				//»­Ê°È¡·½¸ñ
 				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(TDraw::GetAbsolute(*iter, pSlider->dpt, pSlider->angle)));
 		}
+			break;
+		case CONSTRAINT_COLINEAR:
+			//
+
 			break;
 		default:
 			assert(0);

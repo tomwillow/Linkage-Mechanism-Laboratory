@@ -7,5 +7,6 @@ public:
 	TConstraintColinear();
 	~TConstraintColinear();
 	TElement *pElement[2];
+	void TConstraintColinear::NoticeListView(TListView *pListView);
 };
 

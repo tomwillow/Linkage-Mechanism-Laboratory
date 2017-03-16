@@ -16,21 +16,9 @@ TEdit::TEdit()
 	bNoHideSel = false;
 }
 
-
 TEdit::~TEdit()
 {
 	::DeleteObject(m_hFont);
-}
-
-WNDPROC TEdit::oldEditProc;
-LRESULT CALLBACK TEdit::subEditProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	TEdit * pEdit;
-	pEdit=(TEdit *)GetWindowLong(hWnd, GWL_USERDATA);
-	if (pEdit)
-		return pEdit->WndProc(oldEditProc,hWnd, uMsg, wParam, lParam);
-	else
-		return CallWindowProc(oldEditProc, hWnd, uMsg, wParam, lParam);
 }
 
 LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -70,9 +58,7 @@ void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle)
 		0, 0, 0, 0, hParent,(HMENU)id, hInst,0);
 
 	//SetFont(m_hFont);
-
-	SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
-	oldEditProc = (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subEditProc);
+	RegisterProc();
 }
 
 void TEdit::SetDefaultGuiFont()

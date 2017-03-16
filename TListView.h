@@ -26,11 +26,14 @@ private:
 	std::vector<void *> vecpContent;
 	TShape *pShape;
 protected:
-	static WNDPROC oldListViewProc;
-	static LRESULT CALLBACK subListViewProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	//static WNDPROC oldListViewProc;
+
+	//virtual void OnLButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
+	//virtual LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	//虚拟消息处理函数，可重载
-	virtual LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 public:
 	TListView();
 	~TListView();

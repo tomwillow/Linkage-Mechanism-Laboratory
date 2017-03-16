@@ -2,16 +2,18 @@
 #include "MyMath.h"
 #include <Windows.h>
 
-#include "TBar.h"
-#include "TLine.h"
-#include "TRealLine.h"
-#include "TSlideway.h"
-#include "TConstraintCoincide.h"
+#include "DPOINT.h"
 
-#include "TConfiguration.h"
-
+class TConfiguration;
+class TElement;
+class TBar;
+class TLine;
+class TRealLine;
+class TSlideway;
 class TSlider;
 class TFramePoint;
+class TConstraintCoincide;
+class TConstraintColinear;
 class TDraw
 {
 #define FRAMEPOINT_R 6//½ÚµãÔ²°ë¾¶
@@ -51,6 +53,7 @@ public:
 	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config);
 	static void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig);
 	static void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TConfiguration *pConfig);
+	static void TDraw::DrawConstraintColinear(HDC hdc, TConstraintColinear *pColinear, TConfiguration *pConfig);
 
 	static void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, const LOGPEN &logpen, const COLORREF &crColor);
 	static void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen);

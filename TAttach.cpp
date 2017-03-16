@@ -257,9 +257,6 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 			}
 			break;
 		}
-		case ELEMENT_SLIDEWAY:
-		case CONSTRAINT_COINCIDE:
-			break;
 		case ELEMENT_SLIDER:
 		{
 			TSlider *pSlider = (TSlider *)(pShape->Element[i]);
@@ -277,6 +274,11 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 			}
 			break;
 		}
+		//不吸附端点的元素
+		case ELEMENT_SLIDEWAY:
+		case CONSTRAINT_COLINEAR:
+		case CONSTRAINT_COINCIDE:
+			break;
 		default:
 			assert(0);
 			break;

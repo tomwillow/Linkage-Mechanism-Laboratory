@@ -17,6 +17,7 @@
 #include "TVariableTable.h"
 #include "TEquations.h"
 #include "TConstraintCoincide.h"
+#include "TConstraintColinear.h"
 
 TSolver::TSolver()
 {
@@ -144,16 +145,18 @@ void TSolver::RefreshEquations(bool Output)
 
 	Outputln(TEXT("自由度: DOF = nc-nh = %d - %d = %d"), pShape->nc(), pShape->nh(), pShape->DOF());
 	int i, j;
-	DPOINT SiP, SjP;
+	DPOINT SiP, SjP,SiQ,SjQ;
 	TCHAR buffer1[100], buffer2[100];
 
 	Outputln(TEXT("\r\n约束方程:"));
 
 	for (auto element : pShape->Element)
 	{
-		if (element->eType == CONSTRAINT_COINCIDE)
+		switch (element->eType)
 		{
-			pShape->GetSijP(element, &SiP, &SjP, &i, &j);
+		case CONSTRAINT_COINCIDE:
+		{
+			pShape->GetSijP((TConstraintCoincide *)element, SiP, SjP, i, j);
 
 			//得到2个重合构件的广义坐标
 			double xi, yi, phii, xj, yj, phij;
@@ -163,23 +166,51 @@ void TSolver::RefreshEquations(bool Output)
 			//定义变量及其初始值
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
-			Equations->VariableTable.Define(Output,buffer1, buffer2);
+			Equations->VariableTable.Define(Output, buffer1, buffer2);
 
 			//读入方程
 			_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
 			_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d-%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
 			Outputln(Equations->AddEquation(Output, buffer1, false));
-			Outputln(Equations->AddEquation(Output,buffer2, false));
-
+			Outputln(Equations->AddEquation(Output, buffer2, false));
+			break;
 		}
-		if (element->eType == ELEMENT_FRAMEPOINT)
+		case CONSTRAINT_COLINEAR:
+		{
+			break;
+			//pShape->GetSijP(element, &SiP, &SjP, &i, &j);
+			pShape->GetSP(((TConstraintColinear *)element)->pElement[0],0,)
+
+			//得到2个重合构件的广义坐标
+			double xi, yi, phii, xj, yj, phij;
+			pShape->GetCoordinateByElement(((TConstraintColinear *)element)->pElement[0], &xi, &yi, &phii);
+			pShape->GetCoordinateByElement(((TConstraintColinear *)element)->pElement[1], &xj, &yj, &phij);
+
+			//定义变量及其初始值
+			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
+			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
+			Equations->VariableTable.Define(Output, buffer1, buffer2);
+
+			//读入方程
+			_stprintf(buffer1, TEXT("(cos(phii)*(yiP-yiQ)+sin(phii)*(xiP-xiQ))*(xi-xj+xip*cos(phii)-xjp*cos(phij)-yip*sin(phii)+yjp*sin(phij))\
+																	-(cos(phii)*(xiP-xiQ)-sin(phii)*(yiP-yiQ))*(yi-yj+yip*cos(phii)-yjp*cos(phij)+xip*sin(phii)-xjp*sin(phij)))"),
+																	i, SiP.y, SiQ.y, i, SiP.x, SiQ.x, i, j, SiP.x, i, SjP.x, j, SiP.y, i, SjP.y, j,
+																	i, SiP.x, SiQ.x, i, SiP.y, SiQ.y, i, j, SiP.y, i, SjP.y, j, SiP.x, i, SjP.x, j);
+			//_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
+			//_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d-%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
+			Outputln(Equations->AddEquation(Output, buffer1, false));
+			//Outputln(Equations->AddEquation(Output, buffer2, false));
+			break;
+		}
+		case ELEMENT_FRAMEPOINT:
 		{
 			int id = element->id;
 
 			_stprintf(subsVar, TEXT("%s x%d y%d phi%d"), subsVar, id, id, id);
 
 			_stprintf(subsValue, TEXT("%s %f %f %f"), subsValue, ((TFramePoint *)(element))->dpt.x, ((TFramePoint *)(element))->dpt.y, 0.0);
-
+			break;
+		}
 		}
 	}
 
