@@ -11,6 +11,7 @@
 #include "TConstraintColinear.h"
 #include "TSliderTool.h"
 
+
 TSliderTool::TSliderTool()
 {
 	pAttach = new TAttach(pCanvas, pShape, pConfig);
@@ -243,4 +244,5 @@ void TSliderTool::Draw(HDC hdc)
 	
 	if (bShowTips)
 		TDraw::DrawTips(hdc, ptMouse, sTips.c_str(), pConfig);
+
 }

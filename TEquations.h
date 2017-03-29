@@ -13,11 +13,11 @@ private:
 	std::String Str;
 	typedef std::vector<std::vector<double>> Matrix;
 	typedef std::vector<double> Vector;
-	std::vector<std::vector<TExpressionTree *>> Jacobi;
+	std::vector<std::vector<TExpressionTree *>> Jacobian;
 	std::vector<TExpressionTree *> Equations;
 	std::vector<bool> EquationIsTemp;
 	void TEquations::CalcPhiValue(Vector &PhiValue, const Vector &Q);
-	void TEquations::CalcJacobiValue(Matrix &JacobiValue,const Vector &Q);
+	void TEquations::CalcJacobianValue(Matrix &JacobianValue,const Vector &Q);
 	int TEquations::GetMaxAbsRowIndex(const Matrix &A, int RowStart, int RowEnd, int Col);
 	void TEquations::SwapRow(Matrix &A, Vector &b, int i, int j);
 	bool TEquations::AllIs0(Vector &V);
@@ -28,12 +28,17 @@ public:
 	TEquations();
 	~TEquations();
 	bool hasSolved;
-	TVariableTable VariableTable; 
+	TVariableTable VariableTable; //变量表
+	TExpressionTree * TEquations::GetLastExpressionTree()
+	{
+		return Equations.back();
+	}
 	size_t TEquations::GetEquationsCount();
-	const TCHAR * TEquations::AddEquation(bool output, TCHAR *input, bool istemp);
-	void TEquations::RemoveTempEquations();
-	const TCHAR * TEquations::BuildJacobi(bool bOutput, TCHAR *subsVar, TCHAR *subsValue);
-	enumError TEquations::SolveLinear(Matrix &A, Vector &x, Vector &b);
-	const TCHAR * TEquations::SolveEquations(bool bOutput);
+	const TCHAR * TEquations::AddEquation(bool output, TCHAR *input, bool istemp);//添加方程
+	void TEquations::RemoveTempEquations();//移除临时方程
+	const TCHAR * TEquations::BuildJacobian(bool bOutput, TCHAR *subsVar, TCHAR *subsValue);//建立Jacobian
+	enumError TEquations::SolveLinear(Matrix &A, Vector &x, Vector &b);//解线性方程组 系数A，未知数x
+	const TCHAR * TEquations::SolveEquations(bool bOutput);//求解方程组
+	const TCHAR * TEquations::SimplifyEquations(bool bOutput);//将方程组中的简单方程解出
 };
 

@@ -7,6 +7,7 @@
 #include "TConfiguration.h"
 
 #include "TConstraintCoincide.h"
+#include "TConstraintColinear.h"
 
 TShape::TShape()
 {
@@ -21,12 +22,12 @@ TShape::~TShape()
 	ReleaseAll();
 }
 
-TElement * TShape::GetElementById(int id)
+TElement* TShape::GetElementById(int id)
 {
-	for (int i = 0; i < Element.size(); i++)
+	for (auto pElement : Element)
 	{
-		if (Element[i]->id == id)
-			return Element[i];
+		if (pElement->id == id)
+			return pElement;
 	}
 }
 
@@ -67,7 +68,9 @@ std::vector<int> TShape::DeleteElement(int index)
 	//依次比对 约束 中是否有被删元素地址，有则删掉约束
 	for (auto iter = Element.begin(); iter != Element.end();)
 	{
-		if ((*iter)->eType==CONSTRAINT_COINCIDE)//如果是约束
+		switch ((*iter)->eType)
+		{
+		case CONSTRAINT_COINCIDE://如果是约束
 			if (((TConstraintCoincide *)*iter)->pElement[0] == pDeleted ||
 				((TConstraintCoincide *)*iter)->pElement[1] == pDeleted
 				)//且涉及到被删除元素，则删除此约束
@@ -77,10 +80,22 @@ std::vector<int> TShape::DeleteElement(int index)
 
 				((TConstraintCoincide *)(*iter))->RestorePointStyle();
 				delete *iter;
-				iter=Element.erase(iter);
+				iter = Element.erase(iter);
 				continue;
 			}
-		iter++;
+		case CONSTRAINT_COLINEAR:
+			if (((TConstraintColinear *)*iter)->pElement[0] == pDeleted ||
+				((TConstraintColinear *)*iter)->pElement[1] == pDeleted
+				)//且涉及到被删除元素，则删除此约束
+			{
+				DeletedId.push_back((*iter)->id);
+
+				delete *iter;
+				iter = Element.erase(iter);
+				continue;
+			}
+		}
+		++iter;
 	}
 
 	delete pDeleted;
@@ -157,6 +172,7 @@ void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, dou
 	{
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
+	case ELEMENT_SLIDEWAY:
 		*x = ((TBar *)element)->ptBegin.x;
 		*y = ((TBar *)element)->ptBegin.y;
 		*theta = ((TBar *)element)->dAngle;
@@ -185,6 +201,7 @@ void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SQ
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
 	case ELEMENT_FRAMEPOINT://第二点
+	case ELEMENT_SLIDEWAY:
 		SQ = { ((TRealLine *)pElement)->dLength, 0 };
 		break;
 	case ELEMENT_SLIDER:
@@ -196,20 +213,19 @@ void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SQ
 	}
 }
 
-void TShape::GetSP(const TElement *pElement,int PointIndexOfElement, DPOINT &SP, int &i)
+void TShape::GetSP(const TElement *pElement, int PointIndexOfElement, DPOINT &SP, int &i)
 {
 	i = pElement->id;
 	switch (pElement->eType)
 	{
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
-		if (PointIndexOfElement == 1)//ptBegin
+	case ELEMENT_FRAMEPOINT://不可能出现1
+	case ELEMENT_SLIDEWAY:
+		if (PointIndexOfElement == 0)//ptBegin
 			SP = { 0, 0 };
 		else
 			SP = { ((TBar *)GetElementById(i))->dLength, 0 };
-		break;
-	case ELEMENT_FRAMEPOINT:
-		SP = { 0, 0 };
 		break;
 	case ELEMENT_SLIDER:
 		SP = ((TSlider *)pElement)->vecDpt[PointIndexOfElement];
@@ -240,12 +256,171 @@ DWORD TShape::GetSizeOfElement(EnumElementType eType)
 		return sizeof(TFramePoint);
 	case ELEMENT_SLIDEWAY:
 		return sizeof(TSlideway);
-	case CONSTRAINT_COINCIDE:
-		return sizeof(TConstraintCoincide);
 	case ELEMENT_SLIDER:
 		return sizeof(TSlider);
+	case CONSTRAINT_COINCIDE:
+		return sizeof(TConstraintCoincide);
+	case CONSTRAINT_COLINEAR:
+		return sizeof(TConstraintColinear);
 	default:
 		assert(0);
 		break;
 	}
+}
+
+bool TShape::ReadFromFile(TCHAR szFileName[])
+{
+	HANDLE hf;
+	hf = CreateFile(szFileName,
+		GENERIC_READ,
+		0,
+		(LPSECURITY_ATTRIBUTES)NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		(HANDLE)NULL);
+	if (GetLastError() != 0)
+		return false;
+
+	//读入元素数量
+	DWORD now_pos = 0;
+	int size;
+	ReadFile(hf, &size, sizeof(size), &now_pos, NULL);
+	if (GetLastError() != 0)
+		return false;
+	now_pos += sizeof(size);
+
+	EnumElementType eType;
+	for (int i = 0; i < size; i++)
+	{
+		//读入类型
+		ReadFile(hf, &eType, sizeof(EnumElementType), &now_pos, NULL);
+		if (GetLastError() != 0)
+			return false;
+		now_pos += sizeof(EnumElementType);
+
+		//按照类型读入元素
+		switch (eType)
+		{
+		case ELEMENT_BAR:
+		{
+			TBar temp;
+			if (temp.ReadFile(hf, now_pos,this))
+				AddElement(&temp);
+			else
+				return false;
+			break;
+		}
+		case ELEMENT_REALLINE:
+		{
+			TRealLine temp;
+			if (temp.ReadFile(hf, now_pos, this))
+				AddElement(&temp);
+			else
+				return false;
+			break;
+		}
+		case ELEMENT_FRAMEPOINT:
+		{
+			TFramePoint temp;
+			if (temp.ReadFile(hf, now_pos, this))
+				AddElement(&temp);
+			else
+				return false;
+			break;
+		}
+		case ELEMENT_SLIDER:
+		{
+			TSlider temp;
+			if (temp.ReadFile(hf, now_pos, this))
+				AddElement(&temp);
+			else
+				return false;
+			break;
+		}
+		case ELEMENT_SLIDEWAY:
+		{
+			TSlideway temp;
+			if (temp.ReadFile(hf, now_pos, this))
+				AddElement(&temp);
+			else
+				return false;
+			break;
+		}
+		case CONSTRAINT_COINCIDE:
+		{
+			TConstraintCoincide temp;
+			if (temp.ReadFile(hf, now_pos, this))
+				AddElement(&temp);
+			else
+				return false;
+			break;
+		}
+		case CONSTRAINT_COLINEAR:
+		{
+			TConstraintColinear temp;
+			if (temp.ReadFile(hf, now_pos, this))
+				AddElement(&temp);
+			else
+				return false;
+			break;
+		}
+		default:
+			assert(0);
+			break;
+		}
+	}
+
+	CloseHandle(hf);
+	return true;
+}
+
+bool TShape::SaveToFile(TCHAR szFileName[])
+{
+
+	//Ofstream out(szFileName,std::ios::binary);
+	//for (auto pElement : m_Shape.Element)
+	//{
+	//	pElement->Save(out);
+	//}
+	//out.close();
+	//break;
+	//std::wofstream out(szFileName);
+	//for (auto element : m_Shape.Element)
+	//{
+	//	std::vector<String> vec;
+	//	vec.push_back(TEXT("aaaa"));
+	//	out << vec[0];
+	//	//out << *element;
+	//	out.close();
+	//}
+
+	//无弹窗直接存储
+	HANDLE hf;
+	hf = CreateFile(szFileName,
+		GENERIC_WRITE,
+		0,
+		(LPSECURITY_ATTRIBUTES)NULL,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+		(HANDLE)NULL);
+	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+		return false;
+	DWORD now_pos = 0;
+
+	//写入元素数量
+	int size = Element.size();
+	WriteFile(hf, &size, sizeof(size), &now_pos, NULL);
+	now_pos += sizeof(size);
+	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+		return false;
+
+	//逐条写入Element
+	for (auto pElement : Element)
+	{
+		if (!pElement->WriteFile(hf, now_pos))
+			return false;
+	}
+	CloseHandle(hf);
+
+	return true;
 }

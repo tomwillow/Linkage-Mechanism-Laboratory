@@ -51,7 +51,7 @@ TCHAR * TVariableTable::FindVariableTable(TCHAR *varstr)
 //连带value一起删
 void TVariableTable::DeleteByAddress(TCHAR *var)
 {
-	for (int i = 0; i < VariableTable.size(); i++)
+	for (size_t i = 0; i < VariableTable.size(); i++)
 	{
 		if (VariableTable[i] == var)
 		{
@@ -92,7 +92,7 @@ const TCHAR * TVariableTable::Remove(const TCHAR input_str[])
 
 	//找出存在的变量
 	TCHAR *var;
-	for (int i = 0; i < temp.size(); i++)
+	for (size_t i = 0; i < temp.size(); i++)
 		if (var=FindVariableTable(temp[i]))
 		{
 			DeleteByAddress(var);
@@ -141,7 +141,7 @@ const TCHAR * TVariableTable::Define(bool bOutput,TCHAR *input_str,TCHAR *input_
 
 		}
 
-		for (int i = 0; i < vectorStrNums.size(); i++)
+		for (size_t i = 0; i < vectorStrNums.size(); i++)
 		{
 			vectorNums.push_back(TTransfer::TCHAR2double(vectorStrNums[i]));//不合法数值被转化为0
 			delete[] vectorStrNums[i];
@@ -149,7 +149,7 @@ const TCHAR * TVariableTable::Define(bool bOutput,TCHAR *input_str,TCHAR *input_
 	}
 
 	//滤掉不合法输入
-	for (int i = 0; i < temp.size(); i++)
+	for (size_t i = 0; i < temp.size(); i++)
 	{
 		if (TMyString::isVariableName(temp[i])==false)
 		{
@@ -164,13 +164,13 @@ const TCHAR * TVariableTable::Define(bool bOutput,TCHAR *input_str,TCHAR *input_
 	}
 
 	//
-	for (int i = 0; i < temp.size(); i++)
-		if (FindVariableTable(temp[i]))
+	for (size_t i = 0; i < temp.size(); i++)
+		if (FindVariableTable(temp[i]))//已有的不再定义
 		{
 			delete[] temp[i];
 		}
 		else
-		{
+		{//未定义的进行定义
 			VariableTable.push_back(temp[i]);
 			if (input_num == NULL)
 				VariableValue.push_back(0.0);

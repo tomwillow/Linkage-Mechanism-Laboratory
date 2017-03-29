@@ -68,7 +68,9 @@
   <ItemGroup>
     <ClCompile Include="DetectMemoryLeak.cpp" />
     <ClCompile Include="DialogAddDriver.cpp" />
+    <ClCompile Include="ShowMessage.cpp" />
     <ClCompile Include="TConstraintColinear.cpp" />
+    <ClCompile Include="TDialogBox.cpp" />
     <ClCompile Include="TDragTool.cpp" />
     <ClCompile Include="TEquations.cpp" />
     <ClCompile Include="main.cpp" />
@@ -119,8 +121,10 @@
   <ItemGroup>
     <ClInclude Include="DetectMemoryLeak.h" />
     <ClInclude Include="DialogAddDriver.h" />
+    <ClInclude Include="ShowMessage.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="TConstraintColinear.h" />
+    <ClInclude Include="TDialogBox.h" />
     <ClInclude Include="TDragTool.h" />
     <ClInclude Include="TEquations.h" />
     <ClInclude Include="resource.h" />
@@ -178,6 +182,9 @@
     <Image Include="Resource\Icon.ico" />
     <Image Include="Resource\Icon_16.ico" />
     <Image Include="Resource\toolbar_mechanism.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

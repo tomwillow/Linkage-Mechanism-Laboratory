@@ -1,6 +1,6 @@
 #pragma once
-#define _CRT_SECURE_NO_WARNINGS
-#define _CRT_NON_CONFORMING_SWPRINTFS
+//#define _CRT_SECURE_NO_WARNINGS
+//#define _CRT_NON_CONFORMING_SWPRINTFS
 #include "DetectMemoryLeak.h"
 
 #include <time.h>
@@ -8,7 +8,11 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "MyMath.h"
+
 #include "TSolver.h"
+
+#include "TMyString.h"
 
 #include "DPOINT.h"
 #include "TMainWindow.h"
@@ -30,7 +34,7 @@ TSolver::TSolver()
 
 TSolver::~TSolver()
 {
-	delete Equations;
+	ClearEuqations();
 }
 
 void TSolver::SetHwnd(HWND hwnd)
@@ -133,20 +137,25 @@ void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt)
 	}
 }
 
+void TSolver::ClearEuqations()
+{
+	if (Equations != NULL)
+		delete Equations;
+	Equations = new TEquations;
+}
+
 void TSolver::RefreshEquations(bool Output)
 {
 	bOutput = Output;
 	Str = TEXT("");
 	_tcscpy(subsVar, TEXT(""));
 	_tcscpy(subsValue, TEXT(""));
-	if (Equations != NULL)
-		delete Equations;
-	Equations = new TEquations;
+	ClearEuqations();
 
 	Outputln(TEXT("自由度: DOF = nc-nh = %d - %d = %d"), pShape->nc(), pShape->nh(), pShape->DOF());
 	int i, j;
 	DPOINT SiP, SjP,SiQ,SjQ;
-	TCHAR buffer1[100], buffer2[100];
+	TCHAR buffer1[1024], buffer2[1024];
 
 	Outputln(TEXT("\r\n约束方程:"));
 
@@ -177,14 +186,17 @@ void TSolver::RefreshEquations(bool Output)
 		}
 		case CONSTRAINT_COLINEAR:
 		{
-			break;
-			//pShape->GetSijP(element, &SiP, &SjP, &i, &j);
-			pShape->GetSP(((TConstraintColinear *)element)->pElement[0],0,)
+			TConstraintColinear *pColinear = (TConstraintColinear *)element;
+			pShape->GetSP(pColinear->pElement[0], 0, SiP, i);
+			pShape->GetSQ(pColinear->pElement[0], 0, SiQ, i);
+
+			pShape->GetSP(pColinear->pElement[1], 0, SjP, j);
+			pShape->GetSQ(pColinear->pElement[1], 0, SjQ, j);
 
 			//得到2个重合构件的广义坐标
 			double xi, yi, phii, xj, yj, phij;
-			pShape->GetCoordinateByElement(((TConstraintColinear *)element)->pElement[0], &xi, &yi, &phii);
-			pShape->GetCoordinateByElement(((TConstraintColinear *)element)->pElement[1], &xj, &yj, &phij);
+			pShape->GetCoordinateByElement(pColinear->pElement[0], &xi, &yi, &phii);
+			pShape->GetCoordinateByElement(pColinear->pElement[1], &xj, &yj, &phij);
 
 			//定义变量及其初始值
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
@@ -192,23 +204,25 @@ void TSolver::RefreshEquations(bool Output)
 			Equations->VariableTable.Define(Output, buffer1, buffer2);
 
 			//读入方程
-			_stprintf(buffer1, TEXT("(cos(phii)*(yiP-yiQ)+sin(phii)*(xiP-xiQ))*(xi-xj+xip*cos(phii)-xjp*cos(phij)-yip*sin(phii)+yjp*sin(phij))\
-																	-(cos(phii)*(xiP-xiQ)-sin(phii)*(yiP-yiQ))*(yi-yj+yip*cos(phii)-yjp*cos(phij)+xip*sin(phii)-xjp*sin(phij)))"),
+			_stprintf(buffer1, TEXT("(cos(phi%d)*(%f-%f)+sin(phi%d)*(%f-%f))*(x%d-x%d+%f*cos(phi%d)-%f*cos(phi%d)-%f*sin(phi%d)+%f*sin(phi%d))\
+								-(cos(phi%d)*(%f-%f)-sin(phi%d)*(%f-%f))*(y%d-y%d+%f*cos(phi%d)-%f*cos(phi%d)+%f*sin(phi%d)-%f*sin(phi%d))"),
 																	i, SiP.y, SiQ.y, i, SiP.x, SiQ.x, i, j, SiP.x, i, SjP.x, j, SiP.y, i, SjP.y, j,
 																	i, SiP.x, SiQ.x, i, SiP.y, SiQ.y, i, j, SiP.y, i, SjP.y, j, SiP.x, i, SjP.x, j);
-			//_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
-			//_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d-%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
+			_stprintf(buffer2, TEXT("(cos(phi%d-phi%d)*(%f-%f)+sin(phi%d-phi%d)*(%f-%f))*(%f-%f)-(cos(phi%d-phi%d)*(%f-%f)-sin(phi%d-phi%d)*(%f-%f))*(%f-%f)"),
+										i,j,SiP.y,SiQ.y,i,j,SiP.x,SiQ.x,SjP.x,SjQ.x,i,j,SiP.x,SiQ.x,i,j,SiP.y,SiQ.y,SjP.y,SjQ.y);
+
 			Outputln(Equations->AddEquation(Output, buffer1, false));
-			//Outputln(Equations->AddEquation(Output, buffer2, false));
+			Outputln(Equations->AddEquation(Output, buffer2, false));
 			break;
 		}
+		case ELEMENT_SLIDEWAY:
 		case ELEMENT_FRAMEPOINT:
 		{
 			int id = element->id;
 
 			_stprintf(subsVar, TEXT("%s x%d y%d phi%d"), subsVar, id, id, id);
-
-			_stprintf(subsValue, TEXT("%s %f %f %f"), subsValue, ((TFramePoint *)(element))->dpt.x, ((TFramePoint *)(element))->dpt.y, 0.0);
+			_stprintf(subsValue, TEXT("%s %f %f %f"), subsValue, element->dpt.x,element->dpt.y, element->angle);
+			//Solve时，建立Jacobian会替换掉
 			break;
 		}
 		}
@@ -232,6 +246,7 @@ void TSolver::ClearOutput()
 	Str = TEXT("");
 }
 
+//必须使用了本函数才刷新Edit内容
 void TSolver::RefreshWindowText()
 {
 	if (hwndOutput != NULL)
@@ -246,6 +261,7 @@ void TSolver::RefreshWindowText()
 	}
 }
 
+//求解
 void TSolver::Solve(bool Output)
 {
 	bOutput = Output;
@@ -255,11 +271,11 @@ void TSolver::Solve(bool Output)
 
 	start = clock();
 
-	Outputln(Equations->BuildJacobi(Output, subsVar, subsValue));
-	Outputln(Equations->VariableTable.Output());
-	Outputln(Equations->SolveEquations(Output));
+	Outputln(Equations->BuildJacobian(Output, subsVar, subsValue));//建立Jacobian
+	Outputln(Equations->VariableTable.Output());//输出当前变量
+	Outputln(Equations->SolveEquations(Output));//解方程
 
-	if (Equations->hasSolved)
+	if (Equations->hasSolved)//解出
 	{
 		for (size_t i = 0; i < Equations->VariableTable.VariableTable.size(); i++)
 		{
@@ -284,21 +300,20 @@ void TSolver::Solve(bool Output)
 			{
 			case ELEMENT_BAR:
 			case ELEMENT_REALLINE:
+			case ELEMENT_SLIDEWAY:
 			{
 				TBar *bar = (TBar *)element;
 				switch (eQType)
 				{
 				case x:
-					((TBar *)bar)->ptBegin.x = data;
+					((TBar *)bar)->dpt.x = data;
 					break;
 				case y:
-					((TBar *)bar)->ptBegin.y = data;
+					((TBar *)bar)->dpt.y = data;
 					break;
 				case phi:
-					//bar->dAngle = data;
-					if (abs(data) > 2 * M_PI)
-						data = abs(data / M_PI / 2 - (int)(data / M_PI / 2)) * 2 * M_PI;
-					bar->SetPoint(bar->ptBegin, bar->dLength, data);
+					data = MakeIn2Pi(data);
+					bar->SetPoint(bar->ptBegin, bar->dLength,data );
 					break;
 				}
 				break;
@@ -314,6 +329,7 @@ void TSolver::Solve(bool Output)
 					element->dpt.y = data;
 					break;
 				case phi:
+					data = MakeIn2Pi(data);
 					element->angle = data;
 					break;
 				}
@@ -336,15 +352,31 @@ void TSolver::Solve(bool Output)
 
 void TSolver::Demo()
 {
-	TExpressionTree ex;
-	TVariableTable VarTable;
-	Outputln(VarTable.Define(true,TEXT("  x   y z   ")));
-	Outputln(ex.LinkVariableTable(&VarTable));
-	Outputln(ex.Read(TEXT("sqrt(x/y)"), true));
-	Outputln(ex.Simplify(true));
-	Outputln(ex.Diff(TEXT("x"), 1, true));
-	Outputln(ex.Simplify(true));
-	Outputln(ex.Subs(TEXT("x y"), TEXT(" y 0.1 "), true));
-	Outputln(ex.Simplify(true));
-	Outputln(TEXT("%f"), ex.Value(true));
+	//Outputln(Equations->VariableTable.Define(true, TEXT("x1 y1 phi1 x2 y2 phi2 l t"),TEXT("0 0 0 2.3 0 0 1.3 0")));
+	//Outputln(Equations->AddEquation(true, TEXT("x1"), false));
+	//Outputln(Equations->AddEquation(true, TEXT("y1"), false));
+	//Outputln(Equations->AddEquation(true, TEXT("y2"), false));
+	//Outputln(Equations->AddEquation(true, TEXT("x1-x2+cos(phi1)+l*sin(phi2)"), false));
+	//Outputln(Equations->AddEquation(true, TEXT("y1-y2+sin(phi1)-l*cos(phi2)"), false));
+	//Outputln(Equations->AddEquation(true, TEXT("phi1-t"), false));
+	//Outputln(Equations->BuildJacobian(true, TEXT("l t"), TEXT("1.3 0")));
+
+	Outputln(Equations->VariableTable.Define(true, TEXT("x2 phi2"), TEXT("0 0")));
+	Outputln(Equations->AddEquation(true, TEXT("-x2+1+1.3*sin(phi2)"), false));
+	Outputln(Equations->AddEquation(true, TEXT("-1.3*cos(phi2)"), false));
+	Outputln(Equations->BuildJacobian(true, TEXT("l t"), TEXT("1.3 0")));
+	Outputln(Equations->SolveEquations(true));
+	RefreshWindowText();
+	//建立ExpressionTree
+	//TExpressionTree ex;
+	//TVariableTable VarTable;
+	//Outputln(VarTable.Define(true,TEXT("  x   y z   ")));
+	//Outputln(ex.LinkVariableTable(&VarTable));
+	//Outputln(ex.Read(TEXT("sqrt(x/y)"), true));
+	//Outputln(ex.Simplify(true));
+	//Outputln(ex.Diff(TEXT("x"), 1, true));
+	//Outputln(ex.Simplify(true));
+	//Outputln(ex.Subs(TEXT("x y"), TEXT(" y 0.1 "), true));
+	//Outputln(ex.Simplify(true));
+	//Outputln(TEXT("%f"), ex.Value(true));
 }

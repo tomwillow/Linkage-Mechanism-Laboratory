@@ -44,6 +44,11 @@ void TConfiguration::Initial(HWND hwnd)
 	crGridSmall = RGB(39, 45, 56);
 
 	logpen = { iStyle, { iWidth, 0 }, crPen };
+
+	//Graph
+	crGraphBackground = RGB(240, 240, 240);
+	crGraphGridBig = RGB(200, 200, 200);
+	crGraphGridSmall = RGB(220, 220, 220);
 }
 
 void TConfiguration::SetDPU(double Proportion)

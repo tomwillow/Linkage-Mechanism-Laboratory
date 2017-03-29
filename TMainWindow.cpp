@@ -5,6 +5,8 @@
 #include "TMainWindow.h"
 
 #include "TConstraintCoincide.h" 
+#include "TConstraintColinear.h"
+#include "TSlider.h"
 #include "TSolver.h"
 #include "TConsole.h"
 #include "TSelectTool.h"
@@ -69,9 +71,10 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Status.Create(hWnd, IDR_STATUS, m_hInst, 24);
 	m_Status.AddPart(IDR_STATUS_COORDINATE, 160, PT_FIXED);//坐标
 	m_Status.AddPart(0, 0, PT_NONE);
+	m_Status.AddPart(0, 24, PT_FIXED);//连杆绘制/真实绘制
 	m_Status.AddPart(IDR_STATUS_PROPORTIONNAME, 40, PT_FIXED);//比例：
 	m_Status.AddPart(IDR_STATUS_TRACKBAR, 120, PT_FIXED);//
-	m_Status.AddPart(IDR_STATUS_PROPORTION, 60, PT_FIXED);//100%
+	m_Status.AddPart(IDR_STATUS_PROPORTION, 60, PT_FIXED);//比例数字
 	m_Status.AddPart(0, 6, PT_FIXED);//留给拖动三角的
 	m_Status.FreshSize();
 
@@ -202,9 +205,8 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		RightWindow.TreeViewContent.Initial();
 		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);
-		m_ManageTool.SetCurActiveTool(ID_SELECT);
+		OnCommand(MAKELONG(ID_SELECT, 0), 0);
 
-		//m_Solver.RefreshEquations(true);
 		pSolver->RefreshEquations(true);
 		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
 		break;
@@ -217,10 +219,9 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		//准备打开对话框
 		OPENFILENAME ofn;
-		HANDLE hf;
 
 		InitialOpenFileName(&ofn, m_hWnd, szFileName);
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;//限定文件必须存在
 
 		if (GetOpenFileName(&ofn) == TRUE)
 		{
@@ -229,134 +230,14 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//无条件初始化
 			_tcscpy(szFileName, szFileNameBackup);
 
-			hf = CreateFile(ofn.lpstrFile,
-				GENERIC_READ,
-				0,
-				(LPSECURITY_ATTRIBUTES)NULL,
-				OPEN_EXISTING,
-				FILE_ATTRIBUTE_NORMAL,
-				(HANDLE)NULL);
-			if (GetLastError() != 0)
+			if (m_Shape.ReadFromFile(ofn.lpstrFile))
 			{
+				RightWindow.TreeViewContent.AddAllItem();
+				SetText(TEXT("%s - %s"), szName, szFileName);
+				pSolver->RefreshEquations(true);
+			}
+			else
 				ShowMessage(TEXT("Error:%d"), GetLastError());
-				return;
-			}
-
-			//读入元素数量
-			DWORD real_pos = 0;
-			DWORD *now_pos = &real_pos;
-			int size;
-			ReadFile(hf, &size, sizeof(size), now_pos, NULL);
-			if (GetLastError() != 0)
-			{
-				ShowMessage(TEXT("Error:%d"), GetLastError());
-				return;
-			}
-			*now_pos += sizeof(size);
-
-			EnumElementType eType;
-			for (int i = 0; i < size; i++)
-			{
-				//读入类型
-				ReadFile(hf, &eType, sizeof(EnumElementType), now_pos, NULL);
-				if (GetLastError() != 0)
-				{
-					ShowMessage(TEXT("Error:%d"), GetLastError());
-					return;
-				}
-				*now_pos += sizeof(EnumElementType);
-
-				//按照类型读入元素
-				switch (eType)
-				{
-				case ELEMENT_BAR:
-				{
-					TBar *temp = new TBar;
-					ReadFile(hf, temp, m_Shape.GetSizeOfElement(eType), now_pos, NULL);
-					if (GetLastError() != 0)
-					{
-						ShowMessage(TEXT("Error:%d"), GetLastError());
-					}
-					else
-						m_Shape.AddElement(temp);
-					delete temp;
-					break;
-				}
-				case ELEMENT_REALLINE:
-				{
-					TRealLine *temp = new TRealLine;
-					ReadFile(hf, temp, m_Shape.GetSizeOfElement(eType), now_pos, NULL);
-					if (GetLastError() != 0)
-					{
-						ShowMessage(TEXT("Error:%d"), GetLastError());
-					}
-					else
-						m_Shape.AddElement(temp);
-					delete temp;
-					break;
-				}
-				case ELEMENT_FRAMEPOINT:
-				{
-					TFramePoint *temp = new TFramePoint;
-					ReadFile(hf, temp, m_Shape.GetSizeOfElement(eType), now_pos, NULL);
-					if (GetLastError() != 0)
-					{
-						ShowMessage(TEXT("Error:%d"), GetLastError());
-					}
-					else
-						m_Shape.AddElement(temp); 
-					delete temp;
-					break;
-				}
-				case ELEMENT_SLIDEWAY:
-				{
-					TSlideway *temp = new TSlideway;
-					ReadFile(hf, temp, m_Shape.GetSizeOfElement(eType), now_pos, NULL);
-					if (GetLastError() != 0)
-					{
-						ShowMessage(TEXT("Error:%d"), GetLastError());
-					}
-					else
-						m_Shape.AddElement(temp);
-					delete temp;
-					break;
-				}
-				case CONSTRAINT_COINCIDE:
-				{
-					TConstraintCoincide *temp = new TConstraintCoincide;
-					ReadFile(hf, temp, m_Shape.GetSizeOfElement(eType), now_pos, NULL);
-					if (GetLastError() != 0)
-					{
-						ShowMessage(TEXT("Error:%d"), GetLastError());
-					}
-					else
-					{
-						//如果是约束则读入两连接件id
-						int id1, id2;
-						ReadFile(hf, &id1, sizeof(id1), now_pos, NULL);
-						ReadFile(hf, &id2, sizeof(id2), now_pos, NULL);
-
-						temp->pElement[0] = m_Shape.GetElementById(id1);
-						temp->pElement[1] = m_Shape.GetElementById(id2);
-
-						temp->BuildpDpt();
-
-						m_Shape.AddElement(temp);
-					}
-					delete temp;
-					break;
-				}
-				default:
-					assert(0);
-					break;
-				}
-			}
-
-			CloseHandle(hf);
-			RightWindow.TreeViewContent.AddAllItem();
-			SetText(TEXT("%s - %s"), szName, szFileName);
-			//m_Solver.RefreshEquations(true);
-			pSolver->RefreshEquations(true);
 		}
 		break;
 	case ID_SAVE:
@@ -375,69 +256,13 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 					return;
 			}
 
-		//无弹窗直接存储
-		HANDLE hf;
-		hf = CreateFile(szFileName,
-			GENERIC_WRITE,
-			0,
-			(LPSECURITY_ATTRIBUTES)NULL,
-			CREATE_ALWAYS,
-			FILE_ATTRIBUTE_NORMAL,
-			(HANDLE)NULL);
-		if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
-		{
+		if (!m_Shape.SaveToFile(szFileName))
 			ShowMessage(TEXT("Error:%d"), GetLastError());
-			return;
-		}
-		DWORD real_pos = 0;
-		DWORD *now_pos = &real_pos;
-
-		//写入元素数量
-		int size = m_Shape.Element.size();
-		WriteFile(hf, &size, sizeof(size), now_pos, NULL);
-		*now_pos += sizeof(size);
-		if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+		else
 		{
-			ShowMessage(TEXT("Error:%d"), GetLastError());
-			return;
+			ShowMessage(TEXT("保存%s成功。"), szFileName);
+			SetText(TEXT("%s - %s"), szName, szFileName);
 		}
-
-		//逐条写入Element
-		for (auto element : m_Shape.Element)
-		{
-			//写入类型标记
-			WriteFile(hf, &(element->eType), sizeof(EnumElementType), now_pos, NULL);
-			*now_pos += sizeof(EnumElementType);
-			if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
-			{
-				ShowMessage(TEXT("Error:%d"), GetLastError());
-				return;
-			}
-
-			//写入数据
-			WriteFile(hf, element, m_Shape.GetSizeOfElement(element->eType), now_pos, NULL);
-			*now_pos += m_Shape.GetSizeOfElement(element->eType);
-			if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
-			{
-				ShowMessage(TEXT("Error:%d"), GetLastError());
-				return;
-			}
-
-			//如果是约束则写入两连接件id
-			if (element->eType == CONSTRAINT_COINCIDE)
-			{
-				TConstraintCoincide *temp = (TConstraintCoincide *)element;
-				WriteFile(hf, &(temp->pElement[0]->id), sizeof(temp->pElement[0]->id), now_pos, NULL);
-				*now_pos += sizeof(temp->pElement[0]->id);
-				WriteFile(hf, &(temp->pElement[1]->id), sizeof(temp->pElement[1]->id), now_pos, NULL);
-				*now_pos += sizeof(temp->pElement[1]->id);
-			}
-
-		}
-		CloseHandle(hf);
-		ShowMessage(TEXT("保存%s成功。"), szFileName);
-		SetText(TEXT("%s - %s"), szName, szFileName);
-
 	}
 	break;
 	case ID_SAVEAS:
@@ -471,7 +296,12 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_ANALYZE_MECHANISM:
 		if (pConsole == NULL)
 			OnCommand(ID_SHOW_CONSOLE, 0);
-		pSolver->RefreshEquations(true);
+		//pSolver->RefreshEquations(true);
+
+		pSolver->ClearOutput();
+		pSolver->ClearEuqations();
+		pSolver->Demo();
+
 		break;
 	case ID_SHOW_CONSOLE:
 	{
@@ -480,7 +310,6 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		else
 		{
 			pConsole = new TConsole;
-			//pConsole->pSolver = &m_Solver;
 			pConsole->pSolver = pSolver;
 			pConsole->CreateEx(0, TEXT("Console"), TEXT("Console"),
 				WS_OVERLAPPEDWINDOW,
@@ -514,13 +343,6 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		std::vector<DPOINT> dptVector;
 		DPOINT dpt;
-		double y;
-		//for (double t = 0; t < 1000; ++t)
-		//{
-		//	dpt.x = t / 10 * cos(t / 10);
-		//	dpt.y = t / 10 * sin(t / 10);
-		//	dptVector.push_back(dpt);
-		//}
 		for (double x = 0; x < 1000; ++x)
 		{
 			dpt.x = x;
@@ -532,9 +354,9 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 	case ID_SET_DRIVER:
 	{
-		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT)
+		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT || m_ManageTool.m_uiCurActiveTool==ID_DRAG)
 		{
-			if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
+			//if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
 				//选择工具 且 选中元素可驱动 则弹出原动件对话框
 				if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DlgAddDriverProc))
 				{

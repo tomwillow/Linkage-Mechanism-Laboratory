@@ -69,7 +69,7 @@ public:
 		return temp;
 	}
 	
-	TElement * GetElementById(int id);
+	TElement* TShape::GetElementById(int id);
 	int TShape::CalcFrameNum();
 	int TShape::nc();
 	int TShape::nh();
@@ -82,5 +82,7 @@ public:
 	void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, double *theta);
 	DWORD TShape::GetSizeOfElement(EnumElementType eType);
 	void TShape::ChangePos(int index, DPOINT dptDelta);
+	bool TShape::ReadFromFile(TCHAR szFileName[]);
+	bool TShape::SaveToFile(TCHAR szFileName[]);
 };
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "String.h"
 #include <initializer_list>
 
 class DPOINT
@@ -16,3 +17,4 @@ public:
 	DPOINT& operator-(DPOINT &dpt);
 };
 
+Ofstream& operator<<(Ofstream& out, DPOINT &dpt);

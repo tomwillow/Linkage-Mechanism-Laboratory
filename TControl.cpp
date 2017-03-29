@@ -6,6 +6,9 @@
 
 TControl::TControl()
 {
+	m_hWnd = NULL;
+	m_hWndParent = NULL;
+	m_hInst = NULL;
 }
 
 
@@ -36,12 +39,17 @@ LRESULT CALLBACK TControl::subControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 		return CallWindowProc((WNDPROC)oldProc, hWnd, uMsg, wParam, lParam);
 }
 
+void TControl::LinkControl(HWND hwnd)
+{
+	m_hWnd = hwnd;
+	RegisterProc();
+}
+
 void TControl::RegisterProc()//创建窗口后注册
 {
 	SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
 
-	WNDPROC oldProc;
-	oldProc = (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subControlProc);
+	WNDPROC oldProc= (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subControlProc);
 
 	SetProp(m_hWnd, TEXT("oldProc"), oldProc);
 }

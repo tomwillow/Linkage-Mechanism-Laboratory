@@ -40,5 +40,6 @@ public:
 	void TSolver::RefreshWindowText();
 	void TSolver::ClearConstraint();
 	void TSolver::Demo();
+	void TSolver::ClearEuqations();
 };
 

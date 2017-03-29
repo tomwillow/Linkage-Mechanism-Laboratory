@@ -8,11 +8,18 @@
 TLine::TLine() :dAngle(angle)
 {
 	TLine::dLength = 0;
-	_tcscpy_s(Name, TEXT("TLine"));
+	_tcscpy(Name, TEXT("TLine"));
 }
-
-
 
 TLine::~TLine()
 {
+}
+
+TLine& TLine::operator=(const TLine &Line)
+{
+	TElement::operator=(Line);
+	ptBegin = Line.ptBegin;
+	ptEnd = Line.ptEnd;
+	dLength = Line.dLength;
+	return *this;
 }

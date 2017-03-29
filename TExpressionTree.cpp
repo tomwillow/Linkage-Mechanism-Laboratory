@@ -1906,6 +1906,7 @@ void TExpressionTree::CopyVariableTable(std::vector<TCHAR *> &Dest, const std::v
 		Dest.push_back(source[i]);
 }
 
+//替换 VarsVector变量 NumsVector数字
 TCHAR * TExpressionTree::Subs(std::vector<TCHAR *> VarsVector, std::vector<double> NumsVector, bool output)
 {
 	if (eError == ERROR_NO)
@@ -1967,6 +1968,7 @@ TCHAR * TExpressionTree::Subs(std::vector<TCHAR *> VarsVector, std::vector<doubl
 	return GetErrorInfo();
 }
 
+//替换  vars变量串 nums数字串 以空格分隔，支持表达式替换
 TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums, bool output)
 {
 	if (eError == ERROR_NO)

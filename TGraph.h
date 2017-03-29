@@ -20,6 +20,8 @@ private:
 	RECT rcGraph;
 	std::vector<DPOINT> dptVector;
 	int iPick;
+
+	int iMargin;
 	void TGraph::OnSize(WPARAM wParam, LPARAM lParam);
 	void TGraph::OnDraw(HDC hdc);
 	bool TGraph::OnClose();
@@ -30,5 +32,6 @@ public:
 	TGraph(TConfiguration *pConfig);
 	~TGraph();
 	void TGraph::InputDptVector(std::vector<DPOINT> &dptInputVector);
+	void TGraph::SetMargin(int iMargin);
 };
 

@@ -17,5 +17,7 @@ public:
 	void TSlider::NoticeListView(TListView *pListView);
 	TSlider();
 	~TSlider();
+	virtual bool TSlider::WriteFile(HANDLE &hf, DWORD &now_pos);
+	virtual bool TSlider::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape);
 };
 

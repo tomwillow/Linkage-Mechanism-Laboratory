@@ -6,8 +6,8 @@
 #include "TControl.h"
 class TEdit :public TControl
 {
+private:
 protected:
-	HWND hParent;
 	bool bVisible;
 
 	//虚拟消息处理函数，可重载
@@ -24,8 +24,6 @@ protected:
 public:
 	bool bMultiLine,bAutoHScrol,bAutoVScrol,bNoHideSel;
 	HFONT m_hFont;
-	HWND m_hWnd;
-	HINSTANCE m_hInst;
 	TEdit();
 	~TEdit();
 	void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle = WS_EX_CLIENTEDGE);//创建Edit

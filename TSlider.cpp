@@ -41,3 +41,45 @@ void TSlider::NoticeListView(TListView *pListView)
 	//pListView->AddAttributeItem(TEXT("P2"), CTRLTYPE_COOR_P2_EDIT, &ptEnd, TEXT("%.3f,%.3f"), ptEnd.x, ptEnd.y);
 	//pListView->AddAttributeItem(TEXT("³¤¶È"), CTRLTYPE_LEN_EDIT, NULL, TEXT("%f"), dLength);
 }
+
+bool TSlider::WriteFile(HANDLE &hf, DWORD &now_pos)
+{
+	TElement::WriteFile(hf, now_pos);
+
+	size_t vecLineSize = vecLine.size();
+	::WriteFile(hf, &(vecLineSize), sizeof(vecLineSize), &now_pos, NULL);
+	now_pos += sizeof(vecLineSize);
+
+	for (auto iLine : vecLine)
+	{
+		::WriteFile(hf, &iLine, sizeof(iLine), &now_pos, NULL);
+		now_pos += sizeof(iLine);
+	}
+
+	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+		return false;
+	else
+		return true;
+}
+
+bool TSlider::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
+{
+	TElement::ReadFile(hf, now_pos,pShape);
+
+	size_t vecLineSize;
+	::ReadFile(hf, &(vecLineSize), sizeof(vecLineSize), &now_pos, NULL);
+	now_pos += sizeof(vecLineSize);
+
+	LinkLine tempLink;
+	for (size_t i = 0; i < vecLineSize;++i)
+	{
+		::ReadFile(hf, &tempLink, sizeof(tempLink), &now_pos, NULL);
+		now_pos += sizeof(tempLink);
+		vecLine.push_back(tempLink);
+	}
+
+	if (GetLastError() != 0)
+		return false;
+	else
+		return true;
+}

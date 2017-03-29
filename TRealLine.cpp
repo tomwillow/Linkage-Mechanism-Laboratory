@@ -30,8 +30,8 @@ void TRealLine::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
 	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
 	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
-	pListView->AddAttributeItem(TEXT("P1"), CTRLTYPE_COOR_P1_EDIT, &ptBegin, TEXT("%.3f,%.3f"), ptBegin.x, ptBegin.y);
-	pListView->AddAttributeItem(TEXT("P2"), CTRLTYPE_COOR_P2_EDIT, &ptEnd, TEXT("%.3f,%.3f"), ptEnd.x, ptEnd.y);
+	pListView->AddAttributeItem(TEXT("P0"), CTRLTYPE_COOR_P1_EDIT, &ptBegin, TEXT("%.3f,%.3f"), ptBegin.x, ptBegin.y);
+	pListView->AddAttributeItem(TEXT("P1"), CTRLTYPE_COOR_P2_EDIT, &ptEnd, TEXT("%.3f,%.3f"), ptEnd.x, ptEnd.y);
 	pListView->AddAttributeItem(TEXT("长度"), CTRLTYPE_LEN_EDIT, NULL, TEXT("%f"), dLength);
 	pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_EDIT, NULL, TEXT("%f"), REG2DEG(dAngle));
 }
@@ -110,18 +110,42 @@ void TRealLine::SetPointByIvoryLine(int iIvoryLine, DPOINT dptBegin, double leng
 
 TRealLine& TRealLine::operator=(const TRealLine &realline)
 {
-	this->id = realline.id;
-	this->available = realline.available;
-	_tcscpy(this->Name, realline.Name);
-	this->logpenStyle = realline.logpenStyle;
-	this->logpenStyleShow = realline.logpenStyleShow;
-	this->vecDpt = realline.vecDpt;
-	this->vecIsJoint = realline.vecIsJoint;
-	this->dpt = realline.dpt;
-	this->angle = realline.angle;
+	TElement::operator=(realline);
 
-	this->dLength = realline.dLength;
-	this->ptBegin = realline.dpt;
+	TLine::operator=(realline);
+
 	this->ptEnd = realline.ptEnd;
 	return *this;
+}
+
+bool TRealLine::WriteFile(HANDLE &hf, DWORD &now_pos)
+{
+	TElement::WriteFile(hf, now_pos);
+
+	::WriteFile(hf, &ptEnd, sizeof(ptEnd), &now_pos, NULL);
+	now_pos += sizeof(ptEnd);
+
+	::WriteFile(hf, &dLength, sizeof(dLength), &now_pos, NULL);
+	now_pos += sizeof(dLength);
+
+	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+		return false;
+	else
+		return true;
+}
+
+bool TRealLine::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
+{
+	TElement::ReadFile(hf, now_pos,pShape);
+
+	::ReadFile(hf, &ptEnd, sizeof(ptEnd), &now_pos, NULL);
+	now_pos += sizeof(ptEnd);
+
+	::ReadFile(hf, &dLength, sizeof(dLength), &now_pos, NULL);
+	now_pos += sizeof(dLength);
+
+	if (GetLastError() != 0)
+		return false;
+	else
+		return true;
 }

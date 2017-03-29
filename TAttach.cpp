@@ -225,7 +225,7 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 				bAttachedEndpoint = true;
 				bShowAttachPoint = true;
 				pAttachElement = pRealLine;
-				iAttachElementPointIndex = 1;
+				iAttachElementPointIndex = 0;
 				dptAttach = pRealLine->ptBegin;
 				return true;
 			}
@@ -236,7 +236,7 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 				bAttachedEndpoint = true;
 				bShowAttachPoint = true;
 				pAttachElement = pRealLine;
-				iAttachElementPointIndex = 2;
+				iAttachElementPointIndex = 1;
 				dptAttach = pRealLine->ptEnd;
 				return true;
 			}

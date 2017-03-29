@@ -17,9 +17,9 @@ TEquations::~TEquations()
 		delete Equations[i];
 
 	//释放雅可比
-	for (int i = 0; i < Jacobi.size(); i++)
-		for (int j = 0; j < Jacobi[i].size(); j++)
-			delete Jacobi[i][j];
+	for (int i = 0; i < Jacobian.size(); i++)
+		for (int j = 0; j < Jacobian[i].size(); j++)
+			delete Jacobian[i][j];
 }
 
 void TEquations::RemoveTempEquations()
@@ -53,13 +53,14 @@ const TCHAR * TEquations::AddEquation(bool output,TCHAR *szInput, bool istemp)
 	temp->Read(szInput, false);
 	temp->Simplify(false);
 
-	if ((eError=temp->GetError()) != ERROR_NO)
+	if ((eError=temp->GetError()) != ERROR_NO)//若出错
 	{
 		Str += temp->GetErrorInfo();
 		delete temp;
 		return Str.c_str();
 	}
 
+	//加入方程组
 	Equations.push_back(temp);
 	EquationIsTemp.push_back(istemp);
 
@@ -69,15 +70,15 @@ const TCHAR * TEquations::AddEquation(bool output,TCHAR *szInput, bool istemp)
 		return NULL;
 }
 
-const TCHAR * TEquations::BuildJacobi(bool bOutput,TCHAR *subsVar,TCHAR *subsValue)
+const TCHAR * TEquations::BuildJacobian(bool bOutput,TCHAR *subsVar,TCHAR *subsValue)
 {
 	if (eError != ERROR_NO)
 		return Str.c_str();
 
 	//释放旧的雅可比
-	for (int i = 0; i < Jacobi.size(); i++)
-		for (int j = 0; j < Jacobi[i].size(); j++)
-			delete Jacobi[i][j];
+	for (int i = 0; i < Jacobian.size(); i++)
+		for (int j = 0; j < Jacobian[i].size(); j++)
+			delete Jacobian[i][j];
 
 	TExpressionTree *temp;
 	TVariableTable exceptVars;
@@ -86,8 +87,8 @@ const TCHAR * TEquations::BuildJacobi(bool bOutput,TCHAR *subsVar,TCHAR *subsVal
 		exceptVars.Define(bOutput,subsVar);
 
 	//构建雅可比矩阵
-	Jacobi.clear();
-	Jacobi.resize(Equations.size());
+	Jacobian.clear();
+	Jacobian.resize(Equations.size());
 	for (int i = 0; i < Equations.size(); i++)
 	{
 		//替换掉机架点坐标
@@ -104,7 +105,7 @@ const TCHAR * TEquations::BuildJacobi(bool bOutput,TCHAR *subsVar,TCHAR *subsVal
 				*temp = *Equations[i];
 				temp->Diff(VariableTable.VariableTable[j], 1, false);
 				temp->Simplify(false);
-				Jacobi[i].push_back(temp);
+				Jacobian[i].push_back(temp);
 			}
 		}
 	}
@@ -125,15 +126,15 @@ const TCHAR * TEquations::BuildJacobi(bool bOutput,TCHAR *subsVar,TCHAR *subsVal
 		}
 		Str += TEXT("]\r\n");
 
-		Str += TEXT("\r\nJacobi=\r\n[");
-		for (int ii = 0; ii < Jacobi.size(); ii++)
+		Str += TEXT("\r\nJacobian=\r\n[");
+		for (int ii = 0; ii < Jacobian.size(); ii++)
 		{
-			for (int jj = 0; jj < Jacobi[ii].size(); jj++)
+			for (int jj = 0; jj < Jacobian[ii].size(); jj++)
 			{
-				Str += Jacobi[ii][jj]->OutputStr();
+				Str += Jacobian[ii][jj]->OutputStr();
 				Str += TEXT(" ");
 			}
-			if (ii != Jacobi.size() - 1)
+			if (ii != Jacobian.size() - 1)
 				Str += TEXT(";\r\n");
 		}
 		Str += TEXT("]\r\n");
@@ -179,27 +180,27 @@ void TEquations::Output(Vector& v)
 }
 
 //利用变量表中的值计算雅可比
-void TEquations::CalcJacobiValue(Matrix &JacobiValue,const Vector &Q)
+void TEquations::CalcJacobianValue(Matrix &JacobianValue,const Vector &Q)
 {
-	JacobiValue.clear();
-	JacobiValue.resize(Jacobi.size());
+	JacobianValue.clear();
+	JacobianValue.resize(Jacobian.size());
 	TExpressionTree *temp;
-	for (size_t i = 0; i < Jacobi.size();i++)
+	for (size_t i = 0; i < Jacobian.size();i++)
 	{
-		for (auto exprJacobi:Jacobi[i])
+		for (auto exprJacobian:Jacobian[i])
 		{
 			temp = new TExpressionTree;
-			*temp = *exprJacobi;
+			*temp = *exprJacobian;
 			try
 			{
 				temp->Vpa(false);
-				JacobiValue[i].push_back(temp->Value(true));//得到临时表达式值存入雅可比
+				JacobianValue[i].push_back(temp->Value(true));//得到临时表达式值存入雅可比
 			}
 			catch (enumError& err)
 			{
 				Str += TEXT("ERROR:");
 				Str += temp->OutputStr(true);
-				Str += TEXT("\r\nJacobi计算出错:");
+				Str += TEXT("\r\nJacobian计算出错:");
 				Str += temp->GetErrorInfo();
 				delete temp;
 				throw err;
@@ -275,7 +276,7 @@ enumError TEquations::SolveLinear(Matrix &A,Vector &x, Vector &b)
 
 	if (x.size() != m) x.resize(m);//仅对方阵成立
 	
-	if (m != b.size())//Jacobi行数不等于Phi行数
+	if (m != b.size())//Jacobian行数不等于Phi行数
 		return ERROR_JACOBI_ROW_NOT_EQUAL_PHI_ROW;
 
 	if (m>0)
@@ -418,7 +419,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 		return Str.c_str();
 	hasSolved = false;
 
-	Matrix JacobiValue;
+	Matrix JacobianValue;
 	Vector PhiValue, DeltaQ, &Q = VariableTable.VariableValue;
 	Vector VariableValueBackup = VariableTable.VariableValue;
 	TCHAR *buffer = new TCHAR[20];
@@ -440,7 +441,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 
 		try
 		{
-			CalcJacobiValue(JacobiValue, Q);
+			CalcJacobianValue(JacobianValue, Q);
 		}
 		catch (enumError& err)
 		{
@@ -452,10 +453,10 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 
 		if (bOutput)
 		{
-			Str += TEXT("Jacobi(");
+			Str += TEXT("Jacobian(");
 			Str+=_itow(n, buffer,10);
 			Str+=TEXT(")=\r\n");
-			Output(JacobiValue);
+			Output(JacobianValue);
 			Str += TEXT("\r\n");
 		}
 
@@ -479,11 +480,11 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 			Str += TEXT("\r\n");
 		}
 
-		switch (SolveLinear(JacobiValue, DeltaQ, PhiValue))
+		switch (SolveLinear(JacobianValue, DeltaQ, PhiValue))
 		{
 		case ERROR_SINGULAR_MATRIX:
 			//矩阵奇异
-			Str += TEXT("Jacobi矩阵奇异且无解（存在矛盾方程）。\r\n");
+			Str += TEXT("Jacobian矩阵奇异且无解（存在矛盾方程）。\r\n");
 			delete[] buffer;
 			VariableTable.VariableValue = VariableValueBackup;
 			return Str.c_str();
@@ -491,12 +492,12 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 			Str += TEXT("不定方程组。返回一组特解。\r\n");
 			break;
 		case ERROR_JACOBI_ROW_NOT_EQUAL_PHI_ROW:
-			Str += TEXT("Jacobi矩阵与Phi向量行数不等，程序出错。\r\n");
+			Str += TEXT("Jacobian矩阵与Phi向量行数不等，程序出错。\r\n");
 			delete[] buffer;
 			VariableTable.VariableValue = VariableValueBackup;
 			return Str.c_str();
 		case ERROR_INFINITY_SOLUTIONS:
-			Str += TEXT("Jacobi矩阵奇异，但有无穷多解（存在等价方程）。返回一组特解。\r\n");
+			Str += TEXT("Jacobian矩阵奇异，但有无穷多解（存在等价方程）。返回一组特解。\r\n");
 			break;
 		case ERROR_OVER_DETERMINED_EQUATIONS:
 			Str += TEXT("矛盾方程组，无法求解。\r\n");
@@ -542,7 +543,14 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 	}
 
 	delete[] buffer;
-	//szStr = new TCHAR[_tcslen(Str.c_str()) + 1];
-	//_tcscpy(szStr, Str.c_str());
+	return Str.c_str();
+}
+
+
+const TCHAR * TEquations::SimplifyEquations(bool bOutput)//将方程组中的简单方程解出
+{
+	for (auto pExpr : Equations)
+	{
+	}
 	return Str.c_str();
 }

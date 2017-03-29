@@ -2,16 +2,12 @@
 #include "DPOINT.h"
 
 
-DPOINT::DPOINT()
+DPOINT::DPOINT() :x(0), y(0)
 {
-	DPOINT::x = 0;
-	DPOINT::y = 0;
 }
 
-DPOINT::DPOINT(double x, double y)
+DPOINT::DPOINT(double x, double y) : x(x), y(y)
 {
-	DPOINT::x = x;
-	DPOINT::y = y;
 }
 
 
@@ -48,4 +44,10 @@ DPOINT& DPOINT::operator-(DPOINT &dpt)
 	x -= dpt.x;
 	y -= dpt.y;
 	return *this;
+}
+
+Ofstream& operator<<(Ofstream& out, DPOINT &dpt)
+{
+	out << dpt.x << dpt.y;
+	return out;
 }

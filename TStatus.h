@@ -9,7 +9,8 @@
 
 #pragma comment(lib, "comctl32.lib")
 
-enum PartType { PT_FIXED, PT_NONE };
+enum PartType { PT_FIXED,//固定大小
+	PT_NONE };//可伸缩
 
 class TStatus
 {

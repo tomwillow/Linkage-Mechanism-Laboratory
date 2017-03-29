@@ -12,5 +12,6 @@ public:
 	double dLength;
 	TLine();
 	~TLine();
+	TLine& TLine::operator=(const TLine &Line);
 };
 

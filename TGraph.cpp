@@ -14,6 +14,8 @@ TGraph::TGraph(TConfiguration *pConfig)
 	LineMouseY.SetStyle(PS_DOT, 1, 0);
 
 	iPick = -1;
+
+	iMargin = 0;
 }
 
 
@@ -23,9 +25,14 @@ TGraph::~TGraph()
 	delete[] ptArray;
 }
 
+void TGraph::SetMargin(int iMargin)
+{
+	this->iMargin = iMargin;
+}
+
 void TGraph::OnSize(WPARAM wParam, LPARAM lParam)
 {
-	rcGraph = TDraw::GetMarginRect(ClientRect, 20);
+	rcGraph = TDraw::GetMarginRect(ClientRect, iMargin);
 	CalcPointArray();
 	Invalidate();
 }
@@ -66,23 +73,14 @@ void TGraph::CalcPointArray()
 
 void TGraph::OnDraw(HDC hdc)
 {
-	TConfiguration Config; 
-	Config.Initial(m_hWnd);
-	TConfiguration *pConfig = &Config;
-
 	SetBkMode(hdc, TRANSPARENT);
 
 	//Ìî³ä±³¾°
 	TDraw::FillRect(hdc, &ClientRect, RGB(255,255,255));
 
-	//TDraw::DrawRect(hdc, rcGraph, );
+	TDraw::FillRect(hdc, &rcGraph, pConfig->crGraphBackground);
 
-	pConfig->crBackground = RGB(240, 240, 240);
-	TDraw::FillRect(hdc, &rcGraph, pConfig->crBackground);
-
-	pConfig->crGridBig = RGB(200, 200, 200);
-	pConfig->crGridSmall = RGB(220, 220, 220);
-	//TDraw::DrawGrid(hdc, rcGraph, pConfig);
+	TDraw::DrawGrid(hdc, rcGraph, pConfig,pConfig->crGraphGridBig,pConfig->crGraphGridSmall);
 
 	LOGPEN logpen = { PS_SOLID, { 1, 0 }, 0 };
 	TDraw::DrawPolyline(hdc, ptArray, iPtCount, logpen);

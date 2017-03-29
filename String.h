@@ -1,9 +1,26 @@
-#ifdef _UNICODE
 #include <string>
+#include <fstream>
 
-#define String wstring
+#ifdef _UNICODE
+
 using std::wstring;
+#define String wstring
+
+using std::wofstream;
+#define Ofstream wofstream
+
+using std::wifstream;
+#define Ifstream wifstream
+
 #else
-#define String string
+
 using std::string;
+#define String string
+
+using std::ofstream;
+#define Ofstream ofstream
+
+using std::ifstream;
+#define Ifstream ifstream
+
 #endif

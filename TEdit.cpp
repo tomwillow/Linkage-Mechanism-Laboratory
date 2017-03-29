@@ -4,9 +4,6 @@
 #include <CommCtrl.h>
 TEdit::TEdit()
 {
-	m_hWnd = NULL;
-	hParent = NULL;
-	m_hInst = NULL;
 	bVisible = false;
 	m_hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 
@@ -31,6 +28,7 @@ LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		else
 			return 0;
 	case WM_KEYDOWN:
+		MessageBeep(0);
 		if (OnKeyDown(wParam, lParam))
 			return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 		else
@@ -47,7 +45,7 @@ LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle)
 {
 	m_hInst = hInst;
-	this->hParent = hParent;
+	m_hWndParent = hParent;
 	m_hWnd = ::CreateWindowEx(dwStyle,//WS_EX_CLIENTEDGE
 		TEXT("Edit"), 0,
 		WS_CHILD |
@@ -57,7 +55,6 @@ void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle)
 		(bNoHideSel?ES_NOHIDESEL:0),//|ES_RIGHT | WS_VISIBLE
 		0, 0, 0, 0, hParent,(HMENU)id, hInst,0);
 
-	//SetFont(m_hFont);
 	RegisterProc();
 }
 

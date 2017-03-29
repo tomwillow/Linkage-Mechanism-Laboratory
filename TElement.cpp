@@ -2,6 +2,7 @@
 #include "DetectMemoryLeak.h"
 #include <stdio.h>
 
+#include "ShowMessage.h"
 #include "TElement.h"
 
 #include "TListView.h"
@@ -11,6 +12,8 @@ TElement::TElement() :available(true)
 	eType = ELEMENT_NULL;
 	dpt = { 0, 0 };
 	angle = 0.0;
+
+	alpha = 0xff;
 
 	_tcscpy(Name,TEXT("undefined"));
 
@@ -98,12 +101,135 @@ TElement& TElement::operator=(const TElement &element)
 {
 	this->id = element.id;
 	this->available = element.available;
+	this->eType = element.eType;
 	_tcscpy(this->Name, element.Name);
+
 	this->logpenStyle = element.logpenStyle;
 	this->logpenStyleShow = element.logpenStyleShow;
+
 	this->vecDpt = element.vecDpt;
 	this->vecIsJoint = element.vecIsJoint;
+
 	this->dpt = element.dpt;
 	this->angle = element.angle;
+
+	this->alpha = element.alpha;
 	return *this;
+}
+
+bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos)
+{
+	//写入类型标记
+	::WriteFile(hf, &eType, sizeof(EnumElementType), &now_pos, NULL);
+	now_pos += sizeof(EnumElementType);
+
+	//写入数据	
+	::WriteFile(hf, &id, sizeof(id), &now_pos, NULL);
+	now_pos += sizeof(id);
+	::WriteFile(hf, &available, sizeof(available), &now_pos, NULL);
+	now_pos += sizeof(available);
+	::WriteFile(hf, &Name, sizeof(Name), &now_pos, NULL);
+	now_pos += sizeof(Name);
+
+	::WriteFile(hf, &logpenStyle, sizeof(logpenStyle), &now_pos, NULL);
+	now_pos += sizeof(logpenStyle);
+	::WriteFile(hf, &logpenStyleShow, sizeof(logpenStyleShow), &now_pos, NULL);
+	now_pos += sizeof(logpenStyleShow);
+
+	size_t tempSize = vecDpt.size();
+	::WriteFile(hf, &tempSize, sizeof(tempSize), &now_pos, NULL);
+	now_pos += sizeof(tempSize);
+	for (auto Dpt : vecDpt)
+	{
+		::WriteFile(hf, &Dpt, sizeof(Dpt), &now_pos, NULL);
+		now_pos += sizeof(Dpt);
+	}
+
+	tempSize = vecIsJoint.size();
+	::WriteFile(hf, &tempSize, sizeof(tempSize), &now_pos, NULL);
+	now_pos += sizeof(tempSize);
+	for (auto JointList : vecIsJoint)
+	{
+		tempSize = JointList.size();
+		::WriteFile(hf, &tempSize, sizeof(tempSize), &now_pos, NULL);
+		now_pos += sizeof(tempSize);
+		for (auto JointId : JointList)
+		{
+			::WriteFile(hf, &JointId, sizeof(JointId), &now_pos, NULL);
+			now_pos += sizeof(JointId);
+		}
+	}
+
+	::WriteFile(hf, &dpt, sizeof(dpt), &now_pos, NULL);
+	now_pos += sizeof(dpt);
+	::WriteFile(hf, &angle, sizeof(angle), &now_pos, NULL);
+	now_pos += sizeof(angle);
+
+	::WriteFile(hf, &alpha, sizeof(alpha), &now_pos, NULL);
+	now_pos += sizeof(alpha);
+
+	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+		return false;
+	else
+		return true;
+}
+
+bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
+{
+	//读入数据，除了eType	
+	::ReadFile(hf, &id, sizeof(id), &now_pos, NULL);
+	now_pos += sizeof(id);
+	::ReadFile(hf, &available, sizeof(available), &now_pos, NULL);
+	now_pos += sizeof(available);
+	::ReadFile(hf, &Name, sizeof(Name), &now_pos, NULL);
+	now_pos += sizeof(Name);
+
+	::ReadFile(hf, &logpenStyle, sizeof(logpenStyle), &now_pos, NULL);
+	now_pos += sizeof(logpenStyle);
+	::ReadFile(hf, &logpenStyleShow, sizeof(logpenStyleShow), &now_pos, NULL);
+	now_pos += sizeof(logpenStyleShow);
+
+	size_t tempSize;
+	DPOINT tempDpt;
+	::ReadFile(hf, &tempSize, sizeof(tempSize), &now_pos, NULL);
+	now_pos += sizeof(tempSize);
+	vecDpt.clear();
+	for (size_t i = 0; i < tempSize;++i)
+	{
+		::ReadFile(hf, &tempDpt, sizeof(tempDpt), &now_pos, NULL);
+		now_pos += sizeof(tempDpt);
+		vecDpt.push_back(tempDpt);
+	}
+
+	::ReadFile(hf, &tempSize, sizeof(tempSize), &now_pos, NULL);
+	now_pos += sizeof(tempSize);
+	size_t JointNum;
+	int JointId;
+	vecIsJoint.clear();
+	std::vector<int> JointList;
+	for (size_t i = 0; i < tempSize;++i)
+	{
+		::ReadFile(hf, &JointNum, sizeof(JointNum), &now_pos, NULL);
+		now_pos += sizeof(JointNum);
+		for (size_t n = 0; n < JointNum; ++n)
+		{
+			::ReadFile(hf, &JointId, sizeof(JointId), &now_pos, NULL);
+			now_pos += sizeof(JointId);
+			JointList.push_back(JointId);
+		}
+		vecIsJoint.push_back(JointList);
+	}
+
+	::ReadFile(hf, &dpt, sizeof(dpt), &now_pos, NULL);
+	now_pos += sizeof(dpt);
+	::ReadFile(hf, &angle, sizeof(angle), &now_pos, NULL);
+	now_pos += sizeof(angle);
+
+	::ReadFile(hf, &alpha, sizeof(alpha), &now_pos, NULL);
+	now_pos += sizeof(alpha);
+
+	if (GetLastError() != 0)
+		return false;
+	else
+		return true;
 }

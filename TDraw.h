@@ -16,13 +16,6 @@ class TConstraintCoincide;
 class TConstraintColinear;
 class TDraw
 {
-#define FRAMEPOINT_R 6//节点圆半径
-#define FRAMEPOINT_H 20//高-圆心到地线距离
-#define FRAMEPOINT_B 30//底边长
-#define FRAMEPOINT_SECTION_H 10//剖面线区域高度
-#define FRAMEPOINT_ANGLE 60.0 / 180.0 * M_PI//三角形角度
-#define SLIDER_B 45
-#define SLIDER_H 30
 public:
 	TDraw();
 	~TDraw();
@@ -38,8 +31,6 @@ public:
 	static bool TDraw::GetIntersection(const POINT &ptL1Begin, const POINT &ptL1End, const POINT &ptL2Begin, const  POINT &ptL2End, POINT &ptIntersection);
 	static bool TDraw::GetIntersection(const DPOINT &dptL1Begin, const DPOINT &dptL1End, const DPOINT &dptL2Begin, const  DPOINT &dptL2End, DPOINT &dptIntersection);
 
-	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt);
-	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);
 	static RECT TDraw::GetMarginRect(RECT rect, int margin);
 	static void TDraw::GetMarginRect(RECT *rect, int margin);
 	static POINT TDraw::GetCenter(POINT &pt1, POINT &pt2);
@@ -48,6 +39,7 @@ public:
 	static void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig);
 	static void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *Config);
 	static void TDraw::DrawBar(HDC hdc, TBar *Bar, TConfiguration *Config);
+	static void TDraw::DrawBarTranslucent(HDC hdc, DPOINT &dptArray, int iDptCount, LOGPEN logpen, const TConfiguration *pConfig);
 	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config);
 	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, TConfiguration *Config);
 	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config);
@@ -67,9 +59,9 @@ public:
 	static void TDraw::DrawCross(HDC hdc, POINT pt, int size, LOGPEN Style);
 	static void TDraw::DrawArrow(HDC hdc, POINT ptBegin, POINT ptEnd, int length, int width);
 	static void TDraw::DrawAxes(HDC hdc, int Ox, int Oy, COLORREF crColor);
-	static void TDraw::CalcSliderRectCoor(POINT aptResult[4], const POINT &pt, double angle);
+	static void TDraw::CalcSliderRectCoor(POINT aptResult[4], const POINT &pt, double angle, const TConfiguration *pConfig);
 	static void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor);
-	static void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config);
+	static void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config, COLORREF crGridBig, COLORREF crGridSmall);
 	static void TDraw::DrawTips(HDC hdc, POINT &ptMouse, const TCHAR text[], TConfiguration *pConfig);
 	static void TDraw::DrawSystemFontText(HDC hdc,const TCHAR text[], RECT &rect, COLORREF color, UINT format);
 	static void TDraw::DrawTextAdvance(HDC hdc,const TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format);
@@ -82,6 +74,8 @@ public:
 	static void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt);
 	static POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max, RECT &rect);
 	static DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, double y_max, RECT &rect);
+	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt, const TConfiguration *pConfig);
+	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);
 	static bool TDraw::PointInRealLine(POINT ptPos, TRealLine *pRealLine, TConfiguration *pConfig);
 	static bool TDraw::PointInSlider(POINT ptPos, TSlider *pSlider, TConfiguration *pConfig);
 	static bool TDraw::PointInRealLine(POINT &ptPos, DPOINT &dptBegin, DPOINT &dptEnd, TConfiguration *pConfig);

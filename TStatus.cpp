@@ -95,6 +95,7 @@ void CDECL TStatus::SetText(int id, TCHAR szFormat[], ...)
 	}
 }
 
+//µÃµ½Ä³¿éµÄRect
 RECT TStatus::GetPartRect(int id, int margin)
 {
 	for (int i = 0; i < m_iPartsNum; i++)

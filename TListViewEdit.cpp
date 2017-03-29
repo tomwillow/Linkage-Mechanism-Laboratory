@@ -119,7 +119,7 @@ bool TListViewEdit::OnChar(WPARAM wParam, LPARAM lParam)
 		ChangeSource();
 		this->SetVisible(false);
 		
-		PostMessage(hParent, WM_USER, 0, 0);//通知ListView更新
+		PostMessage(m_hWndParent, WM_USER, 0, 0);//通知ListView更新
 
 		return false;
 	}
@@ -130,7 +130,7 @@ bool TListViewEdit::OnKillFocus(WPARAM wParam, LPARAM lParam)
 {
 	ChangeSource();
 	this->SetVisible(false);
-	PostMessage(hParent, WM_USER, 0, 0);//通知ListView更新
+	PostMessage(m_hWndParent, WM_USER, 0, 0);//通知ListView更新
 	return true;
 }
 

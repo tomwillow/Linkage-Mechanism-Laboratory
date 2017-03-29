@@ -29,7 +29,6 @@ void TConsole::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	pSolver->SetHwnd(Edit.m_hWnd);
 	pSolver->RefreshWindowText();
 	//pSolver->Demo();
-	//pSolver->RefreshWindowText();
 
 	SetFocus(Edit.m_hWnd);
 	Edit.SetSelect(Edit.GetLength(), Edit.GetLength());

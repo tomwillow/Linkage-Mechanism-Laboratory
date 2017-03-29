@@ -3,6 +3,7 @@
 #include <tchar.h>
 #include <stdio.h>
 
+#include "TShape.h"
 #include "TDraw.h"
 #include "TConstraintCoincide.h"
 
@@ -53,11 +54,10 @@ void TConstraintCoincide::BuildpDpt()
 		switch (PointIndexOfElement[i])
 		{
 		case 0:
-		case 1:
 			pDpt[i] = &(pElement[i]->dpt);
 			pElement[i]->vecIsJoint[0].push_back(id);
 			break;
-		case 2:
+		case 1:
 			pDpt[i] = &(((TRealLine *)this->pElement[i])->ptEnd);
 			pElement[i]->vecIsJoint[1].push_back(id);
 			break;
@@ -82,4 +82,51 @@ void TConstraintCoincide::NoticeListView(TListView *pListView)
 	wsprintf(buffer, TEXT("ID:%d.P%d = ID:%d.P%d"), pElement[0]->id, PointIndexOfElement[0], pElement[1]->id, PointIndexOfElement[1]);
 
 	pListView->AddAttributeItem(TEXT("Value"), CTRLTYPE_NULL, NULL, buffer);
+}
+
+bool TConstraintCoincide::WriteFile(HANDLE &hf, DWORD &now_pos)
+{
+	if (!TElement::WriteFile(hf, now_pos))
+		return false;
+
+	::WriteFile(hf, &(pElement[0]->id), sizeof(pElement[0]->id), &now_pos, NULL);
+	now_pos += sizeof(pElement[0]->id);
+	::WriteFile(hf, &(pElement[1]->id), sizeof(pElement[1]->id), &now_pos, NULL);
+	now_pos += sizeof(pElement[1]->id);
+
+	::WriteFile(hf, &(PointIndexOfElement[0]), sizeof(PointIndexOfElement[0]), &now_pos, NULL);
+	now_pos += sizeof(PointIndexOfElement[0]);
+	::WriteFile(hf, &(PointIndexOfElement[1]), sizeof(PointIndexOfElement[1]), &now_pos, NULL);
+	now_pos += sizeof(PointIndexOfElement[1]);
+
+	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
+		return false;
+	else
+		return true;
+}
+
+bool TConstraintCoincide::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
+{
+	TElement::ReadFile(hf, now_pos,pShape);
+
+	int id0, id1;
+	::ReadFile(hf, &id0, sizeof(id0), &now_pos, NULL);
+	now_pos += sizeof(id0);
+	::ReadFile(hf, &id1, sizeof(id1), &now_pos, NULL);
+	now_pos += sizeof(id1);
+
+	pElement[0] = pShape->GetElementById(id0);
+	pElement[1] = pShape->GetElementById(id1);
+
+	::ReadFile(hf, &(PointIndexOfElement[0]), sizeof(PointIndexOfElement[0]), &now_pos, NULL);
+	now_pos += sizeof(PointIndexOfElement[0]);
+	::ReadFile(hf, &(PointIndexOfElement[1]), sizeof(PointIndexOfElement[1]), &now_pos, NULL);
+	now_pos += sizeof(PointIndexOfElement[1]);
+
+	BuildpDpt();
+
+	if (GetLastError() != 0)
+		return false;
+	else
+		return true;
 }
