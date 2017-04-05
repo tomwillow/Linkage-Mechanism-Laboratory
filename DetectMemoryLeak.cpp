@@ -1,8 +1,9 @@
 #ifdef _DEBUG
 
+#include "DetectMemoryLeak.h"
 #include <windows.h>
+#include <stdio.h>//_vsntprintf
 #include <stdarg.h>//va_start
-#include <tchar.h>
 
 void OutputDebugPrintf(const TCHAR * strOutputString, ...)
 {

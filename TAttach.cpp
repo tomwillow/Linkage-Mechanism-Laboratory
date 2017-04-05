@@ -56,20 +56,20 @@ void TAttach::Draw(HDC hdc)
 
 	if (bShowAttachPoint)
 	{
-		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, pConfig->crPen });
+		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18,pConfig->logpenSystem);
 	}
 	//画X辅助线
 	if (bShowXAssist)
 	{
 		TDraw::DrawRealLine(hdc, *XAssistLine, pConfig);//
-		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, pConfig->crPen });
+		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18, pConfig->logpenSystem);
 	}
 
 	//画Y辅助线
 	if (bShowYAssist)
 	{
 		TDraw::DrawRealLine(hdc, *YAssistLine, pConfig);//
-		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18, { PS_SOLID, { 1, 0 }, pConfig->crPen });
+		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18, pConfig->logpenSystem);
 	}
 
 	if (bShowExtensionLine)
@@ -217,6 +217,7 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 		{
 		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
+		case ELEMENT_SLIDEWAY:
 		{
 			TRealLine *pRealLine = (TRealLine *)(pShape->Element[i]);
 			//吸附起点
@@ -275,7 +276,6 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 			break;
 		}
 		//不吸附端点的元素
-		case ELEMENT_SLIDEWAY:
 		case CONSTRAINT_COLINEAR:
 		case CONSTRAINT_COINCIDE:
 			break;

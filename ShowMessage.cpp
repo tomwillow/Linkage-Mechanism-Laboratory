@@ -1,5 +1,6 @@
 #include "ShowMessage.h"
 
+#include <stdio.h>//_vsntprintf
 
 void ShowMessage(TCHAR szFormat[], ...)
 {

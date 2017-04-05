@@ -16,6 +16,7 @@ class TTool
 private:
 protected:
 	//TMainWindow *pwin;
+	HINSTANCE hInst;
 	TShape *pShape;
 	TCanvas *pCanvas;
 	HWND hwndWin;

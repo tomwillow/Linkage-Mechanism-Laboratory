@@ -1,6 +1,8 @@
 #pragma once
 #include "DetectMemoryLeak.h"
 
+#include "resource.h"
+
 #include "TSelectTool.h"
 
 #include "TSlider.h"
@@ -147,96 +149,40 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	}
 
 	RestoreHoveredLineStyle();
-	iHoverIndex = -1;
 
 	//遍历所有以显示浮动效果
-	for (size_t i = 0; i < pShape->Element.size(); i++)
+	iHoverIndex = pShape->GetPickedElementIndex(ptPos, pConfig);
+
+	if (iHoverIndex != -1)//悬停有东西
 	{
-		switch (pShape->Element[i]->eType)
+		if (iPickIndex != iHoverIndex)//浮过的线未被选中
 		{
-		case ELEMENT_BAR:
-		case ELEMENT_REALLINE:
-		case ELEMENT_SLIDEWAY:
-			if (TDraw::PointInRealLine(ptPos, (TRealLine *)pShape->Element[i], pConfig))//发现拾取
-			{
-				iHoverIndex = i;
-			}
-			break;
-		case ELEMENT_FRAMEPOINT:
-			if (TDraw::PointInFramePoint(pConfig->RealToScreen(((TFramePoint *)(pShape->Element[i]))->dpt), ptPos,pConfig))
-			{
-				iHoverIndex = i;
-			}
-			break;
-		case ELEMENT_SLIDER:
-			if (TDraw::PointInSlider(ptPos, (TSlider *)pShape->Element[i], pConfig))
-			{
-				iHoverIndex = i;
-			}
-			break;
-		case CONSTRAINT_COINCIDE:
-			if (PickConstraintCoincide(ptPos, pShape->Element[i]))
-			{
-				iHoverIndex = i;
-			}
-			break;
-		case CONSTRAINT_COLINEAR:
-			if (PickConstraintColinear(ptPos, pShape->Element[i]))
-			{
-				iHoverIndex = i;
-			}
-			break;
-		default:
-			assert(0);
-			break;
-		}
-		if (iHoverIndex != -1)//悬停有东西
-		{
-			if (iPickIndex != iHoverIndex)//浮过的线未被选中
-			{
-				//暂存当前线型并更改
-				pShape->Element[iHoverIndex]->logpenStyleShow.lopnColor = RGB(200, 200, 200);
-				HoveredLineId.push(pShape->Element[iHoverIndex]->id);
-				sTips = TEXT("点击可选中");
-				return;
-			}
-			else
-			{
-				//若浮过的线已被选中则不变色
-				switch (eMode)
-				{
-				case SELECT_MOVE:
-				sTips = TEXT("再次点击可进行移动");
-					return;
-				case SELECT_DRAG:
-					sTips = TEXT("再次点击可进行拖动");
-					return;
-				}
-			}
+			//暂存当前线型并更改
+			pShape->Element[iHoverIndex]->logpenStyleShow.lopnColor = RGB(200, 200, 200);
+			HoveredLineId.push(pShape->Element[iHoverIndex]->id);
+			sTips = TEXT("点击可选中");
+			return;
 		}
 		else
-			sTips = TEXT("");
-	}
-}
-
-
-bool TSelectTool::PickConstraintColinear(POINT ptPos, TElement *element)
-{
-	return false;
-}
-
-bool TSelectTool::PickConstraintCoincide(POINT ptPos, TElement *element)
-{
-	TConstraintCoincide *temp = (TConstraintCoincide *)element;
-
-	//重合虚线显示，且虚线被拾取
-	if (TDraw::ShowConstraintCoincideDotLine(temp, pConfig) && TDraw::PointInRealLine(ptPos, *(temp->pDpt[0]), *(temp->pDpt[1]), pConfig))
-	{
-		return true;
+		{
+			//若浮过的线已被选中则不变色
+			switch (eMode)
+			{
+			case SELECT_MOVE:
+				sTips = TEXT("再次点击可进行移动");
+				return;
+			case SELECT_DRAG:
+				sTips = TEXT("再次点击可进行拖动");
+				return;
+			}
+		}
 	}
 	else
-		return false;
+		sTips = TEXT("");
+
 }
+
+
 
 void TSelectTool::EndDrag()
 {
@@ -256,7 +202,6 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	CancelTreeViewAndListView();
 	RestorePickedLineStyle();
-	iPickIndex = -1;
 
 	if (bDrag)
 	{
@@ -269,108 +214,63 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	}
 
 	//遍历所有
-	for (size_t i = 0; i < pShape->Element.size(); i++)
+	iPickIndex = pShape->GetPickedElementIndex(ptPos, pConfig);
+
+	if (iPickIndex != -1)//拾取到了
 	{
-		switch (pShape->Element[i]->eType)
+		switch (eMode)
 		{
-		case ELEMENT_BAR:
-		case ELEMENT_REALLINE:
-		case ELEMENT_SLIDEWAY:
-			if (TDraw::PointInRealLine(ptPos, (TRealLine *)pShape->Element[i], pConfig))//发现拾取
+		case SELECT_MOVE:
+			//非拾取状态再次点击同一对象进入拾取
+			if (bMove == false)
 			{
-				iPickIndex = i;
+				if (iPrevPickIndex != -1 && iPrevPickIndex == iPickIndex)
+				{
+					bMove = true;
+					Cursor = IDC_CROSS;
+					ptMouseClick.x = ptPos.x;
+					ptMouseClick.y = ptPos.y;
+				}
+				iPrevPickIndex = iPickIndex;
 			}
 			break;
-		case ELEMENT_FRAMEPOINT:
-			if (TDraw::PointInFramePoint(pConfig->RealToScreen(((TFramePoint *)(pShape->Element[i]))->dpt), ptPos, pConfig))
+		case SELECT_DRAG:
+			if (bDrag == false)
 			{
-				iPickIndex = i;
+				if (iPrevPickIndex != -1 && iPrevPickIndex == iPickIndex)
+				{
+					//非拾取状态再次点击同一对象进入拾取
+					bDrag = true;
+					Cursor = IDC_HAND;
+				}
+				iPrevPickIndex = iPickIndex;
 			}
-			break;
-		case ELEMENT_SLIDER:
-			if (TDraw::PointInSlider(ptPos, (TSlider *)pShape->Element[i], pConfig))
-			{
-				iPickIndex = i;
-			}
-			break;
-		case CONSTRAINT_COINCIDE:
-			if (PickConstraintCoincide(ptPos, pShape->Element[i]))
-			{
-				iPickIndex = i;
-			}
-			break;
-		case CONSTRAINT_COLINEAR:
-			if (PickConstraintColinear(ptPos, pShape->Element[i]))
-			{
-				iPickIndex = i;
-			}
-			break;
-		default:
-			assert(0);
 			break;
 		}
 
-		if (iPickIndex != -1)//拾取到了
-		{
+		//暂存当前线型并更改
+		pShape->Element[iPickIndex]->logpenStyleShow.lopnStyle = PS_DOT;
+		PickedLineId.push(pShape->Element[iPickIndex]->id);
 
-			switch (eMode)
-			{
-			case SELECT_MOVE:
-				//非拾取状态再次点击同一对象进入拾取
-				if (bMove == false)
-				{
-					if (iPrevPickIndex != -1 && iPrevPickIndex == iPickIndex)
-					{
-						bMove = true;
-						Cursor = IDC_CROSS;
-						ptMouseClick.x = ptPos.x;
-						ptMouseClick.y = ptPos.y;
-					}
-					iPrevPickIndex = i;
-				}
-				break;
-			case SELECT_DRAG:
-				if (bDrag == false)
-				{
-					if (iPrevPickIndex != -1 && iPrevPickIndex == iPickIndex)
-					{
-						//非拾取状态再次点击同一对象进入拾取
-						bDrag = true;
-						Cursor = IDC_HAND;
-					}
-					iPrevPickIndex = i;
-				}
-				break;
-			}
+		//通知TreeView选中
+		pTreeViewContent->SelectById(pShape->Element[iPickIndex]->id);
 
-			//暂存当前线型并更改
-			pShape->Element[iPickIndex]->logpenStyleShow.lopnStyle = PS_DOT;
-			PickedLineId.push(pShape->Element[iPickIndex]->id);
-
-			//通知TreeView选中
-			pTreeViewContent->SelectById(pShape->Element[iPickIndex]->id);
-
-			//通知ListView更新
-			pShape->Element[iPickIndex]->NoticeListView(pListView);
-			return;
-		}
+		//通知ListView更新
+		pShape->Element[iPickIndex]->NoticeListView(pListView);
+		return;
 	}
+
 	//遍历结束
 	if (iPickIndex == -1)
 		iPrevPickIndex = -1;
 
 }
 
-void TSelectTool::SelectById(int id)
+void TSelectTool::SelectByIndex(size_t index)
 {
 	RestorePickedLineStyle();
-	iPickIndex = -1;
 
-	for (size_t i = 0; i < pShape->Element.size(); i++)
-	{
-		if (pShape->Element[i]->id == id)
-		{
-			iPickIndex = i;
+			iPickIndex = index;
 			//暂存当前线型并更改
 			pShape->Element[iPickIndex]->logpenStyleShow.lopnStyle = PS_DOT;
 			PickedLineId.push(pShape->Element[iPickIndex]->id);
@@ -379,9 +279,20 @@ void TSelectTool::SelectById(int id)
 			pShape->Element[iPickIndex]->NoticeListView(pListView);
 
 			pCanvas->Invalidate();
+}
+
+void TSelectTool::SelectById(int id)
+{
+
+	for (size_t i = 0; i < pShape->Element.size(); i++)
+	{
+		if (pShape->Element[i]->id == id)
+		{
+			SelectByIndex(i);
 			return;
 		}
 	}
+	iPickIndex = -1;
 }
 
 void TSelectTool::CancelTreeViewAndListView()
@@ -395,11 +306,25 @@ void TSelectTool::CancelTreeViewAndListView()
 
 void TSelectTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	EndDrag();
-	EndMove();
-	SelectNull();
+	iHoverIndex = pShape->GetPickedElementIndex(ptPos, pConfig);
+	if (iHoverIndex != -1)// && eMode == SELECT_MOVE
+	{
+		SelectByIndex(iHoverIndex);
 
-	pCanvas->Invalidate();
+		//弹出右键菜单
+		HMENU hMenu = LoadMenu(hInst, (TCHAR *)(IDR_MENU_RIGHT));
+		hMenu = GetSubMenu(hMenu, 0);
+		ClientToScreen(hWnd, &ptPos);
+
+		TrackPopupMenu(hMenu, TPM_RIGHTBUTTON, ptPos.x, ptPos.y, 0, hWnd, NULL);
+	}
+	else
+	{
+		EndDrag();
+		EndMove();
+		SelectNull();
+		pCanvas->Invalidate();
+	}
 
 }
 
@@ -446,7 +371,7 @@ void TSelectTool::Draw(HDC hdc)
 				//画拾取方格
 				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(TDraw::GetAbsolute(*iter, pSlider->dpt, pSlider->angle)));
 		}
-			break;
+		break;
 		case CONSTRAINT_COLINEAR:
 			//
 

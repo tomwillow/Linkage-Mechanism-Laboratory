@@ -68,7 +68,11 @@
   <ItemGroup>
     <ClCompile Include="DetectMemoryLeak.cpp" />
     <ClCompile Include="DialogAddDriver.cpp" />
+    <ClCompile Include="DialogOption.cpp" />
+    <ClCompile Include="FileFunction.cpp" />
+    <ClCompile Include="RegisterFunction.cpp" />
     <ClCompile Include="ShowMessage.cpp" />
+    <ClCompile Include="TButton.cpp" />
     <ClCompile Include="TConstraintColinear.cpp" />
     <ClCompile Include="TDialogBox.cpp" />
     <ClCompile Include="TDragTool.cpp" />
@@ -99,6 +103,7 @@
     <ClCompile Include="TMainWindow.cpp" />
     <ClCompile Include="TManageTool.cpp" />
     <ClCompile Include="TMyString.cpp" />
+    <ClCompile Include="TPolygonBar.cpp" />
     <ClCompile Include="TRealLine.cpp" />
     <ClCompile Include="TRightWindow.cpp" />
     <ClCompile Include="TSelectTool.cpp" />
@@ -121,8 +126,12 @@
   <ItemGroup>
     <ClInclude Include="DetectMemoryLeak.h" />
     <ClInclude Include="DialogAddDriver.h" />
+    <ClInclude Include="DialogOption.h" />
+    <ClInclude Include="FileFunction.h" />
+    <ClInclude Include="RegisterFunction.h" />
     <ClInclude Include="ShowMessage.h" />
     <ClInclude Include="String.h" />
+    <ClInclude Include="TButton.h" />
     <ClInclude Include="TConstraintColinear.h" />
     <ClInclude Include="TDialogBox.h" />
     <ClInclude Include="TDragTool.h" />
@@ -153,6 +162,7 @@
     <ClInclude Include="TMainWindow.h" />
     <ClInclude Include="TManageTool.h" />
     <ClInclude Include="TMyString.h" />
+    <ClInclude Include="TPolygonBar.h" />
     <ClInclude Include="TRealLine.h" />
     <ClInclude Include="TRightWindow.h" />
     <ClInclude Include="TSelectTool.h" />
@@ -174,11 +184,15 @@
     <ClInclude Include="enumError.h" />
     <ClInclude Include="enumCtrlType.h" />
     <ClInclude Include="MyMath.h" />
+    <ClInclude Include="tchar_head.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Mechanism Design System.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Resource\bitmap_show_real.bmp" />
+    <Image Include="Resource\bitmap_show_simple.bmp" />
+    <Image Include="Resource\file_icon.ico" />
     <Image Include="Resource\Icon.ico" />
     <Image Include="Resource\Icon_16.ico" />
     <Image Include="Resource\toolbar_mechanism.bmp" />

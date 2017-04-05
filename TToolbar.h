@@ -3,7 +3,7 @@
 #include <map>
 #include <Windows.h>
 #include <CommCtrl.h>
-#include <tchar.h>
+#include "tchar_head.h"
 #pragma comment(lib,"comctl32.lib")//样式使用
 
 #include "TControl.h"

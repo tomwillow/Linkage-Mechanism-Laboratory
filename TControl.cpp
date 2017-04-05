@@ -7,7 +7,7 @@
 TControl::TControl()
 {
 	m_hWnd = NULL;
-	m_hWndParent = NULL;
+	m_hParent = NULL;
 	m_hInst = NULL;
 }
 
@@ -16,9 +16,14 @@ TControl::~TControl()
 {
 }
 
+void TControl::SetPos(RECT &rect)//只使用rect的left和top，如果没有设置m_iWidth和m_iHeight将出错
+{
+	::MoveWindow(m_hWnd, rect.left, rect.top, m_iWidth,m_iHeight, true);
+}
+
 void TControl::SetRect(RECT &rect)
 {
-	::MoveWindow(m_hWnd, rect.top, rect.left, rect.right, rect.bottom, true);
+	::MoveWindow(m_hWnd, rect.left,rect.top,  rect.right, rect.bottom, true);
 }
 
 void TControl::SetRect(int x1, int y1, int x2, int y2)
@@ -39,9 +44,9 @@ LRESULT CALLBACK TControl::subControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 		return CallWindowProc((WNDPROC)oldProc, hWnd, uMsg, wParam, lParam);
 }
 
-void TControl::LinkControl(HWND hwnd)
+void TControl::LinkControl(HWND hwndControl)//链接到已有控件（用于对话框中）
 {
-	m_hWnd = hwnd;
+	m_hWnd = hwndControl;
 	RegisterProc();
 }
 

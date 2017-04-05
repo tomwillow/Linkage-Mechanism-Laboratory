@@ -19,17 +19,8 @@ TRealLine::~TRealLine()
 
 void TRealLine::NoticeListView(TListView *pListView)
 {
-	pListView->DeleteAllItems();
+	TElement::NoticeListView(pListView);
 
-	TCHAR buffer[16];
-
-	pListView->id = id;
-	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
-	pListView->AddAttributeItem(TEXT("名称"), CTRLTYPE_EDIT,&Name, Name);// stringToTCHAR(&Name,buffer)
-	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, GetElementTypeName(buffer));
-	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
-	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
-	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
 	pListView->AddAttributeItem(TEXT("P0"), CTRLTYPE_COOR_P1_EDIT, &ptBegin, TEXT("%.3f,%.3f"), ptBegin.x, ptBegin.y);
 	pListView->AddAttributeItem(TEXT("P1"), CTRLTYPE_COOR_P2_EDIT, &ptEnd, TEXT("%.3f,%.3f"), ptEnd.x, ptEnd.y);
 	pListView->AddAttributeItem(TEXT("长度"), CTRLTYPE_LEN_EDIT, NULL, TEXT("%f"), dLength);

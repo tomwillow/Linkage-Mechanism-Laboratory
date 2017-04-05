@@ -1,5 +1,8 @@
 #ifdef _DEBUG
 
+#include "tchar_head.h"
+void OutputDebugPrintf(const TCHAR * strOutputString, ...);
+
 #pragma once
 #define CRTDBG_MAP_ALLOC
 #include <stdlib.h>
@@ -9,8 +12,6 @@
 
 #include <assert.h>
 
-#include <tchar.h>
-void OutputDebugPrintf(const TCHAR * strOutputString, ...);
 
 #else
 #define NDEBUG

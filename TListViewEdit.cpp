@@ -72,12 +72,19 @@ void TListViewEdit::ChangeSource()
 		TMyString::ReleaseVectorTCHAR(szNums);
 		break;
 	}
-	case CTRLTYPE_VALUE_EDIT:
+	case CTRLTYPE_DOUBLE_EDIT:
 	{
 		this->GetText(Text);
 
 		double value = TTransfer::TCHAR2double(Text);
 		*((double *)pContent) = value;
+		break;
+	}
+	case CTRLTYPE_INT_EDIT:
+	{
+		this->GetText(Text);
+
+		*((int *)pContent) = TTransfer::TCHAR2int(Text);
 		break;
 	}
 	case CTRLTYPE_ANGLE_VALUE_EDIT:
@@ -119,7 +126,7 @@ bool TListViewEdit::OnChar(WPARAM wParam, LPARAM lParam)
 		ChangeSource();
 		this->SetVisible(false);
 		
-		PostMessage(m_hWndParent, WM_USER, 0, 0);//通知ListView更新
+		PostMessage(m_hParent, WM_USER, 0, 0);//通知ListView更新
 
 		return false;
 	}
@@ -130,7 +137,7 @@ bool TListViewEdit::OnKillFocus(WPARAM wParam, LPARAM lParam)
 {
 	ChangeSource();
 	this->SetVisible(false);
-	PostMessage(m_hWndParent, WM_USER, 0, 0);//通知ListView更新
+	PostMessage(m_hParent, WM_USER, 0, 0);//通知ListView更新
 	return true;
 }
 

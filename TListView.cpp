@@ -12,6 +12,7 @@ TListView::TListView()
 	iRowCount = 0;
 	iColumnCount = 0;
 	pShape = &(win.m_Shape);
+	pTreeViewContent = &(win.RightWindow.TreeViewContent);
 }
 
 
@@ -19,31 +20,7 @@ TListView::~TListView()
 {
 }
 
-//WNDPROC TListView::oldListViewProc;
-//LRESULT CALLBACK TListView::subListViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-//{
-//	TListView * pListView;
-//	pListView = (TListView *)GetWindowLong(hWnd, GWL_USERDATA);
-//	if (pListView)
-//		return pListView->WndProc(oldListViewProc, hWnd, uMsg, wParam, lParam);
-//	else
-//		return CallWindowProc(oldListViewProc, hWnd, uMsg, wParam, lParam);
-//}
-
-//LRESULT CALLBACK TListView::subControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-//{
-//	TListView * pControl;
-//	pControl = (TListView *)GetWindowLong(hWnd, GWL_USERDATA);
-//
-//	if (pControl)
-//		return pControl->WndProc(oldControlProc, hWnd, uMsg, wParam, lParam);
-//	else
-//		return CallWindowProc(oldControlProc, hWnd, uMsg, wParam, lParam);
-//}
-
-WNDPROC oldListViewProc;
 LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
- //LRESULT TListView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -51,11 +28,18 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 	{
 			if (tempEdit.Text != NULL)
 			{
-				//刷新ListView
-				pShape->GetElementById(id)->NoticeListView(this);
+				//刷新TreeViewContent
+				pTreeViewContent->DeleteAllItems();
+				pTreeViewContent->Initial();
+				pTreeViewContent->AddAllItem();
+
+				pTreeViewContent->SelectById(id);//刷新ListView
+
+				//pShape->GetElementById(id)->NoticeListView(this);
 
 				//恢复位置
 				ListView_Scroll(hWnd,origin.x,origin.y);
+				win.pSolver->RefreshEquations();
 				win.Canvas.Invalidate();
 			}
 		break;
@@ -98,7 +82,8 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 				{
 				case CTRLTYPE_EDIT:
 				case CTRLTYPE_COOR_EDIT:
-				case CTRLTYPE_VALUE_EDIT:
+				case CTRLTYPE_INT_EDIT:
+				case CTRLTYPE_DOUBLE_EDIT:
 				case CTRLTYPE_ANGLE_VALUE_EDIT:
 				case CTRLTYPE_COOR_P1_EDIT:
 				case CTRLTYPE_COOR_P2_EDIT:
@@ -144,7 +129,6 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 		break;
 	}
 	}
-	//return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 }
 
@@ -217,12 +201,6 @@ void TListView::CreateListViewEx(HWND hParent, UINT id, HINSTANCE hInst)
 	tempEdit.SetPos(10, 10, 100, 20);
 	tempEdit.SetVisible(false);
 
-	//
-	//SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
-	//oldListViewProc = (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subListViewProc);
-
-	//SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
-	//oldControlProc = (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subControlProc);
 	RegisterProc();
 }
 

@@ -4,10 +4,15 @@
 #include "TShape.h"
 #include "TSlideway.h"
 
+#include "TConfiguration.h"
 
 TSlidewayTool::TSlidewayTool()
 {
 	myElementType = ELEMENT_SLIDEWAY;
+
+	delete MoveLine;
+	MoveLine = new TSlideway;
+	MoveLine->SetStyle(pConfig->logpen);
 }
 
 

@@ -5,7 +5,7 @@
 
 #include <windows.h>
 #include <assert.h>
-#include <tchar.h>
+#include "tchar_head.h"
 #include <stdio.h>
 #include "TWindow.h"
 

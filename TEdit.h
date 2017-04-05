@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include <tchar.h>
+#include "tchar_head.h"
 #include <stdio.h>
 
 #include "TControl.h"
@@ -39,4 +39,3 @@ public:
 	void TEdit::SetSelectAll();//ȫѡ
 	bool TEdit::GetVisible();
 };
-

@@ -180,6 +180,21 @@
     <ClCompile Include="ShowMessage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TPolygonBar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TButton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogOption.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterFunction.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileFunction.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -347,6 +362,24 @@
     <ClInclude Include="ShowMessage.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TPolygonBar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tchar_head.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TButton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogOption.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterFunction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileFunction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Mechanism Design System.rc">
@@ -361,6 +394,15 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="Resource\Icon_16.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\bitmap_show_real.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\bitmap_show_simple.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\file_icon.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

@@ -1,5 +1,5 @@
 #pragma once
-#include <tchar.h>
+#include "tchar_head.h"
 
 #include "TSlider.h"
 #include "TListView.h"

@@ -10,23 +10,27 @@ class TConfiguration
 {
 private:
 	POINT Org;
-	double dProportion;
+	double dProportion = 1.0;;
 public:
+	int FRAMEPOINT_TRANS_R=5;//半透明状态节点圆半径
 	int FRAMEPOINT_R = 6;//节点圆半径
 	int FRAMEPOINT_H = 20;//高-圆心到地线距离
 	int FRAMEPOINT_B = 30;//底边长
 	int FRAMEPOINT_SECTION_H = 10;//剖面线区域高度
-	int FRAMEPOINT_ANGLE = 60.0 / 180.0 * M_PI;//三角形角度
-	int SLIDER_B = 45;
-	int SLIDER_H = 30;
-	bool bDrawReal;
-	double dAnglePrecision;
-	units uUnits;
-	int iMapMode;
+	int FRAMEPOINT_ANGLE = int(DEG2REG(60.0));//三角形弧度
+	int SLIDER_B = 45;//滑块宽
+	int SLIDER_H = 30;//滑块高
+	int BAR_R = 7;//杆件圆角半径
+	bool bDrawReal=true;
+	double dAnglePrecision = 1e-1;
+	units uUnits = UNITS_MM;
 	LOGPEN logpen;
-	int iStyle, iWidth;
+	int iStyle = PS_SOLID;
+	int iWidth = 1;
+	LOGPEN logpenSystem;
 	COLORREF crBackground, crPen,crDash,crDot,crCoordinate;
 	COLORREF crGridBig, crGridSmall;
+	COLORREF crLink;
 
 	//Graph
 	COLORREF crGraphBackground,crGraphGridBig, crGraphGridSmall;
@@ -54,7 +58,7 @@ public:
 
 	LONG TConfiguration::RealToScreenX(double x);
 	LONG TConfiguration::RealToScreenY(double y);
-	POINT TConfiguration::RealToScreen(DPOINT dpt);
+	POINT TConfiguration::RealToScreen(DPOINT dpt) const;
 
 	LONG TConfiguration::LengthToScreenX(double xlen);
 	LONG TConfiguration::LengthToScreenY(double ylen);

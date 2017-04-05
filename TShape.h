@@ -74,6 +74,7 @@ public:
 	int TShape::nc();
 	int TShape::nh();
 	int TShape::DOF();
+	size_t TShape::GetPickedElementIndex(const POINT &ptPos,const TConfiguration *pConfig);
 	void TShape::GetSP(const TElement *pElement, int PointIndexOfElement, DPOINT &SP, int &i);
 	void TShape::GetSijP(const TConstraintCoincide *pCoincide, DPOINT &SiP, DPOINT &SjP, int &i, int &j);
 	void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SP, int &i);

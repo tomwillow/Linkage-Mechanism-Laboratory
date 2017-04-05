@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 #include <CommCtrl.h>
-#include <tchar.h>
+#include "tchar_head.h"
 #include <stdio.h>
 #pragma comment(lib, "comctl32.lib")
 
@@ -13,6 +13,7 @@
 
 #include "enumCtrlType.h"
 
+class TTreeViewContent;
 class TShape;
 class TListView:public TControl
 {
@@ -25,13 +26,8 @@ private:
 	std::vector<enumCtrlType> vecCtrlType;
 	std::vector<void *> vecpContent;
 	TShape *pShape;
+	TTreeViewContent *pTreeViewContent;
 protected:
-	//static WNDPROC oldListViewProc;
-
-	//virtual void OnLButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
-	//virtual LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
 	//虚拟消息处理函数，可重载
 	LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 public:

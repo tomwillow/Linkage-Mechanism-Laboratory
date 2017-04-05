@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include <tchar.h>
+#include "tchar_head.h"
 #include <stdio.h>
 
 #pragma   comment(lib,"Msimg32.lib")//AlphaBlend使用
@@ -208,51 +208,5 @@ void TCanvas::OnDraw(HDC hdc)
 
 	return;
 
-	RECT rc1 = { 30, 30, 150, 150 };
-	TDraw::FillRect(hdc, &rc1, RGB(0, 255, 0));
-
-	int left = 0, top = 0;
-	int width = 200, height = 100;
-	HDC hBitmapDC;
-	hBitmapDC = CreateCompatibleDC(NULL);
-
-	BITMAPINFO bmpInfo = { 0 };
-	bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmpInfo.bmiHeader.biWidth = width;
-	bmpInfo.bmiHeader.biHeight = height;//正数，说明数据从下到上，如未负数，则从上到下  
-	bmpInfo.bmiHeader.biPlanes = 1;
-	bmpInfo.bmiHeader.biBitCount = 32;
-	bmpInfo.bmiHeader.biCompression = BI_RGB;
-	
-	VOID *pvBits;
-	HBITMAP hBitmap = CreateDIBSection(hBitmapDC, &bmpInfo, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
-	SelectObject(hBitmapDC, hBitmap);
-
-	RECT rc = { 20, 20, 180, 180 };
-	TDraw::FillRect(hBitmapDC, &rc, RGB(255, 0, 0));
-	POINT pt = { 20, 20 };
-	SetBkMode(hBitmapDC, TRANSPARENT);
-	TDraw::DrawTips(hBitmapDC, pt, TEXT("test"), Config);
-
-	//将有内容区域设为不透明
-	UINT32 *data;
-	for (int y = 0; y < height; y++)
-		for (int x = 0; x < width; x++)
-		{
-			data = ((UINT32 *)pvBits) + x + y * width;
-			if (*data)
-				*data |= 0xff000000;
-		}
-
-	BLENDFUNCTION bf;
-	bf.BlendOp = AC_SRC_OVER;
-	bf.AlphaFormat = AC_SRC_ALPHA;
-	bf.BlendFlags = 0;
-	bf.SourceConstantAlpha = 128;
-
-	AlphaBlend(hdc, left, top, width, height, hBitmapDC, left, top, width, height, bf);
-
-	DeleteObject(hBitmap);
-	DeleteObject(hBitmapDC);
 
 }

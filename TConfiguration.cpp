@@ -23,18 +23,16 @@ void TConfiguration::Initial(HWND hwnd)
 
 	ReleaseDC(hwnd, hdc);
 
-	dAnglePrecision = 1e-1;
-
-	uUnits = UNITS_MM;
 	Org = { 0, 0 };
-	dProportion = 1.0;
+	
 	SetDPU(dProportion);
 
-	iStyle = PS_SOLID;
-	iWidth = 1;
+	logpenSystem = { PS_SOLID, { 1, 0 }, RGB(255, 255, 255) };
+
+	crPen = RGB(255, 255, 255);
+	logpen = { iStyle, { iWidth, 0 }, crPen };
 
 	crBackground = RGB(33,40,48);
-	crPen = RGB(255, 255, 255);
 	crDash = RGB(0, 200, 0);
 	crDot = RGB(0, 200, 0);
 
@@ -43,12 +41,12 @@ void TConfiguration::Initial(HWND hwnd)
 	crGridBig = RGB(51, 57, 73);
 	crGridSmall = RGB(39, 45, 56);
 
-	logpen = { iStyle, { iWidth, 0 }, crPen };
-
 	//Graph
 	crGraphBackground = RGB(240, 240, 240);
 	crGraphGridBig = RGB(200, 200, 200);
 	crGraphGridSmall = RGB(220, 220, 220);
+
+	crLink = 0;
 }
 
 void TConfiguration::SetDPU(double Proportion)
@@ -103,7 +101,7 @@ LONG TConfiguration::RealToScreenY(double y)
 {
 		return (LONG)(-y*DPUY + Org.y);
 }
-POINT TConfiguration::RealToScreen(DPOINT dpt)
+POINT TConfiguration::RealToScreen(DPOINT dpt) const
 {
 	POINT pt;
 		pt.x = (LONG)(dpt.x*DPUX + Org.x);
@@ -141,8 +139,5 @@ double TConfiguration::ScreenToLengthY(LONG ypixel)
 
 DPOINT TConfiguration::ScreenToLength(POINT pt)
 {
-	DPOINT dpt;
-	pt.x = (double)(pt.x)/DPUX;
-	pt.y = (double)(pt.y)/DPUY;
-	return dpt;
+	return {pt.x/DPUX ,pt.y/DPUY };
 }

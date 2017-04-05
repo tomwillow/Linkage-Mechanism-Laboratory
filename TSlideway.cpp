@@ -1,9 +1,9 @@
 #pragma once
-#include <tchar.h>
+#include "tchar_head.h"
 #include <stdio.h>
 
 #include "TSlideway.h"
-
+#include "TListView.h"
 
 TSlideway::TSlideway()
 {
@@ -61,4 +61,12 @@ bool TSlideway::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 		return false;
 	else
 		return true;
+}
+
+void TSlideway::NoticeListView(TListView *pListView)
+{
+	TRealLine::NoticeListView(pListView);
+	
+	pListView->AddAttributeItem(TEXT("阴影长度"), CTRLTYPE_INT_EDIT, &ShadowLength, TEXT("%d"), ShadowLength);
+	pListView->AddAttributeItem(TEXT("阴影位置"), CTRLTYPE_INT_EDIT, &ShadowQuadrant, TEXT("%d"), ShadowQuadrant);
 }

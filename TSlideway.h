@@ -11,6 +11,7 @@ public:
 	TSlideway& TSlideway::operator=(const TSlideway &Slideway);
 	TSlideway& TSlideway::operator=(const TRealLine &RealLine);
 	virtual bool TSlideway::WriteFile(HANDLE &hf, DWORD &now_pos);
-	virtual bool TSlideway::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape);
+	virtual bool TSlideway::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape);
+	void TSlideway::NoticeListView(TListView *pListView);
 };
 

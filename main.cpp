@@ -2,7 +2,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-#include <tchar.h>
+#include "tchar_head.h"
 #include <CommCtrl.h>
 
 #include "ControlStyle.h"
@@ -44,7 +44,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine
 	win.ShowWindow(iCmdShow);
 
 	win.UpdateWindow();
-
 
 	return win.MessageLoop();
 }

@@ -7,6 +7,7 @@ extern TMainWindow win;
 TTool::TTool()
 {
 	//pwin = &win;
+	hInst = win.m_hInst;
 	hwndWin = win.m_hWnd;
 	pConfig = &(win.m_Configuration);
 	pCanvas = &(win.Canvas);

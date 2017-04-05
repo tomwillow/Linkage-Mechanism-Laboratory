@@ -19,7 +19,6 @@ private:
 	TElement *pPrevLine;
 	TAttach *Attach;
 	std::vector<DPOINT> dptHit;//每次的点击位置
-	TRealLine *MoveLine;//显示点的位置
 	bool bShowDimLine;
 	POINT pt1, pt2;
 	TLine *Line1, *Line2, *LineDim;
@@ -38,6 +37,7 @@ private:
 	void TLineTool::InitialLine(DPOINT dptPos);
 	void Draw(HDC hdc);
 protected:
+	TRealLine *MoveLine;//显示点的位置
 	EnumElementType myElementType;
 	virtual TElement * TLineTool::AddIntoShape(TRealLine &RealLine);
 	virtual void TLineTool::AddIntoTreeViewContent(TElement *Element, int id);

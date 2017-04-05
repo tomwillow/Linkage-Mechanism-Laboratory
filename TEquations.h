@@ -29,6 +29,7 @@ public:
 	~TEquations();
 	bool hasSolved;
 	TVariableTable VariableTable; //变量表
+	TVariableTable VariableTableSolved;//已解出变量表
 	TExpressionTree * TEquations::GetLastExpressionTree()
 	{
 		return Equations.back();

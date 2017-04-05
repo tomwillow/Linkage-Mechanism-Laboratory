@@ -45,7 +45,7 @@ LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle)
 {
 	m_hInst = hInst;
-	m_hWndParent = hParent;
+	m_hParent = hParent;
 	m_hWnd = ::CreateWindowEx(dwStyle,//WS_EX_CLIENTEDGE
 		TEXT("Edit"), 0,
 		WS_CHILD |

@@ -1,14 +1,10 @@
 #pragma once
-//#define _CRT_SECURE_NO_WARNINGS
-//#define _CRT_NON_CONFORMING_SWPRINTFS
 #include "DetectMemoryLeak.h"
 
+#include "MyMath.h"
 #include <time.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#include "MyMath.h"
+#include "TTransfer.h"
 
 #include "TSolver.h"
 
@@ -90,7 +86,7 @@ int TSolver::GetIdFromVariableStr(TCHAR varname[])
 		varname++;
 	}
 	_tcsncpy(temp, varname, end - varname + 1);
-	i = _wtoi(temp);
+	i = TTransfer::TCHAR2int(temp);
 
 	delete[] temp;
 	return i;

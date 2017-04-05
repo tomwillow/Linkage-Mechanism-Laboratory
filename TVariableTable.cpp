@@ -192,7 +192,7 @@ const TCHAR * TVariableTable::Output()
 	str = TEXT("已定义变量(");
 
 	TCHAR tc[8];
-	_itow(VariableTable.size(), tc, 10);
+	TTransfer::int2TCHAR(VariableTable.size(), tc);
 	str += tc;
 
 	str += TEXT("个):");

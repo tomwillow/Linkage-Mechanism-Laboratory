@@ -13,7 +13,7 @@ TElement::TElement() :available(true)
 	dpt = { 0, 0 };
 	angle = 0.0;
 
-	alpha = 0xff;
+	alpha = 0xa0;
 
 	_tcscpy(Name,TEXT("undefined"));
 
@@ -22,6 +22,11 @@ TElement::TElement() :available(true)
 TElement::~TElement()
 {
 	
+}
+
+void TElement::BuildpDpt()
+{ 
+	assert(0); 
 }
 
 void TElement::SetStyle(const LOGPEN &logpen)//设置样式
@@ -232,4 +237,20 @@ bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 		return false;
 	else
 		return true;
+}
+
+void TElement::NoticeListView(TListView *pListView)
+{
+	pListView->DeleteAllItems();
+
+	TCHAR buffer[16];
+
+	pListView->id = id;
+	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
+	pListView->AddAttributeItem(TEXT("名称"), CTRLTYPE_EDIT, &Name, Name);
+	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, TEXT("机架"));
+	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
+	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
+	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
+	pListView->AddAttributeItem(TEXT("Alpha"), CTRLTYPE_INT_EDIT, &alpha, TEXT("%d"), alpha);
 }

@@ -4,6 +4,8 @@
 #include <process.h>
 #include "TMainWindow.h"
 
+#include "String.h"
+
 #include "TConstraintCoincide.h" 
 #include "TConstraintColinear.h"
 #include "TSlider.h"
@@ -12,10 +14,11 @@
 #include "TSelectTool.h"
 
 #include "DialogAddDriver.h"
+#include "DialogOption.h"
 
 #include "TGraph.h"
 
-#define _CRT_SECURE_NO_WARNINGS
+#include "FileFunction.h"
 
 TMainWindow::TMainWindow()
 {
@@ -55,9 +58,9 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	//m_Toolbar.bTextOnRight = true;
 	m_Toolbar.CreateToolbar(hWnd, m_hInst);
 	m_Toolbar.LoadImageList(32, 32, IDR_TOOLBAR_MAIN, RGB(255, 255, 255));
-	m_Toolbar.AddGroup(0,0, ID_SELECT, true, TEXT("选择"));
+	m_Toolbar.AddGroup(0, 0, ID_SELECT, true, TEXT("选择"));
 	m_Toolbar.AddGroup(1, 0, ID_DRAG, true, TEXT("拖动"));
-	m_Toolbar.AddButton(2,  ID_REFRESH, true, TEXT("刷新"));
+	m_Toolbar.AddButton(2, ID_REFRESH, true, TEXT("刷新"));
 	m_Toolbar.AddSeparator(0);
 	m_Toolbar.AddGroup(3, 0, ID_DRAW_FRAME, true, TEXT("机架"));
 	m_Toolbar.AddGroup(4, 0, ID_DRAW_BAR, true, TEXT("连杆"));
@@ -71,7 +74,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Status.Create(hWnd, IDR_STATUS, m_hInst, 24);
 	m_Status.AddPart(IDR_STATUS_COORDINATE, 160, PT_FIXED);//坐标
 	m_Status.AddPart(0, 0, PT_NONE);
-	m_Status.AddPart(0, 24, PT_FIXED);//连杆绘制/真实绘制
+	m_Status.AddPart(IDR_STATUS_CHECKBOX_SHOW_REAL, 26, PT_FIXED);//连杆绘制/真实绘制
 	m_Status.AddPart(IDR_STATUS_PROPORTIONNAME, 40, PT_FIXED);//比例：
 	m_Status.AddPart(IDR_STATUS_TRACKBAR, 120, PT_FIXED);//
 	m_Status.AddPart(IDR_STATUS_PROPORTION, 60, PT_FIXED);//比例数字
@@ -80,6 +83,12 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("比例："), m_Configuration.GetProportion() * 100);
 	m_Status.SetText(IDR_STATUS_PROPORTION, TEXT("%.0f%%"), m_Configuration.GetProportion() * 100);
+
+	//创建真实切换按钮
+	m_CheckBoxShowReal.LoadCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_REAL);
+	m_CheckBoxShowReal.LoadUnCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_SIMPLE);
+	m_CheckBoxShowReal.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).top, IDR_STATUS_CHECKBOX_SHOW_REAL);
+	m_CheckBoxShowReal.SetCheckedAndBitmap(m_Configuration.bDrawReal);
 
 	//创建Trackbar
 	m_Trackbar.CreateTrackbar(m_Status.m_hWnd, this->m_hInst, m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0), IDR_TRACKBAR);
@@ -114,8 +123,16 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	_tcscpy(szFileName, TEXT(""));
 
-	//默认初始化
-	this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);
+	TCHAR szInputFileName[MAX_PATH];
+	if (GetCommandLineByIndex(1, szInputFileName))
+	{
+		//ShowMessage(szInputFileName);
+		_tcscpy(szFileName, szInputFileName);
+		::PostMessage(hWnd, WM_COMMAND, MAKELONG(ID_OPEN, ID_OPEN_NOCHECK), 0);//无弹窗打开
+	}
+	else
+		//默认初始化
+		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);
 
 }
 
@@ -150,37 +167,6 @@ void TMainWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 }
 
-bool GetFileExists(TCHAR filename[])
-{
-	WIN32_FIND_DATA FindFileData;
-	HANDLE hFind;
-
-	hFind = FindFirstFile(filename, &FindFileData);
-
-	if (hFind == INVALID_HANDLE_VALUE) {
-		return false;
-	}
-	else {
-		FindClose(hFind);
-		return true;
-	}
-}
-
-void InitialOpenFileName(OPENFILENAME *ofn, HWND hwnd, TCHAR szFile[], DWORD nMaxFile = MAX_PATH)
-{
-	// Initialize OPENFILENAME
-	ZeroMemory(ofn, sizeof(OPENFILENAME));
-	ofn->lStructSize = sizeof(OPENFILENAME);
-	ofn->hwndOwner = hwnd;
-	ofn->lpstrFile = szFile;
-	ofn->lpstrFile[0] = TEXT('\0');
-	ofn->nMaxFile = nMaxFile;
-	ofn->lpstrFilter = TEXT("机构设计文件(*.mds)\0*.mds\0\0");
-	ofn->nFilterIndex = 1;
-	ofn->lpstrFileTitle = NULL;
-	ofn->nMaxFileTitle = 0;
-	ofn->lpstrInitialDir = NULL;
-}
 
 void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
@@ -198,10 +184,10 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			}
 		_tcscpy(szFileName, TEXT(""));
 		SetText(szName);
-		m_ManageTool.CloseCurTool();
-		m_Shape.ReleaseAll();
-		RightWindow.TreeViewContent.DeleteAllItems();
-		RightWindow.ListView.DeleteAllItems();
+		m_ManageTool.CloseCurTool();//关闭工具
+		m_Shape.ReleaseAll();//释放元素
+		RightWindow.TreeViewContent.DeleteAllItems();//删除tree
+		RightWindow.ListView.DeleteAllItems();//删除list
 
 		RightWindow.TreeViewContent.Initial();
 		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);
@@ -217,28 +203,32 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 				return;
 		}
 
-		//准备打开对话框
-		OPENFILENAME ofn;
-
-		InitialOpenFileName(&ofn, m_hWnd, szFileName);
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;//限定文件必须存在
-
-		if (GetOpenFileName(&ofn) == TRUE)
+		if (wmEvent != ID_OPEN_NOCHECK)
 		{
-			TCHAR szFileNameBackup[MAX_PATH];
-			_tcscpy(szFileNameBackup, szFileName);
-			this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//无条件初始化
-			_tcscpy(szFileName, szFileNameBackup);
-
-			if (m_Shape.ReadFromFile(ofn.lpstrFile))
-			{
-				RightWindow.TreeViewContent.AddAllItem();
-				SetText(TEXT("%s - %s"), szName, szFileName);
-				pSolver->RefreshEquations(true);
-			}
-			else
-				ShowMessage(TEXT("Error:%d"), GetLastError());
+			//准备打开对话框
+			OPENFILENAME ofn;
+			InitialOpenFileName(&ofn, m_hWnd, szFileName);
+			ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;//限定文件必须存在
+			if (GetOpenFileName(&ofn) == FALSE)
+				break;
 		}
+
+
+		//因为New会改变szFileName，所以先保存再恢复
+		TCHAR szFileNameBackup[MAX_PATH];
+		_tcscpy(szFileNameBackup, szFileName);
+		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//无条件初始化
+		_tcscpy(szFileName, szFileNameBackup);
+
+		if (m_Shape.ReadFromFile(szFileName))
+		{
+			RightWindow.TreeViewContent.AddAllItem();
+			SetText(TEXT("%s - %s"), szName, szFileName);
+			pSolver->RefreshEquations(true);
+		}
+		else
+			ShowMessage(TEXT("Error:%d"), GetLastError());
+
 		break;
 	case ID_SAVE:
 	{
@@ -292,6 +282,22 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_DRAW_SLIDER:
 		SendMessage(m_Toolbar.m_hWnd, WM_USER, wmId, 0);
 		p_Managetool->SetCurActiveTool(wmId);
+		break;
+	case ID_DELETE_ELEMENT:
+		p_Managetool->m_pCurrentTool->OnKeyDown(m_hWnd, VK_DELETE, 0);
+		break;
+	case IDR_STATUS_CHECKBOX_SHOW_REAL:
+		if (m_CheckBoxShowReal.GetChecked())
+		{
+			m_CheckBoxShowReal.SetBitmapIsChecked();
+			m_Configuration.bDrawReal = true;
+		}
+		else
+		{
+			m_CheckBoxShowReal.SetBitmapIsUnChecked();
+			m_Configuration.bDrawReal = false;
+		}
+		Canvas.Invalidate();
 		break;
 	case ID_ANALYZE_MECHANISM:
 		if (pConsole == NULL)
@@ -354,19 +360,27 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 	case ID_SET_DRIVER:
 	{
-		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT || m_ManageTool.m_uiCurActiveTool==ID_DRAG)
+		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT || m_ManageTool.m_uiCurActiveTool == ID_DRAG)
 		{
 			//if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
-				//选择工具 且 选中元素可驱动 则弹出原动件对话框
-				if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DlgAddDriverProc))
-				{
-					MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
-				}
-				else
-					break;
+			//选择工具 且 选中元素可驱动 则弹出原动件对话框
+			if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DlgAddDriverProc))
+			{
+				MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
+			}
+			else
+				break;
 		}
 
 		MessageBox(m_hWnd, TEXT("请先使用选择工具选择一个元素，再设为原动件。"), TEXT(""), MB_ICONINFORMATION);
+		break;
+	}
+	case ID_OPTION:
+	{
+			if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_OPTION), m_hWnd, DlgOptionProc))
+			{
+				MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
+			}
 		break;
 	}
 	case ID_DELETE_GRAPH:
@@ -429,6 +443,7 @@ void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 	m_Toolbar.FreshSize();
 	m_Status.FreshSize();
 	m_Trackbar.MoveWindow(m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0));//Trackbar嵌入Status
+	m_CheckBoxShowReal.SetPos(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0));
 
 	SetRightWindowPos();
 

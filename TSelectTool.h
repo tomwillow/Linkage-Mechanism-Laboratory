@@ -18,7 +18,7 @@ protected:
 	//bool bShowTips;
 	//POINT ptTips;
 
-	LPWSTR Cursor;
+	TCHAR *Cursor;
 
 	bool bDrag;
 
@@ -34,8 +34,6 @@ protected:
 	void OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	void OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
-	bool TSelectTool::PickConstraintCoincide(POINT ptPos, TElement *element);
-	bool TSelectTool::PickConstraintColinear(POINT ptPos, TElement *element);
 	void TSelectTool::CancelTreeViewAndListView();
 	void TSelectTool::RestorePickedLineStyle();
 	void TSelectTool::RestoreHoveredLineStyle();
@@ -46,6 +44,7 @@ public:
 	TSelectTool();
 	~TSelectTool();
 	bool TSelectTool::CanBeDriver();
+	void TSelectTool::SelectByIndex(size_t index);
 	void TSelectTool::SelectById(int id);
 };
 

@@ -1,6 +1,7 @@
 #pragma once
-#include <tchar.h>
+#include "tchar_head.h"
 #include <vector>
+#include <map>
 
 #include "String.h"
 #include "enumError.h"
@@ -13,6 +14,7 @@ private:
 public:
 	enumError eError;
 	String str;
+	//std::map<TCHAR *, double> VariableTable;
 	std::vector<TCHAR *> VariableTable;
 	std::vector<double> VariableValue;
 	TVariableTable();

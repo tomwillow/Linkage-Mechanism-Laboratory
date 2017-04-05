@@ -208,6 +208,7 @@ void TSliderTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	case 0://空点右键
 		//没有点的情况下点右键则重置工具
 		::PostMessage(hwndWin, WM_COMMAND, ID_SELECT, 0);
+		pCanvas->Invalidate();
 		break;
 	case 1://刚画滑块还没画线
 

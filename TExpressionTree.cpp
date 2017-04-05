@@ -2081,6 +2081,15 @@ TCHAR * TExpressionTree::Read(double num, bool bOutput)
 		return OutputEmptyStr();
 }
 
+TCHAR * TExpressionTree::Solve()
+{
+	TExpressionTree Result;
+
+	TNode *Now, *ResultNow;
+	return OutputEmptyStr();
+
+}
+
 TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput)
 {
 	std::queue<TNode *> InOrder;

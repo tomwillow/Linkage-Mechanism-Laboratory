@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tchar.h>
+#include "tchar_head.h"
 #include <stdio.h>
 
 #include "TShape.h"

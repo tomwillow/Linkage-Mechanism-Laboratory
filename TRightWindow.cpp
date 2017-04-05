@@ -1,7 +1,7 @@
 #pragma once
 #include "TRightWindow.h"
 #include <CommCtrl.h>
-#include <tchar.h>
+#include "tchar_head.h"
 #include <stdio.h>
 #pragma comment(lib, "comctl32.lib")
 

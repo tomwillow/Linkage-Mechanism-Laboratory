@@ -36,6 +36,8 @@ void TStatus::Create(HWND hParent, UINT nControlID,HINSTANCE hInst,int iHeight)
 	::MoveWindow(m_hWnd, 0, rectParent.bottom - iHeight, rectParent.right, iHeight, TRUE);
 	m_iHeight = iHeight;
 	m_hParent = hParent;
+
+	RegisterProc();
 }
 
 RECT TStatus::GetClientRect()

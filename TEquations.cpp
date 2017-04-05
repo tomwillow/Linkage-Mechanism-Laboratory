@@ -4,6 +4,8 @@
 #include "TEquations.h"
 #include <Windows.h>
 
+#include "TTransfer.h"
+
 TEquations::TEquations()
 {
 	eError = ERROR_NO;
@@ -47,8 +49,7 @@ size_t TEquations::GetEquationsCount()
 
 const TCHAR * TEquations::AddEquation(bool output,TCHAR *szInput, bool istemp)
 {
-	TExpressionTree *temp;
-	temp = new TExpressionTree;
+	TExpressionTree *temp=new TExpressionTree;
 	temp->LinkVariableTable(&VariableTable);
 	temp->Read(szInput, false);
 	temp->Simplify(false);
@@ -433,7 +434,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 		if (bOutput)
 		{
 			Str += TEXT("q(");
-			Str += _itow(n, buffer, 10);
+			Str += TTransfer::int2TCHAR(n, buffer);
 			Str += TEXT(")=\r\n");
 			Output(Q);
 			Str += TEXT("\r\n");
@@ -454,7 +455,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 		if (bOutput)
 		{
 			Str += TEXT("Jacobian(");
-			Str+=_itow(n, buffer,10);
+			Str += TTransfer::int2TCHAR(n, buffer);
 			Str+=TEXT(")=\r\n");
 			Output(JacobianValue);
 			Str += TEXT("\r\n");
@@ -474,7 +475,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 		if (bOutput)
 		{
 			Str += TEXT("Phi(");
-			Str += _itow(n, buffer, 10);
+			Str += TTransfer::int2TCHAR(n, buffer);
 			Str += TEXT(")=\r\n");
 			Output(PhiValue);
 			Str += TEXT("\r\n");
@@ -509,7 +510,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 		if (bOutput)//Êä³öDeltaQ
 		{
 			Str += TEXT("¦¤q(");
-			Str += _itow(n, buffer, 10);
+			Str += TTransfer::int2TCHAR(n, buffer);
 			Str += TEXT(")=\r\n");
 			Output(DeltaQ);
 			Str += TEXT("\r\n\r\n");

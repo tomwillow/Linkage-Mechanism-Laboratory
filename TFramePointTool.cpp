@@ -11,9 +11,11 @@ TFramePointTool::TFramePointTool()
 {
 	Attach = new TAttach(pCanvas, pShape, pConfig);
 
-	tempFramePoint.SetStyle(PS_SOLID, 1, pConfig->crPen);
+	tempFramePoint.SetStyle(pConfig->logpen);
 
 	pPrevFramePoint = NULL;
+
+	bShowTips = true;
 }
 
 
@@ -25,8 +27,12 @@ TFramePointTool::~TFramePointTool()
 
 void TFramePointTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {
+	ptMouse = ptPos;
+
 	Attach->AttachAll(ptPos);
 	tempFramePoint.dpt = Attach->dptAttach;
+
+	sTips = TEXT("点击以建立机架点");
 }
 
 
@@ -37,7 +43,15 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	pTreeViewContent->AddItem(&tempFramePoint, pShape->iNextId);
 	pPrevFramePoint = pShape->AddElement(&tempFramePoint);
 	//pPrevFramePoint=pShape->AddFramePoint(tempFramePoint);
+	sTips = TEXT("已建立。");
 
+	if (Attach->pAttachElement!=NULL)
+	switch (Attach->pAttachElement->eType)
+	{
+	case ELEMENT_FRAMEPOINT:
+	case ELEMENT_SLIDEWAY:
+		return;
+	}
 	if (Attach->bAttachedEndpoint)
 	{
 		TConstraintCoincide coincide;
@@ -61,14 +75,18 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 void TFramePointTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	::PostMessage(hwndWin, WM_COMMAND, ID_SELECT, 0);
+	pCanvas->Invalidate();
 }
 
 //插入WM_PAINT事件中进行绘制
 void TFramePointTool::Draw(HDC hdc)
 {
-	Attach->Draw(hdc);
+	if (bShowTips)
+		TDraw::DrawTips(hdc, ptMouse, sTips.c_str(), pConfig);
 
+	TDraw::DrawFramePoint(hdc, &tempFramePoint, pConfig);
 	//已存储点由Canvas负责绘制
+	Attach->Draw(hdc);
 }
 
 void TFramePointTool::OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos)

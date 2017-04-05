@@ -21,14 +21,14 @@ TLineTool::TLineTool()
 	Attach = new TAttach(pCanvas, pShape, pConfig);
 	bShowDimLine = false;
 	MoveLine = new TRealLine;
-	MoveLine->SetStyle(PS_SOLID, 1, pConfig->crPen);
+	MoveLine->SetStyle(pConfig->logpen);
 
 	Line1 = new TLine;
 	Line2 = new TLine;
 	LineDim = new TLine;
-	Line1->SetStyle(PS_DOT, 1, pConfig->crPen);
-	Line2->SetStyle(PS_DOT, 1, pConfig->crPen);
-	LineDim->SetStyle(PS_DOT, 1, pConfig->crPen);
+	Line1->SetStyle(PS_DOT, 1, pConfig->logpenSystem.lopnColor);
+	Line2->SetStyle(PS_DOT, 1, pConfig->logpenSystem.lopnColor);
+	LineDim->SetStyle(PS_DOT, 1, pConfig->logpenSystem.lopnColor);
 
 	LineEdit = new TLineEdit;
 
@@ -134,7 +134,18 @@ void TLineTool::Draw(HDC hdc)
 	//画临时线及尺寸线
 	if (dptHit.size() > 0)
 	{
-		TDraw::DrawRealLine(hdc, *MoveLine, pConfig);//点过一次后才开始画临时线
+		switch (myElementType)
+		{
+		case ELEMENT_REALLINE://点过一次后才开始画临时线
+			TDraw::DrawRealLine(hdc, *MoveLine, pConfig);
+			break;
+		case ELEMENT_BAR:
+			TDraw::DrawBar(hdc, (TBar *)MoveLine, pConfig);
+			break;
+		case ELEMENT_SLIDEWAY:
+			TDraw::DrawSlideway(hdc, (TSlideway *)MoveLine, pConfig);
+			break;
+		}
 
 		if (bShowDimLine)
 		{

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tchar.h>
+#include "tchar_head.h"
 #include <queue>
 #include <stack>
 #include "TVariableTable.h"
@@ -92,6 +92,7 @@ public:
 	TCHAR * TExpressionTree::LinkVariableTable(TVariableTable *p);//链接变量表
 	TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput);
 	TCHAR * TExpressionTree::Read(double num, bool bOutput);//读入只有1个数字的表达式
+	TCHAR * TExpressionTree::Solve();
 	TCHAR * TExpressionTree::OutputStr(bool bIgnoreError=false);
 	TCHAR * TExpressionTree::Simplify(bool bOutput);//化简
 	TCHAR * TExpressionTree::Diff(TCHAR *var, int n, bool bOutput);//对变量求导

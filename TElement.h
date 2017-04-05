@@ -1,9 +1,8 @@
 #pragma once
-#include "DetectMemoryLeak.h"
 #include <vector>
 #include <Windows.h>
 
-#include "String.h"
+//#include "String.h"
 
 #include "DPOINT.h"
 
@@ -21,6 +20,7 @@ class TListView;
 class TElement
 {
 private:
+protected:
 public:
 	int id;
 	bool available;//未启用
@@ -43,8 +43,8 @@ public:
 	TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[]);//得到线型名称
 	TCHAR * TElement::GetElementTypeName(TCHAR name[]);//得到类型名称
 	TElement& TElement::operator=(const TElement &element);
-	virtual void TElement::NoticeListView(TListView *pListView){}//
-	virtual void TElement::BuildpDpt(){ assert(0); }
+	virtual void TElement::BuildpDpt();
 	virtual bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos);
 	virtual bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape);
+	virtual void TElement::NoticeListView(TListView *pListView);
 };

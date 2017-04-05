@@ -4,6 +4,8 @@
 #include "TSlider.h"
 
 #include "TShape.h"
+#include "TDraw.h"
+
 #include "TConfiguration.h"
 
 #include "TConstraintCoincide.h"
@@ -154,6 +156,9 @@ void TShape::ChangePos(int index, DPOINT dptDelta)
 		((TRealLine *)temp)->ptBegin.y += dptDelta.y;
 		((TRealLine *)temp)->ptEnd.x += dptDelta.x;
 		((TRealLine *)temp)->ptEnd.y += dptDelta.y;
+		break;
+	case CONSTRAINT_COINCIDE://不可移动
+	case CONSTRAINT_COLINEAR:
 		break;
 	default:
 		assert(0);
@@ -423,4 +428,40 @@ bool TShape::SaveToFile(TCHAR szFileName[])
 	CloseHandle(hf);
 
 	return true;
+}
+
+size_t TShape::GetPickedElementIndex(const POINT &ptPos, const TConfiguration *pConfig)
+{
+	for (auto iter = Element.cbegin(); iter != Element.cend();++iter)
+	{
+		switch ((*iter)->eType)
+		{
+		case ELEMENT_BAR:
+		case ELEMENT_REALLINE:
+		case ELEMENT_SLIDEWAY:
+			if (TDraw::PointInRealLine(ptPos, (TRealLine *)(*iter), pConfig))//发现拾取
+				return iter-Element.cbegin();
+			break;
+		case ELEMENT_FRAMEPOINT:
+			if (TDraw::PointInFramePoint(pConfig->RealToScreen(((TFramePoint *)(*iter))->dpt), ptPos, pConfig))
+				return iter - Element.cbegin();
+			break;
+		case ELEMENT_SLIDER:
+			if (TDraw::PointInSlider(ptPos, (TSlider *)(*iter), pConfig))
+				return iter - Element.cbegin();
+			break;
+		case CONSTRAINT_COINCIDE:
+			if (TDraw::PickConstraintCoincide(ptPos, (*iter), pConfig))
+				return iter - Element.cbegin();
+			break;
+		case CONSTRAINT_COLINEAR:
+			if (TDraw::PickConstraintColinear(ptPos, (*iter)))
+				return iter - Element.cbegin();
+			break;
+		default:
+			assert(0);
+			break;
+		}
+	}
+	return -1;
 }
