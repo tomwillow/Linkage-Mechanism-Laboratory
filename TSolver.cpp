@@ -267,6 +267,7 @@ void TSolver::Solve(bool Output)
 
 	start = clock();
 
+	Outputln(Equations->SimplifyEquations(Output));
 	Outputln(Equations->BuildJacobian(Output, subsVar, subsValue));//建立Jacobian
 	Outputln(Equations->VariableTable.Output());//输出当前变量
 	Outputln(Equations->SolveEquations(Output));//解方程
@@ -357,9 +358,12 @@ void TSolver::Demo()
 	//Outputln(Equations->AddEquation(true, TEXT("phi1-t"), false));
 	//Outputln(Equations->BuildJacobian(true, TEXT("l t"), TEXT("1.3 0")));
 
-	Outputln(Equations->VariableTable.Define(true, TEXT("x2 phi2"), TEXT("0 0")));
+	//Outputln(Equations->VariableTable.Define(true, TEXT("x2 phi2"), TEXT("0 0")));
+	Outputln(Equations->DefineVariable(true, TEXT("x2 phi2 z"), TEXT("0 0 0")));
 	Outputln(Equations->AddEquation(true, TEXT("-x2+1+1.3*sin(phi2)"), false));
-	Outputln(Equations->AddEquation(true, TEXT("-1.3*cos(phi2)"), false));
+	Outputln(Equations->AddEquation(true, TEXT("-1.3*(-phi2/(5+4))-20"), false));
+	Outputln(Equations->AddEquation(true, TEXT("2*sin(z)-0.5*cos(z)"), false));
+	Outputln(Equations->SimplifyEquations(true));
 	Outputln(Equations->BuildJacobian(true, TEXT("l t"), TEXT("1.3 0")));
 	Outputln(Equations->SolveEquations(true));
 	RefreshWindowText();

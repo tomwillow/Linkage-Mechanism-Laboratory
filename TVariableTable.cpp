@@ -12,13 +12,15 @@
 
 TVariableTable::TVariableTable()
 {
+	bShared = false;
 	eError = ERROR_NO;
 }
 
 
 TVariableTable::~TVariableTable()
 {
-	ReleaseVariableTable(VariableTable);
+	if (bShared!=true)
+		ReleaseVariableTable(VariableTable);
 }
 
 void TVariableTable::ReleaseVariableTable(std::vector<TCHAR *> &input)
@@ -40,6 +42,19 @@ double TVariableTable::GetValueFromVarPoint(TCHAR *pVar)
 	throw eError;
 }
 
+void TVariableTable::SetValueFromVarStr(TCHAR *VarStr,double value)
+{
+	for (size_t i = 0; i < VariableTable.size(); i++)
+		if (_tcscmp(VarStr, VariableTable[i]) == 0)
+		{
+			VariableValue[i] = value;
+			return;
+		}
+
+	eError = ERROR_UNDEFINED_VARIABLE;
+	throw eError;
+}
+
 TCHAR * TVariableTable::FindVariableTable(TCHAR *varstr)
 {
 	for (auto szVar:VariableTable)
@@ -55,7 +70,7 @@ void TVariableTable::DeleteByAddress(TCHAR *var)
 	{
 		if (VariableTable[i] == var)
 		{
-			delete[] VariableTable[i];
+			if (bShared==false) delete[] VariableTable[i];
 			std::vector<TCHAR *>::iterator iter = VariableTable.begin() + i;
 			VariableTable.erase(iter);
 
@@ -205,4 +220,25 @@ const TCHAR * TVariableTable::Output()
 	str += TEXT("\r\n");
 
 	return str.c_str();
+}
+
+void TVariableTable::SetValueByVarTable(TVariableTable &VarTable)
+{
+	for (size_t i = 0; i < VarTable.VariableTable.size(); i++)
+	{
+			SetValueFromVarStr(VarTable.VariableTable[i], VarTable.VariableValue[i]);
+	}
+}
+
+void TVariableTable::OutputValue(String &S)//Êä³ö x=0 ÐÎÊ½
+{
+	TCHAR *buffer = new TCHAR[20];
+	for (int i = 0; i < VariableTable.size(); i++)
+	{
+		S += VariableTable[i];
+		S += TEXT(" = ");
+		_stprintf(buffer, TEXT("%f"), VariableValue[i]);
+		S += buffer;
+		S += TEXT("\r\n");
+	}
 }

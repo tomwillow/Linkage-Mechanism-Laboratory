@@ -55,6 +55,9 @@ private:
 
 	TCHAR *szOutput;
 	TVariableTable *pVariableTable;
+	int iVarAppearedCount;
+	TNode *LastVarNode;
+	//TVariableTable SelfVariableTable;
 	bool TExpressionTree::IsIntAndEven(double n);
 	int TExpressionTree::Rank(enumMathOperator eOperator);
 	TExpressionTree::enumError TExpressionTree::InQueue2PostQueue(std::queue<TNode *> &InOrder, std::vector<TNode *> &PostOrder);
@@ -82,6 +85,8 @@ private:
 	TExpressionTree::TNode * TExpressionTree::NewNode(enumNodeType eType, enumMathOperator eOperator=MATH_NOT_AVAILIALBE);
 	void TExpressionTree::ReleaseVectorTNode(std::vector<TNode *> vec);
 	void TExpressionTree::Vpa_inner(TNode *now);
+	void TExpressionTree::Solve(TNode *now, TNode *&write_pos);
+	void TExpressionTree::CheckOnlyOneVar(TNode *now);
 public:
 	TNode *head;
 	enumError TExpressionTree::GetError();
@@ -92,13 +97,16 @@ public:
 	TCHAR * TExpressionTree::LinkVariableTable(TVariableTable *p);//链接变量表
 	TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput);
 	TCHAR * TExpressionTree::Read(double num, bool bOutput);//读入只有1个数字的表达式
-	TCHAR * TExpressionTree::Solve();
+	TCHAR * TExpressionTree::Solve(TCHAR *&var, double &value);//求解单变量方程 不验证可求解性，需提前调用HasOnlyOneVar确认 不改动表达式内容
 	TCHAR * TExpressionTree::OutputStr(bool bIgnoreError=false);
 	TCHAR * TExpressionTree::Simplify(bool bOutput);//化简
 	TCHAR * TExpressionTree::Diff(TCHAR *var, int n, bool bOutput);//对变量求导
 	TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums,bool output);//vars为被替换变量，nums为替换表达式，以逗号分隔
 	TCHAR * TExpressionTree::Subs(std::vector<TCHAR *> VarsVector, std::vector<double> NumsVector,bool output);
 	bool TExpressionTree::CanCalc();//检查是否还有变量存在，可以计算则返回true
+	bool TExpressionTree::IsSingleVar();//检查是否为一元(not used)
+	bool TExpressionTree::HasOnlyOneVar();//只有一个变量（只有刚read才有效）
+	bool TExpressionTree::CheckOnlyOneVar();//只有一个变量（实时验证）
 	double TExpressionTree::Value(bool operateHeadNode);//不验证可计算性，必须与CanCalc合用
 	TCHAR * TExpressionTree::Calc(double *result = NULL);//计算表达式的值，若传入了result则把结果存入。返回值为结果字符串或表达式串。
 

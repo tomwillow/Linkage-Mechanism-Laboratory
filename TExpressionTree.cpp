@@ -29,6 +29,8 @@ void TExpressionTree::Reset()
 	szOutput = NULL;
 	pVariableTable = NULL;
 	eError = ERROR_NO;
+
+	iVarAppearedCount = 0;
 }
 
 void TExpressionTree::Release()
@@ -554,7 +556,7 @@ enumError TExpressionTree::InQueue2PostQueue(std::queue<TNode *> &InOrder, std::
 	if (parenthesis_num != 0)
 	{
 		ReleaseVectorTNode(PostOrder);
-		return eError=ERROR_PARENTHESIS_NOT_MATCH;
+		return eError = ERROR_PARENTHESIS_NOT_MATCH;
 	}
 	else
 		return ERROR_NO;
@@ -809,7 +811,7 @@ enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> 
 					if (pVariableTable == NULL)
 					{
 						ReleaseVectorTNode(PreInOrder);
-						return eError=ERROR_NOT_LINK_VARIABLETABLE;
+						return eError = ERROR_NOT_LINK_VARIABLETABLE;
 					}
 					if (TMyString::isAlphaCharOrUnderline(Data[i].start[0]) == false)//变量名首字符需为下划线或字母
 					{
@@ -834,7 +836,7 @@ enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> 
 					{
 						delete[] tempTChar;
 						ReleaseVectorTNode(PreInOrder);
-						return eError=ERROR_UNDEFINED_VARIABLE;
+						return eError = ERROR_UNDEFINED_VARIABLE;
 					}
 
 					tempNode = new TNode;
@@ -842,6 +844,15 @@ enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> 
 					tempNode->eType = NODE_VARIABLE;
 					tempNode->ValueOrName.varname = tempTChar;
 					PreInOrder.push_back(tempNode);
+
+					////得到自身的变量表 以解方程
+					//if (SelfVariableTable.FindVariableTable(tempTChar) == NULL)
+					//{
+					//	SelfVariableTable.VariableTable.push_back(tempTChar);
+					//	SelfVariableTable.VariableValue.push_back(pVariableTable->GetValueFromVarPoint(tempTChar));
+					//}
+					iVarAppearedCount++;
+					LastVarNode = tempNode;
 
 					tempTChar = NULL;
 				}
@@ -959,7 +970,7 @@ bool TExpressionTree::IsIntAndEven(double n)
 	return false;
 }
 
-void TExpressionTree::CalcNode(TNode *Operator,const TNode *Node1,const TNode *Node2 = NULL)
+void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode *Node2 = NULL)
 {
 	double value1 = Node1->ValueOrName.value;
 	double value2 = (Node2 != NULL ? Node2->ValueOrName.value : 0.0);
@@ -1698,12 +1709,12 @@ enumError TExpressionTree::Simplify(TNode *now)
 			try
 			{
 				CalcNode(now, now->left, now->right);
-			delete now->left;
-			delete now->right;
-			now->eOperator = MATH_NOT_AVAILIALBE;
-			now->left = NULL;
-			now->right = NULL;
-			return ERROR_NO;
+				delete now->left;
+				delete now->right;
+				now->eOperator = MATH_NOT_AVAILIALBE;
+				now->left = NULL;
+				now->right = NULL;
+				return ERROR_NO;
 			}
 			catch (enumError err)
 			{
@@ -2081,11 +2092,191 @@ TCHAR * TExpressionTree::Read(double num, bool bOutput)
 		return OutputEmptyStr();
 }
 
-TCHAR * TExpressionTree::Solve()
+void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
+{
+	TNode *parent = now->parent;
+	if (parent != NULL)
+	{
+		TNode *brother;
+		bool bVarIsLeft;
+		if (parent->left == now)
+		{
+			brother = parent->right;
+			bVarIsLeft = true;
+		}
+		else
+		{
+			brother = parent->left;
+			bVarIsLeft = false;
+		}
+
+		switch (parent->eOperator)
+		{
+		case MATH_ADD:
+			write_pos->eType = NODE_OPERATOR;
+			write_pos->eOperator = MATH_SUBSTRACT;
+
+			write_pos->right = CopyNodeTree(brother);
+			write_pos->right->parent = write_pos;
+
+			write_pos->left = new TNode;
+			ZeroMemory(write_pos->left, sizeof(TNode));
+
+			write_pos->left->parent = write_pos;
+			Solve(parent, write_pos->left);
+			break;
+		case MATH_MULTIPLY:
+			write_pos->eType = NODE_OPERATOR;
+			write_pos->eOperator = MATH_DIVIDE;
+
+			write_pos->right = CopyNodeTree(brother);
+			write_pos->right->parent = write_pos;
+
+			write_pos->left = new TNode;
+			ZeroMemory(write_pos->left, sizeof(TNode));
+
+			write_pos->left->parent = write_pos;
+			Solve(parent, write_pos->left);
+			break;
+		case MATH_SUBSTRACT://分左右
+			if (bVarIsLeft)//被减数
+			{
+				write_pos->eType = NODE_OPERATOR;
+				write_pos->eOperator = MATH_ADD;
+
+				write_pos->right = CopyNodeTree(brother);
+				write_pos->right->parent = write_pos;
+
+				write_pos->left = new TNode;
+				ZeroMemory(write_pos->left, sizeof(TNode));
+
+				write_pos->left->parent = write_pos;
+				Solve(parent, write_pos->left);
+			}
+			else
+			{
+				write_pos->eType = NODE_OPERATOR;
+				write_pos->eOperator = MATH_SUBSTRACT;
+
+				write_pos->left = CopyNodeTree(brother);
+				write_pos->left->parent = write_pos;
+
+				write_pos->right = new TNode;
+				ZeroMemory(write_pos->right, sizeof(TNode));
+
+				write_pos->right->parent = write_pos;
+				Solve(parent, write_pos->right);
+			}
+			break;
+		case MATH_DIVIDE://分左右
+			if (bVarIsLeft)//被除数
+			{
+				write_pos->eType = NODE_OPERATOR;
+				write_pos->eOperator = MATH_MULTIPLY;
+
+				write_pos->right = CopyNodeTree(brother);
+				write_pos->right->parent = write_pos;
+
+				write_pos->left = new TNode;
+				ZeroMemory(write_pos->left, sizeof(TNode));
+
+				write_pos->left->parent = write_pos;
+				Solve(parent, write_pos->left);
+			}
+			else
+			{
+				write_pos->eType = NODE_OPERATOR;
+				write_pos->eOperator = MATH_DIVIDE;
+
+				write_pos->left = CopyNodeTree(brother);
+				write_pos->left->parent = write_pos;
+
+				write_pos->right = new TNode;
+				ZeroMemory(write_pos->right, sizeof(TNode));
+
+				write_pos->right->parent = write_pos;
+				Solve(parent, write_pos->right);
+			}
+			break;
+		case MATH_POSITIVE:
+			write_pos->eType = NODE_OPERATOR;
+			write_pos->eOperator = MATH_POSITIVE;
+
+			write_pos->left = new TNode;
+			ZeroMemory(write_pos->left, sizeof(TNode));
+
+			write_pos->left->parent = write_pos;
+			Solve(parent, write_pos->left);
+			break;
+		case MATH_NEGATIVE:
+			write_pos->eType = NODE_OPERATOR;
+			write_pos->eOperator = MATH_NEGATIVE;
+
+			write_pos->left = new TNode;
+			ZeroMemory(write_pos->left, sizeof(TNode));
+
+			write_pos->left->parent = write_pos;
+			Solve(parent, write_pos->left);
+			break;
+		case MATH_SIN:
+			write_pos->eType = NODE_OPERATOR;
+			write_pos->eOperator = MATH_ARCSIN;
+
+			write_pos->left = new TNode;
+			ZeroMemory(write_pos->left, sizeof(TNode));
+
+			write_pos->left->parent = write_pos;
+			Solve(parent, write_pos->left);
+			break;
+		case MATH_COS:
+			write_pos->eType = NODE_OPERATOR;
+			write_pos->eOperator = MATH_ARCCOS;
+
+			write_pos->left = new TNode;
+			ZeroMemory(write_pos->left, sizeof(TNode));
+
+			write_pos->left->parent = write_pos;
+			Solve(parent, write_pos->left);
+			break;
+		case MATH_TAN:
+			write_pos->eType = NODE_OPERATOR;
+			write_pos->eOperator = MATH_ARCTAN;
+
+			write_pos->left = new TNode;
+			ZeroMemory(write_pos->left, sizeof(TNode));
+
+			write_pos->left->parent = write_pos;
+			Solve(parent, write_pos->left);
+			break;
+		default:
+			assert(0);
+			break;
+		}
+	}
+	else
+	{
+		//have not parent
+		write_pos->eType = NODE_NUMBER;
+		write_pos->ValueOrName.value = 0.0;
+
+	}
+}
+
+//求解单变量方程 不验证可求解性，需提前调用HasOnlyOneVar确认
+TCHAR * TExpressionTree::Solve(TCHAR *&var,double &value)
 {
 	TExpressionTree Result;
 
-	TNode *Now, *ResultNow;
+	TNode *Now, *ResultNow = new TNode;
+	ZeroMemory(ResultNow, sizeof(TNode));
+
+	var = LastVarNode->ValueOrName.varname;
+
+	Solve(LastVarNode, ResultNow);
+
+	Result.head = ResultNow;
+	value = Result.Value(true);
+
 	return OutputEmptyStr();
 
 }
@@ -2269,4 +2460,37 @@ TCHAR * TExpressionTree::Vpa(bool bOutput)
 		}
 	}
 	return GetErrorInfo();
+}
+
+bool TExpressionTree::IsSingleVar()//检查是否为一元
+{
+	//return SelfVariableTable.VariableTable.size() == 1;
+	return true;
+}
+
+
+void TExpressionTree::CheckOnlyOneVar(TNode *now)//只有一个变量（实时验证）
+{
+	if (now->eType == NODE_VARIABLE)
+	{
+		iVarAppearedCount++;
+		LastVarNode = now;
+	}
+	if (now->left != NULL)
+		CheckOnlyOneVar(now->left);
+
+	if (now->right != NULL)
+		CheckOnlyOneVar(now->right);
+}
+
+bool TExpressionTree::CheckOnlyOneVar()//只有一个变量（实时验证）
+{
+	iVarAppearedCount = 0;
+	CheckOnlyOneVar(head);
+	return HasOnlyOneVar();
+}
+
+bool TExpressionTree::HasOnlyOneVar()//只有一个变量
+{
+	return iVarAppearedCount == 1;
 }

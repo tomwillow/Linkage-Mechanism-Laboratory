@@ -28,8 +28,9 @@ public:
 	TEquations();
 	~TEquations();
 	bool hasSolved;
-	TVariableTable VariableTable; //变量表
+	TVariableTable VariableTable; //总变量表
 	TVariableTable VariableTableSolved;//已解出变量表
+	TVariableTable VariableTableUnsolved;
 	TExpressionTree * TEquations::GetLastExpressionTree()
 	{
 		return Equations.back();
@@ -41,5 +42,6 @@ public:
 	enumError TEquations::SolveLinear(Matrix &A, Vector &x, Vector &b);//解线性方程组 系数A，未知数x
 	const TCHAR * TEquations::SolveEquations(bool bOutput);//求解方程组
 	const TCHAR * TEquations::SimplifyEquations(bool bOutput);//将方程组中的简单方程解出
+	const TCHAR * TEquations::DefineVariable(bool bOutput, TCHAR *input_str, TCHAR *input_num);
 };
 
