@@ -49,15 +49,24 @@ std::vector<int> TShape::DeleteElement(int index)
 	//刷新构件及机架数量
 	switch (Element[index]->eType)
 	{
+	case ELEMENT_SLIDER:
 	case ELEMENT_BAR:
 		nb--;
 		break;
+	case ELEMENT_SLIDEWAY:
 	case ELEMENT_FRAMEPOINT:
 		if (CalcFrameNum() == 1)//最后一个机架
 		{
 			hasFrame = false;
 			nb--;
 		}
+		break;
+	case ELEMENT_REALLINE:
+	case CONSTRAINT_COINCIDE://之后处理
+	case CONSTRAINT_COLINEAR://之后处理
+		break;
+	default:
+		assert(0);
 		break;
 	}
 
@@ -90,6 +99,7 @@ std::vector<int> TShape::DeleteElement(int index)
 				((TConstraintColinear *)*iter)->pElement[1] == pDeleted
 				)//且涉及到被删除元素，则删除此约束
 			{
+				iCoincideNum--;
 				DeletedId.push_back((*iter)->id);
 
 				delete *iter;

@@ -36,6 +36,10 @@ TSolver::~TSolver()
 void TSolver::SetHwnd(HWND hwnd)
 {
 	hwndOutput = hwnd;
+	if (hwnd != NULL)
+		bOutput = true;
+	else
+		bOutput = false;
 }
 
 void TSolver::Outputln(const TCHAR *szFormat, ...)
@@ -98,7 +102,7 @@ void TSolver::ClearConstraint()
 }
 
 //添加鼠标约束
-void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt)
+void TSolver::AddMouseConstraint(int index, DPOINT dpt)
 {
 	switch (pShape->Element[index]->eType)
 	{
@@ -118,7 +122,7 @@ void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt)
 		_stprintf(szVar, TEXT("x%d y%d phi%d"), i, i, i);
 		_stprintf(szValue, TEXT("%f %f %f"), element->dpt.x, element->dpt.y, element->angle);
 
-		Outputln(Equations->VariableTable.Define(true, szVar, szValue));
+		Outputln(Equations->DefineVariable(bOutput, szVar, szValue));
 		Outputln(Equations->AddEquation(bOutput, temp, true));
 
 		return;
@@ -140,15 +144,14 @@ void TSolver::ClearEuqations()
 	Equations = new TEquations;
 }
 
-void TSolver::RefreshEquations(bool Output)
+void TSolver::RefreshEquations()
 {
-	bOutput = Output;
 	Str = TEXT("");
 	_tcscpy(subsVar, TEXT(""));
 	_tcscpy(subsValue, TEXT(""));
 	ClearEuqations();
 
-	Outputln(TEXT("自由度: DOF = nc-nh = %d - %d = %d"), pShape->nc(), pShape->nh(), pShape->DOF());
+	Outputln(TEXT("自由度: DOF = nc - nh = nb*3 - nh = %d*3 - %d = %d"), pShape->nb,pShape->nh(), pShape->DOF());
 	int i, j;
 	DPOINT SiP, SjP,SiQ,SjQ;
 	TCHAR buffer1[1024], buffer2[1024];
@@ -171,13 +174,13 @@ void TSolver::RefreshEquations(bool Output)
 			//定义变量及其初始值
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
-			Equations->VariableTable.Define(Output, buffer1, buffer2);
+			Equations->DefineVariable(bOutput, buffer1, buffer2);
 
 			//读入方程
 			_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
 			_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d-%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
-			Outputln(Equations->AddEquation(Output, buffer1, false));
-			Outputln(Equations->AddEquation(Output, buffer2, false));
+			Outputln(Equations->AddEquation(bOutput, buffer1, false));
+			Outputln(Equations->AddEquation(bOutput, buffer2, false));
 			break;
 		}
 		case CONSTRAINT_COLINEAR:
@@ -197,7 +200,7 @@ void TSolver::RefreshEquations(bool Output)
 			//定义变量及其初始值
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
-			Equations->VariableTable.Define(Output, buffer1, buffer2);
+			Equations->DefineVariable(bOutput, buffer1, buffer2);
 
 			//读入方程
 			_stprintf(buffer1, TEXT("(cos(phi%d)*(%f-%f)+sin(phi%d)*(%f-%f))*(x%d-x%d+%f*cos(phi%d)-%f*cos(phi%d)-%f*sin(phi%d)+%f*sin(phi%d))\
@@ -207,8 +210,8 @@ void TSolver::RefreshEquations(bool Output)
 			_stprintf(buffer2, TEXT("(cos(phi%d-phi%d)*(%f-%f)+sin(phi%d-phi%d)*(%f-%f))*(%f-%f)-(cos(phi%d-phi%d)*(%f-%f)-sin(phi%d-phi%d)*(%f-%f))*(%f-%f)"),
 										i,j,SiP.y,SiQ.y,i,j,SiP.x,SiQ.x,SjP.x,SjQ.x,i,j,SiP.x,SiQ.x,i,j,SiP.y,SiQ.y,SjP.y,SjQ.y);
 
-			Outputln(Equations->AddEquation(Output, buffer1, false));
-			Outputln(Equations->AddEquation(Output, buffer2, false));
+			Outputln(Equations->AddEquation(bOutput, buffer1, false));
+			Outputln(Equations->AddEquation(bOutput, buffer2, false));
 			break;
 		}
 		case ELEMENT_SLIDEWAY:
@@ -233,7 +236,7 @@ void TSolver::RefreshEquations(bool Output)
 	if (pShape->DOF() > 1)
 		Outputln(TEXT("\r\n欠约束。"));
 
-	if (Output)
+	if (bOutput)
 		RefreshWindowText();
 }
 
@@ -258,19 +261,20 @@ void TSolver::RefreshWindowText()
 }
 
 //求解
-void TSolver::Solve(bool Output)
+void TSolver::Solve()
 {
-	bOutput = Output;
 
 	clock_t start, stop;//clock_t是clock()函数返回类型
 	double duration;
 
 	start = clock();
 
-	Outputln(Equations->SimplifyEquations(Output));
-	Outputln(Equations->BuildJacobian(Output, subsVar, subsValue));//建立Jacobian
-	Outputln(Equations->VariableTable.Output());//输出当前变量
-	Outputln(Equations->SolveEquations(Output));//解方程
+	Outputln(Equations->Subs(bOutput, subsVar, subsValue));
+	Outputln(Equations->SimplifyEquations(bOutput));
+	Outputln(TEXT("简化后变量："));
+	Outputln(Equations->VariableTableUnsolved.Output());//输出当前变量
+	Outputln(Equations->BuildJacobian(bOutput));//建立Jacobian, subsVar, subsValue
+	Outputln(Equations->SolveEquations(bOutput));//解方程
 
 	if (Equations->hasSolved)//解出
 	{
@@ -315,6 +319,7 @@ void TSolver::Solve(bool Output)
 				}
 				break;
 			}
+			case ELEMENT_FRAMEPOINT:
 			case ELEMENT_SLIDER:
 			{
 				switch (eQType)
@@ -342,9 +347,9 @@ void TSolver::Solve(bool Output)
 	stop = clock();
 	duration = ((double)(stop - start)) / CLK_TCK;
 
-	Outputln(TEXT("\r\n耗时 %f ms"), duration);
+	Outputln(TEXT("\r\n耗时 %f s"), duration);
 
-	if (Output) RefreshWindowText();
+	if (bOutput) RefreshWindowText();
 }
 
 void TSolver::Demo()
@@ -359,12 +364,14 @@ void TSolver::Demo()
 	//Outputln(Equations->BuildJacobian(true, TEXT("l t"), TEXT("1.3 0")));
 
 	//Outputln(Equations->VariableTable.Define(true, TEXT("x2 phi2"), TEXT("0 0")));
-	Outputln(Equations->DefineVariable(true, TEXT("x2 phi2 z"), TEXT("0 0 0")));
-	Outputln(Equations->AddEquation(true, TEXT("-x2+1+1.3*sin(phi2)"), false));
+	Outputln(Equations->DefineVariable(true, TEXT("x2 phi2 z t l"), TEXT("0 0 0 0 0")));
+	Outputln(Equations->AddEquation(true, TEXT("-x2+1+1.3*sin(phi2)*l"), false));
 	Outputln(Equations->AddEquation(true, TEXT("-1.3*(-phi2/(5+4))-20"), false));
-	Outputln(Equations->AddEquation(true, TEXT("2*sin(z)-0.5*cos(z)"), false));
+	Outputln(Equations->AddEquation(true, TEXT("2*sin(z)+0.5*cos(z)+t"), false));
+	Outputln(Equations->AddEquation(true, TEXT("t-0.3"), false));
+	Outputln(Equations->Subs(true, TEXT("l"), TEXT("1.3")));
 	Outputln(Equations->SimplifyEquations(true));
-	Outputln(Equations->BuildJacobian(true, TEXT("l t"), TEXT("1.3 0")));
+	Outputln(Equations->BuildJacobian(true));
 	Outputln(Equations->SolveEquations(true));
 	RefreshWindowText();
 	//建立ExpressionTree

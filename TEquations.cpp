@@ -20,6 +20,9 @@ TEquations::~TEquations()
 	for (int i = 0; i < Equations.size(); i++)
 		delete Equations[i];
 
+	for (int i = 0; i < EquationsSolved.size(); i++)
+		delete EquationsSolved[i];
+
 	//ÊÍ·ÅÑÅ¿É±È
 	for (int i = 0; i < Jacobian.size(); i++)
 		for (int j = 0; j < Jacobian[i].size(); j++)
@@ -51,7 +54,7 @@ size_t TEquations::GetEquationsCount()
 
 const TCHAR * TEquations::DefineVariable(bool bOutput, TCHAR *input_str, TCHAR *input_num)
 {
-	Str+=VariableTable.Define(bOutput, input_str, input_num);
+	Str=VariableTable.Define(bOutput, input_str, input_num);
 
 	VariableTableUnsolved.VariableTable = VariableTable.VariableTable;
 	VariableTableUnsolved.VariableValue = VariableTable.VariableValue;
@@ -86,6 +89,57 @@ const TCHAR * TEquations::AddEquation(bool output, TCHAR *szInput, bool istemp)
 		return NULL;
 }
 
+const TCHAR * TEquations::Subs(bool bOutput, TCHAR *subsVar, TCHAR *subsValue)//´úÈë
+{
+	if (eError != ERROR_NO)
+		return Str.c_str();
+
+
+	TVariableTable exceptVars;
+	//ÈôÊäÈëÁËÌæ»»±äÁ¿£¬Ôò½øÐÐ¶¨Òå
+	if (subsVar != NULL)
+	{
+		exceptVars.Define(bOutput, subsVar,subsValue);
+		TCHAR *ptVar;
+		for (int i = 0; i < exceptVars.VariableTable.size(); ++i)
+		{
+			if ((ptVar = VariableTable.FindVariableTable(exceptVars.VariableTable[i])) && VariableTableSolved.FindVariableTable(ptVar)==NULL)
+			{
+				VariableTableSolved.VariableTable.push_back(ptVar);
+				VariableTableSolved.VariableValue.push_back(exceptVars.VariableValue[i]);
+			}
+		}
+		//VariableTableSolved.SetValueByVarTable(exceptVars);
+	}
+
+	Str = TEXT("Ìæ»»Íê³É¡£µ±Ç°·½³Ì£º\r\n");
+	for (int i = 0; i < Equations.size(); i++)//±éÀú·½³Ì
+	{
+		Equations[i]->LinkVariableTable(&VariableTableUnsolved);
+
+		//Ìæ»»µô»ú¼Üµã×ø±ê
+		if (subsVar != NULL && _tcslen(subsVar)>0)
+			Equations[i]->Subs(subsVar, subsValue, false);
+
+		if (bOutput)
+		{
+			Str += Equations[i]->OutputStr(false);
+			Str += TEXT("\r\n");
+		}
+	}
+
+		//ÌÞ³ýµô±»Ìæ»»µôµÄ±äÁ¿
+	if (subsVar != NULL && _tcslen(subsVar) > 0)
+	{
+		VariableTableUnsolved.Remove(subsVar);
+	}
+
+		if (bOutput)
+			return Str.c_str();
+		else
+			return TEXT("");
+}
+
 const TCHAR * TEquations::BuildJacobian(bool bOutput, TCHAR *subsVar, TCHAR *subsValue)
 {
 	if (eError != ERROR_NO)
@@ -105,21 +159,24 @@ const TCHAR * TEquations::BuildJacobian(bool bOutput, TCHAR *subsVar, TCHAR *sub
 	//¹¹½¨ÑÅ¿É±È¾ØÕó
 	Jacobian.clear();
 	Jacobian.resize(Equations.size());
-	for (int i = 0; i < Equations.size(); i++)
+	for (int i = 0; i < Equations.size(); i++)//±éÀú·½³Ì
 	{
+		//ÒÔÎ´½â³ö±äÁ¿½¨Á¢ÑÅ¿É±È¾ØÕó
+		Equations[i]->LinkVariableTable(&VariableTableUnsolved);
+
 		//Ìæ»»µô»ú¼Üµã×ø±ê
 		if (subsVar != NULL && _tcslen(subsVar)>0)
 			Equations[i]->Subs(subsVar, subsValue, false);
 
 		Equations[i]->Simplify(false);
-		for (int j = 0; j < VariableTable.VariableTable.size(); j++)
+		for (int j = 0; j < VariableTableUnsolved.VariableTable.size(); j++)
 		{
 			//±»ÅÅ³ý±äÁ¿²»½øÈëÑÅ¿É±È¾ØÕóÁÐ
-			if (exceptVars.FindVariableTable(VariableTable.VariableTable[j]) == NULL)//·ÇÅÅ³ý±äÁ¿
+			if (exceptVars.FindVariableTable(VariableTableUnsolved.VariableTable[j]) == NULL)//·ÇÅÅ³ý±äÁ¿
 			{
 				temp = new TExpressionTree;
 				*temp = *Equations[i];
-				temp->Diff(VariableTable.VariableTable[j], 1, false);
+				temp->Diff(VariableTableUnsolved.VariableTable[j], 1, false);
 				temp->Simplify(false);
 				Jacobian[i].push_back(temp);
 			}
@@ -128,7 +185,7 @@ const TCHAR * TEquations::BuildJacobian(bool bOutput, TCHAR *subsVar, TCHAR *sub
 
 	//ÌÞ³ýµô±»Ìæ»»µôµÄ±äÁ¿
 	if (subsVar != NULL && _tcslen(subsVar)>0)
-		VariableTable.Remove(subsVar);
+		VariableTableUnsolved.Remove(subsVar);
 
 	//
 	if (bOutput)
@@ -440,8 +497,8 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 
 		TCHAR *buffer = new TCHAR[20];
 		Matrix JacobianValue;
-		Vector PhiValue, DeltaQ, &Q = VariableTable.VariableValue;
-		Vector VariableValueBackup = VariableTable.VariableValue;
+		Vector PhiValue, DeltaQ, &Q = VariableTableUnsolved.VariableValue;
+		Vector VariableValueBackup = VariableTableUnsolved.VariableValue;
 		int n = 0;
 
 		Str = TEXT("");
@@ -466,7 +523,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 			{
 				Str += TEXT("ÎÞ·¨¼ÆËã¡£\r\n");
 				delete[] buffer;
-				VariableTable.VariableValue = VariableValueBackup;
+				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return Str.c_str();
 			}
 
@@ -487,7 +544,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 			{
 				Str += TEXT("ÎÞ·¨¼ÆËã¡£\r\n");
 				delete[] buffer;
-				VariableTable.VariableValue = VariableValueBackup;
+				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return Str.c_str();
 			}
 			if (bOutput)
@@ -505,7 +562,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 				//¾ØÕóÆæÒì
 				Str += TEXT("Jacobian¾ØÕóÆæÒìÇÒÎÞ½â£¨´æÔÚÃ¬¶Ü·½³Ì£©¡£\r\n");
 				delete[] buffer;
-				VariableTable.VariableValue = VariableValueBackup;
+				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return Str.c_str();
 			case ERROR_INDETERMINATE_EQUATION:
 				Str += TEXT("²»¶¨·½³Ì×é¡£·µ»ØÒ»×éÌØ½â¡£\r\n");
@@ -513,7 +570,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 			case ERROR_JACOBI_ROW_NOT_EQUAL_PHI_ROW:
 				Str += TEXT("Jacobian¾ØÕóÓëPhiÏòÁ¿ÐÐÊý²»µÈ£¬³ÌÐò³ö´í¡£\r\n");
 				delete[] buffer;
-				VariableTable.VariableValue = VariableValueBackup;
+				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return Str.c_str();
 			case ERROR_INFINITY_SOLUTIONS:
 				Str += TEXT("Jacobian¾ØÕóÆæÒì£¬µ«ÓÐÎÞÇî¶à½â£¨´æÔÚµÈ¼Û·½³Ì£©¡£·µ»ØÒ»×éÌØ½â¡£\r\n");
@@ -521,7 +578,7 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 			case ERROR_OVER_DETERMINED_EQUATIONS:
 				Str += TEXT("Ã¬¶Ü·½³Ì×é£¬ÎÞ·¨Çó½â¡£\r\n");
 				delete[] buffer;
-				VariableTable.VariableValue = VariableValueBackup;
+				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return Str.c_str();
 			}
 
@@ -543,18 +600,21 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 			{
 				Str += TEXT("³¬¹ý20²½ÈÔÎ´ÊÕÁ²¡£\r\n");
 				delete[] buffer;
-				VariableTable.VariableValue = VariableValueBackup;
+				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return Str.c_str();
 			}
 			n++;
 		}
+		//´Ë´¦ÒÑ½â³ö
+
+		VariableTable.SetValueByVarTable(VariableTableUnsolved);
 
 		hasSolved = true;
 		delete[] buffer;
 	}
 	else
 	{
-		VariableTable.SetValueByVarTable(VariableTableSolved);
+		//VariableTable.SetValueByVarTable(VariableTableSolved);
 	}
 
 	Str += TEXT("\r\nµÃµ½½á¹û£º\r\n");
@@ -566,6 +626,11 @@ const TCHAR * TEquations::SolveEquations(bool bOutput)
 
 const TCHAR * TEquations::SimplifyEquations(bool bOutput)//½«·½³Ì×éÖÐµÄ¼òµ¥·½³Ì½â³ö
 {
+	if (eError != ERROR_NO)
+		return Str.c_str();
+
+	Str = TEXT("");
+
 	std::vector<bool> vecHasSolved(Equations.size(), false);
 	//for (auto pExpr : Equations)
 	for (size_t i = 0; i < Equations.size(); ++i)
@@ -574,10 +639,8 @@ const TCHAR * TEquations::SimplifyEquations(bool bOutput)//½«·½³Ì×éÖÐµÄ¼òµ¥·½³Ì½
 		{
 			TExpressionTree *pExpr = Equations[i];
 
-			//pExpr->OutputStr();
 			//´úÈë
 			pExpr->Subs(VariableTableSolved.VariableTable, VariableTableSolved.VariableValue, bOutput);
-			//pExpr->OutputStr();
 
 			if (pExpr->CheckOnlyOneVar())
 			{
@@ -587,7 +650,7 @@ const TCHAR * TEquations::SimplifyEquations(bool bOutput)//½«·½³Ì×éÖÐµÄ¼òµ¥·½³Ì½
 				VariableTableSolved.VariableTable.push_back(var);//Îª¹²Ïíµ¥Î»£¬²»¸ºÔðÎö¹¹±äÁ¿
 				VariableTableSolved.VariableValue.push_back(value);
 
-				VariableTableUnsolved.DeleteByAddress(var);
+				//VariableTableUnsolved.DeleteByAddress(var);//Çå³ýÒÑ½â³ö±äÁ¿
 
 				vecHasSolved[i] = true;
 				i = -1;//ÖØ»ØÆðµã
@@ -595,11 +658,21 @@ const TCHAR * TEquations::SimplifyEquations(bool bOutput)//½«·½³Ì×éÖÐµÄ¼òµ¥·½³Ì½
 		}
 	}
 
+	//Çå³ýÒÑ½â³ö±äÁ¿
+	for (int i = 0; i < VariableTableSolved.VariableTable.size(); ++i)
+	{
+		VariableTableUnsolved.DeleteByAddress(VariableTableSolved.VariableTable[i]);
+	}
+
+	Str += TEXT("¼òµ¥·½³Ì£º\r\n");
+
 	//ÇåÀíµôÒÑ½â³ö·½³Ì
 	for (int i = vecHasSolved.size()-1; i >=0 ; --i)
 	{
 		if (vecHasSolved[i] == true)
 		{
+			Str += Equations[i]->OutputStr();
+			Str += TEXT("\r\n");
 			delete Equations[i];
 			auto iter = Equations.begin() + i;
 			Equations.erase(iter);
@@ -608,6 +681,8 @@ const TCHAR * TEquations::SimplifyEquations(bool bOutput)//½«·½³Ì×éÖÐµÄ¼òµ¥·½³Ì½
 			EquationIsTemp.erase(iter2);
 		}
 	}
+
+	VariableTable.SetValueByVarTable(VariableTableSolved);
 
 	//
 	if (VariableTableUnsolved.VariableTable.size() == 0)

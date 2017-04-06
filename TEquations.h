@@ -14,7 +14,7 @@ private:
 	typedef std::vector<std::vector<double>> Matrix;
 	typedef std::vector<double> Vector;
 	std::vector<std::vector<TExpressionTree *>> Jacobian;
-	std::vector<TExpressionTree *> Equations;
+	std::vector<TExpressionTree *> Equations,EquationsSolved;
 	std::vector<bool> EquationIsTemp;
 	void TEquations::CalcPhiValue(Vector &PhiValue, const Vector &Q);
 	void TEquations::CalcJacobianValue(Matrix &JacobianValue,const Vector &Q);
@@ -38,10 +38,12 @@ public:
 	size_t TEquations::GetEquationsCount();
 	const TCHAR * TEquations::AddEquation(bool output, TCHAR *input, bool istemp);//添加方程
 	void TEquations::RemoveTempEquations();//移除临时方程
-	const TCHAR * TEquations::BuildJacobian(bool bOutput, TCHAR *subsVar, TCHAR *subsValue);//建立Jacobian
+	const TCHAR * TEquations::BuildJacobian(bool bOutput, TCHAR *subsVar=NULL, TCHAR *subsValue=NULL);//建立Jacobian
 	enumError TEquations::SolveLinear(Matrix &A, Vector &x, Vector &b);//解线性方程组 系数A，未知数x
 	const TCHAR * TEquations::SolveEquations(bool bOutput);//求解方程组
 	const TCHAR * TEquations::SimplifyEquations(bool bOutput);//将方程组中的简单方程解出
 	const TCHAR * TEquations::DefineVariable(bool bOutput, TCHAR *input_str, TCHAR *input_num);
+	const TCHAR * TEquations::Subs(bool bOutput, TCHAR *subsVar, TCHAR *subsValue);//代入
+
 };
 

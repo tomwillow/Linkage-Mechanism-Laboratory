@@ -198,7 +198,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 				AddCoincide(CoincideBegin, pShape->iNextId, pConfig);
 
-				pSolver->RefreshEquations(true);
+				pSolver->RefreshEquations();
 
 				delete CoincideBegin;
 				CoincideBegin = NULL;
@@ -343,7 +343,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			//AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
 			//pShape->AddCoincide(*CoincideBegin, pConfig);
 
-			pSolver->RefreshEquations(true);
+			pSolver->RefreshEquations();
 			//RefreshTreeViewContent();
 			delete CoincideBegin;
 			CoincideBegin = NULL;
@@ -367,7 +367,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			//AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
 			//pShape->AddCoincide(*CoincideBegin, pConfig);
 
-			pSolver->RefreshEquations(true);
+			pSolver->RefreshEquations();
 
 			delete CoincideBegin;
 			CoincideBegin = NULL;

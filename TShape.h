@@ -23,8 +23,6 @@ public:
 	std::vector<TElement *> Element;
 	TShape();
 	~TShape();
-	void TShape::ReleaseAll();
-	std::vector<int> TShape::DeleteElement(int index);
 	template <typename T>
 	T* AddElement(const T *pElement)
 	{
@@ -39,6 +37,7 @@ public:
 		switch (temp->eType)
 		{
 		case CONSTRAINT_COLINEAR:
+			iCoincideNum++;
 			break;
 		case CONSTRAINT_COINCIDE:
 			temp->BuildpDpt();
@@ -68,7 +67,9 @@ public:
 
 		return temp;
 	}
-	
+
+	void TShape::ReleaseAll();
+	std::vector<int> TShape::DeleteElement(int index);
 	TElement* TShape::GetElementById(int id);
 	int TShape::CalcFrameNum();
 	int TShape::nc();

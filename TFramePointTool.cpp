@@ -67,7 +67,7 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 		pShape->AddElement(&coincide);//Ô¼ÊøÈë¿â
 
-		pSolver->RefreshEquations(true);
+		pSolver->RefreshEquations();
 	}
 
 }

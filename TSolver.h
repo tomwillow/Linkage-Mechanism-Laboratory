@@ -32,10 +32,10 @@ private:
 public:
 	TSolver();
 	~TSolver();
-	void TSolver::Solve(bool Output = false);
+	void TSolver::Solve();
 	void TSolver::ClearOutput();
-	void TSolver::RefreshEquations(bool Output = false);
-	void TSolver::AddMouseConstraint(bool bOutput,int index, DPOINT dpt);
+	void TSolver::RefreshEquations();
+	void TSolver::AddMouseConstraint(int index, DPOINT dpt);
 	void TSolver::SetHwnd(HWND hwnd);
 	void TSolver::RefreshWindowText();
 	void TSolver::ClearConstraint();

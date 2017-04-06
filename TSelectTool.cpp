@@ -98,7 +98,7 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 			CancelTreeViewAndListView();
 
-			pSolver->RefreshEquations(true);
+			pSolver->RefreshEquations();
 
 			pCanvas->Invalidate();
 		}
@@ -123,8 +123,8 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 		{
 			pSolver->ClearOutput();
 			pSolver->ClearConstraint();
-			pSolver->AddMouseConstraint(false, iPickIndex, pConfig->ScreenToReal(ptPos));
-			pSolver->Solve(true);
+			pSolver->AddMouseConstraint(iPickIndex, pConfig->ScreenToReal(ptPos));
+			pSolver->Solve();
 
 			pCanvas->Invalidate();
 

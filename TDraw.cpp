@@ -59,7 +59,7 @@ void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
 		DrawRealLine(hdc, ((TRealLine *)Element)->ptBegin, ((TRealLine *)Element)->ptEnd, ((TRealLine *)Element)->logpenStyleShow, pConfig);
 		break;
 	case ELEMENT_FRAMEPOINT:
-			DrawFramePoint(hdc, (TFramePoint *)Element, pConfig);
+		DrawFramePoint(hdc, (TFramePoint *)Element, pConfig);
 		break;
 	case ELEMENT_BAR:
 		DrawBar(hdc, (TBar *)Element, pConfig);
@@ -146,19 +146,14 @@ void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, TConfiguration *pConfig)
 	DrawBarTranslucent(hdc, pConfig->RealToScreen(pBar->ptBegin), pConfig->RealToScreen(pBar->ptEnd), pBar->angle, pBar->alpha, pBar->logpenStyleShow, pConfig);
 }
 
-void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, TConfiguration *pConfig)
+//所有绘制x坐标均-left，y坐标-top
+//只要画的不是黑色 背景就是黑色 -> bNeedDrawBlack=false
+//标准开头（注销在EndTranslucent中完成，不需手动处理）
+//HDC hBitmapDC;
+//HBITMAP hBitmap;
+//VOID *pvBits;
+void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, bool bNeedDrawBlack)
 {
-	//上下左右各加半径
-	int left = min(ptBegin.x, ptEnd.x) - pConfig->BAR_R, top = min(ptBegin.y, ptEnd.y) - pConfig->BAR_R;
-	int width = abs(ptBegin.x - ptEnd.x) + 2 * pConfig->BAR_R, height = abs(ptBegin.y - ptEnd.y) + 2 * pConfig->BAR_R;
-
-
-	ptBegin.x -= left;
-	ptBegin.y -= top;
-	ptEnd.x -= left;
-	ptEnd.y -= top;
-
-	HDC hBitmapDC;
 	hBitmapDC = CreateCompatibleDC(NULL);
 
 	BITMAPINFO bmpInfo = { 0 };
@@ -169,26 +164,80 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	bmpInfo.bmiHeader.biBitCount = 32;
 	bmpInfo.bmiHeader.biCompression = BI_RGB;
 
-	VOID *pvBits;
-	HBITMAP hBitmap = CreateDIBSection(hBitmapDC, &bmpInfo, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
+	hBitmap = CreateDIBSection(hBitmapDC, &bmpInfo, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
 	SelectObject(hBitmapDC, hBitmap);
 
-	bool BkgIsNotBlack = logpen.lopnColor == 0;//只要画的不是黑色 背景就是黑色
+	//开始画
+	if (bNeedDrawBlack)//背景不是黑色就先涂白
+	{
+		HPEN hPen = (HPEN)::GetStockObject(NULL_PEN);
+		::SelectObject(hBitmapDC, hPen);
 
-	//logpen.lopnColor = 0x00ffff;// = RGB(0, 200, 0);
+		HBRUSH hBrush = CreateSolidBrush(0xffffff);//white
+
+		RECT rcTrans = { 0, 0, width, height };
+		::FillRect(hBitmapDC, &rcTrans, hBrush);
+
+		DeleteObject(hPen);
+		DeleteObject(hBrush);
+	}
+
+
+}
+
+void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, BYTE alpha, bool bNeedDrawBlack)
+{
+
+	//将有内容区域设为不透明
+	UINT32 *data;
+	if (bNeedDrawBlack)
+		for (int i = 0; i < width*height; ++i)
+		{
+			data = ((UINT32 *)pvBits) + i;
+			if (*data != 0x00ffffff)//not white
+				*data |= 0xff000000;
+		}
+	else
+		for (int i = 0; i < width*height; ++i)//黑色背景
+		{
+			data = ((UINT32 *)pvBits) + i;
+			if (*data)//为黑色
+				*data |= 0xff000000;
+		}
+
+	BLENDFUNCTION bf;
+	bf.BlendOp = AC_SRC_OVER;
+	bf.AlphaFormat = AC_SRC_ALPHA;
+	bf.BlendFlags = 0;
+	bf.SourceConstantAlpha = alpha;
+
+	AlphaBlend(hdc, left, top, width, height, hBitmapDC, 0, 0, width, height, bf);
+
+	DeleteObject(hBitmap);
+	DeleteObject(hBitmapDC);
+}
+
+void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, TConfiguration *pConfig)
+{
+	//上下左右各加半径
+	int left = min(ptBegin.x, ptEnd.x) - pConfig->BAR_R, top = min(ptBegin.y, ptEnd.y) - pConfig->BAR_R;
+	int width = abs(ptBegin.x - ptEnd.x) + 2 * pConfig->BAR_R, height = abs(ptBegin.y - ptEnd.y) + 2 * pConfig->BAR_R;
+
+	//换到原点
+	ptBegin.x -= left;
+	ptBegin.y -= top;
+	ptEnd.x -= left;
+	ptEnd.y -= top;
+
+	HDC hBitmapDC;
+	HBITMAP hBitmap;
+	VOID *pvBits;
+	StartTranslucent(hBitmapDC, hBitmap, pvBits, left, top, width, height, logpen.lopnColor == 0);
 
 	//开始画
 	HPEN hPen = (HPEN)::GetStockObject(NULL_PEN);
 	::SelectObject(hBitmapDC, hPen);
-	HBRUSH hBrush;
-	if (BkgIsNotBlack)//背景不是黑色就先涂白
-	{
-		hBrush = CreateSolidBrush(0xffffff);//white
-		RECT rcTrans = { 0, 0, width, height };
-		::FillRect(hBitmapDC, &rcTrans, hBrush);
-		DeleteObject(hBrush);
-	}
-	hBrush = CreateSolidBrush(logpen.lopnColor);
+	HBRUSH hBrush = CreateSolidBrush(logpen.lopnColor);
 	::SelectObject(hBitmapDC, hBrush);
 
 	//填色
@@ -218,47 +267,7 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	::DeleteObject(hBrush);
 	//画完
 
-	//RECT rc = { ptBegin.x,ptBegin.y,ptEnd.x,ptEnd.y };
-	////RECT rc = { ptBegin.x, ptBegin.y, ptEnd.x, ptEnd.y };
-	//TDraw::FillRect(hBitmapDC, &rc, RGB(255, 0, 0));
-	//POINT pt = { ptBegin.x,ptBegin.y };//40,40
-	//SetBkMode(hBitmapDC, TRANSPARENT);
-	//TDraw::DrawTips(hBitmapDC, pt, TEXT("test"), pConfig);
-
-	//将有内容区域设为不透明
-	UINT32 *data;
-	if (BkgIsNotBlack)
-		for (int i = 0; i < width*height; ++i)
-		{
-			data = ((UINT32 *)pvBits) + i;
-			if (*data != 0x00ffffff)//not white
-				*data |= 0xff000000;
-		}
-	else
-		for (int i = 0; i < width*height; ++i)//黑色背景
-		{
-			data = ((UINT32 *)pvBits) + i;
-			if (*data)//为黑色
-				*data |= 0xff000000;
-		}
-	//for (int y = 0; y < height; y++)
-	//	for (int x = 0; x < width; x++)
-	//	{
-	//		data = ((UINT32 *)pvBits) + x + y * width;
-	//		if (*data)
-	//			*data |= 0xff000000;
-	//	}
-
-	BLENDFUNCTION bf;
-	bf.BlendOp = AC_SRC_OVER;
-	bf.AlphaFormat = AC_SRC_ALPHA;
-	bf.BlendFlags = 0;
-	bf.SourceConstantAlpha = alpha;
-
-	AlphaBlend(hdc, left, top, width, height, hBitmapDC, 0, 0, width, height, bf);
-
-	DeleteObject(hBitmap);
-	DeleteObject(hBitmapDC);
+	EndTranslucent(hdc, hBitmapDC, hBitmap, pvBits, left, top, width, height, alpha, logpen.lopnColor == 0);
 }
 
 void TDraw::DrawPolygonBarTranslucent(HDC hdc, DPOINT &dptArray, int iDptCount, LOGPEN logpen, const TConfiguration *pConfig)
@@ -381,8 +390,8 @@ void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *pC
 	}
 	else
 	{
-		HPEN hPen= ::CreatePenIndirect(&(pFramePoint->logpenStyleShow));
-		HBRUSH hBrush= (HBRUSH)::GetStockObject(NULL_BRUSH);
+		HPEN hPen = ::CreatePenIndirect(&(pFramePoint->logpenStyleShow));
+		HBRUSH hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
 		::SelectObject(hdc, hPen);
 		::SelectObject(hdc, hBrush);
 
@@ -403,37 +412,41 @@ void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *pConfig)
 {
 	HPEN hPen;
 	HBRUSH hBrush;
-	hPen = ::CreatePenIndirect(&Slideway->logpenStyleShow);
+	if (pConfig->bDrawReal)
+		hPen = ::CreatePen(PS_SOLID, 2, 0);
+	else
+		hPen = ::CreatePenIndirect(&Slideway->logpenStyleShow);
 	hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
 	::SelectObject(hdc, hPen);
 	::SelectObject(hdc, hBrush);
 
-	DrawRealLine(hdc, Slideway->ptBegin, Slideway->ptEnd, Slideway->logpenStyleShow, pConfig);
+	POINT ptBegin = pConfig->RealToScreen(Slideway->ptBegin);
+	POINT ptEnd = pConfig->RealToScreen(Slideway->ptEnd);
 
 	double angleDEG = REG2DEG(Slideway->dAngle) + 45;
 	POINT pt[4];
 	switch (Slideway->ShadowQuadrant)
 	{
 	case 1:
-		pt[0] = pConfig->RealToScreen(Slideway->ptEnd);
+		pt[0] = ptEnd;
 		pt[1] = { pt[0].x, pt[0].y + pConfig->FRAMEPOINT_SECTION_H };
 		pt[2] = { pt[1].x - Slideway->ShadowLength, pt[1].y };
 		pt[3] = { pt[2].x, pt[0].y };
 		break;
 	case 2:
-		pt[0] = pConfig->RealToScreen(Slideway->ptBegin);
+		pt[0] = ptBegin;
 		pt[1] = { pt[0].x, pt[0].y + pConfig->FRAMEPOINT_SECTION_H };
 		pt[2] = { pt[1].x + Slideway->ShadowLength, pt[1].y };
 		pt[3] = { pt[2].x, pt[0].y };
 		break;
 	case 3:
-		pt[0] = pConfig->RealToScreen(Slideway->ptBegin);
+		pt[0] = ptBegin;
 		pt[1] = { pt[0].x, pt[0].y - pConfig->FRAMEPOINT_SECTION_H };
 		pt[2] = { pt[1].x + Slideway->ShadowLength, pt[1].y };
 		pt[3] = { pt[2].x, pt[0].y };
 		break;
 	case 4:
-		pt[0] = pConfig->RealToScreen(Slideway->ptEnd);
+		pt[0] = ptEnd;
 		pt[1] = { pt[0].x, pt[0].y - pConfig->FRAMEPOINT_SECTION_H };
 		pt[2] = { pt[1].x - Slideway->ShadowLength, pt[1].y };
 		pt[3] = { pt[2].x, pt[0].y };
@@ -443,9 +456,9 @@ void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *pConfig)
 		break;
 	}
 
+	DrawLine(hdc, ptBegin, ptEnd);
 	Rotate(pt, 4, pt[0].x, pt[0].y, Slideway->dAngle);
 	MirrorX(pt, 4, pt[0].y);
-	//Rotate(pt, 4, Slideway->ptBegin.x, Slideway->ptEnd.y, Slideway->dAngle);
 
 	DrawSection(hdc, pt, 4, 10, angleDEG);
 
@@ -1155,6 +1168,9 @@ void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig)
 		;
 	}
 
+	POINT apt[4];
+	CalcSliderRectCoor(apt, pConfig->RealToScreen(pSlider->dpt), pSlider->angle, pConfig);
+
 	HPEN hPen;
 	hPen = ::CreatePenIndirect(&(pSlider->logpenStyleShow));
 	::SelectObject(hdc, hPen);
@@ -1163,8 +1179,6 @@ void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig)
 	hBrush = CreateSolidBrush(pConfig->crBackground);//
 	::SelectObject(hdc, hBrush);
 
-	POINT apt[4];
-	CalcSliderRectCoor(apt, pConfig->RealToScreen(pSlider->dpt), pSlider->angle, pConfig);
 	Polygon(hdc, apt, 4);//画线并填充
 
 	::DeleteObject(hPen);

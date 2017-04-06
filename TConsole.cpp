@@ -10,8 +10,8 @@ TConsole::TConsole()
 
 TConsole::~TConsole()
 {
-	DestroyWindow(m_hWnd);
 	pSolver->SetHwnd(NULL);
+	DestroyWindow(m_hWnd);
 }
 
 void TConsole::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)

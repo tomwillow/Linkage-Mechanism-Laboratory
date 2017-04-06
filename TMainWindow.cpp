@@ -193,7 +193,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);
 		OnCommand(MAKELONG(ID_SELECT, 0), 0);
 
-		pSolver->RefreshEquations(true);
+		pSolver->RefreshEquations();
 		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
 		break;
 	case ID_OPEN:
@@ -224,7 +224,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		{
 			RightWindow.TreeViewContent.AddAllItem();
 			SetText(TEXT("%s - %s"), szName, szFileName);
-			pSolver->RefreshEquations(true);
+			pSolver->RefreshEquations();
 		}
 		else
 			ShowMessage(TEXT("Error:%d"), GetLastError());
@@ -402,11 +402,11 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case ID_REFRESH:
-		pSolver->RefreshEquations(true);
+		pSolver->RefreshEquations();
 		pSolver->ClearOutput();
 		pSolver->ClearConstraint();
 		//pSolver->AddMouseConstraint(false, iPickIndex, pConfig->ScreenToReal(ptPos));
-		pSolver->Solve(true);
+		pSolver->Solve();
 		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
 		break;
 	case ID_VIEW_SUITABLE:
