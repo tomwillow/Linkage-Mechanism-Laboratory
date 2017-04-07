@@ -20,6 +20,7 @@ public:
 	TDraw();
 	~TDraw();
 
+	static void TDraw::Move(POINT apt[], int apt_num, long dx, long dy);
 	static void TDraw::Move(POINT apt[], int apt_num, double angle, double dist);
 	static void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta);
 	static void TDraw::MirrorX(POINT apt[], int apt_num, int Oy);
@@ -32,9 +33,11 @@ public:
 	static bool TDraw::GetIntersection(const DPOINT &dptL1Begin, const DPOINT &dptL1End, const DPOINT &dptL2Begin, const  DPOINT &dptL2End, DPOINT &dptIntersection);
 
 	static RECT TDraw::GetMarginRect(RECT rect, int margin);
-	static void TDraw::GetMarginRect(RECT *rect, int margin);
+	static void TDraw::SetMarginRect(RECT *rect, int margin);
 	static POINT TDraw::GetCenter(POINT &pt1, POINT &pt2);
 	static bool TDraw::ShowConstraintCoincideDotLine(TElement *element,const TConfiguration *pConfig);
+
+	static COLORREF TDraw::GetBrighterColor(COLORREF cr);
 
 	static void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig);
 	static void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *Config);
@@ -91,6 +94,8 @@ public:
 
 	//Í¸Ã÷´¦Àí
 	static void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, bool bNeedDrawBlack);
+	static void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, bool bNeedDrawBlack);
 	static void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, BYTE alpha, bool bNeedDrawBlack);
+	static void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, BYTE alpha, bool bNeedDrawBlack);
 };
 

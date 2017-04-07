@@ -152,6 +152,17 @@ void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, TConfiguration *pConfig)
 //HDC hBitmapDC;
 //HBITMAP hBitmap;
 //VOID *pvBits;
+void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits,const RECT &rect, bool bNeedDrawBlack)
+{
+	StartTranslucent(hBitmapDC, hBitmap, pvBits, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,bNeedDrawBlack);
+}
+
+//所有绘制x坐标均-left，y坐标-top
+//只要画的不是黑色 背景就是黑色 -> bNeedDrawBlack=false
+//标准开头（注销在EndTranslucent中完成，不需手动处理）
+//HDC hBitmapDC;
+//HBITMAP hBitmap;
+//VOID *pvBits;
 void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, bool bNeedDrawBlack)
 {
 	hBitmapDC = CreateCompatibleDC(NULL);
@@ -185,6 +196,11 @@ void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, lo
 
 }
 
+void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, BYTE alpha, bool bNeedDrawBlack)
+{
+	EndTranslucent(hdc, hBitmapDC, hBitmap, pvBits, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, alpha, bNeedDrawBlack);
+}
+
 void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, BYTE alpha, bool bNeedDrawBlack)
 {
 
@@ -215,6 +231,14 @@ void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pv
 
 	DeleteObject(hBitmap);
 	DeleteObject(hBitmapDC);
+}
+
+COLORREF TDraw::GetBrighterColor(COLORREF cr)
+{
+	cr = cr + RGB(128, 128, 128);//增加亮度
+	if (cr > 0xffffff)
+		cr = 0xffffff;
+	return cr;
 }
 
 void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, TConfiguration *pConfig)
@@ -251,10 +275,7 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	::DeleteObject(hPen);
 
 	//画外框线
-	COLORREF crLine = logpen.lopnColor + RGB(128, 128, 128);//增加亮度
-	if (crLine > 0xffffff)
-		crLine = 0xffffff;
-	hPen = CreatePen(PS_SOLID, 1, crLine);
+	hPen = CreatePen(PS_SOLID, 1, GetBrighterColor(logpen.lopnColor));
 	::SelectObject(hBitmapDC, hPen);
 	DrawLine(hBitmapDC, pt[0], pt[1]);
 	DrawLine(hBitmapDC, pt[2], pt[3]);
@@ -466,7 +487,7 @@ void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *pConfig)
 	::DeleteObject(hBrush);
 }
 
-//得到点集的包围盒
+//得到点集的包围盒 rect值保存的是坐标
 void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect, bool YPlusIsUP)
 {
 	int xmin, ymin, xmax, ymax;
@@ -644,6 +665,15 @@ void TDraw::MirrorX(POINT apt[], int apt_num, int Oy)
 	for (int i = 0; i < apt_num; i++)
 	{
 		apt[i].y = Oy - (apt[i].y - Oy);
+	}
+}
+
+void TDraw::Move(POINT apt[], int apt_num, long dx, long dy)
+{
+	for (int i = 0; i < apt_num; i++)
+	{
+		apt[i].x += dx;
+		apt[i].y += dy;
 	}
 }
 
@@ -899,8 +929,8 @@ void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt)
 	pt->y += rect.top;
 }
 
-//根据边缘量更改rect
-void TDraw::GetMarginRect(RECT *rect, int margin)
+//根据边缘量更改rect margin为正则缩小
+void TDraw::SetMarginRect(RECT *rect, int margin)
 {
 	rect->left += margin;
 	rect->top += margin;
@@ -912,7 +942,7 @@ void TDraw::GetMarginRect(RECT *rect, int margin)
 RECT TDraw::GetMarginRect(RECT rect, int margin)
 {
 	RECT rc = rect;
-	GetMarginRect(&rc, margin);
+	SetMarginRect(&rc, margin);
 	return rc;
 }
 
@@ -952,7 +982,7 @@ void TDraw::DrawTips(HDC hdc, POINT &ptMouse, const TCHAR text[], TConfiguration
 
 	DrawSystemFontText(hdc, text, rc, pConfig->logpenSystem.lopnColor, DT_CALCRECT);//不会画出来，只是用来刷新rc的
 	rcBk = rc;
-	GetMarginRect(&rcBk, -5);
+	SetMarginRect(&rcBk, -5);
 	FillRect(hdc, &rcBk, pConfig->crBackground);
 	DrawRect(hdc, rcBk, pConfig->logpenSystem);
 	DrawSystemFontText(hdc, text, rc, pConfig->logpenSystem.lopnColor, DT_LEFT | DT_TOP);//DT_CALCRECT
@@ -1116,8 +1146,9 @@ void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig)
 	{
 		DPOINT &A1 = pSlider->vecDpt[iter->index1];//相对坐标
 		DPOINT &A2 = pSlider->vecDpt[iter->index2];//相对坐标
-		DrawRealLine(hdc, GetAbsolute(A1, pSlider->dpt, pSlider->angle),
-			GetAbsolute(A2, pSlider->dpt, pSlider->angle), pSlider->logpenStyleShow, pConfig);
+		DPOINT dptBegin = GetAbsolute(A1, pSlider->dpt, pSlider->angle);
+		DPOINT dptEnd = GetAbsolute(A2, pSlider->dpt, pSlider->angle);
+		DrawRealLine(hdc,dptBegin,dptEnd, pSlider->logpenStyleShow, pConfig);
 
 		//计算得到相交点
 		double b = pConfig->ScreenToLengthX(pConfig->SLIDER_B);
@@ -1154,13 +1185,13 @@ void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig)
 		POINT ptA2;
 		if (GetAngleBetweenPointReal(A1, dptIntersection, B1) > GetAngleBetweenPointReal(B1, dptIntersection, A2))
 		{
-			ptA1 = pConfig->RealToScreen(GetAbsolute(A1, pSlider->dpt, pSlider->angle));
-			ptA2 = pConfig->RealToScreen(GetAbsolute(A2, pSlider->dpt, pSlider->angle));
+			ptA1 = pConfig->RealToScreen(dptBegin);
+			ptA2 = pConfig->RealToScreen(dptEnd);
 		}
 		else
 		{
-			ptA1 = pConfig->RealToScreen(GetAbsolute(A2, pSlider->dpt, pSlider->angle));
-			ptA2 = pConfig->RealToScreen(GetAbsolute(A1, pSlider->dpt, pSlider->angle));
+			ptA1 = pConfig->RealToScreen(dptEnd);
+			ptA2 = pConfig->RealToScreen(dptBegin);
 		}
 		POINT ptIntersection = pConfig->RealToScreen(GetAbsolute(dptIntersection, pSlider->dpt, pSlider->angle));
 		DrawPie(hdc, ptIntersection, pConfig->FRAMEPOINT_R, ptA1, ptA2, pSlider->logpenStyleShow, pSlider->logpenStyleShow.lopnColor);
@@ -1172,18 +1203,41 @@ void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig)
 	CalcSliderRectCoor(apt, pConfig->RealToScreen(pSlider->dpt), pSlider->angle, pConfig);
 
 	HPEN hPen;
-	hPen = ::CreatePenIndirect(&(pSlider->logpenStyleShow));
-	::SelectObject(hdc, hPen);
-
 	HBRUSH hBrush;
-	hBrush = CreateSolidBrush(pConfig->crBackground);//
-	::SelectObject(hdc, hBrush);
 
-	Polygon(hdc, apt, 4);//画线并填充
+	RECT rect;
+	HDC hBitmapDC, tempDC;
+	HBITMAP hBitmap;
+	VOID *pvBits;
+	if (pConfig->bDrawReal)
+	{
+		GetBoundingBox(apt, 4, &rect, false);
+		SetMarginRect(&rect, -1);
+		StartTranslucent(hBitmapDC, hBitmap, pvBits, rect, pSlider->logpenStyleShow.lopnColor == 0);
+		Move(apt, 4, -rect.left, -rect.top);
+		tempDC = hBitmapDC;
+		hBrush = CreateSolidBrush(pSlider->logpenStyleShow.lopnColor);//
+		hPen = CreatePen(PS_SOLID, 1, GetBrighterColor(pSlider->logpenStyleShow.lopnColor));
+	}
+	else
+	{
+		tempDC = hdc;
+		hBrush = CreateSolidBrush(pConfig->crBackground);//
+		hPen = ::CreatePenIndirect(&(pSlider->logpenStyleShow));
+	}
+
+	::SelectObject(tempDC, hPen);
+	::SelectObject(tempDC, hBrush);
+
+	Polygon(tempDC, apt, 4);//画线并填充
 
 	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
 
+	if (pConfig->bDrawReal)
+	{
+		EndTranslucent(hdc,hBitmapDC, hBitmap, pvBits, rect,pSlider->alpha, pSlider->logpenStyleShow.lopnColor == 0);
+	}
 }
 
 bool TDraw::PointInSlider(POINT ptPos, TSlider *pSlider, const TConfiguration *pConfig)

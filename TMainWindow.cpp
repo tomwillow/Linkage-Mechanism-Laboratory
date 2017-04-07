@@ -45,6 +45,47 @@ TMainWindow::~TMainWindow()
 	//_CrtDumpMemoryLeaks();
 }
 
+// Description:
+//   Creates a tooltip for an item in a dialog box. 
+// Parameters:
+//   idTool - identifier of an dialog box item.
+//   nDlg - window handle of the dialog box.
+//   pszText - string to use as the tooltip text.
+// Returns:
+//   The handle to the tooltip.
+//
+HWND CreateToolTip(HWND hParent,HWND hControl,HINSTANCE hInst, PTSTR pszText)
+{
+	if (!hControl || !hParent || !pszText)
+	{
+		return FALSE;
+	}
+
+	// Create the tooltip. g_hInst is the global instance handle.
+	HWND hwndTip = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
+		WS_POPUP | TTS_ALWAYSTIP | TTS_BALLOON,
+		CW_USEDEFAULT, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT,
+		hParent, NULL,
+		hInst, NULL);
+
+	if (!hControl || !hwndTip)
+	{
+		return (HWND)NULL;
+	}
+
+	// Associate the tooltip with the tool.
+	TOOLINFO toolInfo = { 0 };
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.hwnd = hParent;
+	toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
+	toolInfo.uId = (UINT_PTR)hControl;
+	toolInfo.lpszText = pszText;
+	SendMessage(hwndTip, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
+
+	return hwndTip;
+}
+
 void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	//此时m_hWnd尚未更新，不可使用。只能用hWnd。
@@ -89,6 +130,9 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_CheckBoxShowReal.LoadUnCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_SIMPLE);
 	m_CheckBoxShowReal.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).top, IDR_STATUS_CHECKBOX_SHOW_REAL);
 	m_CheckBoxShowReal.SetCheckedAndBitmap(m_Configuration.bDrawReal);
+
+	//创建tooltip
+	CreateToolTip(m_Status.m_hWnd, m_CheckBoxShowReal.m_hWnd, m_hInst, TEXT("点击以切换 真实/简图 显示"));
 
 	//创建Trackbar
 	m_Trackbar.CreateTrackbar(m_Status.m_hWnd, this->m_hInst, m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0), IDR_TRACKBAR);
@@ -299,13 +343,13 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		}
 		Canvas.Invalidate();
 		break;
-	case ID_ANALYZE_MECHANISM:
+	case ID_ANALYZE_MECHANISM://分析机构
 		if (pConsole == NULL)
 			OnCommand(ID_SHOW_CONSOLE, 0);
 		//pSolver->RefreshEquations(true);
 
 		pSolver->ClearOutput();
-		pSolver->ClearEuqations();
+		//pSolver->ClearEuqations();
 		pSolver->Demo();
 
 		break;

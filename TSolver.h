@@ -12,8 +12,7 @@ class TEquations;
 class TSolver:public TTool
 {
 private:
-	std::String Str;
-	bool bOutput;
+	String *pStr;
 	HWND hwndOutput;
 	//TCHAR *str;
 	TEquations *Equations;

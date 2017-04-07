@@ -21,31 +21,36 @@
 
 TSolver::TSolver()
 {
-	bOutput = false;
 	hwndOutput = NULL;
 	Equations = NULL;
-	Str = TEXT("");
+	pStr = NULL;
 }
 
 
 TSolver::~TSolver()
 {
 	ClearEuqations();
+
+	if (pStr != NULL)
+		delete pStr;
 }
 
 void TSolver::SetHwnd(HWND hwnd)
 {
 	hwndOutput = hwnd;
 	if (hwnd != NULL)
-		bOutput = true;
+		pStr = new String;
 	else
-		bOutput = false;
+	{
+		if (pStr != NULL)
+			delete pStr;
+		pStr = NULL;
+	}
 }
 
 void TSolver::Outputln(const TCHAR *szFormat, ...)
 {
-	if (bOutput == false)
-		return;
+	if (pStr!=NULL)
 	if (szFormat != NULL && _tcslen(szFormat) > 0)
 	{
 		TCHAR *szBuffer = new TCHAR[_tcslen(szFormat) + 1024];
@@ -55,8 +60,8 @@ void TSolver::Outputln(const TCHAR *szFormat, ...)
 		va_end(pArgList);
 
 		//追加换行
-		Str += szBuffer;
-		Str+=TEXT("\r\n");
+		*pStr += szBuffer;
+		*pStr+=TEXT("\r\n");
 
 		delete[] szBuffer;
 	}
@@ -64,7 +69,7 @@ void TSolver::Outputln(const TCHAR *szFormat, ...)
 
 void TSolver::Output(TCHAR *szFormat, ...)
 {
-	if (szFormat == NULL || bOutput==false)
+	if (szFormat == NULL || pStr==NULL)
 		return;
 	TCHAR szBuffer[1024];
 	va_list pArgList;
@@ -72,7 +77,7 @@ void TSolver::Output(TCHAR *szFormat, ...)
 	_vsntprintf(szBuffer, sizeof(szBuffer) / sizeof(TCHAR), szFormat, pArgList);
 	va_end(pArgList);
 
-	Str += szBuffer;
+	*pStr += szBuffer;
 }
 
 int TSolver::GetIdFromVariableStr(TCHAR varname[])
@@ -122,8 +127,8 @@ void TSolver::AddMouseConstraint(int index, DPOINT dpt)
 		_stprintf(szVar, TEXT("x%d y%d phi%d"), i, i, i);
 		_stprintf(szValue, TEXT("%f %f %f"), element->dpt.x, element->dpt.y, element->angle);
 
-		Outputln(Equations->DefineVariable(bOutput, szVar, szValue));
-		Outputln(Equations->AddEquation(bOutput, temp, true));
+		Equations->DefineVariable(pStr, szVar, szValue);
+		Equations->AddEquation(pStr, temp, true);
 
 		return;
 	}
@@ -146,11 +151,13 @@ void TSolver::ClearEuqations()
 
 void TSolver::RefreshEquations()
 {
-	Str = TEXT("");
+	//全部清理
 	_tcscpy(subsVar, TEXT(""));
 	_tcscpy(subsValue, TEXT(""));
+	ClearOutput();
 	ClearEuqations();
 
+	//开始
 	Outputln(TEXT("自由度: DOF = nc - nh = nb*3 - nh = %d*3 - %d = %d"), pShape->nb,pShape->nh(), pShape->DOF());
 	int i, j;
 	DPOINT SiP, SjP,SiQ,SjQ;
@@ -174,13 +181,13 @@ void TSolver::RefreshEquations()
 			//定义变量及其初始值
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
-			Equations->DefineVariable(bOutput, buffer1, buffer2);
+			Equations->DefineVariable(pStr, buffer1, buffer2);
 
 			//读入方程
 			_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
 			_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d-%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
-			Outputln(Equations->AddEquation(bOutput, buffer1, false));
-			Outputln(Equations->AddEquation(bOutput, buffer2, false));
+			Equations->AddEquation(pStr, buffer1, false);
+			Equations->AddEquation(pStr, buffer2, false);
 			break;
 		}
 		case CONSTRAINT_COLINEAR:
@@ -200,7 +207,7 @@ void TSolver::RefreshEquations()
 			//定义变量及其初始值
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
-			Equations->DefineVariable(bOutput, buffer1, buffer2);
+			Equations->DefineVariable(pStr, buffer1, buffer2);
 
 			//读入方程
 			_stprintf(buffer1, TEXT("(cos(phi%d)*(%f-%f)+sin(phi%d)*(%f-%f))*(x%d-x%d+%f*cos(phi%d)-%f*cos(phi%d)-%f*sin(phi%d)+%f*sin(phi%d))\
@@ -210,8 +217,8 @@ void TSolver::RefreshEquations()
 			_stprintf(buffer2, TEXT("(cos(phi%d-phi%d)*(%f-%f)+sin(phi%d-phi%d)*(%f-%f))*(%f-%f)-(cos(phi%d-phi%d)*(%f-%f)-sin(phi%d-phi%d)*(%f-%f))*(%f-%f)"),
 										i,j,SiP.y,SiQ.y,i,j,SiP.x,SiQ.x,SjP.x,SjQ.x,i,j,SiP.x,SiQ.x,i,j,SiP.y,SiQ.y,SjP.y,SjQ.y);
 
-			Outputln(Equations->AddEquation(bOutput, buffer1, false));
-			Outputln(Equations->AddEquation(bOutput, buffer2, false));
+			Equations->AddEquation(pStr, buffer1, false);
+			Equations->AddEquation(pStr, buffer2, false);
 			break;
 		}
 		case ELEMENT_SLIDEWAY:
@@ -236,13 +243,14 @@ void TSolver::RefreshEquations()
 	if (pShape->DOF() > 1)
 		Outputln(TEXT("\r\n欠约束。"));
 
-	if (bOutput)
+	if (pStr!=NULL)
 		RefreshWindowText();
 }
 
 void TSolver::ClearOutput()
 {
-	Str = TEXT("");
+	if (pStr!=NULL)
+		*pStr = TEXT("");
 }
 
 //必须使用了本函数才刷新Edit内容
@@ -250,7 +258,7 @@ void TSolver::RefreshWindowText()
 {
 	if (hwndOutput != NULL)
 	{
-		SetWindowText(hwndOutput, Str.c_str());
+		SetWindowText(hwndOutput, pStr->c_str());
 
 		//SetFocus(Edit.m_hWnd);
 
@@ -269,12 +277,10 @@ void TSolver::Solve()
 
 	start = clock();
 
-	Outputln(Equations->Subs(bOutput, subsVar, subsValue));
-	Outputln(Equations->SimplifyEquations(bOutput));
-	Outputln(TEXT("简化后变量："));
-	Outputln(Equations->VariableTableUnsolved.Output());//输出当前变量
-	Outputln(Equations->BuildJacobian(bOutput));//建立Jacobian, subsVar, subsValue
-	Outputln(Equations->SolveEquations(bOutput));//解方程
+	Equations->Subs(pStr, subsVar, subsValue);
+	Equations->SimplifyEquations(pStr);
+	//Outputln(Equations->BuildJacobian(bOutput));//建立Jacobian, subsVar, subsValue
+	Equations->SolveEquations(pStr);//解方程
 
 	if (Equations->hasSolved)//解出
 	{
@@ -349,7 +355,8 @@ void TSolver::Solve()
 
 	Outputln(TEXT("\r\n耗时 %f s"), duration);
 
-	if (bOutput) RefreshWindowText();
+	if (pStr!=NULL) 
+		RefreshWindowText();
 }
 
 void TSolver::Demo()
@@ -363,7 +370,7 @@ void TSolver::Demo()
 	//Outputln(Equations->AddEquation(true, TEXT("phi1-t"), false));
 	//Outputln(Equations->BuildJacobian(true, TEXT("l t"), TEXT("1.3 0")));
 
-	//Outputln(Equations->VariableTable.Define(true, TEXT("x2 phi2"), TEXT("0 0")));
+	/*
 	Outputln(Equations->DefineVariable(true, TEXT("x2 phi2 z t l"), TEXT("0 0 0 0 0")));
 	Outputln(Equations->AddEquation(true, TEXT("-x2+1+1.3*sin(phi2)*l"), false));
 	Outputln(Equations->AddEquation(true, TEXT("-1.3*(-phi2/(5+4))-20"), false));
@@ -372,8 +379,17 @@ void TSolver::Demo()
 	Outputln(Equations->Subs(true, TEXT("l"), TEXT("1.3")));
 	Outputln(Equations->SimplifyEquations(true));
 	Outputln(Equations->BuildJacobian(true));
-	Outputln(Equations->SolveEquations(true));
+	Outputln(Equations->SolveEquations(true));*/
+
+	Equations->DefineVariable(pStr, TEXT("t"), TEXT("0"));
+	Equations->AddEquation(pStr, TEXT("phi2-0.1*t"), false);
+	Equations->Subs(pStr, subsVar, subsValue);
+	Equations->SimplifyEquations(pStr);
+	Equations->SolveEquations(pStr);
+	//Outputln(Equations->Subs(bOutput,))
+
 	RefreshWindowText();
+
 	//建立ExpressionTree
 	//TExpressionTree ex;
 	//TVariableTable VarTable;

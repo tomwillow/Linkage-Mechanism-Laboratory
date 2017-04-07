@@ -24,3 +24,9 @@ using std::ifstream;
 #define Ifstream ifstream
 
 #endif
+
+//String & operator<<(String &s,TCHAR szStr[])
+//{
+//	s += szStr;
+//	return s;
+//}
