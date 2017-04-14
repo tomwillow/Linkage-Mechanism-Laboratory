@@ -19,13 +19,13 @@ TAttach::TAttach(TCanvas *pCanvas, TShape *pShape, TConfiguration *pConfig)
 
 	XAssistLine = new TRealLine;
 	YAssistLine = new TRealLine;
-	XAssistLine->SetStyle(PS_DOT, 1, pConfig->crDot);
-	YAssistLine->SetStyle(PS_DOT, 1, pConfig->crDot);
+	XAssistLine->SetStyle(pConfig->logpenAssistLine);
+	YAssistLine->SetStyle(pConfig->logpenAssistLine);
 
 	//ÉèÖÃÑÓ³¤Ïß
 	bShowExtensionLine = false;
 	ExtensionLine = new TRealLine;
-	ExtensionLine->SetStyle(PS_DOT, 1, pConfig->crDot);
+	ExtensionLine->SetStyle(pConfig->logpenAssistLine);
 
 	//ÉèÖÃ²¶×½µã
 	bAttachedEndpoint = true;
@@ -56,20 +56,20 @@ void TAttach::Draw(HDC hdc)
 
 	if (bShowAttachPoint)
 	{
-		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18,pConfig->logpenSystem);
+		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), pConfig->CROSS_SIZE, pConfig->logpenFront);
 	}
 	//»­X¸¨ÖúÏß
 	if (bShowXAssist)
 	{
 		TDraw::DrawRealLine(hdc, *XAssistLine, pConfig);//
-		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18, pConfig->logpenSystem);
+		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), pConfig->CROSS_SIZE, pConfig->logpenFront);
 	}
 
 	//»­Y¸¨ÖúÏß
 	if (bShowYAssist)
 	{
 		TDraw::DrawRealLine(hdc, *YAssistLine, pConfig);//
-		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), 18, pConfig->logpenSystem);
+		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), pConfig->CROSS_SIZE, pConfig->logpenFront);
 	}
 
 	if (bShowExtensionLine)

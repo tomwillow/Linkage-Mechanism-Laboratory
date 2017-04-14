@@ -181,6 +181,8 @@ void TVariableTable::Define(String *pStr,TCHAR *input_str,TCHAR *input_num)
 		}
 	}
 
+	if (pStr != NULL)
+		*pStr += TEXT(">>Define: ");
 	//
 	for (size_t i = 0; i < temp.size(); i++)
 		if (FindVariableTable(temp[i]))//已有的不再定义
@@ -193,9 +195,19 @@ void TVariableTable::Define(String *pStr,TCHAR *input_str,TCHAR *input_num)
 			if (input_num == NULL)
 				VariableValue.push_back(0.0);
 			else
-			VariableValue.push_back(vectorNums[i]);
+				VariableValue.push_back(vectorNums[i]);
+
+			if (pStr != NULL)
+			{
+				*pStr += VariableTable.back();
+				*pStr += TEXT("(");
+				*pStr << VariableValue.back();
+				*pStr += TEXT(") ");
+			}
 		}
 
+	if (pStr != NULL)
+		*pStr += TEXT("\r\n\r\n");
 	//if (bOutput)
 	//	return Output();//输出变量情况
 	//else

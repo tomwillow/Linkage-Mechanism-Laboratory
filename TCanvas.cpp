@@ -191,7 +191,8 @@ void TCanvas::OnDraw(HDC hdc)
 	TDraw::FillRect(hdc, &ClientRect, Config->crBackground);
 
 	//画网格
-	TDraw::DrawGrid(hdc, ClientRect, Config,Config->crGridBig,Config->crGridSmall);
+	if (Config->bDrawGrid)
+		TDraw::DrawGrid(hdc, ClientRect, Config,Config->crGridBig,Config->crGridSmall);
 
 	//画坐标原点
 	TDraw::DrawAxes(hdc, Config->GetOrg().x, Config->GetOrg().y, Config->crCoordinate);

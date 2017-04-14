@@ -21,6 +21,7 @@
 
 
 TMainWindow win;
+TMainWindow *pwin = &win;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow)
 {

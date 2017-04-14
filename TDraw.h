@@ -20,7 +20,7 @@ public:
 	TDraw();
 	~TDraw();
 
-	static void TDraw::Move(POINT apt[], int apt_num, long dx, long dy);
+	static void TDraw::MoveByDelta(POINT apt[], int apt_num, long dx, long dy);
 	static void TDraw::Move(POINT apt[], int apt_num, double angle, double dist);
 	static void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta);
 	static void TDraw::MirrorX(POINT apt[], int apt_num, int Oy);

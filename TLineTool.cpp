@@ -21,14 +21,14 @@ TLineTool::TLineTool()
 	Attach = new TAttach(pCanvas, pShape, pConfig);
 	bShowDimLine = false;
 	MoveLine = new TRealLine;
-	MoveLine->SetStyle(pConfig->logpen);
+	MoveLine->SetStyle(pConfig);
 
 	Line1 = new TLine;
 	Line2 = new TLine;
 	LineDim = new TLine;
-	Line1->SetStyle(PS_DOT, 1, pConfig->logpenSystem.lopnColor);
-	Line2->SetStyle(PS_DOT, 1, pConfig->logpenSystem.lopnColor);
-	LineDim->SetStyle(PS_DOT, 1, pConfig->logpenSystem.lopnColor);
+	Line1->SetStyle(pConfig->logpenAssist);
+	Line2->SetStyle(pConfig->logpenAssist);
+	LineDim->SetStyle(pConfig->logpenAssist);
 
 	LineEdit = new TLineEdit;
 
@@ -206,7 +206,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 			//加入连接约束：ID上一个.end=ID这个.begin
 			CoincideBegin = new TConstraintCoincide;
-			CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
+			CoincideBegin->SetStyle(pConfig->logpen);
 
 			CoincideBegin->pElement[0] = pPrevLine;
 			CoincideBegin->PointIndexOfElement[0] = 1;//ptEnd
@@ -313,7 +313,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		{
 			//ID被捕捉=ID新元素.begin
 			CoincideBegin = new TConstraintCoincide;
-			CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
+			CoincideBegin->SetStyle(pConfig->logpen);
 			CoincideBegin->pElement[0] = Attach->pAttachElement;
 			CoincideBegin->PointIndexOfElement[0] = Attach->iAttachElementPointIndex;
 
@@ -327,7 +327,8 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 		//若超出1个点则入库
 		TRealLine RealLine;
-		RealLine.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
+		RealLine.SetStyle(MoveLine->logpenStyle);//只有此处线入库，复制MoveLine颜色，MoveLine颜色取新
+		MoveLine->SetStyle(pConfig);
 		RealLine.SetPoint(dptHit[dptHit.size() - 1], MoveLine->ptEnd);
 
 		//iPrevLineId = pShape->iNextId;
@@ -353,7 +354,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		{
 			//ID被捕捉=ID这个.end
 			CoincideBegin = new TConstraintCoincide;
-			CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
+			CoincideBegin->SetStyle(pConfig->logpen);
 			//CoincideBegin->eElementType1 = Attach->eAttachElementType;
 			CoincideBegin->pElement[0] = Attach->pAttachElement;
 			CoincideBegin->PointIndexOfElement[0] = Attach->iAttachElementPointIndex;
@@ -376,7 +377,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 		//加入连接约束：ID上一个.end=ID这个.begin
 		CoincideBegin = new TConstraintCoincide;
-		CoincideBegin->SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
+		CoincideBegin->SetStyle(pConfig->logpen);
 		//CoincideBegin->eElementType1 = myElementType;
 		CoincideBegin->pElement[0] = pPrevLine;//上一条线id
 		CoincideBegin->PointIndexOfElement[0] = 1;//ptEnd

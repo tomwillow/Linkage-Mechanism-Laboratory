@@ -1,6 +1,7 @@
 #pragma once
-#include "MyMath.h"
 #include "DetectMemoryLeak.h"
+#include "tchar_head.h"
+#include "MyMath.h"
 #include <vector>
 
 #include "TListViewEdit.h"

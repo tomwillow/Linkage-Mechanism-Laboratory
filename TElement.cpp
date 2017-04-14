@@ -3,6 +3,7 @@
 #include "MyMath.h"
 #include <stdio.h>
 
+#include "TConfiguration.h"
 #include "ShowMessage.h"
 #include "TElement.h"
 
@@ -14,7 +15,7 @@ TElement::TElement() :available(true)
 	dpt = { 0, 0 };
 	angle = 0.0;
 
-	alpha = 0xa0;
+	alpha = 100;
 
 	_tcscpy(Name,TEXT("undefined"));
 
@@ -35,14 +36,12 @@ void TElement::SetStyle(const LOGPEN &logpen)//设置样式
 	logpenStyleShow = logpenStyle = logpen;
 }
 
-//自动设置logpenStyle和logpenStyleShow
-void TElement::SetStyle(int iStyle, int iWidth, COLORREF crColor)
+void TElement::SetStyle(TConfiguration *pConfig)
 {
-	logpenStyle.lopnStyle = iStyle;
-	logpenStyle.lopnWidth = { iWidth, 0 };
-	logpenStyle.lopnColor = crColor;
-
-	logpenStyleShow = logpenStyle;
+	if (pConfig->bRandomColor)
+		SetStyle(pConfig->GetRandomColorLogpen());
+	else
+		SetStyle(pConfig->logpen);
 }
 
 TCHAR * TElement::GetElementTypeName(TCHAR name[])

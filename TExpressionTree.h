@@ -87,6 +87,7 @@ private:
 	void TExpressionTree::Vpa_inner(TNode *now);
 	void TExpressionTree::Solve(TNode *now, TNode *&write_pos);
 	void TExpressionTree::CheckOnlyOneVar(TNode *now);
+	void TExpressionTree::Subs_inner(TNode *node, TCHAR *ptVar, double value);
 public:
 	TNode *head;
 	enumError TExpressionTree::GetError();
@@ -101,6 +102,7 @@ public:
 	TCHAR * TExpressionTree::OutputStr(bool bIgnoreError=false);
 	TCHAR * TExpressionTree::Simplify(bool bOutput);//化简
 	TCHAR * TExpressionTree::Diff(TCHAR *var, int n, bool bOutput);//对变量求导
+	TCHAR * TExpressionTree::Subs(TCHAR *ptVar, double value, bool output);
 	TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums,bool output);//vars为被替换变量，nums为替换表达式，以逗号分隔
 	TCHAR * TExpressionTree::Subs(std::vector<TCHAR *> VarsVector, std::vector<double> NumsVector,bool output);
 	bool TExpressionTree::CanCalc();//检查是否还有变量存在，可以计算则返回true

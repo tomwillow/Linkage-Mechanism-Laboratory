@@ -10,8 +10,8 @@ TGraph::TGraph(TConfiguration *pConfig)
 {
 	this->pConfig = pConfig;
 
-	LineMouseX.SetStyle(PS_DOT, 1, 0);
-	LineMouseY.SetStyle(PS_DOT, 1, 0);
+	LineMouseX.SetStyle(pConfig->logpenMouseLine);
+	LineMouseY.SetStyle(pConfig->logpenMouseLine);
 
 	iPick = -1;
 

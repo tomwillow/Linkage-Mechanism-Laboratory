@@ -195,6 +195,9 @@
     <ClCompile Include="FileFunction.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="String.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -403,6 +406,12 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="Resource\file_icon.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\BITMAP_THEME_BRIGHT.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\BITMAP_THEME_DARK.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

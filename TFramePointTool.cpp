@@ -11,7 +11,7 @@ TFramePointTool::TFramePointTool()
 {
 	Attach = new TAttach(pCanvas, pShape, pConfig);
 
-	tempFramePoint.SetStyle(pConfig->logpen);
+	tempFramePoint.SetStyle(pConfig);
 
 	pPrevFramePoint = NULL;
 
@@ -55,7 +55,7 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	if (Attach->bAttachedEndpoint)
 	{
 		TConstraintCoincide coincide;
-		coincide.SetStyle(pConfig->iStyle, pConfig->iWidth, pConfig->crPen);
+		coincide.SetStyle(pConfig->logpen);
 
 		coincide.pElement[0] = Attach->pAttachElement;
 		coincide.PointIndexOfElement[0] = Attach->iAttachElementPointIndex;

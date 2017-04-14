@@ -268,6 +268,77 @@ void TSolver::RefreshWindowText()
 	}
 }
 
+void TSolver::SetElementPosition(TVariableTable &VariableTable)
+{
+	for (size_t i = 0; i < VariableTable.VariableTable.size(); i++)
+	{
+		enum enumQType{ x, y, phi ,other} eQType=other;
+		switch (VariableTable.VariableTable[i][0])
+		{
+		case TEXT('x'):
+			eQType = x;
+			break;
+		case TEXT('y'):
+			eQType = y;
+			break;
+		case TEXT('p'):
+			eQType = phi;
+			break;
+		default:
+			eQType = other;
+			break;
+		}
+		int id = GetIdFromVariableStr(VariableTable.VariableTable[i]);
+		TElement *element = pShape->GetElementById(id);
+		double &data = VariableTable.VariableValue[i];
+
+		switch (element->eType)
+		{
+		case ELEMENT_BAR:
+		case ELEMENT_REALLINE:
+		case ELEMENT_SLIDEWAY:
+		{
+			TBar *bar = (TBar *)element;
+			switch (eQType)
+			{
+			case x:
+				((TBar *)bar)->dpt.x = data;
+				break;
+			case y:
+				((TBar *)bar)->dpt.y = data;
+				break;
+			case phi:
+				data = MakeIn2Pi(data);
+				bar->SetPoint(bar->ptBegin, bar->dLength, data);
+				break;
+			}
+			break;
+		}
+		case ELEMENT_FRAMEPOINT:
+		case ELEMENT_SLIDER:
+		{
+			switch (eQType)
+			{
+			case x:
+				element->dpt.x = data;
+				break;
+			case y:
+				element->dpt.y = data;
+				break;
+			case phi:
+				data = MakeIn2Pi(data);
+				element->angle = data;
+				break;
+			}
+			break;
+		}
+		default:
+			assert(0);
+			break;
+		}
+	}
+}
+
 //求解
 void TSolver::Solve()
 {
@@ -278,76 +349,13 @@ void TSolver::Solve()
 	start = clock();
 
 	Equations->Subs(pStr, subsVar, subsValue);
-	Equations->SimplifyEquations(pStr);
-	//Outputln(Equations->BuildJacobian(bOutput));//建立Jacobian, subsVar, subsValue
+	//Equations->SimplifyEquations(pStr);
+	Equations->BuildJacobian(pStr);
 	Equations->SolveEquations(pStr);//解方程
 
 	if (Equations->hasSolved)//解出
 	{
-		for (size_t i = 0; i < Equations->VariableTable.VariableTable.size(); i++)
-		{
-			enum enumQType{ x, y, phi } eQType;
-			switch (Equations->VariableTable.VariableTable[i][0])
-			{
-			case TEXT('x'):
-				eQType = x;
-				break;
-			case TEXT('y'):
-				eQType = y;
-				break;
-			case TEXT('p'):
-				eQType = phi;
-				break;
-			}
-			int id = GetIdFromVariableStr(Equations->VariableTable.VariableTable[i]);
-			TElement *element = pShape->GetElementById(id);
-			double &data = Equations->VariableTable.VariableValue[i];
-
-			switch (element->eType)
-			{
-			case ELEMENT_BAR:
-			case ELEMENT_REALLINE:
-			case ELEMENT_SLIDEWAY:
-			{
-				TBar *bar = (TBar *)element;
-				switch (eQType)
-				{
-				case x:
-					((TBar *)bar)->dpt.x = data;
-					break;
-				case y:
-					((TBar *)bar)->dpt.y = data;
-					break;
-				case phi:
-					data = MakeIn2Pi(data);
-					bar->SetPoint(bar->ptBegin, bar->dLength,data );
-					break;
-				}
-				break;
-			}
-			case ELEMENT_FRAMEPOINT:
-			case ELEMENT_SLIDER:
-			{
-				switch (eQType)
-				{
-				case x:
-					element->dpt.x = data;
-					break;
-				case y:
-					element->dpt.y = data;
-					break;
-				case phi:
-					data = MakeIn2Pi(data);
-					element->angle = data;
-					break;
-				}
-				break;
-			}
-			default:
-				assert(0);
-				break;
-			}
-		}
+		SetElementPosition(Equations->VariableTable);
 	}
 
 	stop = clock();
@@ -381,12 +389,36 @@ void TSolver::Demo()
 	Outputln(Equations->BuildJacobian(true));
 	Outputln(Equations->SolveEquations(true));*/
 
+	Equations->RemoveTempEquations();
+
 	Equations->DefineVariable(pStr, TEXT("t"), TEXT("0"));
-	Equations->AddEquation(pStr, TEXT("phi2-0.1*t"), false);
+	Equations->AddEquation(pStr, TEXT("phi2-sin(t)"), true);
 	Equations->Subs(pStr, subsVar, subsValue);
+
+	//Equations->BuildEquationsV(pStr);//
+
+	Equations->Subs(pStr, TEXT("t"),TEXT("0.1"));
 	Equations->SimplifyEquations(pStr);
+
+	//Equations->BuildVariableTableV(pStr);//
+
+	Equations->BuildJacobian(pStr);
+	//Equations->BuildJacobianV(pStr);//
+
 	Equations->SolveEquations(pStr);
-	//Outputln(Equations->Subs(bOutput,))
+
+	//Equations->SubsV(pStr, TEXT("t"), 0.1);//
+	//Equations->SolveEquationsV(pStr);//
+
+	SetElementPosition(Equations->VariableTable);
+	
+	Equations->hasSolved = false;
+	//for (auto pEqua : Equations->Equations)
+	//{
+	//	Outputln(pEqua->Diff(TEXT("t"), 1, true));
+	//	Outputln(pEqua->Simplify(true));
+	//}
+	//Equations->SolveEquations(pStr);
 
 	RefreshWindowText();
 

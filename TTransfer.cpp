@@ -19,7 +19,7 @@ double TTransfer::TCHAR2double(TCHAR *start, TCHAR *end)//¿ªÊ¼×Ö·û£¬½áÊø×Ö·û
 	return value;
 }
 
-double TTransfer::TCHAR2int(TCHAR s[])
+int TTransfer::TCHAR2int(TCHAR s[])
 {
 #ifdef _UNICODE
 	return _wtoi(s);

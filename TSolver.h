@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "TTool.h"
+#include "TVariableTable.h"
 
 #include "String.h"
 #include "DPOINT.h"
@@ -28,6 +29,7 @@ private:
 	int TSolver::GetIdFromVariableStr(TCHAR varname[]);
 	void TSolver::Output(TCHAR szFormat[], ...);
 	void TSolver::Outputln(const TCHAR *szFormat, ...);
+	void TSolver::SetElementPosition(TVariableTable &VariableTable);
 public:
 	TSolver();
 	~TSolver();

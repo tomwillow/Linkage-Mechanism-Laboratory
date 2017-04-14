@@ -1979,9 +1979,42 @@ TCHAR * TExpressionTree::Subs(std::vector<TCHAR *> VarsVector, std::vector<doubl
 	return GetErrorInfo();
 }
 
-//替换  vars变量串 nums数字串 以空格分隔，支持表达式替换
-TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums, bool output)
+void TExpressionTree::Subs_inner(TNode *node, TCHAR *ptVar, double value)
 {
+	if (node->eType == NODE_VARIABLE && node->ValueOrName.varname == ptVar)
+	{
+		node->eType = NODE_NUMBER;
+		node->ValueOrName.value = value;
+		return;
+	}
+
+	if (node->left != NULL)
+		Subs_inner(node->left, ptVar, value);
+
+	if (node->right != NULL)
+		Subs_inner(node->right, ptVar, value);
+}
+
+//替换  var变量指针 value数字
+TCHAR * TExpressionTree::Subs(TCHAR *ptVar, double value, bool output)
+{
+	if (eError != ERROR_NO)
+	return GetErrorInfo();
+
+	Subs_inner(head, ptVar, value);
+
+	if (eError == ERROR_NO)
+	{
+		if (output)
+			return OutputStr();
+		else
+			return OutputEmptyStr();
+	}
+}
+
+	//替换  vars变量串 nums数字串 以空格分隔，支持表达式替换
+	TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums, bool output)
+	{
 	if (eError == ERROR_NO)
 	{
 		if (_tcslen(vars) == 0 || _tcslen(nums) == 0)

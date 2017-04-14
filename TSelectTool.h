@@ -25,7 +25,7 @@ protected:
 	bool bMove;
 	POINT ptMouseClick;
 
-	int iPickIndex,iPrevPickIndex;
+	int iPrevPickIndex;
 	int iHoverIndex;
 	std::stack<int> PickedLineId,HoveredLineId;
 	void TSelectTool::Draw(HDC hdc);
@@ -42,7 +42,8 @@ protected:
 	void TSelectTool::EndMove();
 public:
 	TSelectTool();
-	~TSelectTool();
+	~TSelectTool(); 
+	int iPickIndex;
 	bool TSelectTool::CanBeDriver();
 	void TSelectTool::SelectByIndex(size_t index);
 	void TSelectTool::SelectById(int id);

@@ -14,7 +14,7 @@ protected:
 	virtual LRESULT TEdit::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	//接收VK_RETURN,VK_ESCAPE，返回值决定是否调用默认消息处理
-	virtual bool TEdit::OnKeyDown(WPARAM wParam, LPARAM lParam){ return true; };
+	virtual bool TEdit::OnKeyDown(WPARAM wParam, LPARAM lParam);
 
 	//接收字符按键，返回值决定是否调用默认消息处理
 	virtual bool TEdit::OnChar(WPARAM wParam, LPARAM lParam){ return true; };
@@ -22,6 +22,7 @@ protected:
 	//接收字符按键，返回值决定是否调用默认消息处理
 	virtual bool TEdit::OnKillFocus(WPARAM wParam, LPARAM lParam){ return true; };
 public:
+	//bool bSendParentUserMsg=false;//如果置true,则接收到WM_KEYDOWN时向父窗口发送WM_USER消息
 	bool bMultiLine,bAutoHScrol,bAutoVScrol,bNoHideSel;
 	HFONT m_hFont;
 	TEdit();

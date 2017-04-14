@@ -101,6 +101,7 @@ void TTreeViewContent::Initial()
 {
 	hPrevObject = InsertTreeviewItem(TEXT("元素"), TVI_ROOT);
 	hPrevConstraint = InsertTreeviewItem(TEXT("约束"), TVI_ROOT);
+	hPrevDriver = InsertTreeviewItem(TEXT("原动件"), TVI_ROOT);
 }
 
 void TTreeViewContent::SelectNull()

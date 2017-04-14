@@ -54,7 +54,7 @@ TMainWindow::~TMainWindow()
 // Returns:
 //   The handle to the tooltip.
 //
-HWND CreateToolTip(HWND hParent,HWND hControl,HINSTANCE hInst, PTSTR pszText)
+HWND CreateToolTip(HWND hParent, HWND hControl, HINSTANCE hInst, PTSTR pszText)
 {
 	if (!hControl || !hParent || !pszText)
 	{
@@ -105,17 +105,23 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.AddSeparator(0);
 	m_Toolbar.AddGroup(3, 0, ID_DRAW_FRAME, true, TEXT("机架"));
 	m_Toolbar.AddGroup(4, 0, ID_DRAW_BAR, true, TEXT("连杆"));
-	m_Toolbar.AddGroup(5, 0, ID_DRAW_LINE, true, TEXT("线"));
-	m_Toolbar.AddGroup(6, 0, ID_DRAW_SLIDEWAY, true, TEXT("滑道"));
-	m_Toolbar.AddGroup(7, 0, ID_DRAW_SLIDER, true, TEXT("滑块"));
-	m_Toolbar.AddButton(8, ID_SET_DRIVER, true, TEXT("设为原动件"));
+	//m_Toolbar.AddGroup(5, 0, 0, true, TEXT("多段杆"));
+	m_Toolbar.AddGroup(6, 0, ID_DRAW_LINE, true, TEXT("线"));
+	m_Toolbar.AddGroup(7, 0, ID_DRAW_SLIDEWAY, true, TEXT("滑道"));
+	m_Toolbar.AddGroup(8, 0, ID_DRAW_SLIDER, true, TEXT("滑块"));
+	//m_Toolbar.AddSeparator(0);
+	//m_Toolbar.AddGroup(9, 0, 0, true, TEXT("重合约束"));
+	//m_Toolbar.AddGroup(10, 0, 0, true, TEXT("共线约束"));
+	m_Toolbar.AddSeparator(0);
+	m_Toolbar.AddButton(11, ID_SET_DRIVER, true, TEXT("设为原动件"));
 	m_Toolbar.ShowToolbar();
 
 	//创建状态栏
 	m_Status.Create(hWnd, IDR_STATUS, m_hInst, 24);
 	m_Status.AddPart(IDR_STATUS_COORDINATE, 160, PT_FIXED);//坐标
 	m_Status.AddPart(0, 0, PT_NONE);
-	m_Status.AddPart(IDR_STATUS_CHECKBOX_SHOW_REAL, 26, PT_FIXED);//连杆绘制/真实绘制
+	m_Status.AddPart(IDR_STATUS_CHECKBOX_SHOW_REAL, 22, PT_FIXED);//连杆绘制/真实绘制
+	m_Status.AddPart(IDR_STATUS_CHECKBOX_THEME, 22, PT_FIXED);//
 	m_Status.AddPart(IDR_STATUS_PROPORTIONNAME, 40, PT_FIXED);//比例：
 	m_Status.AddPart(IDR_STATUS_TRACKBAR, 120, PT_FIXED);//
 	m_Status.AddPart(IDR_STATUS_PROPORTION, 60, PT_FIXED);//比例数字
@@ -128,11 +134,18 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	//创建真实切换按钮
 	m_CheckBoxShowReal.LoadCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_REAL);
 	m_CheckBoxShowReal.LoadUnCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_SIMPLE);
-	m_CheckBoxShowReal.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).top, IDR_STATUS_CHECKBOX_SHOW_REAL);
+	m_CheckBoxShowReal.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).top, IDR_STATUS_CHECKBOX_SHOW_REAL);
 	m_CheckBoxShowReal.SetCheckedAndBitmap(m_Configuration.bDrawReal);
+
+	//创建风格切换按钮
+	m_CheckBoxTheme.LoadCheckedBitmap(m_hInst, IDB_BITMAP_THEME_DARK);
+	m_CheckBoxTheme.LoadUnCheckedBitmap(m_hInst, IDB_BITMAP_THEME_BRIGHT);
+	m_CheckBoxTheme.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 0).top, IDR_STATUS_CHECKBOX_THEME);
+	m_CheckBoxTheme.SetCheckedAndBitmap(m_Configuration.bThemeDark);
 
 	//创建tooltip
 	CreateToolTip(m_Status.m_hWnd, m_CheckBoxShowReal.m_hWnd, m_hInst, TEXT("点击以切换 真实/简图 显示"));
+	CreateToolTip(m_Status.m_hWnd, m_CheckBoxTheme.m_hWnd, m_hInst, TEXT("点击以切换 深色/浅色 背景"));
 
 	//创建Trackbar
 	m_Trackbar.CreateTrackbar(m_Status.m_hWnd, this->m_hInst, m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0), IDR_TRACKBAR);
@@ -343,6 +356,21 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		}
 		Canvas.Invalidate();
 		break;
+	case IDR_STATUS_CHECKBOX_THEME:
+		if (m_CheckBoxTheme.GetChecked())
+		{
+			m_CheckBoxTheme.SetBitmapIsChecked();
+			m_Configuration.bThemeDark = true;
+			m_Configuration.SetTheme(true);
+		}
+		else
+		{
+			m_CheckBoxTheme.SetBitmapIsUnChecked();
+			m_Configuration.bThemeDark = false;
+			m_Configuration.SetTheme(false);
+		}
+		Canvas.Invalidate();
+		break;
 	case ID_ANALYZE_MECHANISM://分析机构
 		if (pConsole == NULL)
 			OnCommand(ID_SHOW_CONSOLE, 0);
@@ -407,24 +435,26 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT || m_ManageTool.m_uiCurActiveTool == ID_DRAG)
 		{
 			//if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
-			//选择工具 且 选中元素可驱动 则弹出原动件对话框
-			if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DlgAddDriverProc))
 			{
-				MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
+				//选择工具 且 选中元素可驱动 则弹出原动件对话框
+				if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex!=-1)
+				DialogAddDriver::iElementId = m_Shape.Element[((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex]->id;
+				if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DialogAddDriver::DlgAddDriverProc))
+				{
+					MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
+				}
 			}
-			else
-				break;
 		}
-
-		MessageBox(m_hWnd, TEXT("请先使用选择工具选择一个元素，再设为原动件。"), TEXT(""), MB_ICONINFORMATION);
+		else
+			MessageBox(m_hWnd, TEXT("请先使用选择工具选择一个元素，再设为原动件。"), TEXT(""), MB_ICONINFORMATION);
 		break;
 	}
 	case ID_OPTION:
 	{
-			if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_OPTION), m_hWnd, DlgOptionProc))
-			{
-				MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
-			}
+		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_OPTION), m_hWnd, DlgOptionProc))
+		{
+			MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
+		}
 		break;
 	}
 	case ID_DELETE_GRAPH:
@@ -458,6 +488,11 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		//double left, right, top, bottom;
 
 		break;
+	case IDR_LINEEDIT://not deal
+		break;
+	default:
+		assert(0);
+		break;
 	}
 }
 
@@ -487,7 +522,8 @@ void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 	m_Toolbar.FreshSize();
 	m_Status.FreshSize();
 	m_Trackbar.MoveWindow(m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0));//Trackbar嵌入Status
-	m_CheckBoxShowReal.SetPos(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0));
+	m_CheckBoxShowReal.SetPos(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1));
+	m_CheckBoxTheme.SetPos(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1));
 
 	SetRightWindowPos();
 

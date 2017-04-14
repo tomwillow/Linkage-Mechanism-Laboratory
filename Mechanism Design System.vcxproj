@@ -43,6 +43,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <MultiProcessorCompilation>
+      </MultiProcessorCompilation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -72,6 +75,7 @@
     <ClCompile Include="FileFunction.cpp" />
     <ClCompile Include="RegisterFunction.cpp" />
     <ClCompile Include="ShowMessage.cpp" />
+    <ClCompile Include="String.cpp" />
     <ClCompile Include="TButton.cpp" />
     <ClCompile Include="TConstraintColinear.cpp" />
     <ClCompile Include="TDialogBox.cpp" />
@@ -192,6 +196,8 @@
   <ItemGroup>
     <Image Include="Resource\bitmap_show_real.bmp" />
     <Image Include="Resource\bitmap_show_simple.bmp" />
+    <Image Include="Resource\BITMAP_THEME_BRIGHT.bmp" />
+    <Image Include="Resource\BITMAP_THEME_DARK.bmp" />
     <Image Include="Resource\file_icon.ico" />
     <Image Include="Resource\Icon.ico" />
     <Image Include="Resource\Icon_16.ico" />

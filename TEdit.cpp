@@ -18,6 +18,13 @@ TEdit::~TEdit()
 	::DeleteObject(m_hFont);
 }
 
+bool TEdit::OnKeyDown(WPARAM wParam, LPARAM lParam)
+{ 
+	//if (bSendParentUserMsg)
+	//	::PostMessage(m_hParent, WM_USER, wParam, lParam);
+	return true; 
+}
+
 LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
@@ -28,7 +35,6 @@ LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		else
 			return 0;
 	case WM_KEYDOWN:
-		MessageBeep(0);
 		if (OnKeyDown(wParam, lParam))
 			return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 		else

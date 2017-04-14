@@ -12,7 +12,7 @@ TSlidewayTool::TSlidewayTool()
 
 	delete MoveLine;
 	MoveLine = new TSlideway;
-	MoveLine->SetStyle(pConfig->logpen);
+	MoveLine->SetStyle(pConfig);
 }
 
 

@@ -243,6 +243,25 @@ COLORREF TDraw::GetBrighterColor(COLORREF cr)
 
 void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, TConfiguration *pConfig)
 {
+	POINT pt[4];
+	CalcBarRectCoor(pt, ptBegin, ptEnd, angle, pConfig->BAR_R * 2);
+	//画外框线
+
+	HPEN hPen = ::CreatePenIndirect(&logpen);
+	::SelectObject(hdc, hPen);
+	HBRUSH hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
+	::SelectObject(hdc, hBrush);
+
+	DrawLine(hdc, pt[0], pt[1]);
+	DrawLine(hdc, pt[2], pt[3]);
+	Arc(hdc, ptBegin.x - pConfig->BAR_R, ptBegin.y - pConfig->BAR_R, ptBegin.x + pConfig->BAR_R, ptBegin.y + pConfig->BAR_R,
+		pt[3].x, pt[3].y, pt[0].x, pt[0].y);
+	Arc(hdc, ptEnd.x - pConfig->BAR_R, ptEnd.y - pConfig->BAR_R, ptEnd.x + pConfig->BAR_R, ptEnd.y + pConfig->BAR_R,
+		pt[1].x, pt[1].y, pt[2].x, pt[2].y);
+
+	::DeleteObject(hPen);
+	::DeleteObject(hBrush);
+
 	//上下左右各加半径
 	int left = min(ptBegin.x, ptEnd.x) - pConfig->BAR_R, top = min(ptBegin.y, ptEnd.y) - pConfig->BAR_R;
 	int width = abs(ptBegin.x - ptEnd.x) + 2 * pConfig->BAR_R, height = abs(ptBegin.y - ptEnd.y) + 2 * pConfig->BAR_R;
@@ -252,6 +271,7 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	ptBegin.y -= top;
 	ptEnd.x -= left;
 	ptEnd.y -= top;
+	MoveByDelta(pt, 4, -left, -top);
 
 	HDC hBitmapDC;
 	HBITMAP hBitmap;
@@ -259,36 +279,24 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	StartTranslucent(hBitmapDC, hBitmap, pvBits, left, top, width, height, logpen.lopnColor == 0);
 
 	//开始画
-	HPEN hPen = (HPEN)::GetStockObject(NULL_PEN);
+	hPen = (HPEN)::GetStockObject(NULL_PEN);
 	::SelectObject(hBitmapDC, hPen);
-	HBRUSH hBrush = CreateSolidBrush(logpen.lopnColor);
+	hBrush = CreateSolidBrush(logpen.lopnColor);
 	::SelectObject(hBitmapDC, hBrush);
 
-	//填色
+	//填充两个半圆
 	::Ellipse(hBitmapDC, ptBegin.x - pConfig->BAR_R, ptBegin.y - pConfig->BAR_R, ptBegin.x + pConfig->BAR_R, ptBegin.y + pConfig->BAR_R);
 	::Ellipse(hBitmapDC, ptEnd.x - pConfig->BAR_R, ptEnd.y - pConfig->BAR_R, ptEnd.x + pConfig->BAR_R, ptEnd.y + pConfig->BAR_R);
 
-	POINT pt[4];
-	CalcBarRectCoor(pt, ptBegin, ptEnd, angle, pConfig->BAR_R * 2);
 	Polygon(hBitmapDC, pt, 4);//填充
-
-	::DeleteObject(hPen);
-
-	//画外框线
-	hPen = CreatePen(PS_SOLID, 1, GetBrighterColor(logpen.lopnColor));
-	::SelectObject(hBitmapDC, hPen);
-	DrawLine(hBitmapDC, pt[0], pt[1]);
-	DrawLine(hBitmapDC, pt[2], pt[3]);
-	Arc(hBitmapDC, ptBegin.x - pConfig->BAR_R, ptBegin.y - pConfig->BAR_R, ptBegin.x + pConfig->BAR_R, ptBegin.y + pConfig->BAR_R,
-		pt[3].x, pt[3].y, pt[0].x, pt[0].y);
-	Arc(hBitmapDC, ptEnd.x - pConfig->BAR_R, ptEnd.y - pConfig->BAR_R, ptEnd.x + pConfig->BAR_R, ptEnd.y + pConfig->BAR_R,
-		pt[1].x, pt[1].y, pt[2].x, pt[2].y);
 
 	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
 	//画完
 
 	EndTranslucent(hdc, hBitmapDC, hBitmap, pvBits, left, top, width, height, alpha, logpen.lopnColor == 0);
+
+
 }
 
 void TDraw::DrawPolygonBarTranslucent(HDC hdc, DPOINT &dptArray, int iDptCount, LOGPEN logpen, const TConfiguration *pConfig)
@@ -668,7 +676,7 @@ void TDraw::MirrorX(POINT apt[], int apt_num, int Oy)
 	}
 }
 
-void TDraw::Move(POINT apt[], int apt_num, long dx, long dy)
+void TDraw::MoveByDelta(POINT apt[], int apt_num, long dx, long dy)
 {
 	for (int i = 0; i < apt_num; i++)
 	{
@@ -765,13 +773,13 @@ void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor)
 }
 
 //画网格，使用颜色crGridSmall,crGridBig
-void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config, COLORREF crGridBig, COLORREF crGridSmall)
+void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *pConfig, COLORREF crGridBig, COLORREF crGridSmall)
 {
 	int minGrid = 10;
 	int maxGrid = 40;
 
 	DPOINT realGrid = { 2, 2 };//真实网格大小2mm
-	POINT screenGrid = Config->LengthToScreen(realGrid);
+	POINT screenGrid = pConfig->LengthToScreen(realGrid);
 
 	while (screenGrid.x<minGrid || screenGrid.x>maxGrid)
 	{
@@ -785,18 +793,18 @@ void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config, COLORREF crGrid
 			realGrid.x /= 2;
 			realGrid.y /= 2;
 		}
-		screenGrid = Config->LengthToScreen(realGrid);
+		screenGrid = pConfig->LengthToScreen(realGrid);
 	}
 
 	//原点对小格大小取余，得到网格初始偏移量
-	int xOffset = Config->GetOrg().x % screenGrid.x;
-	int yOffset = Config->GetOrg().y % screenGrid.y;
+	int xOffset = pConfig->GetOrg().x % screenGrid.x;
+	int yOffset = pConfig->GetOrg().y % screenGrid.y;
 
 	//原点减去网格偏移量，除以格子大小得到到原点的格数。再对5取余，得到原点到左侧最近大格格数。
 	//用格数取余若得到xBigOffset则应画大格。
-	int xBigOffset = ((Config->GetOrg().x - xOffset) / screenGrid.x) % 5;
+	int xBigOffset = ((pConfig->GetOrg().x - xOffset) / screenGrid.x) % 5;
 	if (xBigOffset < 0) xBigOffset = 5 + xBigOffset;
-	int yBigOffset = ((Config->GetOrg().y - yOffset) / screenGrid.y) % 5;
+	int yBigOffset = ((pConfig->GetOrg().y - yOffset) / screenGrid.y) % 5;
 	if (yBigOffset < 0) yBigOffset = 5 + yBigOffset;
 
 	int x, y;
@@ -804,8 +812,8 @@ void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config, COLORREF crGrid
 	y = yOffset;
 	TLine xLine;
 	TLine yLine;
-	xLine.SetStyle(PS_SOLID, 1, crGridSmall);
-	yLine.SetStyle(PS_SOLID, 1, crGridSmall);
+	xLine.SetStyle(pConfig->logpenGridSmall);
+	yLine.SetStyle(pConfig->logpenGridSmall);
 	for (int i = 0; i < rect.right / screenGrid.x; i++)
 	{
 		xLine.ptBegin = { x, rect.top };
@@ -980,12 +988,12 @@ void TDraw::DrawTips(HDC hdc, POINT &ptMouse, const TCHAR text[], TConfiguration
 	rc.left = ptMouse.x + 22;
 	rc.top = ptMouse.y + 22;
 
-	DrawSystemFontText(hdc, text, rc, pConfig->logpenSystem.lopnColor, DT_CALCRECT);//不会画出来，只是用来刷新rc的
+	DrawSystemFontText(hdc, text, rc, pConfig->logpenFront.lopnColor, DT_CALCRECT);//不会画出来，只是用来刷新rc的
 	rcBk = rc;
 	SetMarginRect(&rcBk, -5);
 	FillRect(hdc, &rcBk, pConfig->crBackground);
-	DrawRect(hdc, rcBk, pConfig->logpenSystem);
-	DrawSystemFontText(hdc, text, rc, pConfig->logpenSystem.lopnColor, DT_LEFT | DT_TOP);//DT_CALCRECT
+	DrawRect(hdc, rcBk, pConfig->logpenFront);
+	DrawSystemFontText(hdc, text, rc, pConfig->logpenFront.lopnColor, DT_LEFT | DT_TOP);//DT_CALCRECT
 }
 
 void TDraw::DrawSystemFontText(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format)
@@ -1214,7 +1222,7 @@ void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig)
 		GetBoundingBox(apt, 4, &rect, false);
 		SetMarginRect(&rect, -1);
 		StartTranslucent(hBitmapDC, hBitmap, pvBits, rect, pSlider->logpenStyleShow.lopnColor == 0);
-		Move(apt, 4, -rect.left, -rect.top);
+		MoveByDelta(apt, 4, -rect.left, -rect.top);
 		tempDC = hBitmapDC;
 		hBrush = CreateSolidBrush(pSlider->logpenStyleShow.lopnColor);//
 		hPen = CreatePen(PS_SOLID, 1, GetBrighterColor(pSlider->logpenStyleShow.lopnColor));

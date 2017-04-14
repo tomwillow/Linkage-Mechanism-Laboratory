@@ -156,7 +156,7 @@ void TSliderTool::Reset()
 	if (pSlider != NULL)
 		delete pSlider;
 	pSlider = new TSlider;
-	pSlider->SetStyle(pConfig->logpen);
+	pSlider->SetStyle(pConfig);
 	pSlider->vecDpt.resize(1);
 	pSlider->vecIsJoint.resize(1);
 

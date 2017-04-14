@@ -11,6 +11,7 @@ class TTreeViewContent :
 private:
 	HTREEITEM hPrevObject;
 	HTREEITEM hPrevConstraint;
+	HTREEITEM hPrevDriver;
 	TShape *pShape;
 	struct TItem
 	{

@@ -1,3 +1,13 @@
+#pragma once
 #include <Windows.h>
 
-BOOL CALLBACK DlgAddDriverProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+#include "TGraph.h"
+#include "TEdit.h"
+
+
+namespace DialogAddDriver
+{
+	extern int iElementId;
+	void UpdateDlgAddDriver();
+	BOOL CALLBACK DlgAddDriverProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+}

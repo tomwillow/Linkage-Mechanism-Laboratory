@@ -88,8 +88,8 @@ void TButton::LoadUnCheckedBitmap(HINSTANCE hInst, UINT uiBitmapId)
 
 void TButton::CreateBitmapCheckBox(HINSTANCE hInst, HWND hParent, int x, int y, UINT id)
 {
-	m_iWidth = 24;
-	m_iHeight = 24;
+	m_iWidth = 20;
+	m_iHeight = 20;
 	m_hParent = hParent;
 	m_hInst = hInst;
 	m_hWnd = CreateWindow(
