@@ -11,13 +11,14 @@ TConfiguration::TConfiguration()
 	vecColorLib.push_back(RGB(164,139,84));
 	PrevRandomColor = vecColorLib[0];
 
+	crDot = RGB(0, 255, 0);
+	crLink = RGB(0, 0, 0);
+	crMouseLine = RGB(0, 0, 0);
 
 	//Graph
 	crGraphBackground = RGB(240, 240, 240);
 	crGraphGridBig = RGB(200, 200, 200);
 	crGraphGridSmall = RGB(220, 220, 220);
-	crLink = RGB(0, 0, 0);
-	crMouseLine = RGB(0, 0, 0);
 }
 
 

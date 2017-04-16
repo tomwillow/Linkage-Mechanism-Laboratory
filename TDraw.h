@@ -1,5 +1,6 @@
 #pragma once
 #include "MyMath.h"
+#include <vector>
 #include <Windows.h>
 
 #include "DPOINT.h"
@@ -25,6 +26,7 @@ public:
 	static void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta);
 	static void TDraw::MirrorX(POINT apt[], int apt_num, int Oy);
 	static void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect, bool YPlusIsUP);
+	static void TDraw::GetBoundingBox(std::vector<DPOINT> &vecdpt, RECT *rect);
 	static double TDraw::Distance(POINT pt1, POINT pt2);
 	static double TDraw::DistanceScreen(const DPOINT &dpt1, const DPOINT &dpt2,const TConfiguration *pConfig);
 	static DPOINT TDraw::GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);
@@ -45,7 +47,7 @@ public:
 	static void TDraw::DrawBarSimple(HDC hdc, TBar *Bar, TConfiguration *Config);
 	static void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, TConfiguration *pConfig);
 	static void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, TConfiguration *pConfig);
-	static void TDraw::DrawPolygonBarTranslucent(HDC hdc, DPOINT &dptArray, int iDptCount, LOGPEN logpen, const TConfiguration *pConfig);
+	static void TDraw::DrawPolylineBarTranslucent(HDC hdc, std::vector<DPOINT> &vecdpt, LOGPEN logpen, const TConfiguration *pConfig);
 	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config);
 	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, TConfiguration *Config);
 	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config);

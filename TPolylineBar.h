@@ -1,10 +1,10 @@
 #pragma once
 #include "TElement.h"
-class TPolygonBar :
+class TPolylineBar :
 	public TElement
 {
 public:
-	TPolygonBar();
-	~TPolygonBar();
+	TPolylineBar();
+	~TPolylineBar();
 };
 

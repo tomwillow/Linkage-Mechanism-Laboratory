@@ -11,6 +11,7 @@
 #include "TFramePointTool.h"
 #include "TSliderTool.h"
 #include "TSlidewayTool.h"
+#include "TPolylineBarTool.h"
 
 TManageTool::TManageTool()
 {
@@ -61,6 +62,9 @@ void TManageTool::SetCurActiveTool(UINT id)
 		break;
 	case ID_DRAW_SLIDEWAY:
 		m_pCurrentTool = new TSlidewayTool;
+		break;
+	case ID_DRAW_POLYLINE_BAR:
+		m_pCurrentTool = new TPolylineBarTool;
 		break;
 	default:
 		assert(0);

@@ -23,6 +23,7 @@ TSolver::TSolver()
 {
 	hwndOutput = NULL;
 	Equations = NULL;
+	EquationsV = NULL;
 	pStr = NULL;
 }
 
@@ -104,6 +105,7 @@ int TSolver::GetIdFromVariableStr(TCHAR varname[])
 void TSolver::ClearConstraint()
 {
 	Equations->RemoveTempEquations();
+	EquationsV->RemoveTempEquations();
 }
 
 //添加鼠标约束
@@ -147,6 +149,10 @@ void TSolver::ClearEuqations()
 	if (Equations != NULL)
 		delete Equations;
 	Equations = new TEquations;
+
+	if (EquationsV != NULL)
+		delete EquationsV;
+	EquationsV = new TEquations;
 }
 
 void TSolver::RefreshEquations()
@@ -182,12 +188,18 @@ void TSolver::RefreshEquations()
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
 			Equations->DefineVariable(pStr, buffer1, buffer2);
+			EquationsV->DefineVariable(pStr, buffer1, buffer2);
 
 			//读入方程
-			_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
-			_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d-%f*sin(phi%d)-%f*cos(phi%d)"), j, SjP.x, j, SjP.y, j, i, SiP.x, i, SiP.y, i);
+			/* 推导结果：
+			xi + xiP*cos(phii) - yiP*sin(phii) - xj  - xjP*cos(phij) + yjP*sin(phij)
+			yi + xiP*sin(phii) + yiP*cos(phii) - yj  - xjP*sin(phij) - yjP*cos(phij)  */
+			_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), i, SiP.x, i, SiP.y, i, j, SjP.x, j, SjP.y, j);
+			_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d-%f*sin(phi%d)-%f*cos(phi%d)"), i, SiP.x, i, SiP.y, i, j, SjP.x, j, SjP.y, j);
 			Equations->AddEquation(pStr, buffer1, false);
 			Equations->AddEquation(pStr, buffer2, false);
+			EquationsV->AddEquation(pStr, buffer1, false);
+			EquationsV->AddEquation(pStr, buffer2, false);
 			break;
 		}
 		case CONSTRAINT_COLINEAR:
@@ -208,17 +220,26 @@ void TSolver::RefreshEquations()
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
 			Equations->DefineVariable(pStr, buffer1, buffer2);
+			EquationsV->DefineVariable(pStr, buffer1, buffer2);
 
 			//读入方程
+			//推导结果：
+			/*
+			(cos(phii)*(yiP - yiQ) + sin(phii)*(xiP - xiQ))*(xi - xj + xiP*cos(phii) - xjP*cos(phij) - yiP*sin(phii) + yjP*sin(phij)) 
+			- (cos(phii)*(xiP - xiQ) - sin(phii)*(yiP - yiQ))*(yi - yj + yiP*cos(phii) - yjP*cos(phij) + xiP*sin(phii) - xjP*sin(phij))
+			*/
 			_stprintf(buffer1, TEXT("(cos(phi%d)*(%f-%f)+sin(phi%d)*(%f-%f))*(x%d-x%d+%f*cos(phi%d)-%f*cos(phi%d)-%f*sin(phi%d)+%f*sin(phi%d))\
-								-(cos(phi%d)*(%f-%f)-sin(phi%d)*(%f-%f))*(y%d-y%d+%f*cos(phi%d)-%f*cos(phi%d)+%f*sin(phi%d)-%f*sin(phi%d))"),
+																	-(cos(phi%d)*(%f-%f)-sin(phi%d)*(%f-%f))*(y%d-y%d+%f*cos(phi%d)-%f*cos(phi%d)+%f*sin(phi%d)-%f*sin(phi%d))"),
 																	i, SiP.y, SiQ.y, i, SiP.x, SiQ.x, i, j, SiP.x, i, SjP.x, j, SiP.y, i, SjP.y, j,
 																	i, SiP.x, SiQ.x, i, SiP.y, SiQ.y, i, j, SiP.y, i, SjP.y, j, SiP.x, i, SjP.x, j);
+
 			_stprintf(buffer2, TEXT("(cos(phi%d-phi%d)*(%f-%f)+sin(phi%d-phi%d)*(%f-%f))*(%f-%f)-(cos(phi%d-phi%d)*(%f-%f)-sin(phi%d-phi%d)*(%f-%f))*(%f-%f)"),
 										i,j,SiP.y,SiQ.y,i,j,SiP.x,SiQ.x,SjP.x,SjQ.x,i,j,SiP.x,SiQ.x,i,j,SiP.y,SiQ.y,SjP.y,SjQ.y);
 
 			Equations->AddEquation(pStr, buffer1, false);
 			Equations->AddEquation(pStr, buffer2, false);
+			EquationsV->AddEquation(pStr, buffer1, false);
+			EquationsV->AddEquation(pStr, buffer2, false);
 			break;
 		}
 		case ELEMENT_SLIDEWAY:
@@ -349,7 +370,7 @@ void TSolver::Solve()
 	start = clock();
 
 	Equations->Subs(pStr, subsVar, subsValue);
-	//Equations->SimplifyEquations(pStr);
+	Equations->SimplifyEquations(pStr);
 	Equations->BuildJacobian(pStr);
 	Equations->SolveEquations(pStr);//解方程
 
@@ -395,24 +416,31 @@ void TSolver::Demo()
 	Equations->AddEquation(pStr, TEXT("phi2-sin(t)"), true);
 	Equations->Subs(pStr, subsVar, subsValue);
 
-	//Equations->BuildEquationsV(pStr);//
+	Equations->BuildEquationsV(pStr);//
 
 	Equations->Subs(pStr, TEXT("t"),TEXT("0.1"));
-	Equations->SimplifyEquations(pStr);
+	//Equations->SimplifyEquations(pStr);
 
-	//Equations->BuildVariableTableV(pStr);//
+	Equations->BuildVariableTableV(pStr);//
 
 	Equations->BuildJacobian(pStr);
-	//Equations->BuildJacobianV(pStr);//
+	Equations->BuildJacobianV(pStr);//
 
 	Equations->SolveEquations(pStr);
 
-	//Equations->SubsV(pStr, TEXT("t"), 0.1);//
-	//Equations->SolveEquationsV(pStr);//
+	Equations->SubsV(pStr, TEXT("t"), 0.1);//
+	Equations->SolveEquationsV(pStr);//
 
 	SetElementPosition(Equations->VariableTable);
 	
 	Equations->hasSolved = false;
+
+
+	//EquationsV->RemoveTempEquations();
+	//EquationsV->DefineVariable(pStr, TEXT("t"), TEXT("0"));
+	//EquationsV->AddEquation(pStr, TEXT("phi2-sin(t)"), true);
+	//EquationsV->Subs(pStr, subsVar, subsValue);
+	//EquationsV->BuildJacobian(pStr);
 	//for (auto pEqua : Equations->Equations)
 	//{
 	//	Outputln(pEqua->Diff(TEXT("t"), 1, true));

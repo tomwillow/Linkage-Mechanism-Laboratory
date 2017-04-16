@@ -172,7 +172,7 @@ void TEquations::Subs(String *pStr, TCHAR *subsVar, TCHAR *subsValue)//代入
 
 	if (pStr != NULL)
 	{
-		*pStr << TEXT(">>替换完成: [") << subsVar;
+		*pStr << TEXT(">>Subs: [") << subsVar;
 		*pStr += TEXT("] -> [");
 		*pStr += subsValue;
 		*pStr += TEXT("]\r\n\r\n当前方程：\r\n");

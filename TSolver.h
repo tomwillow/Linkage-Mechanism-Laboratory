@@ -17,6 +17,7 @@ private:
 	HWND hwndOutput;
 	//TCHAR *str;
 	TEquations *Equations;
+	TEquations *EquationsV;
 	TCHAR subsVar[1000], subsValue[1000];
 	std::vector<int> idOrder;
 	double *Phi, *Phip;

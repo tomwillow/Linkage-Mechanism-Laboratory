@@ -299,16 +299,28 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 
 }
 
-void TDraw::DrawPolygonBarTranslucent(HDC hdc, DPOINT &dptArray, int iDptCount, LOGPEN logpen, const TConfiguration *pConfig)
+void TDraw::DrawPolylineBarTranslucent(HDC hdc, std::vector<DPOINT> &vecdpt, LOGPEN logpen, const TConfiguration *pConfig)
 {
-	HPEN hPen;
+	/*
+	RECT rc;
+	GetBoundingBox(vecdpt, &rc);
+	SetMarginRect(&rc, -pConfig->BAR_R);
 
-	hPen = ::CreatePenIndirect(&logpen);
-	::SelectObject(hdc, hPen);
+	//上下左右各加半径
+	int left = min(ptBegin.x, ptEnd.x) - pConfig->BAR_R, top = min(ptBegin.y, ptEnd.y) - pConfig->BAR_R;
+	int width = abs(ptBegin.x - ptEnd.x) + 2 * pConfig->BAR_R, height = abs(ptBegin.y - ptEnd.y) + 2 * pConfig->BAR_R;
 
-	//DrawLine(hdc, Config->RealToScreen(ptBegin), Config->RealToScreen(ptEnd));
+	//换到原点
+	MoveByDelta(pt, 4, -left, -top);
 
-	::DeleteObject(hPen);
+	HDC hBitmapDC;
+	HBITMAP hBitmap;
+	VOID *pvBits;
+	StartTranslucent(hBitmapDC, hBitmap, pvBits, left, top, width, height, logpen.lopnColor == 0);
+
+
+	EndTranslucent(hdc, hBitmapDC, hBitmap, pvBits, left, top, width, height, alpha, logpen.lopnColor == 0);
+	*/
 }
 
 bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt)
@@ -493,6 +505,29 @@ void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *pConfig)
 
 	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
+}
+
+//得到点集的包围盒 rect值保存的是坐标
+void TDraw::GetBoundingBox(std::vector<DPOINT> &vecdpt, RECT *rect)
+{
+	double xmin, ymin, xmax, ymax;
+	if (vecdpt.empty()==false)
+	{
+		xmax = xmin = vecdpt[0].x;
+		ymax = ymin = vecdpt[0].y;
+	}
+
+	for (auto iter = vecdpt.begin() + 1; iter != vecdpt.end();++iter)
+	{
+		if (iter->x > xmax) xmax = iter->x;
+		if (iter->x < xmin) xmin = iter->x;
+		if (iter->y > ymax) ymax = iter->y;
+		if (iter->y < ymin) ymin = iter->y;
+	}
+	rect->left = xmin;
+	rect->right = xmax;
+		rect->top = ymax;
+		rect->bottom = ymin;
 }
 
 //得到点集的包围盒 rect值保存的是坐标

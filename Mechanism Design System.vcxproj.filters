@@ -25,6 +25,12 @@
     <Filter Include="源文件\Tool">
       <UniqueIdentifier>{b8e063d9-c3f8-4ce0-96b7-99e01bf0a374}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\Common">
+      <UniqueIdentifier>{561672b9-00d9-42b4-bb80-16fc606b102e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Common">
+      <UniqueIdentifier>{f1ad9c79-dc98-4e28-8ab6-dc59cb8acee2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -57,13 +63,7 @@
     <ClCompile Include="TTrackbar.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="DPOINT.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TEdit.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TTransfer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TLineEdit.cpp">
@@ -100,9 +100,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TVariableTable.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TMyString.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TEquations.cpp">
@@ -177,26 +174,38 @@
     <ClCompile Include="TDialogBox.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ShowMessage.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TPolygonBar.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TButton.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DialogOption.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="RegisterFunction.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="TPolylineBar.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="TPolylineBarTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="DPOINT.cpp">
+      <Filter>源文件\Common</Filter>
     </ClCompile>
     <ClCompile Include="FileFunction.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterFunction.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ShowMessage.cpp">
+      <Filter>源文件\Common</Filter>
     </ClCompile>
     <ClCompile Include="String.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="TMyString.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="TTransfer.cpp">
+      <Filter>源文件\Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -230,13 +239,7 @@
     <ClInclude Include="TTrackbar.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="DPOINT.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TEdit.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TTransfer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TLineEdit.h">
@@ -275,22 +278,13 @@
     <ClInclude Include="TVariableTable.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TMyString.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TEquations.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="enumError.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TSolver.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DetectMemoryLeak.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="String.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DialogAddDriver.h">
@@ -300,12 +294,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TListViewEdit.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="enumCtrlType.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="MyMath.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TSelectTool.h">
@@ -362,26 +350,50 @@
     <ClInclude Include="TDialogBox.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ShowMessage.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TPolygonBar.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="tchar_head.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TButton.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DialogOption.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="RegisterFunction.h">
+    <ClInclude Include="TPolylineBar.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TPolylineBarTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="enumCtrlType.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="enumError.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="DPOINT.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
     <ClInclude Include="FileFunction.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="MyMath.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterFunction.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ShowMessage.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="String.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="tchar_head.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="TTransfer.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="TMyString.h">
+      <Filter>头文件\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

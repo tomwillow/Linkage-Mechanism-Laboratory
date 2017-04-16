@@ -41,7 +41,7 @@ inline String & operator<<(String &s, size_t i)
 {
 	TCHAR temp[32];
 #ifdef _UNICODE
-	_itow(i, temp, 10);
+	_itow_s(i, temp, 10);
 #else
 	_itoa(i, temp, 10);
 #endif

@@ -105,7 +105,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.AddSeparator(0);
 	m_Toolbar.AddGroup(3, 0, ID_DRAW_FRAME, true, TEXT("机架"));
 	m_Toolbar.AddGroup(4, 0, ID_DRAW_BAR, true, TEXT("连杆"));
-	//m_Toolbar.AddGroup(5, 0, 0, true, TEXT("多段杆"));
+	//m_Toolbar.AddGroup(5, 0, ID_DRAW_POLYLINE_BAR, true, TEXT("多段杆"));
 	m_Toolbar.AddGroup(6, 0, ID_DRAW_LINE, true, TEXT("线"));
 	m_Toolbar.AddGroup(7, 0, ID_DRAW_SLIDEWAY, true, TEXT("滑道"));
 	m_Toolbar.AddGroup(8, 0, ID_DRAW_SLIDER, true, TEXT("滑块"));
@@ -335,6 +335,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_DRAW_BAR:
 	case ID_DRAW_FRAME:
 	case ID_DRAW_LINE:
+	case ID_DRAW_POLYLINE_BAR:
 	case ID_DRAW_SLIDEWAY:
 	case ID_DRAW_SLIDER:
 		SendMessage(m_Toolbar.m_hWnd, WM_USER, wmId, 0);
