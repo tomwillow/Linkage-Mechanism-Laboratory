@@ -4,17 +4,18 @@
 #include "TCanvas.h"
 #include "resource.h"
 #include "TMyString.h"
-#include "TTool.h"
-#include "TLine.h"
 #include "TTreeViewContent.h"
 
 #include "TConfiguration.h"
 #include "TDraw.h"
 #include "TLineEdit.h"
 #include "TAttach.h"
-#include "TConstraintCoincide.h"
 #include "TTransfer.h"
 #include "TSolver.h"
+
+#include "TLine.h"
+#include "TRealLine.h"
+#include "TConstraintCoincide.h"
 
 TLineTool::TLineTool()
 {

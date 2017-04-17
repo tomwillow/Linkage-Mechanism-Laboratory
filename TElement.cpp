@@ -63,6 +63,9 @@ TCHAR * TElement::GetElementTypeName(TCHAR name[])
 	case ELEMENT_SLIDER:
 		_tcscpy(name, TEXT("»¬¿é"));
 		break;
+	case ELEMENT_POLYLINEBAR:
+		_tcscpy(name, TEXT("¶à¶Î¸Ë"));
+		break;
 	case CONSTRAINT_COINCIDE:
 		_tcscpy(name, TEXT("ÖØºÏ"));
 		break;

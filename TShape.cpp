@@ -8,6 +8,10 @@
 
 #include "TConfiguration.h"
 
+#include "TFramePoint.h"
+#include "TRealLine.h"
+#include "TBar.h"
+#include "TSlideway.h"
 #include "TConstraintCoincide.h"
 #include "TConstraintColinear.h"
 

@@ -14,11 +14,31 @@ TTool::TTool()
 	pShape = &(win.m_Shape);
 	pListView = &(win.RightWindow.ListView);
 	pTreeViewContent = &(win.RightWindow.TreeViewContent);
-	//pSolver = &(win.m_Solver);
 	pSolver = win.pSolver;
 }
 
 
 TTool::~TTool()
 {
+}
+
+void TTool::ResetTool()
+{
+	::PostMessage(hwndWin, WM_COMMAND, ID_SELECT, 0);
+	RefreshCanvas();
+}
+
+void TTool::RefreshCanvas()
+{
+	pCanvas->Invalidate();
+}
+
+void TTool::RefreshEquations()
+{
+	pSolver->RefreshEquations();
+}
+
+void TTool::AddTreeViewItem(TElement *pElement, int iId)
+{
+	pTreeViewContent->AddItem(pElement, iId);
 }

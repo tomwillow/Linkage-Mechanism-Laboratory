@@ -10,10 +10,13 @@
 #include "TShape.h"
 #include "TListView.h"
 #include "TTreeViewContent.h"
-#include "TConstraintCoincide.h"
 
 #include "TDraw.h"
 #include "TConfiguration.h"
+
+#include "TFramePoint.h"
+#include "TRealLine.h"
+#include "TConstraintCoincide.h"
 
 #include "TSolver.h"
 

@@ -44,6 +44,6 @@ public:
 	void TListView::DeleteAllItems();//清除全部项
 	RECT TListView::GetGridRect(int index, int subitem);//根据行号和列号得到格子坐标
 	RECT TListView::GetGridRectInMargin(int index, int subitem);//得到格子边框内的坐标
-	void TListView::LoadObject(int index);
+	//void TListView::LoadObject(int index);
 };
 

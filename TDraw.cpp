@@ -5,6 +5,7 @@
 
 #include "TDraw.h"
 
+#include "TDrawTranslucent.h"
 #include "TConfiguration.h"
 
 #include "TBar.h"
@@ -12,6 +13,7 @@
 #include "TSlideway.h"
 #include "TFramePoint.h"
 #include "TConstraintCoincide.h"
+#include "TPolylineBar.h"
 
 TDraw::TDraw()
 {
@@ -233,12 +235,17 @@ void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pv
 	DeleteObject(hBitmapDC);
 }
 
+//根据ITU - R BT 601
+//亮度值Y = 0.299r + 0.587g + 0.114b
 COLORREF TDraw::GetBrighterColor(COLORREF cr)
 {
-	cr = cr + RGB(128, 128, 128);//增加亮度
-	if (cr > 0xffffff)
-		cr = 0xffffff;
-	return cr;
+	byte y = 0.299*GetRValue(cr) + 0.587*GetGValue(cr) + 0.114*GetBValue(cr);
+	if (y + 128 > 0xff)
+		y = 0xff;
+	else
+		y += 128;
+
+	return RGB(0.299*256 / y*GetRValue(cr), 0.587*256 / y*GetGValue(cr), 0.114*256 / y*GetBValue(cr));
 }
 
 void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, TConfiguration *pConfig)
@@ -273,54 +280,115 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	ptEnd.y -= top;
 	MoveByDelta(pt, 4, -left, -top);
 
-	HDC hBitmapDC;
-	HBITMAP hBitmap;
-	VOID *pvBits;
-	StartTranslucent(hBitmapDC, hBitmap, pvBits, left, top, width, height, logpen.lopnColor == 0);
+	//HDC hBitmapDC;
+	//HBITMAP hBitmap;
+	//VOID *pvBits;
+	//StartTranslucent(hBitmapDC, hBitmap, pvBits, left, top, width, height, logpen.lopnColor == 0);
+	//HDC hdcOld = hdc;
+	//hdc = hBitmapDC;
+	TDrawTranslucent Translucent;
+	Translucent.Start(hdc, alpha, left, top, width, height,logpen.lopnColor == 0);
 
 	//开始画
 	hPen = (HPEN)::GetStockObject(NULL_PEN);
-	::SelectObject(hBitmapDC, hPen);
+	::SelectObject(hdc, hPen);
 	hBrush = CreateSolidBrush(logpen.lopnColor);
-	::SelectObject(hBitmapDC, hBrush);
+	::SelectObject(hdc, hBrush);
 
 	//填充两个半圆
-	::Ellipse(hBitmapDC, ptBegin.x - pConfig->BAR_R, ptBegin.y - pConfig->BAR_R, ptBegin.x + pConfig->BAR_R, ptBegin.y + pConfig->BAR_R);
-	::Ellipse(hBitmapDC, ptEnd.x - pConfig->BAR_R, ptEnd.y - pConfig->BAR_R, ptEnd.x + pConfig->BAR_R, ptEnd.y + pConfig->BAR_R);
+	::Ellipse(hdc, ptBegin.x - pConfig->BAR_R, ptBegin.y - pConfig->BAR_R, ptBegin.x + pConfig->BAR_R, ptBegin.y + pConfig->BAR_R);
+	::Ellipse(hdc, ptEnd.x - pConfig->BAR_R, ptEnd.y - pConfig->BAR_R, ptEnd.x + pConfig->BAR_R, ptEnd.y + pConfig->BAR_R);
 
-	Polygon(hBitmapDC, pt, 4);//填充
+	Polygon(hdc, pt, 4);//填充
 
 	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
 	//画完
 
-	EndTranslucent(hdc, hBitmapDC, hBitmap, pvBits, left, top, width, height, alpha, logpen.lopnColor == 0);
-
+	//EndTranslucent(hdcOld, hBitmapDC, hBitmap, pvBits, left, top, width, height, alpha, logpen.lopnColor == 0);
+	//hdc = hdcOld;
+	Translucent.End();
 
 }
 
-void TDraw::DrawPolylineBarTranslucent(HDC hdc, std::vector<DPOINT> &vecdpt, LOGPEN logpen, const TConfiguration *pConfig)
+void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *PolylineBar, TConfiguration *pConfig)
 {
-	/*
+	if (PolylineBar->vecDpt.empty())
+		return;
+
+	//相对坐标转为绝对坐标
+	std::vector<POINT> vecpt;
+	GetAbsoluteScreen(vecpt, PolylineBar->vecDpt, PolylineBar->dpt, PolylineBar->angle, pConfig);
+
+
+
+	//计算区域
+	HRGN hRgn, hRgnTemp;
+	hRgn = CreateEllipticRgn(vecpt[0].x - pConfig->BAR_R, vecpt[0].y - pConfig->BAR_R, vecpt[0].x + pConfig->BAR_R, vecpt[0].y + pConfig->BAR_R);
+
+	POINT ptBar[4];
+	for (auto iter = vecpt.begin() + 1; iter != vecpt.end(); ++iter)
+	{
+		hRgnTemp = CreateEllipticRgn(iter->x - pConfig->BAR_R, iter->y - pConfig->BAR_R, iter->x + pConfig->BAR_R, iter->y + pConfig->BAR_R);
+		CombineRgn(hRgn, hRgn, hRgnTemp, RGN_OR);
+		DeleteObject(hRgnTemp);
+
+		CalcBarRectCoor(ptBar, *(iter - 1), *iter, GetAngleFromPointScreen(*(iter - 1), *iter), pConfig->BAR_R * 2);
+		hRgnTemp = CreatePolygonRgn(ptBar, 4, ALTERNATE);
+		CombineRgn(hRgn, hRgn, hRgnTemp, RGN_OR);
+		DeleteObject(hRgnTemp);
+	}
+
+	HBRUSH hBrush;
+	hBrush = CreateSolidBrush(PolylineBar->logpenStyleShow.lopnColor);
+	::SelectObject(hdc,hBrush);
+
+	//绘制边线
+	FrameRgn(hdc, hRgn, hBrush, 1, 1);
+
+	//得到包围盒
 	RECT rc;
-	GetBoundingBox(vecdpt, &rc);
-	SetMarginRect(&rc, -pConfig->BAR_R);
+	//GetBoundingBox(vecpt, &rc);
+	GetRgnBox(hRgn, &rc);
+	SetMarginRect(&rc, -(pConfig->BAR_R + 1));
 
-	//上下左右各加半径
-	int left = min(ptBegin.x, ptEnd.x) - pConfig->BAR_R, top = min(ptBegin.y, ptEnd.y) - pConfig->BAR_R;
-	int width = abs(ptBegin.x - ptEnd.x) + 2 * pConfig->BAR_R, height = abs(ptBegin.y - ptEnd.y) + 2 * pConfig->BAR_R;
+	//将所有坐标移到左上角位置
+	OffsetRgn(hRgn, -rc.left, -rc.top);
 
-	//换到原点
-	MoveByDelta(pt, 4, -left, -top);
-
-	HDC hBitmapDC;
-	HBITMAP hBitmap;
-	VOID *pvBits;
-	StartTranslucent(hBitmapDC, hBitmap, pvBits, left, top, width, height, logpen.lopnColor == 0);
+	TDrawTranslucent Translucent;
+	Translucent.Start(hdc, PolylineBar->alpha, rc, PolylineBar->logpenStyleShow.lopnColor == 0);
 
 
-	EndTranslucent(hdc, hBitmapDC, hBitmap, pvBits, left, top, width, height, alpha, logpen.lopnColor == 0);
-	*/
+	HPEN hPen;
+	hPen = CreatePen(PolylineBar->logpenStyleShow.lopnStyle, pConfig->BAR_R * 2 + 2, PolylineBar->logpenStyleShow.lopnColor);
+	::SelectObject(hdc, hPen);
+
+	//填充区域
+	FillRgn(hdc, hRgn, hBrush);
+
+	DeleteObject(hRgn);
+
+	//for (auto iter = vecpt.begin(); iter != vecpt.end() - 1; ++iter)
+	//{
+	//	DrawLine(hdc, *iter, *(iter + 1));
+	//}
+
+	::DeleteObject(hPen);
+
+
+	hPen = CreatePen(PolylineBar->logpenStyleShow.lopnStyle, pConfig->BAR_R * 2 , GetBrighterColor(PolylineBar->logpenStyleShow.lopnColor));
+	//hPen = CreatePenIndirect(&(PolylineBar->logpenStyleShow));
+	::SelectObject(hdc, hPen);
+
+	//for (auto iter = vecpt.begin(); iter != vecpt.end() - 1; ++iter)
+	//{
+	//	DrawLine(hdc, *iter, *(iter + 1));
+	//}
+
+	::DeleteObject(hPen);
+	::DeleteObject(hBrush);
+
+	Translucent.End();
 }
 
 bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt)
@@ -505,6 +573,29 @@ void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *pConfig)
 
 	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
+}
+
+//得到点集的包围盒 rect值保存的是坐标
+void TDraw::GetBoundingBox(std::vector<POINT> &vecpt, RECT *rect)
+{
+	double xmin, ymin, xmax, ymax;
+	if (vecpt.empty() == false)
+	{
+		xmax = xmin = vecpt[0].x;
+		ymax = ymin = vecpt[0].y;
+	}
+
+	for (auto iter = vecpt.begin() + 1; iter != vecpt.end(); ++iter)
+	{
+		if (iter->x > xmax) xmax = iter->x;
+		if (iter->x < xmin) xmin = iter->x;
+		if (iter->y > ymax) ymax = iter->y;
+		if (iter->y < ymin) ymin = iter->y;
+	}
+	rect->left = xmin;
+	rect->right = xmax;
+	rect->top = ymin;
+	rect->bottom = ymax;
 }
 
 //得到点集的包围盒 rect值保存的是坐标
@@ -708,6 +799,15 @@ void TDraw::MirrorX(POINT apt[], int apt_num, int Oy)
 	for (int i = 0; i < apt_num; i++)
 	{
 		apt[i].y = Oy - (apt[i].y - Oy);
+	}
+}
+
+void TDraw::MoveByDelta(std::vector<POINT> &vecpt, long dx, long dy)
+{
+	for (auto &pt : vecpt)
+	{
+		pt.x += dx;
+		pt.y += dy;
 	}
 }
 
@@ -1107,6 +1207,7 @@ bool TDraw::PointInRealLine(POINT ptPos, TRealLine *pRealLine, const TConfigurat
 	return PointInRealLine(ptPos, pRealLine->ptBegin, pRealLine->ptEnd, pConfig);
 }
 
+//根据起始点计算加粗后线段的四个角点 angle可使用GetAngleFromScreen计算得到
 void TDraw::CalcBarRectCoor(POINT ptResult[4], const POINT &ptBegin, const POINT &ptEnd, double angle, int width)
 {
 	ptResult[0] = { ptBegin.x + width / 2.0*sin(angle), ptBegin.y + width / 2.0*cos(angle) };
@@ -1124,6 +1225,14 @@ void TDraw::CalcSliderRectCoor(POINT aptResult[4], const POINT &pt, double angle
 	aptResult[1] = { LONG(pt.x + c*sin(angle + theta)), LONG(pt.y + c*cos(angle + theta)) };
 	aptResult[2] = { LONG(pt.x - c*sin(angle - theta)), LONG(pt.y - c*cos(angle - theta)) };
 	aptResult[3] = { LONG(pt.x - c*sin(angle + theta)), LONG(pt.y - c*cos(angle + theta)) };
+}
+
+
+//相对坐标转绝对坐标 rp=r+A*s'p Result不预先清空
+void TDraw::GetAbsoluteScreen(std::vector<POINT> &vecptResult, const std::vector<DPOINT> &vecdpt, const DPOINT &Org, double angle, const TConfiguration *pConfig)
+{
+	for (auto dpt : vecdpt)
+		vecptResult.push_back(pConfig->RealToScreen(GetAbsolute(dpt, Org, angle)));
 }
 
 //相对坐标转绝对坐标 rp=r+A*s'p

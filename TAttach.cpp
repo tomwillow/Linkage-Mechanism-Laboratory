@@ -5,6 +5,9 @@
 #include "TAttach.h"
 #include "TSlider.h"
 
+#include "TFramePoint.h"
+#include "TRealLine.h"
+
 TAttach::TAttach(TCanvas *pCanvas, TShape *pShape, TConfiguration *pConfig)
 {
 	TAttach::pCanvas = pCanvas;
@@ -210,18 +213,18 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 	bAttachedEndpoint = false;
 	bShowAttachPoint = false;
 	pAttachElement = NULL;
-	for (int i = 0; i < pShape->Element.size(); i++)
+	for (auto pElement: pShape->Element)
 	{
-		eAttachElementType = pShape->Element[i]->eType;
-		switch (pShape->Element[i]->eType)
+		eAttachElementType = pElement->eType;
+		switch (pElement->eType)
 		{
 		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
 		case ELEMENT_SLIDEWAY:
 		{
-			TRealLine *pRealLine = (TRealLine *)(pShape->Element[i]);
+			TRealLine *pRealLine = (TRealLine *)pElement;
 			//吸附起点
-			if (DPTisApproached(dptPos, pRealLine->ptBegin, 10))
+			if (DPTisApproached(dptPos, pRealLine->ptBegin))
 			{
 				bAttachedEndpoint = true;
 				bShowAttachPoint = true;
@@ -232,7 +235,7 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 			}
 
 			//吸附终点
-			if (DPTisApproached(dptPos, pRealLine->ptEnd, 10))
+			if (DPTisApproached(dptPos, pRealLine->ptEnd))
 			{
 				bAttachedEndpoint = true;
 				bShowAttachPoint = true;
@@ -245,9 +248,9 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 		}
 		case ELEMENT_FRAMEPOINT:
 		{
-			TFramePoint *pFramePoint = (TFramePoint *)(pShape->Element[i]);
+			TFramePoint *pFramePoint = (TFramePoint *)pElement;
 			//吸附机架点
-			if (DPTisApproached(dptPos, pFramePoint->dpt, 10))
+			if (DPTisApproached(dptPos, pFramePoint->dpt))
 			{
 				bAttachedEndpoint = true;
 				bShowAttachPoint = true;
@@ -258,12 +261,13 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 			}
 			break;
 		}
+		case ELEMENT_POLYLINEBAR:
 		case ELEMENT_SLIDER:
 		{
-			TSlider *pSlider = (TSlider *)(pShape->Element[i]);
+			TSlider *pSlider = (TSlider *)pElement;
 			for (auto iter = pSlider->vecDpt.begin(); iter != pSlider->vecDpt.end(); ++iter)
 			{
-				if (DPTisApproached(dptPos, TDraw::GetAbsolute(*iter, pSlider->dpt, pSlider->angle), 10))
+				if (DPTisApproached(dptPos, TDraw::GetAbsolute(*iter, pSlider->dpt, pSlider->angle)))
 				{
 					bAttachedEndpoint = true;
 					bShowAttachPoint = true;
@@ -284,14 +288,27 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 			break;
 		}
 	}
+
+	for (auto dpt : vecdpt)
+	{
+		if (DPTisApproached(dptPos, dpt))
+		{
+			bAttachedEndpoint = true;
+			bShowAttachPoint = true;
+			//pAttachElement = pSlider;
+			//iAttachElementPointIndex = iter - pSlider->vecDpt.begin();
+			dptAttach = dpt;
+		}
+	}
+
 	return false;
 }
 
 //两点屏幕距离小于distance
-bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2, int distance)
+bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2)
 {
-	if (abs(pConfig->LengthToScreenX(dpt1.x - dpt2.x)) < distance &&
-		abs(pConfig->LengthToScreenY(dpt1.y - dpt2.y)) < distance)
+	if (abs(pConfig->LengthToScreenX(dpt1.x - dpt2.x)) < iAttachPixel &&
+		abs(pConfig->LengthToScreenY(dpt1.y - dpt2.y)) < iAttachPixel)
 		return true;
 	else
 		return false;

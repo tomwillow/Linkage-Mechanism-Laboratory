@@ -207,6 +207,9 @@
     <ClCompile Include="TTransfer.cpp">
       <Filter>源文件\Common</Filter>
     </ClCompile>
+    <ClCompile Include="TDrawTranslucent.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -394,6 +397,9 @@
     </ClInclude>
     <ClInclude Include="TMyString.h">
       <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="TDrawTranslucent.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

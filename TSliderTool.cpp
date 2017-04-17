@@ -1,11 +1,8 @@
 #pragma once
 #include "TSlider.h"
 
-#include "TSolver.h"
-#include "TCanvas.h"
 #include "resource.h"
 #include "TAttach.h"
-#include "TTreeViewContent.h"
 
 #include "TConstraintCoincide.h"
 #include "TConstraintColinear.h"
@@ -170,7 +167,7 @@ void TSliderTool::Reset()
 void TSliderTool::AddIntoShape()
 {
 		//滑块入库
-		pTreeViewContent->AddItem(pSlider, pShape->iNextId);
+	AddTreeViewItem(pSlider, pShape->iNextId);
 		TSlider *pSavedSlider = pShape->AddElement(pSlider);
 
 		//重合约束入库
@@ -178,7 +175,7 @@ void TSliderTool::AddIntoShape()
 		{
 			stackpCoincide.top()->pElement[1] = pSavedSlider;
 
-			pTreeViewContent->AddItem(stackpCoincide.top(), pShape->iNextId);
+			AddTreeViewItem(stackpCoincide.top(), pShape->iNextId);
 			pShape->AddElement(stackpCoincide.top());
 
 			delete stackpCoincide.top();
@@ -190,7 +187,7 @@ void TSliderTool::AddIntoShape()
 		{
 			stackpColinear.top()->pElement[1] = pSavedSlider;
 
-			pTreeViewContent->AddItem(stackpColinear.top(), pShape->iNextId);
+			AddTreeViewItem(stackpColinear.top(), pShape->iNextId);
 			pShape->AddElement(stackpColinear.top());
 
 			delete stackpColinear.top();
@@ -198,7 +195,7 @@ void TSliderTool::AddIntoShape()
 		}
 
 		//刷新方程组
-		pSolver->RefreshEquations();
+		RefreshEquations();
 }
 
 void TSliderTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
@@ -207,8 +204,7 @@ void TSliderTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	{
 	case 0://空点右键
 		//没有点的情况下点右键则重置工具
-		::PostMessage(hwndWin, WM_COMMAND, ID_SELECT, 0);
-		pCanvas->Invalidate();
+		ResetTool();
 		break;
 	case 1://刚画滑块还没画线
 
@@ -225,7 +221,7 @@ void TSliderTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		Reset();
 		OnMouseMove(hWnd, nFlags, ptPos);
 
-		pCanvas->Invalidate();
+		RefreshCanvas();
 
 		break;
 	}

@@ -10,7 +10,7 @@ class TConfiguration;
 class TListView;
 class TTreeViewContent;
 class TSolver;
-
+class TElement;
 class TTool
 {
 private:
@@ -38,5 +38,9 @@ public:
 	virtual void OnMouseWheel(HWND hWnd, UINT nFlags, POINT ptPos)   { }
 	virtual void OnSetCursor(HWND hWnd, UINT nFlags, POINT ptPos)   { }
 	virtual void Draw(HDC hdc){}
+	void TTool::ResetTool();
+	void TTool::RefreshCanvas();
+	void TTool::RefreshEquations();
+	void TTool::AddTreeViewItem(TElement *pElement, int iId);
 };
 

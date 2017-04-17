@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <Windows.h>
 #include "DPOINT.h"
 #include "TShape.h"
@@ -20,11 +21,13 @@ private:
 	TRealLine *ExtensionLine;
 
 
-	bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2, int distance);
+	int iAttachPixel = 10;
+	bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2);
 	bool TAttach::AttachLine(POINT ptNowPos);
 public:
+	std::vector<DPOINT> vecdpt;
 	bool bShowExtensionLine;//已拾取直线
-	bool bAttachedEndpoint;
+	bool bAttachedEndpoint;//吸附端点
 	EnumElementType eAttachElementType;
 
 	bool bShowAttachPoint;

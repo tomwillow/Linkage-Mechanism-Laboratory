@@ -10,6 +10,7 @@
 
 #include "TMyString.h"
 
+#include "TBar.h"
 #include "DPOINT.h"
 #include "TMainWindow.h"
 #include "TShape.h"

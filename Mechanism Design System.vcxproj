@@ -80,6 +80,7 @@
     <ClCompile Include="TConstraintColinear.cpp" />
     <ClCompile Include="TDialogBox.cpp" />
     <ClCompile Include="TDragTool.cpp" />
+    <ClCompile Include="TDrawTranslucent.cpp" />
     <ClCompile Include="TEquations.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TAttach.cpp" />
@@ -140,6 +141,7 @@
     <ClInclude Include="TConstraintColinear.h" />
     <ClInclude Include="TDialogBox.h" />
     <ClInclude Include="TDragTool.h" />
+    <ClInclude Include="TDrawTranslucent.h" />
     <ClInclude Include="TEquations.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TAttach.h" />

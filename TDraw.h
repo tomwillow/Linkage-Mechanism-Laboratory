@@ -15,6 +15,7 @@ class TSlider;
 class TFramePoint;
 class TConstraintCoincide;
 class TConstraintColinear;
+class TPolylineBar;
 class TDraw
 {
 public:
@@ -22,14 +23,17 @@ public:
 	~TDraw();
 
 	static void TDraw::MoveByDelta(POINT apt[], int apt_num, long dx, long dy);
+	static void TDraw::MoveByDelta(std::vector<POINT> &vecpt, long dx, long dy);
 	static void TDraw::Move(POINT apt[], int apt_num, double angle, double dist);
 	static void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta);
 	static void TDraw::MirrorX(POINT apt[], int apt_num, int Oy);
 	static void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect, bool YPlusIsUP);
 	static void TDraw::GetBoundingBox(std::vector<DPOINT> &vecdpt, RECT *rect);
+	static void TDraw::GetBoundingBox(std::vector<POINT> &vecpt, RECT *rect);
 	static double TDraw::Distance(POINT pt1, POINT pt2);
-	static double TDraw::DistanceScreen(const DPOINT &dpt1, const DPOINT &dpt2,const TConfiguration *pConfig);
+	static double TDraw::DistanceScreen(const DPOINT &dpt1, const DPOINT &dpt2, const TConfiguration *pConfig);
 	static DPOINT TDraw::GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);
+	static void TDraw::GetAbsoluteScreen(std::vector<POINT> &vecptResult, const std::vector<DPOINT> &vecdpt, const DPOINT &Org, double angle, const TConfiguration *pConfig);
 	static DPOINT TDraw::GetRelative(const DPOINT &dpt, const DPOINT &Org, double angle);
 	static bool TDraw::GetIntersection(const POINT &ptL1Begin, const POINT &ptL1End, const POINT &ptL2Begin, const  POINT &ptL2End, POINT &ptIntersection);
 	static bool TDraw::GetIntersection(const DPOINT &dptL1Begin, const DPOINT &dptL1End, const DPOINT &dptL2Begin, const  DPOINT &dptL2End, DPOINT &dptIntersection);
@@ -47,7 +51,7 @@ public:
 	static void TDraw::DrawBarSimple(HDC hdc, TBar *Bar, TConfiguration *Config);
 	static void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, TConfiguration *pConfig);
 	static void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, TConfiguration *pConfig);
-	static void TDraw::DrawPolylineBarTranslucent(HDC hdc, std::vector<DPOINT> &vecdpt, LOGPEN logpen, const TConfiguration *pConfig);
+	static void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *PolylineBar, TConfiguration *pConfig);
 	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config);
 	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, TConfiguration *Config);
 	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config);

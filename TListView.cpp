@@ -274,25 +274,25 @@ RECT TListView::GetGridRect(int index, int subitem)
 	return rect;
 }
 
-void TListView::LoadObject(int index)
-{
-	this->DeleteAllItems();
-
-	TCHAR buffer[16];
-
-	switch (pShape->Element[index]->eType)
-	{
-	case ELEMENT_FRAMEPOINT:
-	{
-		TFramePoint *pElement = (TFramePoint *)pShape->Element[index];
-		AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), pElement->id);
-		AddAttributeItem(TEXT("名称"), CTRLTYPE_EDIT, &(pElement->Name), pElement->Name);
-		AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, TEXT("机架"));
-		AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, pElement->GetLineStyleName(pElement->logpenStyle.lopnStyle, buffer));
-		AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), pElement->logpenStyle.lopnWidth);
-		AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), pElement->logpenStyle.lopnColor);
-		AddAttributeItem(TEXT("P0"), CTRLTYPE_COOR_EDIT, &(pElement->dpt), TEXT("%.3f,%.3f"), pElement->dpt.x, pElement->dpt.y);
-		break;
-	}
-	}
-}
+//void TListView::LoadObject(int index)
+//{
+//	this->DeleteAllItems();
+//
+//	TCHAR buffer[16];
+//
+//	switch (pShape->Element[index]->eType)
+//	{
+//	case ELEMENT_FRAMEPOINT:
+//	{
+//		TFramePoint *pElement = (TFramePoint *)pShape->Element[index];
+//		AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), pElement->id);
+//		AddAttributeItem(TEXT("名称"), CTRLTYPE_EDIT, &(pElement->Name), pElement->Name);
+//		AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, TEXT("机架"));
+//		AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, pElement->GetLineStyleName(pElement->logpenStyle.lopnStyle, buffer));
+//		AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), pElement->logpenStyle.lopnWidth);
+//		AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), pElement->logpenStyle.lopnColor);
+//		AddAttributeItem(TEXT("P0"), CTRLTYPE_COOR_EDIT, &(pElement->dpt), TEXT("%.3f,%.3f"), pElement->dpt.x, pElement->dpt.y);
+//		break;
+//	}
+//	}
+//}
