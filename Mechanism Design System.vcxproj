@@ -70,6 +70,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DetectMemoryLeak.cpp" />
+    <ClCompile Include="DialogAbout.cpp" />
     <ClCompile Include="DialogAddDriver.cpp" />
     <ClCompile Include="DialogOption.cpp" />
     <ClCompile Include="FileFunction.cpp" />
@@ -77,7 +78,9 @@
     <ClCompile Include="ShowMessage.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="TButton.cpp" />
+    <ClCompile Include="TConstraintCoincideTool.cpp" />
     <ClCompile Include="TConstraintColinear.cpp" />
+    <ClCompile Include="TConstraintColinearTool.cpp" />
     <ClCompile Include="TDialogBox.cpp" />
     <ClCompile Include="TDragTool.cpp" />
     <ClCompile Include="TDrawTranslucent.cpp" />
@@ -131,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DetectMemoryLeak.h" />
+    <ClInclude Include="DialogAbout.h" />
     <ClInclude Include="DialogAddDriver.h" />
     <ClInclude Include="DialogOption.h" />
     <ClInclude Include="FileFunction.h" />
@@ -138,7 +142,9 @@
     <ClInclude Include="ShowMessage.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="TButton.h" />
+    <ClInclude Include="TConstraintCoincideTool.h" />
     <ClInclude Include="TConstraintColinear.h" />
+    <ClInclude Include="TConstraintColinearTool.h" />
     <ClInclude Include="TDialogBox.h" />
     <ClInclude Include="TDragTool.h" />
     <ClInclude Include="TDrawTranslucent.h" />
@@ -198,6 +204,7 @@
     <ResourceCompile Include="Mechanism Design System.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Resource\BITMAP_SCHOOL.bmp" />
     <Image Include="Resource\bitmap_show_real.bmp" />
     <Image Include="Resource\bitmap_show_simple.bmp" />
     <Image Include="Resource\BITMAP_THEME_BRIGHT.bmp" />

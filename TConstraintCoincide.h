@@ -15,6 +15,8 @@ public:
 	void TConstraintCoincide::BuildpDpt();
 	void TConstraintCoincide::RestorePointStyle();
 	virtual bool TConstraintCoincide::WriteFile(HANDLE &hf, DWORD &now_pos);
-	virtual bool TConstraintCoincide::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape);
+	virtual bool TConstraintCoincide::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape);
+	void TConstraintCoincide::BuildpDpt_inner(int i);
+	DPOINT TConstraintCoincide::GetLinkDpt(int index);
 };
 

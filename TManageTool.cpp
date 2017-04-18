@@ -13,6 +13,9 @@
 #include "TSlidewayTool.h"
 #include "TPolylineBarTool.h"
 
+#include "TConstraintCoincideTool.h"
+#include "TConstraintColinearTool.h"
+
 TManageTool::TManageTool()
 {
 	m_pCurrentTool = NULL;
@@ -65,6 +68,12 @@ void TManageTool::SetCurActiveTool(UINT id)
 		break;
 	case ID_DRAW_POLYLINE_BAR:
 		m_pCurrentTool = new TPolylineBarTool;
+		break;
+	case ID_DRAW_COINCIDE:
+		m_pCurrentTool = new TConstraintCoincideTool;
+		break;
+	case ID_DRAW_COLINEAR:
+		m_pCurrentTool = new TConstraintColinearTool;
 		break;
 	default:
 		assert(0);

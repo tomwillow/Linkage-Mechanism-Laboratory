@@ -6,5 +6,6 @@ class TPolylineBar :
 public:
 	TPolylineBar();
 	~TPolylineBar();
+	void TPolylineBar::NoticeListView(TListView *pListView) override;
 };
 

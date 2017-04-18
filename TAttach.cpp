@@ -7,6 +7,7 @@
 
 #include "TFramePoint.h"
 #include "TRealLine.h"
+#include "TPolylineBar.h"
 
 TAttach::TAttach(TCanvas *pCanvas, TShape *pShape, TConfiguration *pConfig)
 {
@@ -35,6 +36,8 @@ TAttach::TAttach(TCanvas *pCanvas, TShape *pShape, TConfiguration *pConfig)
 	bShowAttachPoint = false;
 	pAttachElement = NULL;
 	iAttachElementPointIndex = -1;
+
+	bAttachedEndpointSelf = false;
 }
 
 
@@ -88,8 +91,15 @@ void TAttach::AttachAll(POINT ptNowPos, DPOINT dptCheckPos)
 	dptAttach = dptPos;
 	AttachAxis(dptPos, pConfig->ScreenToReal(pConfig->GetOrg()));//吸附原点坐标轴
 	AttachAxis(dptPos, dptCheckPos);
-	if (!AttachPoint(dptPos))//后吸附线端点因为线端点更重要（覆盖掉辅助线点效果）
-		AttachLine(ptNowPos);
+
+//后吸附线端点因为线端点更重要（覆盖掉辅助线点效果）
+
+	//越靠上越优先
+	if (!AttachPointSelf(dptPos))
+		if (!AttachPoint(dptPos))
+			if (!AttachLine(ptNowPos))
+				if (!AttachLineSelf(ptNowPos))
+				return;
 }
 
 void TAttach::AttachAll(POINT ptNowPos)
@@ -97,49 +107,127 @@ void TAttach::AttachAll(POINT ptNowPos)
 	DPOINT dptPos = pConfig->ScreenToReal(ptNowPos);
 	dptAttach = dptPos;
 	AttachAxis(dptPos, pConfig->ScreenToReal(pConfig->GetOrg()));//吸附原点坐标轴
-	if (!AttachPoint(dptPos))//后吸附线端点因为线端点更重要（覆盖掉辅助线点效果）
-		AttachLine(ptNowPos);
+
+//后吸附线端点因为线端点更重要（覆盖掉辅助线点效果）
+
+	//越靠上越优先
+	if (!AttachPointSelf(dptPos))
+	if (!AttachPoint(dptPos))
+		if (!AttachLine(ptNowPos))
+			if (!AttachLineSelf(ptNowPos))
+			return;
 }
 
+//以绝对坐标vecdptAbsolute顺序构成的线段，检测ptNowPos是否位于线上，并设置参数：
+//bAttachedEnepoint
+//bShowAttachPoint
+//bShowExtensionLine  ExtensionLine
+//iAttachLinePointIndex
+bool TAttach::AttachLine_Element(POINT ptNowPos,const std::vector<DPOINT> vecdptAbsolute)
+{
+	if (vecdptAbsolute.empty()) return false;
+
+	for (auto pt = vecdptAbsolute.begin(); pt != vecdptAbsolute.end() - 1; ++pt)
+	{
+		int status = TDraw::PointInRealLineOrExtension(ptNowPos, dptAttach, *pt, *(pt + 1), pConfig);
+		if (status == -1)
+			continue;
+
+		//已捕捉
+		bAttachedEndpoint = false;
+		bShowAttachPoint = true;
+		bShowExtensionLine = true;
+
+		iAttachLinePointIndex[0] = pt - vecdptAbsolute.begin();
+		iAttachLinePointIndex[1] = pt + 1 - vecdptAbsolute.begin();
+
+		switch (status)
+		{
+		case 1://-1都不在 0在线段上 1在pt1一侧延长线 2在pt2一侧延长线
+			ExtensionLine->SetPoint(*pt, dptAttach);
+			return true;
+		case 2:
+			ExtensionLine->SetPoint(*(pt + 1), dptAttach);
+			return true;
+		case 0:
+			ExtensionLine->SetPoint({ 0, 0 }, { 0, 0 });
+			return true;
+		}
+	}
+	return false;
+}
 
 bool TAttach::AttachLine(POINT ptNowPos)
 {
 	bShowExtensionLine = false;
-	for (auto i = pShape->Element.begin(); i != pShape->Element.end(); ++i)
+	for (auto pElement:pShape->Element)
 	{
-		switch ((*i)->eType)
+		switch (pElement->eType)
 		{
+		case ELEMENT_SLIDER:
+		case ELEMENT_POLYLINEBAR:
+		{
+			std::vector<DPOINT> vecdptAbsolute;
+			TDraw::GetAbsoluteReal(vecdptAbsolute, pElement->vecDpt, pElement->dpt, pElement->angle);
+
+			if (AttachLine_Element(ptNowPos, vecdptAbsolute))
+			{
+				pAttachElement = pElement;
+				return true;
+			}
+			break;
+		}
 		case ELEMENT_REALLINE:
 		case ELEMENT_BAR:
 		case ELEMENT_SLIDEWAY:
-			int status = TDraw::PointInRealLineOrExtension(ptNowPos, dptAttach, (TRealLine *)*i, pConfig);
+		{
+			TRealLine *pRealLine = (TRealLine *)pElement;
+			int status = TDraw::PointInRealLineOrExtension(ptNowPos, dptAttach, pRealLine->ptBegin,pRealLine->ptEnd, pConfig);
+			if (status == -1)
+				break;
+
+				bAttachedEndpoint = false;
+				bShowAttachPoint = true;
+				bShowExtensionLine = true;
+				pAttachElement = pElement;
+
+				iAttachLinePointIndex[0] = 0;
+				iAttachLinePointIndex[1] = 1;
+
 			switch (status)
 			{
-			case 1:
-				bAttachedEndpoint = false;
-				bShowAttachPoint = true;
-				bShowExtensionLine = true;
-				ExtensionLine->SetPoint(((TRealLine *)*i)->ptBegin, dptAttach);
-				pAttachElement = *i;
+			case 1://-1都不在 0在线段上 1在pt1一侧延长线 2在pt2一侧延长线
+				ExtensionLine->SetPoint(((TRealLine *)pElement)->ptBegin, dptAttach);
 				return true;
 			case 2:
-				bAttachedEndpoint = false;
-				bShowAttachPoint = true;
-				bShowExtensionLine = true;
-				ExtensionLine->SetPoint(((TRealLine *)*i)->ptEnd, dptAttach);
-				pAttachElement = *i;
+				ExtensionLine->SetPoint(((TRealLine *)pElement)->ptEnd, dptAttach);
 				return true;
 			case 0:
-				bAttachedEndpoint = false;
-				bShowAttachPoint = true;
-				bShowExtensionLine = true;
 				ExtensionLine->SetPoint({ 0, 0 }, { 0, 0 });
-				pAttachElement = *i;
 				return true;
 			}
 		}
+		case ELEMENT_FRAMEPOINT:
+		case CONSTRAINT_COINCIDE:
+		case CONSTRAINT_COLINEAR:
+			break;
+		default:
+			assert(0);
+			break;
+		}
 	}
 	return false;
+}
+
+bool TAttach::AttachLineSelf(POINT ptNowPos)
+{
+	if (AttachLine_Element(ptNowPos, vecdpt))
+	{
+		//pAttachElement = pElement;
+		return true;
+	}
+	else
+		return false;
 }
 
 //检查NowPos是否靠近以CheckPos为原点的极轴，使用前应设置dptAttach为当前点
@@ -264,16 +352,15 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 		case ELEMENT_POLYLINEBAR:
 		case ELEMENT_SLIDER:
 		{
-			TSlider *pSlider = (TSlider *)pElement;
-			for (auto iter = pSlider->vecDpt.begin(); iter != pSlider->vecDpt.end(); ++iter)
+			for (auto iter = pElement->vecDpt.begin(); iter != pElement->vecDpt.end(); ++iter)
 			{
-				if (DPTisApproached(dptPos, TDraw::GetAbsolute(*iter, pSlider->dpt, pSlider->angle)))
+				if (DPTisApproached(dptPos, TDraw::GetAbsolute(*iter, pElement->dpt, pElement->angle)))
 				{
 					bAttachedEndpoint = true;
 					bShowAttachPoint = true;
-					pAttachElement = pSlider;
-					iAttachElementPointIndex = iter - pSlider->vecDpt.begin();
-					dptAttach = TDraw::GetAbsolute(*iter, pSlider->dpt, pSlider->angle);
+					pAttachElement = pElement;
+					iAttachElementPointIndex = iter - pElement->vecDpt.begin();
+					dptAttach = TDraw::GetAbsolute(*iter, pElement->dpt, pElement->angle);
 					return true;
 				}
 			}
@@ -289,18 +376,25 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 		}
 	}
 
+
+	return false;
+}
+
+//吸附vecdpt，使用前应设置dptAttach为当前点
+bool TAttach::AttachPointSelf(DPOINT dptPos)
+{
+	bAttachedEndpointSelf = false;
+	bShowAttachPoint = false;
 	for (auto dpt : vecdpt)
 	{
 		if (DPTisApproached(dptPos, dpt))
 		{
-			bAttachedEndpoint = true;
+			bAttachedEndpointSelf = true;
 			bShowAttachPoint = true;
-			//pAttachElement = pSlider;
-			//iAttachElementPointIndex = iter - pSlider->vecDpt.begin();
 			dptAttach = dpt;
+			return true;
 		}
 	}
-
 	return false;
 }
 

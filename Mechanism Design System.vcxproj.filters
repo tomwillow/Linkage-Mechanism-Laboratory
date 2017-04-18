@@ -210,6 +210,15 @@
     <ClCompile Include="TDrawTranslucent.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TConstraintCoincideTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="TConstraintColinearTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogAbout.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -359,9 +368,6 @@
     <ClInclude Include="DialogOption.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TPolylineBar.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TPolylineBarTool.h">
       <Filter>头文件\Tool</Filter>
     </ClInclude>
@@ -401,6 +407,18 @@
     <ClInclude Include="TDrawTranslucent.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TPolylineBar.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="TConstraintCoincideTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="TConstraintColinearTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogAbout.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Mechanism Design System.rc">
@@ -430,6 +448,9 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="Resource\BITMAP_THEME_DARK.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\BITMAP_SCHOOL.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

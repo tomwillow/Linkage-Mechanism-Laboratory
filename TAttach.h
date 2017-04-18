@@ -24,16 +24,24 @@ private:
 	int iAttachPixel = 10;
 	bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2);
 	bool TAttach::AttachLine(POINT ptNowPos);
+	bool TAttach::AttachPointSelf(DPOINT dptPos);
+	bool TAttach::AttachLine_Element(POINT ptNowPos, const std::vector<DPOINT> vecdptAbsolute);
+	bool TAttach::AttachLineSelf(POINT ptNowPos);
 public:
-	std::vector<DPOINT> vecdpt;
-	bool bShowExtensionLine;//已拾取直线
-	bool bAttachedEndpoint;//吸附端点
+	std::vector<DPOINT> vecdpt;//暂存点，保存PolylineBar之前画过的点，为绝对坐标
+
+	int iAttachLinePointIndex[2];//吸附线段时，被吸附线的P Q点在vecDpt中的序号
+	bool bShowExtensionLine;//会显示延长线，绘制ExtensionLine，作为判断是否吸附直线的依据
+
+	bool bAttachedEndpoint;//吸附端点，为true则吸附上了确切存在的点
+	bool bAttachedEndpointSelf;//吸附上了vecdpt里的端点，用于PolylineBar绘制
 	EnumElementType eAttachElementType;
 
-	bool bShowAttachPoint;
+	bool bShowAttachPoint;//会画叉
 	TElement *pAttachElement;
 	int iAttachElementPointIndex;
 	DPOINT dptAttach;
+
 	TAttach(TCanvas *pCanvas, TShape *shape, TConfiguration *config);
 	~TAttach();
 	void TAttach::InitialLine(POINT ptPos);

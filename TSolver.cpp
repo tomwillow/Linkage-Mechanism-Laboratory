@@ -10,6 +10,8 @@
 
 #include "TMyString.h"
 
+#include "TDraw.h"
+
 #include "TBar.h"
 #include "DPOINT.h"
 #include "TMainWindow.h"
@@ -110,21 +112,24 @@ void TSolver::ClearConstraint()
 }
 
 //添加鼠标约束
-void TSolver::AddMouseConstraint(int index, DPOINT dpt)
+void TSolver::AddMouseConstraint(int index, DPOINT dptm)
 {
 	switch (pShape->Element[index]->eType)
 	{
 	case ELEMENT_BAR:
 	case ELEMENT_REALLINE:
 	case ELEMENT_SLIDER:
+	case ELEMENT_POLYLINEBAR:
 	{
 		TCHAR temp[200];
 		TElement *element = pShape->Element[index];
-		double xm = dpt.x;
-		double ym = dpt.y;
+		double xm = dptm.x;
+		double ym = dptm.y;
 		int i = element->id;
 
-		_stprintf(temp, TEXT("(x%d-%f)*sin(phi%d)-(y%d-%f)*cos(phi%d)"), i, xm, i, i, ym, i);
+		double anglem = 0;// TDraw::GetAngleFromPointReal(element->dpt, dptm) - element->angle;
+
+		_stprintf(temp, TEXT("(x%d-%f)*sin(phi%d+%f)-(y%d-%f)*cos(phi%d+%f)"), i, xm, i,anglem, i, ym, i,anglem);
 
 		TCHAR szVar[100], szValue[100];
 		_stprintf(szVar, TEXT("x%d y%d phi%d"), i, i, i);
@@ -203,14 +208,16 @@ void TSolver::RefreshEquations()
 			EquationsV->AddEquation(pStr, buffer2, false);
 			break;
 		}
-		case CONSTRAINT_COLINEAR:
+		case CONSTRAINT_COLINEAR://共线约束
 		{
 			TConstraintColinear *pColinear = (TConstraintColinear *)element;
-			pShape->GetSP(pColinear->pElement[0], 0, SiP, i);
-			pShape->GetSQ(pColinear->pElement[0], 0, SiQ, i);
+			//构件i
+			pShape->GetSP(pColinear->pElement[0], pColinear->PointBeginIndexOfElement[0], SiP, i);//xiP,yiP
+			pShape->GetSQ(pColinear->pElement[0], pColinear->PointEndIndexOfElement[0], SiQ, i);//xiQ,yiQ
 
-			pShape->GetSP(pColinear->pElement[1], 0, SjP, j);
-			pShape->GetSQ(pColinear->pElement[1], 0, SjQ, j);
+			//构件j
+			pShape->GetSP(pColinear->pElement[1], pColinear->PointBeginIndexOfElement[1], SjP, j);//xjP,yjP
+			pShape->GetSQ(pColinear->pElement[1], pColinear->PointEndIndexOfElement[1], SjQ, j);//xjQ,yjQ
 
 			//得到2个重合构件的广义坐标
 			double xi, yi, phii, xj, yj, phij;
@@ -338,6 +345,7 @@ void TSolver::SetElementPosition(TVariableTable &VariableTable)
 		}
 		case ELEMENT_FRAMEPOINT:
 		case ELEMENT_SLIDER:
+		case ELEMENT_POLYLINEBAR:
 		{
 			switch (eQType)
 			{

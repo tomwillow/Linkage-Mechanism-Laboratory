@@ -33,6 +33,10 @@ void TFramePointTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	tempFramePoint.dpt = Attach->dptAttach;
 
 	sTips = TEXT("点击以建立机架点");
+	if (Attach->bAttachedEndpoint)
+	{
+		sTips += TEXT("\r\n已吸附端点：建立重合约束");
+	}
 }
 
 

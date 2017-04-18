@@ -12,6 +12,7 @@
 #include "TRealLine.h"
 #include "TBar.h"
 #include "TSlideway.h"
+#include "TPolylineBar.h"
 #include "TConstraintCoincide.h"
 #include "TConstraintColinear.h"
 
@@ -53,6 +54,7 @@ std::vector<int> TShape::DeleteElement(int index)
 	//刷新构件及机架数量
 	switch (Element[index]->eType)
 	{
+	case ELEMENT_POLYLINEBAR:
 	case ELEMENT_SLIDER:
 	case ELEMENT_BAR:
 		nb--;
@@ -158,6 +160,7 @@ void TShape::ChangePos(int index, DPOINT dptDelta)
 	TElement *temp = Element[index];
 	switch (temp->eType)
 	{
+	case ELEMENT_POLYLINEBAR:
 	case ELEMENT_SLIDER:
 	case ELEMENT_FRAMEPOINT:
 		((TFramePoint *)temp)->dpt.x += dptDelta.x;
@@ -197,10 +200,7 @@ void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, dou
 		*theta = ((TBar *)element)->dAngle;
 		break;
 	case ELEMENT_FRAMEPOINT:
-		*x = element->dpt.x;
-		*y = element->dpt.y;
-		*theta = 0;
-		break;
+	case ELEMENT_POLYLINEBAR:
 	case ELEMENT_SLIDER:
 		*x = element->dpt.x;
 		*y = element->dpt.y;
@@ -224,7 +224,13 @@ void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SQ
 		SQ = { ((TRealLine *)pElement)->dLength, 0 };
 		break;
 	case ELEMENT_SLIDER:
-		SQ = { 1, 0 };
+		if (PointIndexOfElement==-1)//Slider中的-1点意思是Slider的横轴
+			SQ = { 1, 0 };
+		else
+			SQ = pElement->vecDpt[PointIndexOfElement];
+		break;
+	case ELEMENT_POLYLINEBAR:
+		SQ = pElement->vecDpt[PointIndexOfElement];
 		break;
 	default:
 		assert(0);
@@ -232,6 +238,8 @@ void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SQ
 	}
 }
 
+//传入：pElement,点序号
+//传出：SP,i
 void TShape::GetSP(const TElement *pElement, int PointIndexOfElement, DPOINT &SP, int &i)
 {
 	i = pElement->id;
@@ -246,8 +254,12 @@ void TShape::GetSP(const TElement *pElement, int PointIndexOfElement, DPOINT &SP
 		else
 			SP = { ((TBar *)GetElementById(i))->dLength, 0 };
 		break;
+	case ELEMENT_POLYLINEBAR:
 	case ELEMENT_SLIDER:
-		SP = ((TSlider *)pElement)->vecDpt[PointIndexOfElement];
+		if (PointIndexOfElement == -1)//Slider中的-1点意思是Slider的横轴
+			SP = { 1, 0 };
+		else
+		SP = pElement->vecDpt[PointIndexOfElement];
 		break;
 	default:
 		assert(0);
@@ -350,6 +362,15 @@ bool TShape::ReadFromFile(TCHAR szFileName[])
 		case ELEMENT_SLIDER:
 		{
 			TSlider temp;
+			if (temp.ReadFile(hf, now_pos, this))
+				AddElement(&temp);
+			else
+				return false;
+			break;
+		}
+		case ELEMENT_POLYLINEBAR:
+		{
+			TPolylineBar temp;
 			if (temp.ReadFile(hf, now_pos, this))
 				AddElement(&temp);
 			else
@@ -470,6 +491,10 @@ size_t TShape::GetPickedElementIndex(const POINT &ptPos, const TConfiguration *p
 			break;
 		case CONSTRAINT_COLINEAR:
 			if (TDraw::PickConstraintColinear(ptPos, (*iter)))
+				return iter - Element.cbegin();
+			break;
+		case ELEMENT_POLYLINEBAR:
+			if (TDraw::PointInPolylineBar(ptPos, (TPolylineBar *)(*iter), pConfig))
 				return iter - Element.cbegin();
 			break;
 		default:

@@ -3,6 +3,8 @@
 #include "tchar_head.h"
 #include <stdio.h>
 
+#include "TDraw.h"
+
 #include "TShape.h"
 #include "TDraw.h"
 #include "TConstraintCoincide.h"
@@ -41,16 +43,18 @@ void TConstraintCoincide::RestorePointStyle()
 
 }
 
-void TConstraintCoincide::BuildpDpt()
+void TConstraintCoincide::BuildpDpt_inner(int i)
 {
-	for (int i = 0; i < 2; i++)
+	switch (pElement[i]->eType)
 	{
-		if (pElement[i]->eType == ELEMENT_SLIDER)
-		{
-			pDpt[i] = &(pElement[i]->vecDpt[PointIndexOfElement[i]]);
-			pElement[i]->vecIsJoint[PointIndexOfElement[i]].push_back(id);
-		}
-		else
+	case ELEMENT_SLIDER:
+	case ELEMENT_POLYLINEBAR:
+		pDpt[i] = &(pElement[i]->vecDpt[PointIndexOfElement[i]]);
+		pElement[i]->vecIsJoint[PointIndexOfElement[i]].push_back(id);
+		break;
+	case ELEMENT_BAR:
+	case ELEMENT_SLIDEWAY:
+	case ELEMENT_FRAMEPOINT:
 		switch (PointIndexOfElement[i])
 		{
 		case 0:
@@ -62,6 +66,44 @@ void TConstraintCoincide::BuildpDpt()
 			pElement[i]->vecIsJoint[1].push_back(id);
 			break;
 		}
+		break;
+	default:
+		assert(0);
+		break;
+	}
+}
+
+//根据pElement和PointIndexOfElement得到pDpt，并设置vecIsJoint
+void TConstraintCoincide::BuildpDpt()
+{
+	for (int i = 0; i < 2; i++)//0-1
+	{
+		BuildpDpt_inner(i);
+	}
+}
+
+DPOINT TConstraintCoincide::GetLinkDpt(int index)
+{
+	switch (pElement[index]->eType)
+	{
+	case ELEMENT_SLIDER:
+	case ELEMENT_POLYLINEBAR:
+		return TDraw::GetAbsolute(*pDpt[index], pElement[index]->dpt, pElement[index]->angle);
+		break;
+	case ELEMENT_BAR:
+	case ELEMENT_SLIDEWAY:
+	case ELEMENT_FRAMEPOINT:
+		switch (PointIndexOfElement[index])
+		{
+		case 0:
+			return pElement[index]->dpt;
+		case 1:
+			return ((TRealLine *)pElement)->ptEnd;
+		}
+		break;
+	default:
+		assert(0);
+		break;
 	}
 }
 
@@ -84,6 +126,7 @@ void TConstraintCoincide::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("Value"), CTRLTYPE_NULL, NULL, buffer);
 }
 
+//保存时pElement存入id
 bool TConstraintCoincide::WriteFile(HANDLE &hf, DWORD &now_pos)
 {
 	if (!TElement::WriteFile(hf, now_pos))
@@ -105,9 +148,10 @@ bool TConstraintCoincide::WriteFile(HANDLE &hf, DWORD &now_pos)
 		return true;
 }
 
-bool TConstraintCoincide::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
+//读出时根据pElement中保存的id重新指向对应的元素
+bool TConstraintCoincide::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)
 {
-	TElement::ReadFile(hf, now_pos,pShape);
+	TElement::ReadFile(hf, now_pos, pShape);
 
 	int id0, id1;
 	::ReadFile(hf, &id0, sizeof(id0), &now_pos, NULL);

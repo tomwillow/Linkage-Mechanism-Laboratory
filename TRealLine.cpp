@@ -1,4 +1,5 @@
 #pragma once
+#include "MyMath.h"
 #include "TRealLine.h"
 
 #include "TDraw.h"

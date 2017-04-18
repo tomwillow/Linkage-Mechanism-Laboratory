@@ -336,43 +336,43 @@ void TSelectTool::Draw(HDC hdc)
 {
 	if (iPickIndex != -1)
 	{
-		switch (pShape->Element[iPickIndex]->eType)
+		TElement *pElement = pShape->Element[iPickIndex];
+		switch (pElement->eType)
 		{
 		case ELEMENT_BAR:
 		case ELEMENT_REALLINE:
 		case ELEMENT_SLIDEWAY:
 			//画拾取方格
-			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->Element[iPickIndex])->ptBegin));
-			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pShape->Element[iPickIndex])->ptEnd));
+			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pElement)->ptBegin));
+			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pElement)->ptEnd));
 			break;
 
 		case ELEMENT_FRAMEPOINT:
 			//画拾取方格
-			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TFramePoint *)pShape->Element[iPickIndex])->dpt));
+			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TFramePoint *)pElement)->dpt));
 			break;
 		case CONSTRAINT_COINCIDE:
 		{
-			TConstraintCoincide *temp = ((TConstraintCoincide *)pShape->Element[iPickIndex]);
+			TConstraintCoincide *temp = ((TConstraintCoincide *)pElement);
 			if (TDraw::ShowConstraintCoincideDotLine(temp, pConfig))
 			{
 				//画拾取方格
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt[0])));
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt[1])));
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(temp->GetLinkDpt(0)));
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(temp->GetLinkDpt(1)));
 			}
 			else
 			{
 				//画重合点
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(*(temp->pDpt[0])));
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(temp->GetLinkDpt(0)));
 			}
 		}
 		break;
+		case ELEMENT_POLYLINEBAR:
 		case ELEMENT_SLIDER:
 		{
-			TSlider *pSlider = (TSlider *)pShape->Element[iPickIndex];
-			for (auto iter = pSlider->vecDpt.begin(); iter != pSlider->vecDpt.end(); ++iter)
-
+			for (auto iter = pElement->vecDpt.begin(); iter != pElement->vecDpt.end(); ++iter)
 				//画拾取方格
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(TDraw::GetAbsolute(*iter, pSlider->dpt, pSlider->angle)));
+				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(TDraw::GetAbsolute(*iter, pElement->dpt, pElement->angle)));
 		}
 		break;
 		case CONSTRAINT_COLINEAR:

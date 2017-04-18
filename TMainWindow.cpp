@@ -15,6 +15,7 @@
 
 #include "DialogAddDriver.h"
 #include "DialogOption.h"
+#include "DialogAbout.h"
 
 #include "TGraph.h"
 
@@ -109,9 +110,9 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.AddGroup(6, 0, ID_DRAW_LINE, true, TEXT("线"));
 	m_Toolbar.AddGroup(7, 0, ID_DRAW_SLIDEWAY, true, TEXT("滑道"));
 	m_Toolbar.AddGroup(8, 0, ID_DRAW_SLIDER, true, TEXT("滑块"));
-	//m_Toolbar.AddSeparator(0);
-	//m_Toolbar.AddGroup(9, 0, 0, true, TEXT("重合约束"));
-	//m_Toolbar.AddGroup(10, 0, 0, true, TEXT("共线约束"));
+	m_Toolbar.AddSeparator(0);
+	m_Toolbar.AddGroup(9, 0, ID_DRAW_COINCIDE, true, TEXT("重合约束"));
+	m_Toolbar.AddGroup(10, 0, ID_DRAW_COLINEAR, true, TEXT("共线约束"));
 	m_Toolbar.AddSeparator(0);
 	m_Toolbar.AddButton(11, ID_SET_DRIVER, true, TEXT("设为原动件"));
 	m_Toolbar.ShowToolbar();
@@ -338,7 +339,9 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_DRAW_POLYLINE_BAR:
 	case ID_DRAW_SLIDEWAY:
 	case ID_DRAW_SLIDER:
-		SendMessage(m_Toolbar.m_hWnd, WM_USER, wmId, 0);
+	case ID_DRAW_COINCIDE:
+	case ID_DRAW_COLINEAR:
+		SendMessage(m_Toolbar.m_hWnd, WM_USER, wmId, 0);//刷新Toolbar里的radio状态
 		p_Managetool->SetCurActiveTool(wmId);
 		break;
 	case ID_DELETE_ELEMENT:
@@ -453,6 +456,14 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_OPTION:
 	{
 		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_OPTION), m_hWnd, DlgOptionProc))
+		{
+			MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
+		}
+		break;
+	}
+	case ID_ABOUT:
+	{
+		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ABOUT), m_hWnd, DlgAboutProc))
 		{
 			MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
 		}

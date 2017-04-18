@@ -13,6 +13,10 @@ TConstraintColinear::TConstraintColinear()
 	pElement[0] = NULL;
 	pElement[1] = NULL;
 	_tcscpy(Name, TEXT(""));
+	PointBeginIndexOfElement[0] = -1;
+	PointBeginIndexOfElement[1] = -1;
+	PointEndIndexOfElement[0] = -1;
+	PointEndIndexOfElement[1] = -1;
 }
 
 
@@ -34,7 +38,8 @@ void TConstraintColinear::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("Ïß¿í"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
 	pListView->AddAttributeItem(TEXT("ÑÕÉ«"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
 
-	wsprintf(buffer, TEXT("ID:%d = ID:%d"), pElement[0]->id, pElement[1]->id);
+	wsprintf(buffer, TEXT("ID:%d P%d-P%d = ID:%d P%d-P%d"), pElement[0]->id,PointBeginIndexOfElement[0],PointEndIndexOfElement[0],
+		pElement[1]->id,PointBeginIndexOfElement[1], PointEndIndexOfElement[1] );
 
 	pListView->AddAttributeItem(TEXT("Value"), CTRLTYPE_NULL, NULL, buffer);
 }
@@ -47,6 +52,15 @@ bool TConstraintColinear::WriteFile(HANDLE &hf, DWORD &now_pos)
 	now_pos += sizeof(pElement[0]->id);
 	::WriteFile(hf, &(pElement[1]->id), sizeof(pElement[1]->id), &now_pos, NULL);
 	now_pos += sizeof(pElement[1]->id);
+
+	::WriteFile(hf, &(PointBeginIndexOfElement[0]), sizeof(PointBeginIndexOfElement[0]), &now_pos, NULL);
+	now_pos += sizeof(PointBeginIndexOfElement[0]);
+	::WriteFile(hf, &(PointBeginIndexOfElement[1]), sizeof(PointBeginIndexOfElement[1]), &now_pos, NULL);
+	now_pos += sizeof(PointBeginIndexOfElement[1]);
+	::WriteFile(hf, &(PointEndIndexOfElement[0]), sizeof(PointEndIndexOfElement[0]), &now_pos, NULL);
+	now_pos += sizeof(PointEndIndexOfElement[0]);
+	::WriteFile(hf, &(PointEndIndexOfElement[1]), sizeof(PointEndIndexOfElement[1]), &now_pos, NULL);
+	now_pos += sizeof(PointEndIndexOfElement[1]);
 
 	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
 		return false;
@@ -66,6 +80,15 @@ bool TConstraintColinear::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 
 	pElement[0] = pShape->GetElementById(id0);
 	pElement[1] = pShape->GetElementById(id1);
+
+	::ReadFile(hf, &(PointBeginIndexOfElement[0]), sizeof(PointBeginIndexOfElement[0]), &now_pos, NULL);
+	now_pos += sizeof(PointBeginIndexOfElement[0]);
+	::ReadFile(hf, &(PointBeginIndexOfElement[1]), sizeof(PointBeginIndexOfElement[1]), &now_pos, NULL);
+	now_pos += sizeof(PointBeginIndexOfElement[1]);
+	::ReadFile(hf, &(PointEndIndexOfElement[0]), sizeof(PointEndIndexOfElement[0]), &now_pos, NULL);
+	now_pos += sizeof(PointEndIndexOfElement[0]);
+	::ReadFile(hf, &(PointEndIndexOfElement[1]), sizeof(PointEndIndexOfElement[1]), &now_pos, NULL);
+	now_pos += sizeof(PointEndIndexOfElement[1]);
 
 	if (GetLastError() != 0)
 		return false;

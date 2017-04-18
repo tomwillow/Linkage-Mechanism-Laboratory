@@ -29,7 +29,7 @@ TConfiguration::~TConfiguration()
 void TConfiguration::SetTheme(bool bDark)
 {
 	if (bDark)
-	{
+	{//ÉîÉ«
 		crFront = RGB(255, 255, 255);
 
 		crPen = RGB(255, 255, 255);
@@ -42,7 +42,7 @@ void TConfiguration::SetTheme(bool bDark)
 		crGridSmall = RGB(39, 45, 56);
 	}
 	else
-	{
+	{//Ç³É«
 
 		crFront = RGB(0, 0, 0);
 
@@ -51,9 +51,9 @@ void TConfiguration::SetTheme(bool bDark)
 		crDash = RGB(0, 200, 0);
 		crCoordinate = RGB(100, 100, 100);
 
-		bDrawGrid = false;
-		crGridBig = RGB(51, 57, 73);
-		crGridSmall = RGB(39, 45, 56);
+		bDrawGrid = true;
+		crGridBig = RGB(220, 220, 220);
+		crGridSmall = RGB(240, 240, 240);
 	}
 
 	logpen = { iStyle, { iWidth, 0 }, crPen };

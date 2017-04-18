@@ -17,7 +17,7 @@ private:
 	TPolylineBar *pPolylineBar;
 
 	std::stack<TConstraintColinear *>stackpColinear;
-	std::stack<TConstraintCoincide *>stackpCoincide;
+	std::vector<TConstraintCoincide *>vecpCoincide;
 	void TPolylineBarTool::AddIntoShape();
 	void TPolylineBarTool::Reset();
 public:
