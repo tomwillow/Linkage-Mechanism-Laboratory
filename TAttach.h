@@ -23,10 +23,12 @@ private:
 
 	int iAttachPixel = 10;
 	bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2);
-	bool TAttach::AttachLine(POINT ptNowPos);
+	bool TAttach::AttachLine_inner(DPOINT dptNowPos);
 	bool TAttach::AttachPointSelf(DPOINT dptPos);
-	bool TAttach::AttachLine_Element(POINT ptNowPos, const std::vector<DPOINT> vecdptAbsolute);
-	bool TAttach::AttachLineSelf(POINT ptNowPos);
+	bool TAttach::AttachLine_Element(DPOINT dptNowPos, const std::vector<DPOINT> vecdptAbsolute);
+	bool TAttach::AttachLineSelf(DPOINT dptNowPos);
+	bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos);
+	bool TAttach::AttachPoint(DPOINT dptPos);
 public:
 	std::vector<DPOINT> vecdpt;//暂存点，保存PolylineBar之前画过的点，为绝对坐标
 
@@ -47,8 +49,7 @@ public:
 	void TAttach::InitialLine(POINT ptPos);
 	void TAttach::AttachAll(POINT ptNowPos, DPOINT dptCheckPos);
 	void TAttach::AttachAll(POINT ptNowPos);
-	bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos);
-	bool TAttach::AttachPoint(DPOINT dptPos);
+	void TAttach::AttachLine(POINT ptNowPos);
 	void TAttach::Draw(HDC hdc);
 	int TAttach::GetiIvoryLine()
 	{

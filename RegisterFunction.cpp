@@ -1,7 +1,7 @@
+#include "tchar_head.h"
 #include "RegisterFunction.h"
 
-#include <Windows.h>  
-#include <TCHAR.h>
+#include <Windows.h>
 
 #include <shlobj.h>//SHChangeNotify
 #include <Shlwapi.h>//SHDeleteKey
@@ -97,7 +97,6 @@ int RegisterFileAssociation(TCHAR *strExt, TCHAR *strAppKey, TCHAR *strAppName, 
 //-------------------------------------------------------------------------  
 int UnRegisterFileAssociation(TCHAR *strExt, TCHAR *strAppKey)
 {
-	TCHAR strTemp[MAX_PATH];
 	long ret;
 
 	ret = DeleteRegTree(HKEY_CLASSES_ROOT, strExt);

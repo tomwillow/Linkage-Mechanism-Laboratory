@@ -68,8 +68,8 @@ void TSliderTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 				TElement *pElement = pAttach->pAttachElement;
 				int ptIndex0 = pAttach->iAttachLinePointIndex[0];
 				int ptIndex1 = pAttach->iAttachLinePointIndex[1];
-				DPOINT pt0 = TDraw::GetAbsolute(pElement->vecDpt[ptIndex0], pElement->dpt, pElement->angle);
-				DPOINT pt1 = TDraw::GetAbsolute(pElement->vecDpt[ptIndex1], pElement->dpt, pElement->angle);
+				DPOINT pt0 = pElement->GetAbsolutePointByIndex(ptIndex0);// TDraw::GetAbsolute(pElement->vecDpt[ptIndex0], pElement->dpt, pElement->angle);
+				DPOINT pt1 = pElement->GetAbsolutePointByIndex(ptIndex1);// TDraw::GetAbsolute(pElement->vecDpt[ptIndex1], pElement->dpt, pElement->angle);
 				double angle = TDraw::GetAngleFromPointReal(pt0, pt1);
 				pSlider->angle = angle;
 					break;

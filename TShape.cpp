@@ -29,6 +29,7 @@ TShape::~TShape()
 	ReleaseAll();
 }
 
+//没找到则返回NULL
 TElement* TShape::GetElementById(int id)
 {
 	for (auto pElement : Element)
@@ -36,14 +37,15 @@ TElement* TShape::GetElementById(int id)
 		if (pElement->id == id)
 			return pElement;
 	}
+	return NULL;
 }
 
 int TShape::CalcFrameNum()
 {
 	int num = 0;
-	for (int i = 0; i < Element.size(); i++)
+	for (auto pElement:Element)
 	{
-		if (Element[i]->eType == ELEMENT_FRAMEPOINT)
+		if (pElement->eType == ELEMENT_FRAMEPOINT)
 			num++;
 	}
 	return num;
@@ -125,9 +127,9 @@ std::vector<int> TShape::DeleteElement(int index)
 
 void TShape::ReleaseAll()
 {
-	for (int i = 0; i < Element.size(); i++)
-		delete Element[i];
-	Element.swap(std::vector<TElement *>());
+	for (auto pElement:Element)
+		delete pElement;
+	Element.clear();
 	iNextId = 0;
 	nb = 0;
 	hasFrame = false;
@@ -215,27 +217,7 @@ void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, dou
 void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SQ, int &i)
 {
 	i = pElement->id;
-	switch (pElement->eType)
-	{
-	case ELEMENT_BAR:
-	case ELEMENT_REALLINE:
-	case ELEMENT_FRAMEPOINT://第二点
-	case ELEMENT_SLIDEWAY:
-		SQ = { ((TRealLine *)pElement)->dLength, 0 };
-		break;
-	case ELEMENT_SLIDER:
-		if (PointIndexOfElement==-1)//Slider中的-1点意思是Slider的横轴
-			SQ = { 1, 0 };
-		else
-			SQ = pElement->vecDpt[PointIndexOfElement];
-		break;
-	case ELEMENT_POLYLINEBAR:
-		SQ = pElement->vecDpt[PointIndexOfElement];
-		break;
-	default:
-		assert(0);
-		break;
-	}
+	SQ = pElement->GetRelativePointByIndex(PointIndexOfElement);
 }
 
 //传入：pElement,点序号
@@ -243,28 +225,7 @@ void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SQ
 void TShape::GetSP(const TElement *pElement, int PointIndexOfElement, DPOINT &SP, int &i)
 {
 	i = pElement->id;
-	switch (pElement->eType)
-	{
-	case ELEMENT_BAR:
-	case ELEMENT_REALLINE:
-	case ELEMENT_FRAMEPOINT://不可能出现1
-	case ELEMENT_SLIDEWAY:
-		if (PointIndexOfElement == 0)//ptBegin
-			SP = { 0, 0 };
-		else
-			SP = { ((TBar *)GetElementById(i))->dLength, 0 };
-		break;
-	case ELEMENT_POLYLINEBAR:
-	case ELEMENT_SLIDER:
-		if (PointIndexOfElement == -1)//Slider中的-1点意思是Slider的横轴
-			SP = { 1, 0 };
-		else
-		SP = pElement->vecDpt[PointIndexOfElement];
-		break;
-	default:
-		assert(0);
-		break;
-	}
+	SP = pElement->GetRelativePointByIndex(PointIndexOfElement);
 }
 
 //SiP={xi'P,yi'P}
@@ -295,7 +256,7 @@ DWORD TShape::GetSizeOfElement(EnumElementType eType)
 		return sizeof(TConstraintColinear);
 	default:
 		assert(0);
-		break;
+		return 0;
 	}
 }
 
@@ -405,6 +366,7 @@ bool TShape::ReadFromFile(TCHAR szFileName[])
 			break;
 		}
 		default:
+			return false;
 			assert(0);
 			break;
 		}
@@ -416,23 +378,6 @@ bool TShape::ReadFromFile(TCHAR szFileName[])
 
 bool TShape::SaveToFile(TCHAR szFileName[])
 {
-
-	//Ofstream out(szFileName,std::ios::binary);
-	//for (auto pElement : m_Shape.Element)
-	//{
-	//	pElement->Save(out);
-	//}
-	//out.close();
-	//break;
-	//std::wofstream out(szFileName);
-	//for (auto element : m_Shape.Element)
-	//{
-	//	std::vector<String> vec;
-	//	vec.push_back(TEXT("aaaa"));
-	//	out << vec[0];
-	//	//out << *element;
-	//	out.close();
-	//}
 
 	//无弹窗直接存储
 	HANDLE hf;
@@ -490,7 +435,7 @@ size_t TShape::GetPickedElementIndex(const POINT &ptPos, const TConfiguration *p
 				return iter - Element.cbegin();
 			break;
 		case CONSTRAINT_COLINEAR:
-			if (TDraw::PickConstraintColinear(ptPos, (*iter)))
+			if (TDraw::PickConstraintColinear(ptPos,(TConstraintColinear *)(*iter),pConfig))
 				return iter - Element.cbegin();
 			break;
 		case ELEMENT_POLYLINEBAR:

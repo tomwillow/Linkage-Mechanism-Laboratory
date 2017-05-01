@@ -5,7 +5,6 @@
 
 #include "TTreeViewContent.h"
 #include "TConstraintCoincide.h"
-#include "TSolver.h"
 
 TFramePointTool::TFramePointTool()
 {
@@ -44,9 +43,11 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	tempFramePoint.dpt = Attach->dptAttach;
 
+	tempFramePoint.vecDpt.push_back({ 0, 0 });
+
 	pTreeViewContent->AddItem(&tempFramePoint, pShape->iNextId);
 	pPrevFramePoint = pShape->AddElement(&tempFramePoint);
-	//pPrevFramePoint=pShape->AddFramePoint(tempFramePoint);
+
 	sTips = TEXT("已建立。");
 
 	if (Attach->pAttachElement!=NULL)
@@ -67,11 +68,11 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		coincide.pElement[1] = pPrevFramePoint;
 		coincide.PointIndexOfElement[1] = 0;
 
+		//约束入库
 		pTreeViewContent->AddItem(&coincide, pShape->iNextId);
+		pShape->AddElement(&coincide);
 
-		pShape->AddElement(&coincide);//约束入库
-
-		pSolver->RefreshEquations();
+		RefreshEquations();
 	}
 
 }

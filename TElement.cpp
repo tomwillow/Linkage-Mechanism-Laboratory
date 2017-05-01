@@ -260,3 +260,19 @@ void TElement::NoticeListView(TListView *pListView)
 	//pListView->AddAttributeItem(TEXT("Ô­µã"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
 	//pListView->AddAttributeItem(TEXT("½Ç¶È"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), REG2DEG(angle));
 }
+
+DPOINT TElement::GetAbsolutePointByIndex(int PointIndexOfElement) const
+{
+	return GetAbsolute(vecDpt[PointIndexOfElement], dpt, angle);
+}
+
+const DPOINT TElement::GetRelativePointByIndex(int PointIndexOfElement) const
+{
+	return vecDpt[PointIndexOfElement];
+}
+
+DPOINT GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle)
+{
+	return{ Org.x + dpt.x*cos(angle) - dpt.y*sin(angle),
+		Org.y + dpt.x*sin(angle) + dpt.y*cos(angle) };
+}

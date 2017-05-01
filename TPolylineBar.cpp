@@ -1,3 +1,4 @@
+#include "tchar_head.h"
 #include "MyMath.h"
 #include "TPolylineBar.h"
 
@@ -23,7 +24,7 @@ void TPolylineBar::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("Ô­µã"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
 	pListView->AddAttributeItem(TEXT("½Ç¶È"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), REG2DEG(angle));
 
-	for (auto i = 0; i < vecDpt.size(); ++i)
+	for (size_t i = 0; i < vecDpt.size(); ++i)
 	{
 		_stprintf(buffer, TEXT("P%d"), i);
 		pListView->AddAttributeItem(buffer, CTRLTYPE_COOR_EDIT, &(vecDpt[i]), TEXT("%.3f,%.3f"), vecDpt[i].x, vecDpt[i].y);

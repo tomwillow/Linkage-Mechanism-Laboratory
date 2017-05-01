@@ -314,8 +314,8 @@ void TSelectTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	{
 		SelectByIndex(iHoverIndex);
 
-		//弹出右键菜单
-		HMENU hMenu = LoadMenu(hInst, (TCHAR *)(IDR_MENU_RIGHT));
+		//弹出右键菜单，
+		HMENU hMenu = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_RIGHT));
 		hMenu = GetSubMenu(hMenu, 0);
 		ClientToScreen(hWnd, &ptPos);
 
@@ -376,9 +376,22 @@ void TSelectTool::Draw(HDC hdc)
 		}
 		break;
 		case CONSTRAINT_COLINEAR:
-			//
-
+		{
+			TConstraintColinear *temp = ((TConstraintColinear *)pElement);
+			POINT ptCenter1, ptCenter2;
+			if (TDraw::ShowConstraintColinearDotLine(temp, ptCenter1, ptCenter2, pConfig))
+			{
+				//画拾取方格
+				TDraw::DrawPickSquare(hdc, ptCenter1);
+				TDraw::DrawPickSquare(hdc, ptCenter2);
+			}
+			else
+			{
+				//画重合点
+				TDraw::DrawPickSquare(hdc, ptCenter1);
+			}
 			break;
+		}
 		default:
 			assert(0);
 			break;

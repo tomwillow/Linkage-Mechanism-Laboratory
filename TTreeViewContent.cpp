@@ -35,7 +35,7 @@ LRESULT TTreeViewContent::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM 
 void TTreeViewContent::DeleteAllItems()
 {
 	TreeView_DeleteAllItems(m_hWnd);
-	Item.swap(std::vector<TItem>());
+	Item.clear();
 }
 
 void TTreeViewContent::DeleteById(int id)

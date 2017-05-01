@@ -55,7 +55,7 @@ void TStatus::FreshSize()
 
 	int remaid_width = rectParent.right - has_used_width;
 	int now_x = 0;
-	for (int i = 0; i < m_iPartsNum; i++)
+	for (UINT i = 0; i < m_iPartsNum; i++)
 	{
 		//将空余宽度均分给非固定块
 		if (m_pePartsType[i] == PT_NONE)
@@ -87,7 +87,7 @@ void CDECL TStatus::SetText(int id, TCHAR szFormat[], ...)
 	_vsntprintf(szBuffer, sizeof(szBuffer) / sizeof(TCHAR), szFormat, pArgList);
 	va_end(pArgList);
 
-	for (int i = 0; i < m_iPartsNum; i++)
+	for (UINT i = 0; i < m_iPartsNum; i++)
 	{
 		if (id == m_piID[i])
 		{
@@ -100,7 +100,7 @@ void CDECL TStatus::SetText(int id, TCHAR szFormat[], ...)
 //得到某块的Rect
 RECT TStatus::GetPartRect(int id, int margin)
 {
-	for (int i = 0; i < m_iPartsNum; i++)
+	for (UINT i = 0; i < m_iPartsNum; i++)
 	{
 		if (id == m_piID[i])
 		{
@@ -112,6 +112,7 @@ RECT TStatus::GetPartRect(int id, int margin)
 			return rect;
 		}
 	}
+	throw(id);
 }
 
 void TStatus::AddPart(int id,int iWidth,PartType type)

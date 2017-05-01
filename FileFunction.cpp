@@ -1,6 +1,7 @@
+#include "tchar_head.h"
+
 #include "FileFunction.h"
 
-#include <tchar.h>
 #include <Windows.h>
 
 //成功取得返回true 传入index=1则得到传入文件名

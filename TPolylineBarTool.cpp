@@ -32,6 +32,7 @@ void TPolylineBarTool::Reset()
 	//重设临时块
 	if (pPolylineBar != NULL)
 		delete pPolylineBar;
+
 	pPolylineBar = new TPolylineBar;
 	pPolylineBar->SetStyle(pConfig);
 
@@ -161,7 +162,7 @@ void TPolylineBarTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		Reset();
 		break;
 	default:
-		pPolylineBar->vecDpt.erase(pPolylineBar->vecDpt.end() - 1);
+		pPolylineBar->vecDpt.erase(pPolylineBar->vecDpt.end() - 1);//去掉最后一个
 		pPolylineBar->vecIsJoint.resize(pPolylineBar->vecDpt.size());
 
 		AddIntoShape();
@@ -175,6 +176,7 @@ void TPolylineBarTool::AddIntoShape()
 
 	//入库
 	AddTreeViewItem(pPolylineBar, pShape->iNextId);
+
 	TPolylineBar *pSavedPolylineBar = pShape->AddElement(pPolylineBar);
 
 	//重合约束入库

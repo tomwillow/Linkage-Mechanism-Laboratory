@@ -87,34 +87,33 @@ void TAttach::Draw(HDC hdc)
 
 void TAttach::AttachAll(POINT ptNowPos, DPOINT dptCheckPos)
 {
-	DPOINT dptPos = pConfig->ScreenToReal(ptNowPos);
-	dptAttach = dptPos;
-	AttachAxis(dptPos, pConfig->ScreenToReal(pConfig->GetOrg()));//吸附原点坐标轴
-	AttachAxis(dptPos, dptCheckPos);
+	dptAttach = pConfig->ScreenToReal(ptNowPos);
+
+	AttachAxis(dptAttach, pConfig->ScreenToReal(pConfig->GetOrg()));//吸附原点坐标轴
+	AttachAxis(dptAttach, dptCheckPos);
 
 //后吸附线端点因为线端点更重要（覆盖掉辅助线点效果）
 
 	//越靠上越优先
-	if (!AttachPointSelf(dptPos))
-		if (!AttachPoint(dptPos))
-			if (!AttachLine(ptNowPos))
-				if (!AttachLineSelf(ptNowPos))
+	if (!AttachPointSelf(dptAttach))
+		if (!AttachPoint(dptAttach))
+			if (!AttachLine_inner(dptAttach))
+				if (!AttachLineSelf(dptAttach))
 				return;
 }
 
 void TAttach::AttachAll(POINT ptNowPos)
 {
-	DPOINT dptPos = pConfig->ScreenToReal(ptNowPos);
-	dptAttach = dptPos;
-	AttachAxis(dptPos, pConfig->ScreenToReal(pConfig->GetOrg()));//吸附原点坐标轴
+	dptAttach = pConfig->ScreenToReal(ptNowPos);
+	AttachAxis(dptAttach, pConfig->ScreenToReal(pConfig->GetOrg()));//吸附原点坐标轴
 
 //后吸附线端点因为线端点更重要（覆盖掉辅助线点效果）
 
 	//越靠上越优先
-	if (!AttachPointSelf(dptPos))
-	if (!AttachPoint(dptPos))
-		if (!AttachLine(ptNowPos))
-			if (!AttachLineSelf(ptNowPos))
+	if (!AttachPointSelf(dptAttach))
+		if (!AttachPoint(dptAttach))
+			if (!AttachLine_inner(dptAttach))
+				if (!AttachLineSelf(dptAttach))
 			return;
 }
 
@@ -122,14 +121,17 @@ void TAttach::AttachAll(POINT ptNowPos)
 //bAttachedEnepoint
 //bShowAttachPoint
 //bShowExtensionLine  ExtensionLine
-//iAttachLinePointIndex
-bool TAttach::AttachLine_Element(POINT ptNowPos,const std::vector<DPOINT> vecdptAbsolute)
+//iAttachLinePointIndex[0] iAttachLinePointIndex[1]
+bool TAttach::AttachLine_Element(DPOINT dptNowPos,const std::vector<DPOINT> vecdptAbsolute)
 {
 	if (vecdptAbsolute.empty()) return false;
 
+	bShowExtensionLine = false;
+	pAttachElement = NULL;
+
 	for (auto pt = vecdptAbsolute.begin(); pt != vecdptAbsolute.end() - 1; ++pt)
 	{
-		int status = TDraw::PointInRealLineOrExtension(ptNowPos, dptAttach, *pt, *(pt + 1), pConfig);
+		int status = TDraw::PointInRealLineOrExtension(dptNowPos,dptAttach, *pt, *(pt + 1), pConfig);
 		if (status == -1)
 			continue;
 
@@ -157,9 +159,17 @@ bool TAttach::AttachLine_Element(POINT ptNowPos,const std::vector<DPOINT> vecdpt
 	return false;
 }
 
-bool TAttach::AttachLine(POINT ptNowPos)
+void TAttach::AttachLine(POINT ptNowPos)
+{
+	dptAttach = pConfig->ScreenToReal(ptNowPos);
+	AttachLine_inner(dptAttach);
+}
+
+bool TAttach::AttachLine_inner(DPOINT dptNowPos)
 {
 	bShowExtensionLine = false;
+	pAttachElement = NULL;
+
 	for (auto pElement:pShape->Element)
 	{
 		switch (pElement->eType)
@@ -170,11 +180,28 @@ bool TAttach::AttachLine(POINT ptNowPos)
 			std::vector<DPOINT> vecdptAbsolute;
 			TDraw::GetAbsoluteReal(vecdptAbsolute, pElement->vecDpt, pElement->dpt, pElement->angle);
 
-			if (AttachLine_Element(ptNowPos, vecdptAbsolute))
+			if (AttachLine_Element(dptNowPos, vecdptAbsolute))
 			{
 				pAttachElement = pElement;
 				return true;
 			}
+
+			//吸附Slider
+			if (pElement->eType == ELEMENT_SLIDER)
+			{
+				std::vector<DPOINT> vecdptAbsoluteSlider;
+				vecdptAbsoluteSlider.push_back(pElement->GetAbsolutePointByIndex(-1));
+				vecdptAbsoluteSlider.push_back(pElement->GetAbsolutePointByIndex(0));
+
+				if (AttachLine_Element(dptNowPos, vecdptAbsoluteSlider))
+				{
+					iAttachLinePointIndex[0] = -1;
+					iAttachLinePointIndex[1] = 0;
+					pAttachElement = pElement;
+					return true;
+				}
+			}
+
 			break;
 		}
 		case ELEMENT_REALLINE:
@@ -182,7 +209,7 @@ bool TAttach::AttachLine(POINT ptNowPos)
 		case ELEMENT_SLIDEWAY:
 		{
 			TRealLine *pRealLine = (TRealLine *)pElement;
-			int status = TDraw::PointInRealLineOrExtension(ptNowPos, dptAttach, pRealLine->ptBegin,pRealLine->ptEnd, pConfig);
+			int status = TDraw::PointInRealLineOrExtension(dptNowPos, dptAttach, pRealLine->ptBegin,pRealLine->ptEnd, pConfig);
 			if (status == -1)
 				break;
 
@@ -219,9 +246,9 @@ bool TAttach::AttachLine(POINT ptNowPos)
 	return false;
 }
 
-bool TAttach::AttachLineSelf(POINT ptNowPos)
+bool TAttach::AttachLineSelf(DPOINT dptNowPos)
 {
-	if (AttachLine_Element(ptNowPos, vecdpt))
+	if (AttachLine_Element(dptNowPos, vecdpt))
 	{
 		//pAttachElement = pElement;
 		return true;

@@ -1,3 +1,4 @@
+#include "tchar_head.h"
 #include "ShowMessage.h"
 
 #include <stdio.h>//_vsntprintf

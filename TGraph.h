@@ -10,8 +10,13 @@ class TGraph :
 	public TWindow
 {
 private:
+	struct TPointData
+	{
+
+	};
 	TLine LineMouseX, LineMouseY;
 	POINT ptMouse;
+	DPOINT dptMouse;
 	int iPtCount;
 	POINT *ptArray;
 	double x_max, y_max, x_min, y_min;

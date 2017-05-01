@@ -1,4 +1,5 @@
 #pragma once
+#include "DetectMemoryLeak.h"
 #include "MyMath.h"
 #include "TRealLine.h"
 
@@ -140,4 +141,34 @@ bool TRealLine::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 		return false;
 	else
 		return true;
+}
+
+const DPOINT TRealLine::GetRelativePointByIndex(int PointIndexOfElement)const 
+{
+	switch (PointIndexOfElement)
+	{
+	case 0:
+		return{ 0, 0 };
+	case 1:
+		return{ dLength, 0 };
+	default:
+		assert(0);
+		break;
+	}
+	throw(PointIndexOfElement);
+}
+
+DPOINT TRealLine::GetAbsolutePointByIndex(int PointIndexOfElement)const 
+{
+	switch (PointIndexOfElement)
+	{
+	case 0:
+		return dpt;
+	case 1:
+		return ptEnd;
+	default:
+		assert(0);
+		break;
+	}
+	throw(PointIndexOfElement);
 }

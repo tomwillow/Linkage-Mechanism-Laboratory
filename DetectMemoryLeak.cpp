@@ -15,4 +15,9 @@ void OutputDebugPrintf(const TCHAR * strOutputString, ...)
 	OutputDebugString(strBuffer);
 }
 
+void OutputDebugDouble(double d)
+{
+	OutputDebugPrintf(TEXT("%f"), d);
+}
+
 #endif

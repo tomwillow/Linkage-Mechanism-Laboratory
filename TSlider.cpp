@@ -10,6 +10,7 @@ TSlider::TSlider()
 	_tcscpy(Name, TEXT(""));
 	eType = ELEMENT_SLIDER;
 	
+	dpt_1 = { 1, 0 };
 }
 
 
@@ -27,7 +28,7 @@ void TSlider::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("原点"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
 	pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), REG2DEG(angle));
 
-	for (auto i = 0; i < vecDpt.size(); ++i)
+	for (size_t i = 0; i < vecDpt.size(); ++i)
 	{
 		_stprintf(buffer, TEXT("P%d"), i);
 		pListView->AddAttributeItem(buffer, CTRLTYPE_COOR_EDIT, &(vecDpt[i]), TEXT("%.3f,%.3f"), vecDpt[i].x, vecDpt[i].y);
@@ -74,4 +75,22 @@ bool TSlider::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 		return false;
 	else
 		return true;
+}
+
+//Slider的-1点为(1,0)点，用于指定滑轨
+const DPOINT TSlider::GetRelativePointByIndex(int PointIndexOfElement)const 
+{
+	if (PointIndexOfElement == -1)
+		return dpt_1;
+	else
+		return vecDpt[PointIndexOfElement];
+}
+
+//Slider的-1点为(1,0)点，绝对坐标设置为原点
+DPOINT TSlider::GetAbsolutePointByIndex(int PointIndexOfElement) const
+{
+	if (PointIndexOfElement == -1)
+		return GetAbsolute(dpt_1, dpt, angle);
+	else
+		return TElement::GetAbsolutePointByIndex(PointIndexOfElement);
 }

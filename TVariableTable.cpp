@@ -250,14 +250,13 @@ void TVariableTable::OutputValue(String *pStr)//Êä³ö x=0 ÐÎÊ½
 {
 	if (pStr != NULL)
 	{
-		TCHAR *buffer = new TCHAR[20];
-		for (int i = 0; i < VariableTable.size(); i++)
+		for (size_t i = 0; i < VariableTable.size(); i++)
 		{
 			*pStr+= VariableTable[i];
 			*pStr += TEXT(" = ");
-			_stprintf(buffer, TEXT("%f"), VariableValue[i]);
-			*pStr += buffer;
+			*pStr << VariableValue[i];
 			*pStr += TEXT("\r\n");
 		}
+		*pStr += TEXT("\r\n");
 	}
 }

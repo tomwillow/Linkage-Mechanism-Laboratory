@@ -29,6 +29,7 @@ public:
 	static void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect, bool YPlusIsUP);
 	static void TDraw::GetBoundingBox(std::vector<DPOINT> &vecdpt, RECT *rect);
 	static void TDraw::GetBoundingBox(std::vector<POINT> &vecpt, RECT *rect);
+	static double TDraw::Distance(DPOINT pt1, DPOINT pt2);
 	static double TDraw::Distance(POINT pt1, POINT pt2);
 	static double TDraw::DistanceScreen(const DPOINT &dpt1, const DPOINT &dpt2, const TConfiguration *pConfig);
 	static DPOINT TDraw::GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);
@@ -40,8 +41,10 @@ public:
 
 	static RECT TDraw::GetMarginRect(RECT rect, int margin);
 	static void TDraw::SetMarginRect(RECT *rect, int margin);
-	static POINT TDraw::GetCenter(POINT &pt1, POINT &pt2);
-	static bool TDraw::ShowConstraintCoincideDotLine(TElement *element,const TConfiguration *pConfig);
+	static POINT TDraw::GetCenter(const POINT &pt1,const POINT &pt2);
+	static DPOINT TDraw::GetCenter(const DPOINT &pt1,const DPOINT &pt2);
+	static bool TDraw::ShowConstraintCoincideDotLine(TElement *element, const TConfiguration *pConfig);
+	static bool TDraw::ShowConstraintColinearDotLine(const TConstraintColinear *pColinear, POINT &ptCenter1, POINT &ptCenter2, const TConfiguration *pConfig);
 
 	static COLORREF TDraw::GetBrighterColor(COLORREF cr);
 
@@ -52,13 +55,19 @@ public:
 	static void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, TConfiguration *pConfig);
 	static void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, TConfiguration *pConfig);
 	static void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *PolylineBar, TConfiguration *pConfig);
+	static void TDraw::DrawPolylineBarSimple(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration *pConfig);
+	static void TDraw::DrawPolylineBarTranslucent(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration *pConfig);
 	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config);
-	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, TConfiguration *Config);
+	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen,const TConfiguration *Config);
 	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config);
 	static void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig);
+	static void TDraw::DrawConstraintCoincide(HDC hdc, DPOINT dpt0, DPOINT dpt1,const LOGPEN &logpen, const TConfiguration *pConfig);
 	static void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TConfiguration *pConfig);
+	static void TDraw::DrawConstraintColinear_inner(HDC hdc, const POINT &pt1, const POINT &pt2,LOGPEN logpen, const TConfiguration *pConfig);
 	static void TDraw::DrawConstraintColinear(HDC hdc, TConstraintColinear *pColinear, TConfiguration *pConfig);
 
+	static void TDraw::DrawArc(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, bool bAlwaysDrawAngleBetween);
+	static void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2,bool bAlwaysDrawAngleBetween);
 	static void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, const LOGPEN &logpen, const COLORREF &crColor);
 	static void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen);
 	static void TDraw::DrawPickSquare(HDC hdc, POINT pt);
@@ -72,6 +81,7 @@ public:
 	static void TDraw::DrawArrow(HDC hdc, POINT ptBegin, POINT ptEnd, int length, int width);
 	static void TDraw::DrawAxes(HDC hdc, int Ox, int Oy, COLORREF crColor);
 
+	static void TDraw::CalcBarLineEndpoint(POINT &ptBegin, POINT &ptEnd, int distBegin, int distEnd);
 	static void TDraw::CalcPolylineBarRgn(HRGN &hRgn, const std::vector<DPOINT> &vecDpt, DPOINT dpt, double angle, const TConfiguration *pConfig);
 	static void TDraw::CalcPolylineBarRgn(HRGN &hRgn, TPolylineBar *pPolylineBar, const TConfiguration *pConfig);
 	static void TDraw::CalcBarRectCoor(POINT ptResult[4], const POINT &ptBegin, const POINT &ptEnd, double angle, int width);
@@ -85,7 +95,8 @@ public:
 	static void TDraw::DrawSection(HDC hdc, int x1, int y1, int x2, int y2, int d, double angleDEG);
 	static void TDraw::DrawSection(HDC hdc, POINT apt[], int apt_num, int d, double angleDEG);
 	static double TDraw::GetAngleFromPointReal(DPOINT ptO, DPOINT pt);
-	static double TDraw::GetAngleBetweenPointReal(const DPOINT &pt1,const DPOINT &ptO,const DPOINT &pt2);
+	static double TDraw::GetAngleBetweenPointReal(const DPOINT &pt1, const DPOINT &ptO, const DPOINT &pt2);
+	static double TDraw::GetAngleBetweenPointScreen(const POINT &pt1, const POINT &ptO, const POINT &pt2);
 	static double TDraw::GetAngleFromPointScreen(POINT pt0, POINT pt);
 	static void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt);
 	static POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max, RECT &rect);
@@ -96,10 +107,11 @@ public:
 	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt, const TConfiguration *pConfig);
 	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);
 	static bool TDraw::PointInRealLine(POINT ptPos, TRealLine *pRealLine,const TConfiguration *pConfig);
-	static bool TDraw::PointInSlider(POINT ptPos, TSlider *pSlider,const TConfiguration *pConfig);
-	static bool TDraw::PointInRealLine(POINT &ptPos, DPOINT &dptBegin, DPOINT &dptEnd,const TConfiguration *pConfig);
-	static int TDraw::PointInRealLineOrExtension(const POINT &ptPos, DPOINT &ptIntersection, const DPOINT dptBegin, const DPOINT dptEnd, TConfiguration *pConfig);
-	static bool TDraw::PickConstraintColinear(POINT ptPos, TElement *element);
+	static bool TDraw::PointInSlider(POINT ptPos, TSlider *pSlider, const TConfiguration *pConfig);
+	static bool TDraw::PointInRealLine(const POINT &ptPos,const POINT &ptBegin,const POINT &ptEnd, const TConfiguration *pConfig);
+	static bool TDraw::PointInRealLine(const POINT &ptPos,const DPOINT &dptBegin,const DPOINT &dptEnd, const TConfiguration *pConfig);
+	static int TDraw::PointInRealLineOrExtension(const DPOINT &dptPos, DPOINT &dptIntersection, const DPOINT dptBegin, const DPOINT dptEnd,const TConfiguration *pConfig);
+	static bool TDraw::PickConstraintColinear(POINT ptPos, TConstraintColinear *pColinear,const TConfiguration *pConfig);
 	static bool TDraw::PickConstraintCoincide(POINT ptPos, TElement *element,const TConfiguration *pConfig);
 
 	//Í¸Ã÷´¦Àí

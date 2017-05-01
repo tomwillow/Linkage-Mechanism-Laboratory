@@ -285,7 +285,14 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			pSolver->RefreshEquations();
 		}
 		else
-			ShowMessage(TEXT("Error:%d"), GetLastError());
+		{//读取失败
+			if (GetLastError() == ERROR_NO)//
+				MessageBox(NULL, TEXT("文件格式不正确，读取中止。"), TEXT(""), MB_OK);
+			else
+				ShowMessage(TEXT("Error:%d"), GetLastError());
+
+			this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);
+		}
 
 		break;
 	case ID_SAVE:

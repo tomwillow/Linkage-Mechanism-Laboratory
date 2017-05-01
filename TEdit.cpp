@@ -11,11 +11,16 @@ TEdit::TEdit()
 	bAutoHScrol = false;
 	bAutoVScrol = false;
 	bNoHideSel = false;
+
+	Text = NULL;
 }
 
 TEdit::~TEdit()
 {
 	::DeleteObject(m_hFont);
+
+	if (Text != NULL)
+		free(Text);
 }
 
 bool TEdit::OnKeyDown(WPARAM wParam, LPARAM lParam)
@@ -129,4 +134,13 @@ void CDECL TEdit::SetText(TCHAR szFormat[], ...)
 void TEdit::GetText(TCHAR text[])
 {
 	::GetWindowText(m_hWnd, text, GetLength()+1);//不知道为什么要加1才取得全
+}
+
+TCHAR * TEdit::GetText()
+{
+	//if (Text != NULL)
+	//	free(Text);
+	Text = (TCHAR *)realloc(Text, (GetLength() + 1)*sizeof(TCHAR));
+	GetText(Text);
+	return Text;
 }

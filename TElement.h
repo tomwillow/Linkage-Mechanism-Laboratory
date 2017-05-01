@@ -50,4 +50,8 @@ public:
 	virtual bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos);
 	virtual bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape);
 	virtual void TElement::NoticeListView(TListView *pListView);
+	virtual const DPOINT TElement::GetRelativePointByIndex(int PointIndexOfElement) const;
+	virtual DPOINT TElement::GetAbsolutePointByIndex(int PointIndexOfElement) const;
 };
+
+DPOINT GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);

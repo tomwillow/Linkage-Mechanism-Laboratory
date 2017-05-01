@@ -13,6 +13,7 @@
 #include "TSlideway.h"
 #include "TFramePoint.h"
 #include "TConstraintCoincide.h"
+#include "TConstraintColinear.h"
 #include "TPolylineBar.h"
 
 TDraw::TDraw()
@@ -95,6 +96,16 @@ void TDraw::DrawBar(HDC hdc, TBar *pBar, TConfiguration *pConfig)
 		DrawBarSimple(hdc, pBar, pConfig);
 }
 
+//计算距离线两端点内侧dist单位，结果赋予原端点
+void TDraw::CalcBarLineEndpoint(POINT &ptBegin, POINT &ptEnd, int distBegin, int distEnd)
+{
+	double theta1 = GetAngleFromPointScreen(ptBegin, ptEnd);
+	double theta2 = GetAngleFromPointScreen(ptEnd, ptBegin);
+
+	ptBegin = { LONG(ptBegin.x + distBegin*cos(theta1)), LONG(ptBegin.y - distBegin*sin(theta1)) };
+	ptEnd = { LONG(ptEnd.x + distEnd*cos(theta2)), LONG(ptEnd.y - distEnd*sin(theta2)) };
+}
+
 void TDraw::DrawBarSimple(HDC hdc, TBar *Bar, TConfiguration *pConfig)
 {
 	HPEN hPen;
@@ -110,21 +121,24 @@ void TDraw::DrawBarSimple(HDC hdc, TBar *Bar, TConfiguration *pConfig)
 	//DrawCircle(hdc, ptBegin, FRAMEPOINT_R);
 	//DrawCircle(hdc, ptEnd, FRAMEPOINT_R);
 
-	//计算实际端点
-	POINT p1, p2;
-	double theta1 = GetAngleFromPointScreen(ptBegin, ptEnd);
-	double theta2 = GetAngleFromPointScreen(ptEnd, ptBegin);
+	CalcBarLineEndpoint(ptBegin, ptEnd, Bar->vecIsJoint[0].size() > 0 ? pConfig->FRAMEPOINT_R : 0, Bar->vecIsJoint[1].size() > 0 ? pConfig->FRAMEPOINT_R : 0);
+	DrawLine(hdc, ptBegin, ptEnd);
 
-	if (Bar->vecIsJoint[0].size() > 0)
-		p1 = { LONG(ptBegin.x + pConfig->FRAMEPOINT_R*cos(theta1)), LONG(ptBegin.y - pConfig->FRAMEPOINT_R*sin(theta1)) };
-	else
-		p1 = ptBegin;
+	////计算实际端点
+	//POINT p1, p2;
+	//double theta1 = GetAngleFromPointScreen(ptBegin, ptEnd);
+	//double theta2 = GetAngleFromPointScreen(ptEnd, ptBegin);
 
-	if (Bar->vecIsJoint[1].size() > 0)
-		p2 = { LONG(ptEnd.x + pConfig->FRAMEPOINT_R*cos(theta2)), LONG(ptEnd.y - pConfig->FRAMEPOINT_R*sin(theta2)) };
-	else
-		p2 = ptEnd;
-	DrawLine(hdc, p1, p2);
+	//if (Bar->vecIsJoint[0].size() > 0)
+	//	p1 = { LONG(ptBegin.x + pConfig->FRAMEPOINT_R*cos(theta1)), LONG(ptBegin.y - pConfig->FRAMEPOINT_R*sin(theta1)) };
+	//else
+	//	p1 = ptBegin;
+
+	//if (Bar->vecIsJoint[1].size() > 0)
+	//	p2 = { LONG(ptEnd.x + pConfig->FRAMEPOINT_R*cos(theta2)), LONG(ptEnd.y - pConfig->FRAMEPOINT_R*sin(theta2)) };
+	//else
+	//	p2 = ptEnd;
+	//DrawLine(hdc, p1, p2);
 
 	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
@@ -135,7 +149,7 @@ void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config)
 	DrawRealLine(hdc, RealLine.ptBegin, RealLine.ptEnd, RealLine.logpenStyleShow, Config);
 }
 
-void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, TConfiguration *Config)
+void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, const TConfiguration *Config)
 {
 	HPEN hPen;
 
@@ -242,7 +256,7 @@ void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pv
 //亮度值Y = 0.299r + 0.587g + 0.114b
 COLORREF TDraw::GetBrighterColor(COLORREF cr)
 {
-	byte y = 0.299*GetRValue(cr) + 0.587*GetGValue(cr) + 0.114*GetBValue(cr);
+	byte y = (byte)(0.299*GetRValue(cr) + 0.587*GetGValue(cr) + 0.114*GetBValue(cr));
 	if (y + 128 > 0xff)
 		y = 0xff;
 	else
@@ -358,10 +372,85 @@ bool TDraw::PointInPolylineBar(POINT ptPos, TPolylineBar *pPolylineBar, const TC
 	return PtInRegion(hRgn, ptPos.x, ptPos.y);
 }
 
+void TDraw::DrawPolylineBarSimple(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration *pConfig)
+{
+	if (pPolylineBar->vecDpt.empty())
+	{
+		return;
+	}
+
+	//相对坐标转为绝对坐标
+	std::vector<POINT> vecpt;
+	GetAbsoluteScreen(vecpt, pPolylineBar->vecDpt, pPolylineBar->dpt, pPolylineBar->angle, pConfig);
+
+	HPEN hPen = CreatePenIndirect(&(pPolylineBar->logpenStyleShow));
+	SelectObject(hdc, hPen);
+
+	//画线
+	size_t i = 0;
+	POINT ptBegin, ptEnd;
+	int distBegin, distEnd;
+	int dist = 4;//和内圆的半径差
+	for (size_t i = 0; i < vecpt.size() - 1; ++i)//第1个-倒数第2个
+	{
+		ptBegin = vecpt[i];
+		ptEnd = vecpt[i + 1];
+		if (!pPolylineBar->vecIsJoint[i].empty())
+			if (i == 0)
+				distBegin = pConfig->FRAMEPOINT_R;
+			else
+				distBegin = pConfig->FRAMEPOINT_R + dist;
+		else
+			distBegin = 0;
+		if (!pPolylineBar->vecIsJoint[i + 1].empty())
+			if (i == vecpt.size() - 2)//倒数第2点
+				distEnd = pConfig->FRAMEPOINT_R;
+			else
+				distEnd = pConfig->FRAMEPOINT_R + dist;
+		else
+			distEnd = 0;
+
+		CalcBarLineEndpoint(ptBegin, ptEnd, distBegin, distEnd);
+
+		DrawLine(hdc, ptBegin, ptEnd);
+	}
+
+	//画弧
+	HBRUSH hBrush = CreateSolidBrush(pPolylineBar->logpenStyleShow.lopnColor);
+	SelectObject(hdc, hBrush);
+
+	for (size_t i = 1; i < vecpt.size() - 1; ++i)//第2个-倒数第2个
+	{
+		if (!pPolylineBar->vecIsJoint[i].empty())//有铰链
+		{
+			DrawArc(hdc, vecpt[i], pConfig->FRAMEPOINT_R + dist, vecpt[i - 1], vecpt[i + 1], true);
+		}
+		else
+		{
+			DrawPie(hdc, vecpt[i], pConfig->FRAMEPOINT_R + dist, vecpt[i - 1], vecpt[i + 1], true);
+		}
+	}
+
+	DeleteObject(hBrush);
+
+	DeleteObject(hPen);
+}
+
 void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration *pConfig)
+{
+	if (pConfig->bDrawReal)
+		DrawPolylineBarTranslucent(hdc, pPolylineBar, pConfig);
+	else
+		DrawPolylineBarSimple(hdc, pPolylineBar, pConfig);
+}
+
+void TDraw::DrawPolylineBarTranslucent(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration *pConfig)
 {
 	HRGN hRgn;
 	CalcPolylineBarRgn(hRgn, pPolylineBar, pConfig);
+
+	if (hRgn == NULL)
+		return;
 
 	HBRUSH hBrush;
 	hBrush = CreateSolidBrush(pPolylineBar->logpenStyleShow.lopnColor);
@@ -381,33 +470,10 @@ void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration 
 	TDrawTranslucent Translucent;
 	Translucent.Start(hdc, pPolylineBar->alpha, rc, pPolylineBar->logpenStyleShow.lopnColor == 0);
 
-	HPEN hPen;
-	hPen = CreatePen(pPolylineBar->logpenStyleShow.lopnStyle, pConfig->BAR_R * 2 + 2, pPolylineBar->logpenStyleShow.lopnColor);
-	::SelectObject(hdc, hPen);
-
 	//填充区域
 	FillRgn(hdc, hRgn, hBrush);
 
 	DeleteObject(hRgn);
-
-	//for (auto iter = vecpt.begin(); iter != vecpt.end() - 1; ++iter)
-	//{
-	//	DrawLine(hdc, *iter, *(iter + 1));
-	//}
-
-	::DeleteObject(hPen);
-
-
-	hPen = CreatePen(pPolylineBar->logpenStyleShow.lopnStyle, pConfig->BAR_R * 2, GetBrighterColor(pPolylineBar->logpenStyleShow.lopnColor));
-	//hPen = CreatePenIndirect(&(PolylineBar->logpenStyleShow));
-	::SelectObject(hdc, hPen);
-
-	//for (auto iter = vecpt.begin(); iter != vecpt.end() - 1; ++iter)
-	//{
-	//	DrawLine(hdc, *iter, *(iter + 1));
-	//}
-
-	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
 
 	Translucent.End();
@@ -415,6 +481,13 @@ void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration 
 
 bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt)
 {
+	HRGN hRgn = CreatePolygonRgn(ptRgn, RgnCount, ALTERNATE);
+	bool bInRgn = PtInRegion(hRgn, pt.x, pt.y);
+
+	DeleteObject(hRgn);
+
+	return bInRgn;
+/*
 	int   i, j = RgnCount - 1;
 	bool  oddNodes = false;
 
@@ -428,7 +501,7 @@ bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt)
 		}
 		j = i;
 	}
-	return oddNodes;
+	return oddNodes;*/
 }
 
 bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt, const TConfiguration *pConfig)
@@ -444,7 +517,7 @@ bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt, const TConfiguration
 	return PointInRgn(FramePointRgn, 6, pt);
 }
 
-//画圆 有样式
+//画空心圆 有样式
 void TDraw::DrawCircle(HDC hdc, POINT pt, int r, LOGPEN logpen)
 {
 	HPEN hPen;
@@ -600,7 +673,7 @@ void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *pConfig)
 //得到点集的包围盒 rect值保存的是坐标
 void TDraw::GetBoundingBox(std::vector<POINT> &vecpt, RECT *rect)
 {
-	double xmin, ymin, xmax, ymax;
+	LONG xmin, ymin, xmax, ymax;
 	if (vecpt.empty() == false)
 	{
 		xmax = xmin = vecpt[0].x;
@@ -637,10 +710,10 @@ void TDraw::GetBoundingBox(std::vector<DPOINT> &vecdpt, RECT *rect)
 		if (iter->y > ymax) ymax = iter->y;
 		if (iter->y < ymin) ymin = iter->y;
 	}
-	rect->left = xmin;
-	rect->right = xmax;
-	rect->top = ymax;
-	rect->bottom = ymin;
+	rect->left = (LONG)xmin;
+	rect->right = (LONG)xmax;
+	rect->top = (LONG)ymax;
+	rect->bottom = (LONG)ymin;
 }
 
 //得到点集的包围盒 rect值保存的是坐标
@@ -790,6 +863,14 @@ double TDraw::GetAngleBetweenPointReal(const DPOINT &pt1, const DPOINT &ptO, con
 {
 	double angle = abs(GetAngleFromPointReal(ptO, pt1) - GetAngleFromPointReal(ptO, pt2));
 	return angle > M_PI ? 2 * M_PI - angle : angle;
+}
+
+//返回pt1-pt2夹角,逆时针方向
+double TDraw::GetAngleBetweenPointScreen(const POINT &pt1, const POINT &ptO, const POINT &pt2)
+{
+	double angle = GetAngleFromPointScreen(ptO, pt2) - GetAngleFromPointScreen(ptO, pt1);
+	return angle < 0 ? 2 * M_PI + angle : angle;
+	//return GetAngleFromPointScreen(ptO, pt2) - GetAngleFromPointScreen(ptO, pt1);
 }
 
 //返回pt相对于原点ptO的角度，传入点以Y方向向上为正
@@ -1001,6 +1082,11 @@ double TDraw::Distance(POINT pt1, POINT pt2)
 	return sqrt(double((pt1.x - pt2.x)*(pt1.x - pt2.x) + (pt1.y - pt2.y)*(pt1.y - pt2.y)));
 }
 
+double TDraw::Distance(DPOINT pt1, DPOINT pt2)
+{
+	return sqrt(double((pt1.x - pt2.x)*(pt1.x - pt2.x) + (pt1.y - pt2.y)*(pt1.y - pt2.y)));
+}
+
 double TDraw::DistanceScreen(const DPOINT &dpt1, const DPOINT &dpt2, const TConfiguration *pConfig)
 {
 	POINT p1 = pConfig->RealToScreen(dpt1);
@@ -1008,7 +1094,12 @@ double TDraw::DistanceScreen(const DPOINT &dpt1, const DPOINT &dpt2, const TConf
 	return Distance(p1, p2);
 }
 
-POINT TDraw::GetCenter(POINT &pt1, POINT &pt2)
+DPOINT TDraw::GetCenter(const DPOINT &pt1, const DPOINT &pt2)
+{
+	return{ (pt1.x + pt2.x) / 2, (pt1.y + pt2.y) / 2 };
+}
+
+POINT TDraw::GetCenter(const POINT &pt1,const POINT &pt2)
 {
 	return{ (pt1.x + pt2.x) / 2, (pt1.y + pt2.y) / 2 };
 }
@@ -1024,9 +1115,85 @@ bool TDraw::ShowConstraintCoincideDotLine(TElement *element, const TConfiguratio
 		return false;
 }
 
-void TDraw::DrawConstraintColinear(HDC hdc, TConstraintColinear *pColinear, TConfiguration *pConfig)
+//样式采用配置内置
+void TDraw::DrawConstraintColinear_inner(HDC hdc, const POINT &pt1, const POINT &pt2, LOGPEN logpen, const TConfiguration *pConfig)
 {
 
+	POINT ptCenter1 = pt1, ptCenter2 = pt2;
+
+	HPEN hPen = CreatePenIndirect(&(pConfig->logpenConstraintLine));
+	SelectObject(hdc, hPen);
+
+	DrawLine(hdc, pt1, ptCenter2);
+
+	POINT ptBold1 = GetCenter(ptCenter1, ptCenter2);
+	POINT ptBold2 = ptBold1;
+	CalcBarLineEndpoint(ptCenter1, ptBold1, 0, pConfig->COLINEAR_SYMBOL_L / 2);
+	CalcBarLineEndpoint(ptCenter2, ptBold2, 0, pConfig->COLINEAR_SYMBOL_L / 2);
+
+	DeleteObject(hPen);
+
+	hPen = CreatePenIndirect(&(pConfig->logpenColinearSymbol));
+	SelectObject(hdc, hPen);
+
+	DrawLine(hdc, ptBold1, ptBold2);
+
+	DeleteObject(hPen);
+}
+
+//是否显示共线约束线（共线约束位置不满足）
+//ptCenter1,ptCenter2:返回应该显示共线约束线的点
+bool TDraw::ShowConstraintColinearDotLine(const TConstraintColinear *pColinear, POINT &ptCenter1, POINT &ptCenter2,const TConfiguration *pConfig)
+{
+	DPOINT P1, Q1, P2, Q2;
+	pColinear->GetLinkDpt(0, P1, Q1);
+	pColinear->GetLinkDpt(1, P2, Q2);
+
+	ptCenter1 = pConfig->RealToScreen(GetCenter(P1, Q1));
+	ptCenter2 = pConfig->RealToScreen(GetCenter(P2, Q2));
+
+	DPOINT dptIntersection;
+	if (PointInRealLineOrExtension(P1, dptIntersection, P2, Q2, pConfig) != -1)//P1在P2 Q2上
+		if (PointInRealLineOrExtension(Q1, dptIntersection, P2, Q2, pConfig) != -1)//Q1也在P2 Q2上
+			return false;//P1Q1 P2Q2共线，不绘制
+
+
+	return true;
+
+}
+
+void TDraw::DrawConstraintColinear(HDC hdc, TConstraintColinear *pColinear, TConfiguration *pConfig)
+{
+	POINT ptCenter1, ptCenter2;
+
+	if (ShowConstraintColinearDotLine(pColinear,ptCenter1,ptCenter2,pConfig))
+		DrawConstraintColinear_inner(hdc, ptCenter1, ptCenter2, pColinear->logpenStyleShow, pConfig);
+}
+
+//真正的重合绘制函数 样式采用配置内置
+void TDraw::DrawConstraintCoincide(HDC hdc, DPOINT dpt0, DPOINT dpt1, const LOGPEN &logpen, const TConfiguration *pConfig)
+{
+	if (DistanceScreen(dpt0, dpt1, pConfig) > 4)
+	{
+		//LOGPEN logpenNow = logpen;
+		//logpenNow.lopnStyle = PS_DOT;
+		DrawRealLine(hdc, dpt0, dpt1, pConfig->logpenConstraintLine, pConfig);
+	}
+
+	if (pConfig->bDrawReal)
+	{
+		HPEN hPen = (HPEN)::GetStockObject(NULL_PEN);
+		HBRUSH hBrush = ::CreateSolidBrush(pConfig->crLink);//始终是黑色
+		::SelectObject(hdc, hPen);
+		::SelectObject(hdc, hBrush);
+
+		DrawCircle(hdc, GetCenter(pConfig->RealToScreen(dpt0), pConfig->RealToScreen(dpt1)), pConfig->FRAMEPOINT_TRANS_R);
+
+		::DeleteObject(hPen);
+		::DeleteObject(hBrush);
+	}
+	else
+		DrawCircle(hdc, GetCenter(pConfig->RealToScreen(dpt0), pConfig->RealToScreen(dpt1)), pConfig->FRAMEPOINT_R, pConfig->logpenFront);
 }
 
 //自带真实渲染
@@ -1034,47 +1201,10 @@ void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TCon
 {
 	//比较p1,p2，距离大则画虚线
 	DPOINT dpt[2];
-	for (int i = 0; i < 2; i++)
-	{
-		switch (pCoincide->pElement[i]->eType)
-		{
-		case ELEMENT_SLIDER:
-		case ELEMENT_POLYLINEBAR:
-			dpt[i] = GetAbsolute(*(pCoincide->pDpt[i]), pCoincide->pElement[i]->dpt, pCoincide->pElement[i]->angle);
-			break;
-		case ELEMENT_BAR:
-		case ELEMENT_FRAMEPOINT:
-		case ELEMENT_SLIDEWAY:
-			dpt[i] = *(pCoincide->pDpt[i]);
-			break;
-		default:
-			assert(0);
-			break;
-		}
-	}
+	dpt[0] = pCoincide->GetLinkDpt(0);
+	dpt[1] = pCoincide->GetLinkDpt(1);
 
-	if (DistanceScreen(dpt[0], dpt[1], pConfig) > 4)
-	{
-		UINT oldStyle = pCoincide->logpenStyleShow.lopnStyle;
-		pCoincide->logpenStyleShow.lopnStyle = PS_DOT;
-		DrawRealLine(hdc, dpt[0], dpt[1], pCoincide->logpenStyleShow, pConfig);
-		pCoincide->logpenStyleShow.lopnStyle = oldStyle;
-	}
-
-	if (pConfig->bDrawReal)
-	{
-		HPEN hPen = (HPEN)::GetStockObject(NULL_PEN);
-		HBRUSH hBrush = ::CreateSolidBrush(pConfig->crLink);
-		::SelectObject(hdc, hPen);
-		::SelectObject(hdc, hBrush);
-
-		DrawCircle(hdc, GetCenter(pConfig->RealToScreen(dpt[0]), pConfig->RealToScreen(dpt[1])), pConfig->FRAMEPOINT_TRANS_R);
-
-		::DeleteObject(hPen);
-		::DeleteObject(hBrush);
-	}
-	else
-		DrawCircle(hdc, GetCenter(pConfig->RealToScreen(dpt[0]), pConfig->RealToScreen(dpt[1])), pConfig->FRAMEPOINT_R, pCoincide->logpenStyleShow);
+	DrawConstraintCoincide(hdc, dpt[0], dpt[1], pCoincide->logpenStyleShow, pConfig);
 }
 
 void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen)
@@ -1172,37 +1302,48 @@ void TDraw::DrawSystemFontText(HDC hdc, const TCHAR text[], RECT &rect, COLORREF
 }
 
 //判断点是否位于直线或直线的延长线上 
-//ptIntersection返回交点
 //返回值：-1都不在 0在线段上 1在pt1一侧延长线 2在pt2一侧延长线
-int TDraw::PointInRealLineOrExtension(const POINT &ptPos, DPOINT &ptIntersection,const DPOINT dptBegin,const DPOINT dptEnd, TConfiguration *pConfig)
+//如果在容差以内则dptIntersection设为交点坐标，否则不变
+//容差采用pConfig内数据
+int TDraw::PointInRealLineOrExtension(const DPOINT &dptPos, DPOINT &dptIntersection, const DPOINT dptBegin, const DPOINT dptEnd,const TConfiguration *pConfig)
 {
-	int status = -1;
+	//int status = -1;
 
-	POINT pt1 = pConfig->RealToScreen(dptBegin);
-	POINT pt2 = pConfig->RealToScreen(dptEnd);
-	double length = TDraw::Distance(pt1, pt2);
-	double length1 = TDraw::Distance(ptPos, pt1);
-	double length2 = TDraw::Distance(ptPos, pt2);
+	//POINT ptPos = pConfig->RealToScreen(dptPos);
+	//POINT pt1 = pConfig->RealToScreen(dptBegin);
+	//POINT pt2 = pConfig->RealToScreen(dptEnd);
+	//double length = TDraw::Distance(pt1, pt2);
+	//double length1 = TDraw::Distance(ptPos, pt1);
+	//double length2 = TDraw::Distance(ptPos, pt2);
 
-	if (abs(length1 - (length + length2)) < 0.5)
+	//if (abs(length1 - (length + length2)) < dScreenTolerance)
+	//{
+	//	status = 2;
+	//}
+	//else
+	//	if (abs(length2 - (length + length1)) < dScreenTolerance)
+	//		status = 1;
+	//	else
+	//		if (abs(length1 + length2 - length) < dScreenTolerance)
+	//			status = 0;
+
+	//if (status != -1)
+	//{
+
+	if (pConfig->LengthToScreenX(Distance(dptBegin, dptEnd)) < 0.5)//两点重合
 	{
-		status = 2;
+			return -1;
 	}
-	else
-		if (abs(length2 - (length + length1)) < 0.5)
-			status = 1;
-		else
-			if (abs(length1 + length2 - length) < 0.5)
-				status = 0;
 
-	if (status != -1)
-	{
+	//计算垂足
+	DPOINT dptCalc;
+
 		double x, y;
-		double angle=TDraw::GetAngleFromPointReal(dptBegin, dptEnd);
+		double angle = TDraw::GetAngleFromPointReal(dptBegin, dptEnd);
 		if (CanMod(angle + M_PI_2, M_PI, 1e-6))
 		{
 			x = dptBegin.x;
-			y = pConfig->ScreenToRealY(ptPos.y);
+			y = dptPos.y;
 		}
 		else
 		{
@@ -1213,25 +1354,50 @@ int TDraw::PointInRealLineOrExtension(const POINT &ptPos, DPOINT &ptIntersection
 			double x2 = dptEnd.x;
 			double y2 = dptEnd.y;
 
-			double x0 = pConfig->ScreenToRealX(ptPos.x);
-			double y0 = pConfig->ScreenToRealY(ptPos.y);
+			double x0 = dptPos.x;
+			double y0 = dptPos.y;
 
 			x = (y0 - y1 - k2*x0 + k1*x1) / (k1 - k2);
 			y = k1*x + y1 - k1*x1;
 		}
-		ptIntersection = { x, y };
-	}
-	return status;
+		dptCalc = { x, y };
+
+		double dist = pConfig->LengthToScreenX(Distance(dptPos, dptCalc));
+		if (dist < pConfig->TOLERANCE)
+		{
+			dptIntersection = dptCalc;
+			double length = Distance(dptBegin, dptEnd);
+			double length1 = TDraw::Distance(dptCalc, dptBegin);
+			double length2 = TDraw::Distance(dptCalc, dptEnd);
+			if (length1 > length && length1 > length2)//在pt2一侧
+				return 2;
+			if (length2 > length && length2 > length1)//
+				return 1;
+			return 0;
+		}
+		else
+		{
+			return -1;
+		}
+	//}
+	//return status;
 }
 
-//判断点是否在线以内
-bool TDraw::PointInRealLine(POINT &ptPos, DPOINT &dptBegin, DPOINT &dptEnd, const TConfiguration *pConfig)
+
+bool TDraw::PointInRealLine(const POINT &ptPos, const DPOINT &dptBegin,const DPOINT &dptEnd, const TConfiguration *pConfig)
 {
 	POINT pt1 = pConfig->RealToScreen(dptBegin);
 	POINT pt2 = pConfig->RealToScreen(dptEnd);
-	double length = TDraw::Distance(pt1, pt2);
-	double length1 = TDraw::Distance(ptPos, pt1);
-	double length2 = TDraw::Distance(ptPos, pt2);
+
+	return PointInRealLine(ptPos, pt1, pt2, pConfig);
+}
+
+//判断点是否在线以内
+bool TDraw::PointInRealLine(const POINT &ptPos, const  POINT &ptBegin, const  POINT &ptEnd, const TConfiguration *pConfig)
+{
+	double length = TDraw::Distance(ptBegin, ptEnd);
+	double length1 = TDraw::Distance(ptPos, ptBegin);
+	double length2 = TDraw::Distance(ptPos, ptEnd);
 
 	if (length1 + length2 - length <= 0.5)//容差
 		return true;
@@ -1242,16 +1408,16 @@ bool TDraw::PointInRealLine(POINT &ptPos, DPOINT &dptBegin, DPOINT &dptEnd, cons
 //判断点是否在线以内
 bool TDraw::PointInRealLine(POINT ptPos, TRealLine *pRealLine, const TConfiguration *pConfig)
 {
-	return PointInRealLine(ptPos, pRealLine->ptBegin, pRealLine->ptEnd, pConfig);
+	return PointInRealLine(ptPos,pConfig->RealToScreen( pRealLine->ptBegin),pConfig->RealToScreen( pRealLine->ptEnd), pConfig);
 }
 
 //根据起始点计算加粗后线段的四个角点 angle可使用GetAngleFromScreen计算得到
 void TDraw::CalcBarRectCoor(POINT ptResult[4], const POINT &ptBegin, const POINT &ptEnd, double angle, int width)
 {
-	ptResult[0] = { ptBegin.x + width / 2.0*sin(angle), ptBegin.y + width / 2.0*cos(angle) };
-	ptResult[1] = { ptEnd.x + width / 2.0*sin(angle), ptEnd.y + width / 2.0*cos(angle) };
-	ptResult[3] = { ptBegin.x - width / 2.0*sin(angle), ptBegin.y - width / 2.0*cos(angle) };
-	ptResult[2] = { ptEnd.x - width / 2.0*sin(angle), ptEnd.y - width / 2.0*cos(angle) };
+	ptResult[0] = { (LONG)(ptBegin.x + width / 2.0*sin(angle)), (LONG)(ptBegin.y + width / 2.0*cos(angle)) };
+	ptResult[1] = { (LONG)(ptEnd.x + width / 2.0*sin(angle)), (LONG)(ptEnd.y + width / 2.0*cos(angle)) };
+	ptResult[3] = { (LONG)(ptBegin.x - width / 2.0*sin(angle)), (LONG)(ptBegin.y - width / 2.0*cos(angle)) };
+	ptResult[2] = { (LONG)(ptEnd.x - width / 2.0*sin(angle)), (LONG)(ptEnd.y - width / 2.0*cos(angle)) };
 }
 
 //计算滑块矩形坐标 输入：中心点 角度 输出：4点坐标
@@ -1318,6 +1484,32 @@ bool TDraw::GetIntersection(const DPOINT &dptL1Begin, const DPOINT &dptL1End, co
 		return false;
 }
 
+//不带样式弧线
+//pt:原点 r:半径
+//pt1,pt2:扇形始末方向的点
+void TDraw::DrawArc(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, bool bAlwaysDrawAngleBetween)
+{
+	if (bAlwaysDrawAngleBetween && GetAngleBetweenPointScreen(pt1, pt, pt2) > M_PI)//>180
+		Arc(hdc, pt.x - r, pt.y - r, pt.x + r, pt.y + r, pt2.x, pt2.y, pt1.x, pt1.y);
+	else
+	Arc(hdc, pt.x - r, pt.y - r, pt.x + r, pt.y + r, pt1.x, pt1.y, pt2.x, pt2.y);
+}
+
+//不带样式扇形
+//pt:原点 r:半径
+//pt1,pt2:扇形始末方向的点
+//bAlwaysDrawAngleBetween:为true则始终画夹角
+void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, bool bAlwaysDrawAngleBetween)
+{
+	if (bAlwaysDrawAngleBetween && GetAngleBetweenPointScreen(pt1, pt, pt2) > M_PI)//>180
+		Pie(hdc, pt.x - r, pt.y - r, pt.x + r, pt.y + r, pt2.x, pt2.y, pt1.x, pt1.y);
+	else
+		Pie(hdc, pt.x - r, pt.y - r, pt.x + r, pt.y + r, pt1.x, pt1.y, pt2.x, pt2.y);
+}
+
+//带样式扇形
+//pt:原点 r:半径
+//pt1,pt2:扇形始末方向的点
 void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, const LOGPEN &logpen, const COLORREF &crColor)
 {
 	HPEN hPen;
@@ -1390,6 +1582,7 @@ void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig)
 				ptA2 = pConfig->RealToScreen(dptBegin);
 			}
 			POINT ptIntersection = pConfig->RealToScreen(GetAbsolute(dptIntersection, pSlider->dpt, pSlider->angle));
+
 			DrawPie(hdc, ptIntersection, pConfig->FRAMEPOINT_R, ptA1, ptA2, pSlider->logpenStyleShow, pSlider->logpenStyleShow.lopnColor);
 		End:
 			;
@@ -1466,8 +1659,12 @@ bool TDraw::PointInSlider(POINT ptPos, TSlider *pSlider, const TConfiguration *p
 	return false;
 }
 
-bool TDraw::PickConstraintColinear(POINT ptPos, TElement *element)
+bool TDraw::PickConstraintColinear(POINT ptPos, TConstraintColinear *pColinear, const TConfiguration *pConfig)
 {
+	POINT ptCenter1, ptCenter2;
+	if (ShowConstraintColinearDotLine(pColinear, ptCenter1, ptCenter2, pConfig))
+		if (PointInRealLine(ptPos, ptCenter1, ptCenter2, pConfig))
+			return true;
 	return false;
 }
 

@@ -63,6 +63,8 @@ void TConfiguration::SetTheme(bool bDark)
 	logpenGridSmall = { PS_SOLID, { 1, 0 }, crGridSmall };
 	logpenAssistLine = { PS_DOT, { 1, 0 }, crDot };
 
+	logpenConstraintLine = { PS_DOT, { 1, 0 }, crFront };
+	logpenColinearSymbol = { PS_SOLID, { 5, 0 }, crLink };
 }
 
 void TConfiguration::Initial(HWND hwnd)
@@ -161,7 +163,7 @@ POINT TConfiguration::RealToScreen(DPOINT dpt) const
 	return pt;
 }
 
-LONG TConfiguration::LengthToScreenX(double xlen)
+LONG TConfiguration::LengthToScreenX(double xlen)const
 {
 	return (LONG)(xlen*DPUX);
 }

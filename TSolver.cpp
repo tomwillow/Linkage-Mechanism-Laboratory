@@ -127,9 +127,11 @@ void TSolver::AddMouseConstraint(int index, DPOINT dptm)
 		double ym = dptm.y;
 		int i = element->id;
 
-		double anglem = 0;// TDraw::GetAngleFromPointReal(element->dpt, dptm) - element->angle;
+		DPOINT dptmRelative = TDraw::GetRelative(dptm, element->dpt, element->angle);
 
-		_stprintf(temp, TEXT("(x%d-%f)*sin(phi%d+%f)-(y%d-%f)*cos(phi%d+%f)"), i, xm, i,anglem, i, ym, i,anglem);
+		double phimp = 0;// TDraw::GetAngleFromPointReal({ 0, 0 }, dptmRelative);
+
+		_stprintf(temp, TEXT("(x%d-%f)*sin(phi%d-%f)-(y%d-%f)*cos(phi%d-%f)"), i, xm, i,phimp, i, ym, i,phimp);
 
 		TCHAR szVar[100], szValue[100];
 		_stprintf(szVar, TEXT("x%d y%d phi%d"), i, i, i);
@@ -194,7 +196,7 @@ void TSolver::RefreshEquations()
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
 			Equations->DefineVariable(pStr, buffer1, buffer2);
-			EquationsV->DefineVariable(pStr, buffer1, buffer2);
+			//EquationsV->DefineVariable(pStr, buffer1, buffer2);
 
 			//读入方程
 			/* 推导结果：
@@ -204,8 +206,8 @@ void TSolver::RefreshEquations()
 			_stprintf(buffer2, TEXT("y%d+%f*sin(phi%d)+%f*cos(phi%d)-y%d-%f*sin(phi%d)-%f*cos(phi%d)"), i, SiP.x, i, SiP.y, i, j, SjP.x, j, SjP.y, j);
 			Equations->AddEquation(pStr, buffer1, false);
 			Equations->AddEquation(pStr, buffer2, false);
-			EquationsV->AddEquation(pStr, buffer1, false);
-			EquationsV->AddEquation(pStr, buffer2, false);
+			//EquationsV->AddEquation(pStr, buffer1, false);
+			//EquationsV->AddEquation(pStr, buffer2, false);
 			break;
 		}
 		case CONSTRAINT_COLINEAR://共线约束
@@ -228,7 +230,7 @@ void TSolver::RefreshEquations()
 			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
 			Equations->DefineVariable(pStr, buffer1, buffer2);
-			EquationsV->DefineVariable(pStr, buffer1, buffer2);
+			//EquationsV->DefineVariable(pStr, buffer1, buffer2);
 
 			//读入方程
 			//推导结果：
@@ -246,8 +248,8 @@ void TSolver::RefreshEquations()
 
 			Equations->AddEquation(pStr, buffer1, false);
 			Equations->AddEquation(pStr, buffer2, false);
-			EquationsV->AddEquation(pStr, buffer1, false);
-			EquationsV->AddEquation(pStr, buffer2, false);
+			//EquationsV->AddEquation(pStr, buffer1, false);
+			//EquationsV->AddEquation(pStr, buffer2, false);
 			break;
 		}
 		case ELEMENT_SLIDEWAY:
@@ -422,28 +424,37 @@ void TSolver::Demo()
 	Equations->RemoveTempEquations();
 
 	Equations->DefineVariable(pStr, TEXT("t"), TEXT("0"));
-	Equations->AddEquation(pStr, TEXT("phi2-sin(t)"), true);
+	Equations->AddEquation(pStr, TEXT("phi2-ln(t)"), true);
 	Equations->Subs(pStr, subsVar, subsValue);
 
-	Equations->BuildEquationsV(pStr);//
+	Equations->BuildEquationsV(pStr);//此时t还在变量组内
+	Equations->BuildEquationsA_Phitt(pStr);//
 
 	Equations->Subs(pStr, TEXT("t"),TEXT("0.1"));
 	//Equations->SimplifyEquations(pStr);
 
 	Equations->BuildVariableTableV(pStr);//
+	Equations->BuildVariableTableA(pStr);//
 
 	Equations->BuildJacobian(pStr);
-	Equations->BuildJacobianV(pStr);//
 
+	//解出位置方程
 	Equations->SolveEquations(pStr);
 
-	Equations->SubsV(pStr, TEXT("t"), 0.1);//
-	Equations->SolveEquationsV(pStr);//
+	if (Equations->hasSolved)
+	{
+		//解出速度方程
+		Equations->SubsV(pStr, TEXT("t"), 0.1);//
+		Equations->SolveEquationsV(pStr);//
 
-	SetElementPosition(Equations->VariableTable);
-	
-	Equations->hasSolved = false;
+		//解出加速度方程
+		Equations->SubsA(pStr, TEXT("t"), 0.1);//
+		Equations->SolveEquationsA(pStr);
 
+		//设置位置
+		SetElementPosition(Equations->VariableTable);
+	}
+	RefreshWindowText();
 
 	//EquationsV->RemoveTempEquations();
 	//EquationsV->DefineVariable(pStr, TEXT("t"), TEXT("0"));
@@ -456,8 +467,6 @@ void TSolver::Demo()
 	//	Outputln(pEqua->Simplify(true));
 	//}
 	//Equations->SolveEquations(pStr);
-
-	RefreshWindowText();
 
 	//建立ExpressionTree
 	//TExpressionTree ex;

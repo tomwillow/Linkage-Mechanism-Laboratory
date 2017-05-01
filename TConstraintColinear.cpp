@@ -95,3 +95,9 @@ bool TConstraintColinear::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 	else
 		return true;
 }
+
+void TConstraintColinear::GetLinkDpt(int iLinkIndex, DPOINT &P, DPOINT &Q)const
+{
+	P = pElement[iLinkIndex]->GetAbsolutePointByIndex(PointBeginIndexOfElement[iLinkIndex]);
+	Q = pElement[iLinkIndex]->GetAbsolutePointByIndex(PointEndIndexOfElement[iLinkIndex]);
+}

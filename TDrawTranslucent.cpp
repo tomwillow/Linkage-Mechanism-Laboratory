@@ -58,11 +58,6 @@ void TDrawTranslucent::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *
 	StartTranslucent(hBitmapDC, hBitmap, pvBits, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, bNeedDrawBlack);
 }
 
-void TDrawTranslucent::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, BYTE alpha, bool bNeedDrawBlack)
-{
-	EndTranslucent(hdc, hBitmapDC, hBitmap, pvBits, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, alpha, bNeedDrawBlack);
-}
-
 void TDrawTranslucent::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, BYTE alpha, bool bNeedDrawBlack)
 {
 
@@ -97,7 +92,7 @@ void TDrawTranslucent::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap
 
 //所有绘制x坐标均-left，y坐标-top
 //只要画的不是黑色 背景就是黑色 -> bNeedDrawBlack=false
-void TDrawTranslucent::Start(HDC &hdc, double alpha, long left, long top, long width, long height, bool bNeedDrawBlack)
+void TDrawTranslucent::Start(HDC &hdc, byte alpha, long left, long top, long width, long height, bool bNeedDrawBlack)
 {
 	this->left = left;
 	this->top = top;
@@ -113,7 +108,7 @@ void TDrawTranslucent::Start(HDC &hdc, double alpha, long left, long top, long w
 
 //所有绘制x坐标均-left，y坐标-top
 //只要画的不是黑色 背景就是黑色 -> bNeedDrawBlack=false
-void TDrawTranslucent::Start(HDC &hdc, double alpha, const RECT &rect, bool bNeedDrawBlack)
+void TDrawTranslucent::Start(HDC &hdc, byte alpha, const RECT &rect, bool bNeedDrawBlack)
 {
 	Start(hdc, alpha, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, bNeedDrawBlack);
 }

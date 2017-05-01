@@ -40,6 +40,8 @@ public:
 	int SLIDER_H = 30;//滑块高
 	int BAR_R = 7;//杆件圆角半径
 	int CROSS_SIZE = 18;//×边长
+	int TOLERANCE = 5;
+	int COLINEAR_SYMBOL_L = 10;
 
 	double dAnglePrecision = 1e-1;
 	units uUnits = UNITS_MM;
@@ -49,6 +51,8 @@ public:
 	LOGPEN logpenMouseLine;//图 鼠标跟踪线：黑色虚线
 	LOGPEN logpenGridSmall;
 	LOGPEN logpenAssistLine;//辅助线：绿色虚线
+	LOGPEN logpenConstraintLine;//约束线
+	LOGPEN logpenColinearSymbol;//共线符号
 
 	COLORREF crFront;//前景色：白色实线
 	COLORREF crBackground, crCoordinate;
@@ -84,7 +88,7 @@ public:
 	LONG TConfiguration::RealToScreenY(double y);
 	POINT TConfiguration::RealToScreen(DPOINT dpt) const;
 
-	LONG TConfiguration::LengthToScreenX(double xlen);
+	LONG TConfiguration::LengthToScreenX(double xlen)const;
 	LONG TConfiguration::LengthToScreenY(double ylen);
 	POINT TConfiguration::LengthToScreen(DPOINT dpt);
 

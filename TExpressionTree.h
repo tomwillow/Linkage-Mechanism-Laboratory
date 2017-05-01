@@ -92,11 +92,10 @@ public:
 	TNode *head;
 	enumError TExpressionTree::GetError();
 	TCHAR * TExpressionTree::GetErrorInfo();
-	TExpressionTree& operator=(TExpressionTree &expr);
 	void TExpressionTree::Reset();
 	TCHAR * TExpressionTree::Vpa(bool bOutput);
 	TCHAR * TExpressionTree::LinkVariableTable(TVariableTable *p);//链接变量表
-	TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput);
+	TCHAR * TExpressionTree::Read(const TCHAR *expression, bool bOutput);
 	TCHAR * TExpressionTree::Read(double num, bool bOutput);//读入只有1个数字的表达式
 	TCHAR * TExpressionTree::Solve(TCHAR *&var, double &value);//求解单变量方程 不验证可求解性，需提前调用HasOnlyOneVar确认 不改动表达式内容
 	TCHAR * TExpressionTree::OutputStr(bool bIgnoreError=false);
@@ -111,6 +110,10 @@ public:
 	bool TExpressionTree::CheckOnlyOneVar();//只有一个变量（实时验证）
 	double TExpressionTree::Value(bool operateHeadNode);//不验证可计算性，必须与CanCalc合用
 	TCHAR * TExpressionTree::Calc(double *result = NULL);//计算表达式的值，若传入了result则把结果存入。返回值为结果字符串或表达式串。
+
+	TExpressionTree& TExpressionTree::operator=(const TExpressionTree &expr);
+	TExpressionTree& TExpressionTree::operator+(const TExpressionTree &expr);
+	TExpressionTree & TExpressionTree::operator*(double value);
 
 	TExpressionTree();
 	~TExpressionTree();

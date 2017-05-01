@@ -83,17 +83,17 @@ enumError TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder)
 {
 	std::stack<TNode *> tempStack;
 	//逐个识别PostOrder序列，构建表达式树
-	for (int i = 0; i < PostOrder.size(); i++)
+	for (auto pNodeNow : PostOrder)
 	{
-		switch (PostOrder[i]->eType)
+		switch (pNodeNow->eType)
 		{
 		case NODE_NUMBER:
 		case NODE_VARIABLE:
-			tempStack.push(PostOrder[i]);
+			tempStack.push(pNodeNow);
 			break;
 		case NODE_FUNCTION:
 		case NODE_OPERATOR:
-			if (GetOperateNum(PostOrder[i]->eOperator) == 2)
+			if (GetOperateNum(pNodeNow->eOperator) == 2)
 			{
 				if (tempStack.empty())
 				{
@@ -103,8 +103,8 @@ enumError TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder)
 					return eError = ERROR_WRONG_EXPRESSION;
 				}
 
-				PostOrder[i]->right = tempStack.top();
-				tempStack.top()->parent = PostOrder[i];
+				pNodeNow->right = tempStack.top();
+				tempStack.top()->parent = pNodeNow;
 				tempStack.pop();
 
 				if (tempStack.empty())
@@ -115,11 +115,11 @@ enumError TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder)
 					return eError = ERROR_WRONG_EXPRESSION;
 				}
 
-				PostOrder[i]->left = tempStack.top();
-				tempStack.top()->parent = PostOrder[i];
+				pNodeNow->left = tempStack.top();
+				tempStack.top()->parent = pNodeNow;
 				tempStack.pop();
 
-				tempStack.push(PostOrder[i]);
+				tempStack.push(pNodeNow);
 			}
 			else
 			{
@@ -131,11 +131,11 @@ enumError TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder)
 					return eError = ERROR_WRONG_EXPRESSION;
 				}
 
-				PostOrder[i]->left = tempStack.top();
-				tempStack.top()->parent = PostOrder[i];
+				pNodeNow->left = tempStack.top();
+				tempStack.top()->parent = pNodeNow;
 				tempStack.pop();
 
-				tempStack.push(PostOrder[i]);
+				tempStack.push(pNodeNow);
 			}
 			break;
 		}
@@ -216,6 +216,8 @@ int TExpressionTree::Rank(enumMathOperator eOperator)
 	case MATH_LEFT_PARENTHESIS://左右括号优先级小是为了不被其余任何运算符挤出
 	case MATH_RIGHT_PARENTHESIS:
 		return 0;
+	default:
+		throw(eError = ERROR_WRONG_MATH_OPERATOR);
 	}
 }
 
@@ -432,6 +434,8 @@ TCHAR TExpressionTree::EnumOperatorToTChar(TExpressionTree::enumMathOperator eOp
 		return TEXT('|');
 	case MATH_MOD:
 		return TEXT('%');
+	default:
+		throw(eError = ERROR_WRONG_MATH_OPERATOR);
 	}
 }
 
@@ -864,7 +868,7 @@ enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> 
 	//识别取正运算符与取负运算符
 	bool bFirstOrParenFirst = false;
 	bool bAferOneOperator = false;
-	int i = 0;
+	size_t i = 0;
 	if (PreInOrder[0]->eOperator == MATH_ADD)
 	{
 		PreInOrder[0]->eOperator = MATH_POSITIVE;
@@ -879,7 +883,10 @@ enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> 
 	{
 		if (PreInOrder[i]->eType == NODE_OPERATOR && PreInOrder[i]->eOperator != MATH_RIGHT_PARENTHESIS)
 		{
-			i++;
+			if (i + 1 < PreInOrder.size())
+				i++;
+			else
+				break;
 			if (PreInOrder[i]->eOperator == MATH_ADD)
 			{
 				PreInOrder[i]->eOperator = MATH_POSITIVE;
@@ -897,9 +904,9 @@ enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> 
 			i++;
 	}
 
-	for (i = 0; i < PreInOrder.size(); i++)
+	for (auto pNode : PreInOrder)
 	{
-		InOrder.push(PreInOrder[i]);
+		InOrder.push(pNode);
 	}
 
 	return ERROR_NO;
@@ -1102,7 +1109,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 	Operator->eOperator = MATH_NOT_AVAILIALBE;
 }
 
-
+//复制节点树，返回新节点树头节点
 TExpressionTree::TNode * TExpressionTree::CopyNodeTree(TNode *oldNode)
 {
 	TNode *newNode = new TNode;
@@ -1865,12 +1872,17 @@ TCHAR * TExpressionTree::Simplify(bool bOutput)
 {
 	if (eError == ERROR_NO)
 	{
-		TNode *temp = head;
-		if ((eError = Simplify(temp)) == ERROR_NO)
-			if (bOutput)
-				return OutputStr();
+		if (head != NULL)
+			if ((eError = Simplify(head)) == ERROR_NO)
+				if (bOutput)
+					return OutputStr();
+				else
+					return OutputEmptyStr();
 			else
-				return OutputEmptyStr();
+				;
+		else
+			eError = ERROR_EMPTY_INPUT;
+
 	}
 
 	return GetErrorInfo();
@@ -1878,9 +1890,9 @@ TCHAR * TExpressionTree::Simplify(bool bOutput)
 
 TCHAR * TExpressionTree::FindVariableTableFrom(TCHAR *varstr, std::vector<TCHAR *> newVariableTable)
 {
-	for (int i = 0; i < newVariableTable.size(); i++)
-		if (_tcscmp(varstr, newVariableTable[i]) == 0)
-			return newVariableTable[i];
+	for (auto szNewVar : newVariableTable)
+		if (_tcscmp(varstr, szNewVar) == 0)
+			return szNewVar;
 	return NULL;
 }
 
@@ -1913,8 +1925,8 @@ void TExpressionTree::GetVariablePos(TNode *now, const TCHAR *var, std::vector<T
 void TExpressionTree::CopyVariableTable(std::vector<TCHAR *> &Dest, const std::vector<TCHAR *> source)
 {
 	Dest.clear();
-	for (int i = 0; i < source.size(); i++)
-		Dest.push_back(source[i]);
+	for (auto sz : source)
+		Dest.push_back(sz);
 }
 
 //替换 VarsVector变量 NumsVector数字
@@ -1924,7 +1936,7 @@ TCHAR * TExpressionTree::Subs(std::vector<TCHAR *> VarsVector, std::vector<doubl
 	{
 		if (VarsVector.size() == NumsVector.size())//替换与被替换元素数目相等
 		{
-			for (int i = 0; i < VarsVector.size(); i++)//遍历被替换变量
+			for (size_t i = 0; i < VarsVector.size(); i++)//遍历被替换变量
 			{
 				//查表识别被替换变量
 				TCHAR *var = pVariableTable->FindVariableTable(VarsVector[i]);
@@ -1940,7 +1952,7 @@ TCHAR * TExpressionTree::Subs(std::vector<TCHAR *> VarsVector, std::vector<doubl
 						//得到所有被替换变量的位置
 						std::vector<TNode *> VarsPos;
 						GetVariablePos(var, VarsPos);
-						for (int j = 0; j < VarsPos.size(); j++)
+						for (size_t j = 0; j < VarsPos.size(); j++)
 						{
 							TNode *newNode = CopyNodeTree(Expr.head);
 
@@ -1999,7 +2011,7 @@ void TExpressionTree::Subs_inner(TNode *node, TCHAR *ptVar, double value)
 TCHAR * TExpressionTree::Subs(TCHAR *ptVar, double value, bool output)
 {
 	if (eError != ERROR_NO)
-	return GetErrorInfo();
+		return GetErrorInfo();
 
 	Subs_inner(head, ptVar, value);
 
@@ -2010,11 +2022,13 @@ TCHAR * TExpressionTree::Subs(TCHAR *ptVar, double value, bool output)
 		else
 			return OutputEmptyStr();
 	}
+	else
+		return GetErrorInfo();
 }
 
-	//替换  vars变量串 nums数字串 以空格分隔，支持表达式替换
-	TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums, bool output)
-	{
+//替换  vars变量串 nums数字串 以空格分隔，支持表达式替换
+TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums, bool output)
+{
 	if (eError == ERROR_NO)
 	{
 		if (_tcslen(vars) == 0 || _tcslen(nums) == 0)
@@ -2037,7 +2051,7 @@ TCHAR * TExpressionTree::Subs(TCHAR *ptVar, double value, bool output)
 
 		if (VarsVector.size() == NumsVector.size())//替换与被替换元素数目相等
 		{
-			for (int i = 0; i < VarsVector.size(); i++)//遍历被替换变量
+			for (size_t i = 0; i < VarsVector.size(); i++)//遍历被替换变量
 			{
 				//查表识别被替换变量
 				TCHAR *var = pVariableTable->FindVariableTable(VarsVector[i]);
@@ -2053,7 +2067,7 @@ TCHAR * TExpressionTree::Subs(TCHAR *ptVar, double value, bool output)
 						//得到所有被替换变量的位置
 						std::vector<TNode *> VarsPos;
 						GetVariablePos(var, VarsPos);
-						for (int j = 0; j < VarsPos.size(); j++)
+						for (size_t j = 0; j < VarsPos.size(); j++)
 						{
 							TNode *newNode = CopyNodeTree(Expr.head);
 							//ReplaceNodeVariable(newNode, newVariableTable);
@@ -2085,10 +2099,10 @@ TCHAR * TExpressionTree::Subs(TCHAR *ptVar, double value, bool output)
 		//FinishSubs:
 		delete[] nVars;
 		delete[] nNums;
-		for (int i = 0; i < VarsVector.size(); i++)
-			delete[] VarsVector[i];
-		for (int i = 0; i < NumsVector.size(); i++)
-			delete[] NumsVector[i];
+		for (auto sz : VarsVector)
+			delete[] sz;
+		for (auto sz : NumsVector)
+			delete[] sz;
 
 		if (eError == ERROR_NO)
 		{
@@ -2296,11 +2310,11 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 }
 
 //求解单变量方程 不验证可求解性，需提前调用HasOnlyOneVar确认
-TCHAR * TExpressionTree::Solve(TCHAR *&var,double &value)
+TCHAR * TExpressionTree::Solve(TCHAR *&var, double &value)
 {
 	TExpressionTree Result;
 
-	TNode *Now, *ResultNow = new TNode;
+	TNode *ResultNow = new TNode;
 	ZeroMemory(ResultNow, sizeof(TNode));
 
 	var = LastVarNode->ValueOrName.varname;
@@ -2314,13 +2328,18 @@ TCHAR * TExpressionTree::Solve(TCHAR *&var,double &value)
 
 }
 
-TCHAR * TExpressionTree::Read(TCHAR *expression, bool bOutput)
+TCHAR * TExpressionTree::Read(const TCHAR *expression, bool bOutput)
 {
 	std::queue<TNode *> InOrder;
 	std::vector<TNode *> PostOrder;
+
+	//将expression复制至expr
 	TCHAR *expr = new TCHAR[_tcslen(expression) + 1];
 	_tcscpy(expr, expression);
 	expr[_tcslen(expression)] = TEXT('\0');
+
+	Reset();
+	Release();
 
 	if (eError == ERROR_NO)
 		if ((eError = ReadToInOrder(expr, InOrder)) == ERROR_NO)
@@ -2425,6 +2444,8 @@ double TExpressionTree::Value(bool operateHeadNode)
 			delete pNode;
 		return num;
 	}
+	else
+		throw(eError);
 }
 
 TCHAR * TExpressionTree::Calc(double *result)
@@ -2450,7 +2471,7 @@ TCHAR * TExpressionTree::Calc(double *result)
 	return GetErrorInfo();
 }
 
-TExpressionTree& TExpressionTree::operator=(TExpressionTree &expr)
+TExpressionTree& TExpressionTree::operator=(const TExpressionTree &expr)
 {
 	Release();
 	Reset();
@@ -2461,8 +2482,8 @@ TExpressionTree& TExpressionTree::operator=(TExpressionTree &expr)
 
 void TExpressionTree::ReleaseVectorTNode(std::vector<TNode *> vec)
 {
-	for (int i = 0; i < vec.size(); i++)
-		delete vec[i];
+	for (auto pNode : vec)
+		delete pNode;
 }
 
 void TExpressionTree::Vpa_inner(TNode *now)
@@ -2526,4 +2547,42 @@ bool TExpressionTree::CheckOnlyOneVar()//只有一个变量（实时验证）
 bool TExpressionTree::HasOnlyOneVar()//只有一个变量
 {
 	return iVarAppearedCount == 1;
+}
+
+TExpressionTree & TExpressionTree::operator*(double value)
+{
+	TNode *Multiply = NewNode(NODE_OPERATOR, MATH_MULTIPLY);
+	TNode *Value = NewNode(NODE_NUMBER);
+	Value->ValueOrName.value = value;
+
+	Multiply->left = head;
+	Multiply->right = Value;
+
+	head->parent = Multiply;
+	Value->parent = Multiply;
+
+	head = Multiply;
+
+	return *this;
+}
+
+TExpressionTree& TExpressionTree::operator+(const TExpressionTree &expr)
+{
+	if (head == NULL)
+		head = CopyNodeTree(expr.head);
+	else
+	{
+		TNode *Add = NewNode(NODE_OPERATOR, MATH_ADD);
+		TNode *Right = CopyNodeTree(expr.head);
+
+
+		Add->left = head;
+		Add->right = Right;
+
+		head->parent = Add;
+		Right->parent = Add;
+
+		head = Add;
+	}
+	return *this;
 }

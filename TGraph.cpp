@@ -65,7 +65,7 @@ void TGraph::InputDptVector(std::vector<DPOINT> &dptInputVector)
 
 void TGraph::CalcPointArray()
 {
-	for (int i = 0; i < dptVector.size();++i)
+	for (size_t i = 0; i < dptVector.size();++i)
 	{
 		ptArray[i] = TDraw::DPOINT2POINT(dptVector[i], x_min, x_max, y_min, y_max, rcGraph);
 	}
@@ -92,7 +92,15 @@ void TGraph::OnDraw(HDC hdc)
 	}
 
 	if (iPick != -1)
+	{
+		static TCHAR szCoordinate[32];
+		_stprintf(szCoordinate,TEXT("(%f,%f)"), dptMouse.x, dptMouse.y);
+		//ÏÔÊ¾×ø±ê
+		TDraw::DrawTips(hdc, ptMouse, szCoordinate, pConfig);
+
+		//»­·½¿é
 		TDraw::DrawPickSquare(hdc, ptArray[iPick]);
+	}
 }
 
 void TGraph::OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -106,7 +114,6 @@ void TGraph::OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	LineMouseY.ptBegin = { ptMouse.x,rcGraph.top };
 	LineMouseY.ptEnd = { ptMouse.x,rcGraph.bottom };
 
-	DPOINT dptMouse;
 	dptMouse = TDraw::POINT2DPOINT(ptMouse, x_min, x_max, y_min, y_max, rcGraph);
 
 	SetText(TEXT("(%f,%f)"), dptMouse.x, dptMouse.y);

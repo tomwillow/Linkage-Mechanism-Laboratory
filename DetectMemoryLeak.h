@@ -2,6 +2,7 @@
 
 #include "tchar_head.h"
 void OutputDebugPrintf(const TCHAR * strOutputString, ...);
+void OutputDebugDouble(double d);
 
 #pragma once
 #define CRTDBG_MAP_ALLOC

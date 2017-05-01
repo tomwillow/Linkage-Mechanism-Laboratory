@@ -11,6 +11,7 @@ public:
 	int PointEndIndexOfElement[2];//Qiµ„ Qjµ„ –Ú∫≈£®vecDpt–Ú∫≈£©
 	void TConstraintColinear::NoticeListView(TListView *pListView);
 	virtual bool TConstraintColinear::WriteFile(HANDLE &hf, DWORD &now_pos);
-	virtual bool TConstraintColinear::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape);
+	virtual bool TConstraintColinear::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape);
+	void TConstraintColinear::GetLinkDpt(int iLinkIndex,DPOINT &dpt1,DPOINT &dpt2)const;
 };
 

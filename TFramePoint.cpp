@@ -1,4 +1,5 @@
 #pragma once
+#include "DetectMemoryLeak.h"
 #include "TFramePoint.h"
 
 #include "TListView.h"

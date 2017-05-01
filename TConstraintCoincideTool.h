@@ -11,6 +11,8 @@ private:
 	std::vector<POINT> dptHit;
 	TAttach *pAttach;
 	TConstraintCoincide *pCoincide;
+	void TConstraintCoincideTool::Reset();
+	void TConstraintCoincideTool::AddIntoShape();
 public:
 	TConstraintCoincideTool();
 	~TConstraintCoincideTool();
@@ -19,8 +21,6 @@ public:
 	void TConstraintCoincideTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos);
 	void TConstraintCoincideTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
 	void TConstraintCoincideTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos);
-	void TConstraintCoincideTool::OnMouseWheel(HWND hWnd, UINT nFlags, POINT ptPos);
 	void TConstraintCoincideTool::Draw(HDC hdc);
-	void TConstraintCoincideTool::Reset();
 };
 

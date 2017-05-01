@@ -36,3 +36,9 @@ TCHAR * TTransfer::int2TCHAR(int i,TCHAR s[],int Radix)
 	return _itoa(i, s, Radix);
 #endif
 }
+
+TCHAR * TTransfer::double2TCHAR(double d, TCHAR s[])
+{
+	_stprintf(s, TEXT("%f"), d);
+	return s;
+}

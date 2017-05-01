@@ -17,8 +17,8 @@ TConstraintCoincide::TConstraintCoincide()
 	eType = CONSTRAINT_COINCIDE;
 	pElement[0] = NULL;
 	pElement[1] = NULL;
-	pDpt[0] = NULL;
-	pDpt[1] = NULL;
+	//pDpt[0] = NULL;
+	//pDpt[1] = NULL;
 	_tcscpy(Name, TEXT(""));
 }
 
@@ -45,32 +45,8 @@ void TConstraintCoincide::RestorePointStyle()
 
 void TConstraintCoincide::BuildpDpt_inner(int i)
 {
-	switch (pElement[i]->eType)
-	{
-	case ELEMENT_SLIDER:
-	case ELEMENT_POLYLINEBAR:
-		pDpt[i] = &(pElement[i]->vecDpt[PointIndexOfElement[i]]);
-		pElement[i]->vecIsJoint[PointIndexOfElement[i]].push_back(id);
-		break;
-	case ELEMENT_BAR:
-	case ELEMENT_SLIDEWAY:
-	case ELEMENT_FRAMEPOINT:
-		switch (PointIndexOfElement[i])
-		{
-		case 0:
-			pDpt[i] = &(pElement[i]->dpt);
-			pElement[i]->vecIsJoint[0].push_back(id);
-			break;
-		case 1:
-			pDpt[i] = &(((TRealLine *)this->pElement[i])->ptEnd);
-			pElement[i]->vecIsJoint[1].push_back(id);
-			break;
-		}
-		break;
-	default:
-		assert(0);
-		break;
-	}
+	//pDpt[i] = &(pElement[i]->GetRelativePointByIndex(PointIndexOfElement[i]));
+	pElement[i]->vecIsJoint[PointIndexOfElement[i]].push_back(id);
 }
 
 //根据pElement和PointIndexOfElement得到pDpt，并设置vecIsJoint
@@ -84,27 +60,7 @@ void TConstraintCoincide::BuildpDpt()
 
 DPOINT TConstraintCoincide::GetLinkDpt(int index)
 {
-	switch (pElement[index]->eType)
-	{
-	case ELEMENT_SLIDER:
-	case ELEMENT_POLYLINEBAR:
-		return TDraw::GetAbsolute(*pDpt[index], pElement[index]->dpt, pElement[index]->angle);
-		break;
-	case ELEMENT_BAR:
-	case ELEMENT_SLIDEWAY:
-	case ELEMENT_FRAMEPOINT:
-		switch (PointIndexOfElement[index])
-		{
-		case 0:
-			return pElement[index]->dpt;
-		case 1:
-			return ((TRealLine *)pElement)->ptEnd;
-		}
-		break;
-	default:
-		assert(0);
-		break;
-	}
+	return pElement[index]->GetAbsolutePointByIndex(PointIndexOfElement[index]);
 }
 
 void TConstraintCoincide::NoticeListView(TListView *pListView)

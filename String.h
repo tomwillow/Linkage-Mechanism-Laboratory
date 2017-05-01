@@ -2,6 +2,7 @@
 #include <windows.h>
 #include "tchar_head.h"
 
+#include <iostream>
 #include <string>
 #include <fstream>
 
@@ -16,6 +17,9 @@ using std::wofstream;
 using std::wifstream;
 #define Ifstream wifstream
 
+using std::wcout;
+#define COUT wcout;
+
 #else
 
 using std::string;
@@ -26,6 +30,9 @@ using std::ofstream;
 
 using std::ifstream;
 #define Ifstream ifstream
+
+using std::cout;
+#define COUT cout;
 
 #endif
 
@@ -38,6 +45,18 @@ inline String & operator<<(String &s, double d)
 }
 
 inline String & operator<<(String &s, size_t i)
+{
+	TCHAR temp[32];
+#ifdef _UNICODE
+	_itow_s(i, temp, 10);
+#else
+	_itoa(i, temp, 10);
+#endif
+	s += temp;
+	return s;
+}
+
+inline String & operator<<(String &s, int i)
 {
 	TCHAR temp[32];
 #ifdef _UNICODE
