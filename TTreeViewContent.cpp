@@ -60,6 +60,21 @@ void TTreeViewContent::AddAllItem()
 	}
 }
 
+void TTreeViewContent::AddDriver(int id,const TCHAR szMemo[])
+{
+	HTREEITEM temp;
+	TItem tempItem;
+	TCHAR buffer[64];
+	//ID:0 类型 名称
+	wsprintf(buffer, TEXT("ID:%d %s"), id,szMemo);
+
+	temp = InsertTreeviewItem(buffer, hPrevDriver);
+	TreeView_Expand(m_hWnd, hPrevDriver, TVE_EXPAND);
+	tempItem.ObjectId = id;
+	tempItem.hTreeItem = temp;
+	Item.push_back(tempItem);
+}
+
 void TTreeViewContent::AddItem(TElement *Element, int id)
 {
 	HTREEITEM temp;
@@ -92,6 +107,13 @@ void TTreeViewContent::AddItem(TElement *Element, int id)
 		tempItem.hTreeItem = temp;
 		Item.push_back(tempItem);
 		break;
+	case DRIVER:
+		temp = InsertTreeviewItem(buffer, hPrevDriver);
+		TreeView_Expand(m_hWnd, hPrevDriver, TVE_EXPAND);
+		tempItem.ObjectId = id;
+		tempItem.hTreeItem = temp;
+		Item.push_back(tempItem);
+		break;
 	default:
 		assert(0);
 		break;
@@ -102,7 +124,7 @@ void TTreeViewContent::Initial()
 {
 	hPrevObject = InsertTreeviewItem(TEXT("元素"), TVI_ROOT);
 	hPrevConstraint = InsertTreeviewItem(TEXT("约束"), TVI_ROOT);
-	hPrevDriver = InsertTreeviewItem(TEXT("原动件"), TVI_ROOT);
+	hPrevDriver = InsertTreeviewItem(TEXT("驱动"), TVI_ROOT);
 }
 
 void TTreeViewContent::SelectNull()

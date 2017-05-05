@@ -96,9 +96,16 @@ public:
 		return ::UpdateWindow(m_hWnd);
 	}
 
+	//Rect保存宽高度
 	void TWindow::SetRect(RECT &rect)
 	{
-		::MoveWindow(m_hWnd, rect.top, rect.left, rect.right, rect.bottom, true);
+		::MoveWindow(m_hWnd, rect.left, rect.top, rect.right, rect.bottom, true);
+	}
+
+	//Rect保存坐标
+	void TWindow::SetWindowRect(RECT &rect)
+	{
+		::MoveWindow(m_hWnd, rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, true);
 	}
 
 	void TWindow::SetRect(int x1, int y1, int x2, int y2)

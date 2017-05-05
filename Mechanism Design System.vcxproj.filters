@@ -219,6 +219,12 @@
     <ClCompile Include="DialogAbout.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TToolTip.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TDriver.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -417,6 +423,12 @@
       <Filter>头文件\Tool</Filter>
     </ClInclude>
     <ClInclude Include="DialogAbout.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TToolTip.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TDriver.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

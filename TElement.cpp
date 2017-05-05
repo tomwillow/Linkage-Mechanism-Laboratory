@@ -72,6 +72,9 @@ TCHAR * TElement::GetElementTypeName(TCHAR name[])
 	case CONSTRAINT_COLINEAR:
 		_tcscpy(name, TEXT("¹²Ïß"));
 		break;
+	case DRIVER:
+		_tcscpy(name, TEXT("Çý¶¯"));
+		break;
 	default:
 		assert(0);
 		break;

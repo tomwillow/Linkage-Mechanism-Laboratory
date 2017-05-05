@@ -1,4 +1,5 @@
 #pragma once
+#include "DetectMemoryLeak.h"
 #include "TGraph.h"
 
 #include "resource.h"
@@ -14,6 +15,7 @@ TGraph::TGraph(TConfiguration *pConfig)
 	LineMouseY.SetStyle(pConfig->logpenMouseLine);
 
 	iPick = -1;
+	iPickPointDataIndex = -1;
 
 	iMargin = 0;
 }
@@ -22,12 +24,24 @@ TGraph::TGraph(TConfiguration *pConfig)
 TGraph::~TGraph()
 {
 	DestroyWindow(m_hWnd);
-	delete[] ptArray;
+	Clear();
+}
+
+void TGraph::Clear()
+{
+	for (auto PointData : vecPointData)
+		delete[] PointData.ptArray;
+
+	vecPointData.clear();
+
+	iPick = -1;
+	iPickPointDataIndex = -1;
 }
 
 void TGraph::SetMargin(int iMargin)
 {
 	this->iMargin = iMargin;
+	OnSize(0, 0);
 }
 
 void TGraph::OnSize(WPARAM wParam, LPARAM lParam)
@@ -37,38 +51,73 @@ void TGraph::OnSize(WPARAM wParam, LPARAM lParam)
 	Invalidate();
 }
 
-void TGraph::InputDptVector(std::vector<DPOINT> &dptInputVector)
+void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOGPEN &logpen, bool visible)
 {
-	dptVector = dptInputVector;
-	if (dptVector.size() > 0)
+	TPointData PointData;
+	PointData.dptVector = dptInputVector;
+	if (PointData.dptVector.size() > 0)
 	{
-		x_max = x_min = dptVector[0].x;
-		y_max = y_min = dptVector[0].y;
+		PointData.x_max = PointData.x_min = PointData.dptVector[0].x;
+		PointData.y_max = PointData.y_min = PointData.dptVector[0].y;
 	}
 
-	for (auto dpt : dptVector)
+	for (auto dpt : PointData.dptVector)
 	{
-		if (dpt.x > x_max) x_max = dpt.x;
-		if (dpt.x < x_min) x_min = dpt.x;
-		if (dpt.y > y_max) y_max = dpt.y;
-		if (dpt.y < y_min) y_min = dpt.y;
+		if (dpt.x > PointData.x_max) PointData.x_max = dpt.x;
+		if (dpt.x < PointData.x_min) PointData.x_min = dpt.x;
+		if (dpt.y > PointData.y_max) PointData.y_max = dpt.y;
+		if (dpt.y < PointData.y_min) PointData.y_min = dpt.y;
 	}
-	x_len = x_max - x_min;
-	y_len = y_max - y_min;
+	PointData.x_len = PointData.x_max - PointData.x_min;
+	PointData.y_len = PointData.y_max - PointData.y_min;
 
-	iPtCount = dptVector.size();
-	ptArray = new POINT[iPtCount];
-	CalcPointArray();
+	PointData.iPtCount = PointData.dptVector.size();
+	PointData.ptArray = new POINT[PointData.iPtCount];
 
-	Invalidate();
+	PointData.logpen = logpen;
+
+	PointData.Show = visible;
+
+	vecPointData.push_back(PointData);
+
+	OnSize(0, 0);
+
+	//CalcPointArray();
+
+	//Invalidate();
 }
 
 void TGraph::CalcPointArray()
 {
-	for (size_t i = 0; i < dptVector.size();++i)
+	double x_max, x_min, y_max, y_min;
+	if (vecPointData.size() > 0)
 	{
-		ptArray[i] = TDraw::DPOINT2POINT(dptVector[i], x_min, x_max, y_min, y_max, rcGraph);
+		x_max = vecPointData.front().x_max;
+		x_min = vecPointData.front().x_min;
+		y_max = vecPointData.front().y_max;
+		y_min = vecPointData.front().y_min;
 	}
+	for (auto &PointData : vecPointData)
+	{
+		if (PointData.x_max > x_max) x_max = PointData.x_max;
+		if (PointData.x_min < x_min) x_min = PointData.x_min;
+		if (PointData.y_max > y_max) y_max = PointData.y_max;
+		if (PointData.y_min < y_min) y_min = PointData.y_min;
+	}
+
+	for (auto &PointData : vecPointData)
+	{
+		for (size_t i = 0; i < PointData.dptVector.size(); ++i)
+		{
+			PointData.ptArray[i] = TDraw::DPOINT2POINT(PointData.dptVector[i], x_min, x_max, y_min, y_max, rcGraph);
+		}
+	}
+}
+
+void TGraph::SetPointDataVisible(int index, bool visible)
+{
+	if (index < vecPointData.size())
+		vecPointData[index].Show = visible;
 }
 
 void TGraph::OnDraw(HDC hdc)
@@ -76,30 +125,35 @@ void TGraph::OnDraw(HDC hdc)
 	SetBkMode(hdc, TRANSPARENT);
 
 	//填充背景
-	TDraw::FillRect(hdc, &ClientRect, RGB(255,255,255));
+	TDraw::FillRect(hdc, &ClientRect, pConfig->crGraphBackground);
 
-	TDraw::FillRect(hdc, &rcGraph, pConfig->crGraphBackground);
 
-	TDraw::DrawGrid(hdc, rcGraph, pConfig,pConfig->crGraphGridBig,pConfig->crGraphGridSmall);
+	TDraw::FillRect(hdc, &(rcGraph), RGB(255, 255, 255));
 
-	LOGPEN logpen = { PS_SOLID, { 1, 0 }, 0 };
-	TDraw::DrawPolyline(hdc, ptArray, iPtCount, logpen);
 
-	if (PtInRect(&rcGraph, ptMouse))
+	if (bShowMouseLine && PtInRect(&(rcGraph), ptMouse))
 	{
 		TDraw::DrawLine(hdc, LineMouseX);
 		TDraw::DrawLine(hdc, LineMouseY);
 	}
 
-	if (iPick != -1)
+	//画线
+	for (auto PointData : vecPointData)
+	{
+		if (PointData.Show == true)
+			TDraw::DrawPolyline(hdc, PointData.ptArray, PointData.iPtCount, PointData.logpen);
+	}
+
+	if (bShowMouseLine && iPickPointDataIndex != -1 && vecPointData[iPickPointDataIndex].Show)
 	{
 		static TCHAR szCoordinate[32];
-		_stprintf(szCoordinate,TEXT("(%f,%f)"), dptMouse.x, dptMouse.y);
+		_stprintf(szCoordinate, TEXT("(%f,%f)"), vecPointData[iPickPointDataIndex].dptVector[iPick].x, vecPointData[iPickPointDataIndex].dptVector[iPick].y);
+
 		//显示坐标
 		TDraw::DrawTips(hdc, ptMouse, szCoordinate, pConfig);
 
 		//画方块
-		TDraw::DrawPickSquare(hdc, ptArray[iPick]);
+		TDraw::DrawPickSquare(hdc, vecPointData[iPickPointDataIndex].ptArray[iPick]);
 	}
 }
 
@@ -108,40 +162,63 @@ void TGraph::OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	ptMouse.x = LOWORD(lParam);
 	ptMouse.y = HIWORD(lParam);
 
+	AttachPoint();
+
 	LineMouseX.ptBegin = { rcGraph.left, ptMouse.y };
 	LineMouseX.ptEnd = { rcGraph.right, ptMouse.y };
 
-	LineMouseY.ptBegin = { ptMouse.x,rcGraph.top };
-	LineMouseY.ptEnd = { ptMouse.x,rcGraph.bottom };
+	LineMouseY.ptBegin = { ptMouse.x, rcGraph.top };
+	LineMouseY.ptEnd = { ptMouse.x, rcGraph.bottom };
 
-	dptMouse = TDraw::POINT2DPOINT(ptMouse, x_min, x_max, y_min, y_max, rcGraph);
+	//OutputDebugPrintf(TEXT("%d,%d\n"), ptMouse.x, ptMouse.y);
 
-	SetText(TEXT("(%f,%f)"), dptMouse.x, dptMouse.y);
+	if (iPickPointDataIndex != -1)
+	{
 
-	OnLButtonDown(hWnd, uMsg, wParam, lParam);
+		dptMouse = TDraw::POINT2DPOINT(ptMouse, vecPointData[iPickPointDataIndex].x_min, vecPointData[iPickPointDataIndex].x_max, vecPointData[iPickPointDataIndex].y_min, vecPointData[iPickPointDataIndex].y_max, rcGraph);
 
-	Invalidate();
+		SetText(TEXT("(%f,%f)"), vecPointData[iPickPointDataIndex].dptVector[iPick].x, vecPointData[iPickPointDataIndex].dptVector[iPick].y);
+
+		Invalidate();
+	}
+	else
+		if (bShowMouseLine)
+			Invalidate();
+}
+
+//输入 vecPointData, ptMouse
+//输出 iPick, iPickPointDataIndex
+void TGraph::AttachPoint()
+{
+	double dist, min_dist = 10;//px
+	iPick = -1;
+	iPickPointDataIndex = -1;
+	for (size_t index = 0; index < vecPointData.size(); ++index)
+		if (vecPointData[index].Show)
+			for (int i = 0; i < vecPointData[index].iPtCount; ++i)
+			{
+				dist = TDraw::Distance(vecPointData[index].ptArray[i], ptMouse);
+				if (dist < min_dist)//遍历所有 得到最近
+				{
+					min_dist = dist;
+					iPick = i;
+					iPickPointDataIndex = index;
+				}
+			}
 }
 
 void TGraph::OnLButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	double dist, min_dist=10;
-	iPick = -1;
-	for (int i = 0; i < iPtCount; ++i)
-	{
-		dist = TDraw::Distance(ptArray[i], ptMouse);
-		if (dist < min_dist)
-		{
-			min_dist = dist;
-			iPick = i;
-		}
-	}
+	AttachPoint();
 
-	if (iPick != -1)
+	if (iPickPointDataIndex != -1)
 	{
-		SetText(TEXT("(%f,%f)"), dptVector[iPick].x,dptVector[iPick].y);
+		SetText(TEXT("(%f,%f)"), vecPointData[iPickPointDataIndex].dptVector[iPick].x, vecPointData[iPickPointDataIndex].dptVector[iPick].y);
 		Invalidate();
 	}
+	else
+		if (bShowMouseLine)
+			Invalidate();
 }
 
 bool TGraph::OnClose()

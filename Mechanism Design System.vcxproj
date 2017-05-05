@@ -87,6 +87,7 @@
     <ClCompile Include="TDialogBox.cpp" />
     <ClCompile Include="TDragTool.cpp" />
     <ClCompile Include="TDrawTranslucent.cpp" />
+    <ClCompile Include="TDriver.cpp" />
     <ClCompile Include="TEquations.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TAttach.cpp" />
@@ -128,6 +129,7 @@
     <ClCompile Include="TStatus.cpp" />
     <ClCompile Include="TTool.cpp" />
     <ClCompile Include="TToolbar.cpp" />
+    <ClCompile Include="TToolTip.cpp" />
     <ClCompile Include="TTreeView.cpp" />
     <ClCompile Include="TTreeViewContent.cpp" />
     <ClCompile Include="TVariableTable.cpp" />
@@ -151,6 +153,7 @@
     <ClInclude Include="TDialogBox.h" />
     <ClInclude Include="TDragTool.h" />
     <ClInclude Include="TDrawTranslucent.h" />
+    <ClInclude Include="TDriver.h" />
     <ClInclude Include="TEquations.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TAttach.h" />
@@ -192,6 +195,7 @@
     <ClInclude Include="TStatus.h" />
     <ClInclude Include="TTool.h" />
     <ClInclude Include="TToolbar.h" />
+    <ClInclude Include="TToolTip.h" />
     <ClInclude Include="TTreeView.h" />
     <ClInclude Include="TTreeViewContent.h" />
     <ClInclude Include="TVariableTable.h" />

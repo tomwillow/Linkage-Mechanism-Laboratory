@@ -1,5 +1,6 @@
 #pragma once
 #include "TEdit.h"
+#include "TDraw.h"
 
 #include <CommCtrl.h>
 TEdit::TEdit()
@@ -34,6 +35,26 @@ LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 {
 	switch (uMsg)
 	{
+	//case WM_NCPAINT:
+	//{
+	//	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
+	//	HDC hdc;
+	//	PAINTSTRUCT ps;
+	//	RECT ClientRect;
+	//	hdc = BeginPaint(hWnd, &ps);
+
+	//	GetClientRect(hWnd, &ClientRect);
+	//	TDraw::SetMarginRect(&ClientRect, -2);
+
+	//	SetBkMode(hdc, TRANSPARENT);
+
+	//	LOGPEN logpen = { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) };
+	//	TDraw::DrawRect(hdc, ClientRect, logpen);
+
+	//	EndPaint(hWnd, &ps);
+	//	InvalidateRect(hWnd, &ClientRect, TRUE);
+	//	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
+	//}
 	case WM_CHAR:
 		if (OnChar(wParam, lParam))
 			return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);

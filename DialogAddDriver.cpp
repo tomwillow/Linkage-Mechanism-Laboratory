@@ -5,6 +5,12 @@
 #include "DialogAddDriver.h"
 
 #include "resource.h"
+#include "TDriver.h"
+
+#include "TConfiguration.h"
+#include "TShape.h"
+#include "TToolTip.h"
+#include "TTreeViewContent.h"
 
 #include "TTransfer.h"
 #include "TExpressionTree.h"
@@ -17,6 +23,10 @@ extern TMainWindow win;
 namespace DialogAddDriver
 {
 	int iElementId;
+	TConfiguration *pConfig;
+	TTreeViewContent *pTreeViewContent;
+	TShape *pShape;
+
 	TEdit EditA;
 	TEdit EditB;
 	TEdit LabelA;
@@ -24,9 +34,13 @@ namespace DialogAddDriver
 	TEdit EditExprRight;
 	TEdit EditExprLeft;
 	TEdit LabelDriverUnit;
+	TButton CheckBoxPosition;
+	TButton CheckBoxV;
+	TButton CheckBoxA;
 	TGraph *pGraph;
 	HWND hComboDriverType;
 	HWND hComboExprType;
+	HWND hToolTipError;
 
 	//所有左侧控件更新进入此处
 	void UpdateDlgAddDriver()
@@ -57,7 +71,7 @@ namespace DialogAddDriver
 			switch (ComboBox_GetCurSel(hComboDriverType))
 			{
 			case 0://位置
-				EditExprRight.SetText(TEXT("%f"),TTransfer::TCHAR2double(EditA.GetText()));
+				EditExprRight.SetText(TEXT("%f"), TTransfer::TCHAR2double(EditA.GetText()));
 				break;
 			case 1://速度
 				EditExprRight.SetText(TEXT("%f*t"), TTransfer::TCHAR2double(EditA.GetText()));
@@ -113,9 +127,20 @@ namespace DialogAddDriver
 		{
 		case WM_INITDIALOG:
 		{
+			pTreeViewContent = &(win.RightWindow.TreeViewContent);
+			pShape = &(win.m_Shape);
+			pConfig = &(win.m_Configuration);
+
+			hToolTipError = NULL;
+
+			RECT rcGraph;
+			GetClientRect(GetDlgItem(hDlg, IDC_STATIC_GRAPH), &rcGraph);
+			MapWindowRect(GetDlgItem(hDlg, IDC_STATIC_GRAPH), hDlg, &rcGraph);
 
 			//
 			pGraph = new TGraph(&(win.m_Configuration));
+			pGraph->bShowMouseLine = true;
+			pGraph->SetMargin(10);
 			pGraph->CreateEx(0, TEXT("图表"), TEXT("图表"),
 				WS_CHILD,
 				300,
@@ -125,17 +150,8 @@ namespace DialogAddDriver
 				hDlg, (HMENU)0, (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE));
 			pGraph->SetDoubleBuffer(true);
 			pGraph->ShowWindow(SW_SHOWNORMAL);
+			pGraph->SetWindowRect(rcGraph);
 			pGraph->UpdateWindow();
-
-			//std::vector<DPOINT> dptVector;
-			//DPOINT dpt;
-			//for (double x = 0; x < 1000; ++x)
-			//{
-			//	dpt.x = x;
-			//	dpt.y = sin(x / 50);
-			//	dptVector.push_back(dpt);
-			//}
-			//pGraph->InputDptVector(dptVector);
 
 			//
 			hComboDriverType = GetDlgItem(hDlg, IDC_COMBO_DRIVER_TYPE);
@@ -161,24 +177,61 @@ namespace DialogAddDriver
 			//
 			LabelDriverUnit.LinkControl(GetDlgItem(hDlg, IDC_STATIC_DRIVER_UNIT));
 
-
 			EditExprLeft.LinkControl(GetDlgItem(hDlg, IDC_EDIT_FORMULAR_L));
-
-			////
 			EditExprRight.LinkControl(GetDlgItem(hDlg, IDC_EDIT_FORMULAR_R));
-			EditExprRight.SetText(TEXT("0.1*t"));
 
+			CheckBoxPosition.LinkControl(GetDlgItem(hDlg, IDC_CHECK_POSITION));
+			CheckBoxV.LinkControl(GetDlgItem(hDlg, IDC_CHECK_V));
+			CheckBoxA.LinkControl(GetDlgItem(hDlg, IDC_CHECK_A));
+			CheckBoxPosition.SetChecked(true);
 
+			//test
+			ComboBox_SetCurSel(hComboDriverType, 0);
+			ComboBox_SetCurSel(hComboExprType, 2);
+			EditExprRight.SetText(TEXT("sin(t)"));
 
 			UpdateDlgAddDriver();
 
 			return TRUE;
 		}
+
+		case WM_CTLCOLORSTATIC:
+		case WM_CTLCOLOREDIT:
+		{
+			HWND hwndControl = (HWND)lParam;
+			if (hwndControl == EditExprRight.m_hWnd)
+			{
+				enumError err = (enumError)(int)GetProp(EditExprRight.m_hWnd, TEXT("error"));
+				//OutputDebugInt(err);
+				if (hToolTipError != NULL)
+				{
+					DestroyWindow(hToolTipError);
+					hToolTipError = NULL;
+				}
+				if (err != ERROR_NO)//有错误
+				{
+					HDC hdc = (HDC)wParam;
+					HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0));
+
+					SetBkMode(hdc, TRANSPARENT);
+
+					//SetTextColor(hdc, RGB(255, 0, 0));
+
+					TCHAR szErr[64];
+					GetErrorInfo(err, szErr);
+					hToolTipError=CreateToolTip(hDlg, EditExprRight.m_hWnd, (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE),szErr);
+
+
+					return (LRESULT)hBrush;
+				}
+			}
+			return 0;
+		}
 		case WM_COMMAND:
 			switch (LOWORD(wParam))
 			{
 
-			//改动Edit内容
+				//改动Edit内容
 			case IDC_EDIT_A:
 			case IDC_EDIT_B:
 			{
@@ -194,46 +247,102 @@ namespace DialogAddDriver
 			{
 				if (HIWORD(wParam) == EN_CHANGE)
 				{
-					TCHAR buf[32];
-					TExpressionTree Expr;
-					//TVariableTable VariableTable;
-					//VariableTable.Define(NULL, TEXT("t"));
-					//Expr.LinkVariableTable(&VariableTable);
+					pGraph->Clear();
 
-					double value;
+					TExpressionTree Expr,ExprV,ExprA;
+					TExpressionTree ExprTemp,ExprTempV,ExprTempA;
+					TVariableTable VariableTable;
+					VariableTable.Define(NULL, TEXT("t"));
+					TCHAR *sz_t = VariableTable.VariableTable[0];
+					Expr.LinkVariableTable(&VariableTable);
+					ExprV.LinkVariableTable(&VariableTable);
+					ExprA.LinkVariableTable(&VariableTable);
+					ExprTemp.LinkVariableTable(&VariableTable);
+					ExprTempV.LinkVariableTable(&VariableTable);
+					ExprTempA.LinkVariableTable(&VariableTable);
 
+					//读入Expr
 					String s = EditExprRight.GetText();
-					String s_temp;
+					Expr.Read(s.c_str(), false);
 
-					std::vector<DPOINT> dptVector;
-					//enumError err;
-					for (double t = 0; t <= 10; t += 0.1)
+					enumError err;
+
+					double value,valueV,valueA;
+					if ((err = Expr.GetError()) == ERROR_NO)
 					{
-						s_temp = s;
-						if (s.find(TEXT("t"))!=String::npos)
-							s_temp.replace(s.find(TEXT("t")), 1, TTransfer::double2TCHAR(t, buf));
+						std::vector<DPOINT> dptVector,dptVectorV,dptVectorA;
+						ExprV = Expr;
+						ExprV.Diff(sz_t, 1, false);
+						ExprV.Simplify(false);
 
-						try
+						ExprA = ExprV;
+						ExprA.Diff(sz_t, 1, false);
+						ExprA.Simplify(false);
+						for (double t = 0; t <= 10; t += 0.1)
 						{
-							Expr.Read(s_temp.c_str(), false);
+							try
+							{
+								ExprTemp = Expr;
+								ExprTemp.Subs(sz_t, t, false);
+								value = ExprTemp.Value(true);
 
-							value = Expr.Value(true);
+								ExprTempV = ExprV;
+								ExprTempV.Subs(sz_t, t, false);
+								valueV = ExprTempV.Value(true);
+
+								ExprTempA = ExprA;
+								ExprTempA.Subs(sz_t, t, false);
+								valueA = ExprTempA.Value(true);
+							}
+							catch (enumError eerr)
+							{
+								err = eerr;
+								break;
+							}
+							//if ((err = Expr.GetError()) != ERROR_NO)
+							//	break;
+							dptVector.push_back({ t, value });
+							dptVectorV.push_back({ t, valueV });
+							dptVectorA.push_back({ t, valueA });
 						}
-						catch (enumError err)
+
+						//循环结束，送入数据
+						if (err == ERROR_NO)
 						{
-							break;
+							pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, CheckBoxPosition.GetChecked());
+							pGraph->InputDptVector(dptVectorV, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, CheckBoxV.GetChecked());
+							pGraph->InputDptVector(dptVectorA, { PS_SOLID, { 1, 0 }, RGB(0, 255, 0) }, CheckBoxA.GetChecked());
 						}
-						//if ((err = Expr.GetError()) != ERROR_NO)
-						//	break;
-						dptVector.push_back({ t, value });
-					}
-					pGraph->InputDptVector(dptVector);
-					
-				}
+					}//correct
+
+					//存入错误码
+					SetProp(EditExprRight.m_hWnd, TEXT("error"), (HANDLE)err);
+
+					//刷新
+					//pGraph->Invalidate();
+
+					//为更新Edit背景 刷新Dlg  将触发WM_CTLCOLOREDIT
+					RECT ClientRect;
+					GetClientRect(hDlg, &ClientRect);
+					InvalidateRect(hDlg, &ClientRect, TRUE);
+				}//EN_CHANGE
 				break;
 			}
 
-			//改动ComboBox选项
+			case IDC_CHECK_POSITION:
+				pGraph->SetPointDataVisible(0, CheckBoxPosition.GetChecked());
+				pGraph->Invalidate();
+				break;
+			case IDC_CHECK_V:
+				pGraph->SetPointDataVisible(1, CheckBoxV.GetChecked());
+				pGraph->Invalidate();
+				break;
+			case IDC_CHECK_A:
+				pGraph->SetPointDataVisible(2, CheckBoxA.GetChecked());
+				pGraph->Invalidate();
+				break;
+
+				//改动ComboBox选项
 			case IDC_COMBO_EXPR_TYPE:
 			case IDC_COMBO_DRIVER_TYPE:
 			{
@@ -245,9 +354,36 @@ namespace DialogAddDriver
 				break;
 			}
 			case IDOK:
+			{
 				//添加约束
+				/*int len1,len2;
 
+				TCHAR *s, *temp;
+
+				len1 = ComboBox_GetTextLength(hComboDriverType) + 1;
+				len2 = ComboBox_GetTextLength(hComboExprType) + 1;
+				s = new TCHAR[len1+len2];
+				ComboBox_GetText(hComboDriverType,s, len1);
+
+				temp = new TCHAR[len2];
+				ComboBox_GetText(hComboExprType, temp, len2);
+
+				_tcscat(s, TEXT(" "));
+				_tcscat(s, temp);
+
+				pTreeViewContent->AddDriver(iElementId, s);
+
+				delete[] s;
+				delete[] temp;*/
 				//win.pSolver->AddMouseConstraint
+
+				TDriver Driver;
+				Driver.SetStyle(pConfig);
+
+				pTreeViewContent->AddItem(&Driver, pShape->iNextId);
+				pShape->AddElement(&Driver);
+
+			}
 			case IDCANCEL:
 				EndDialog(hDlg, 0);
 				return TRUE;

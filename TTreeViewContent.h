@@ -26,6 +26,7 @@ public:
 	int TTreeViewContent::GetIdFromHTreeView(HTREEITEM hTreeItem);
 	HTREEITEM TTreeViewContent::GetHTreeItemFromId(int id);
 	void TTreeViewContent::SelectById(int id);//∑¢ÀÕ÷¡RightWindow OnNotify
+	void TTreeViewContent::AddDriver(int id,const TCHAR szMemo[]);
 	void TTreeViewContent::AddItem(TElement *Element,int id);
 	void TTreeViewContent::DeleteById(int id);
 	void TTreeViewContent::SelectNull();

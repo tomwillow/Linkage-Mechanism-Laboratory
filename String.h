@@ -11,6 +11,8 @@
 using std::wstring;
 #define String wstring
 
+//#define String std::basic_string<TCHAR>
+
 using std::wofstream;
 #define Ofstream wofstream
 
@@ -71,5 +73,11 @@ inline String & operator<<(String &s, int i)
 inline String & operator<<(String &s, TCHAR szStr[])
 {
 	s += szStr;
+	return s;
+}
+
+inline String & operator<<(String &s,const String &s2)
+{
+	s += s2;
 	return s;
 }

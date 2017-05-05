@@ -4,6 +4,8 @@
 #include <process.h>
 #include "TMainWindow.h"
 
+#include "TToolTip.h"
+
 #include "String.h"
 
 #include "TConstraintCoincide.h" 
@@ -46,46 +48,6 @@ TMainWindow::~TMainWindow()
 	//_CrtDumpMemoryLeaks();
 }
 
-// Description:
-//   Creates a tooltip for an item in a dialog box. 
-// Parameters:
-//   idTool - identifier of an dialog box item.
-//   nDlg - window handle of the dialog box.
-//   pszText - string to use as the tooltip text.
-// Returns:
-//   The handle to the tooltip.
-//
-HWND CreateToolTip(HWND hParent, HWND hControl, HINSTANCE hInst, PTSTR pszText)
-{
-	if (!hControl || !hParent || !pszText)
-	{
-		return FALSE;
-	}
-
-	// Create the tooltip. g_hInst is the global instance handle.
-	HWND hwndTip = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
-		WS_POPUP | TTS_ALWAYSTIP | TTS_BALLOON,
-		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT,
-		hParent, NULL,
-		hInst, NULL);
-
-	if (!hControl || !hwndTip)
-	{
-		return (HWND)NULL;
-	}
-
-	// Associate the tooltip with the tool.
-	TOOLINFO toolInfo = { 0 };
-	toolInfo.cbSize = sizeof(toolInfo);
-	toolInfo.hwnd = hParent;
-	toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
-	toolInfo.uId = (UINT_PTR)hControl;
-	toolInfo.lpszText = pszText;
-	SendMessage(hwndTip, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
-
-	return hwndTip;
-}
 
 void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
@@ -417,6 +379,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_DRAW_GRAPH:
 	{
 		TGraph *pGraph = new TGraph(&m_Configuration);
+		pGraph->bShowMouseLine = true;
 		pGraph->CreateEx(0, TEXT("图表"), TEXT("图表"),
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
@@ -426,26 +389,36 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			m_hWnd, (HMENU)0, m_hInst);
 		pGraph->SetDoubleBuffer(true);
 		pGraph->ShowWindow(SW_SHOWNORMAL);
+
+
 		pGraph->UpdateWindow();
 
-		vecpGraph.push_back(pGraph);
 
-		std::vector<DPOINT> dptVector;
+		std::vector<DPOINT> dptVector,dptVector2;
 		DPOINT dpt;
 		for (double x = 0; x < 1000; ++x)
 		{
 			dpt.x = x;
-			dpt.y = sin(x / 50);
+			dpt.y = sin(x / 50) * 50;
 			dptVector.push_back(dpt);
+
+			dpt.y = cos(x / 50) * 50;
+			dptVector2.push_back(dpt);
 		}
-		pGraph->InputDptVector(dptVector);
+
+		pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 },true);
+		pGraph->InputDptVector(dptVector2, { PS_SOLID, { 1, 0 }, RGB(255,0,0) },true);
+
+		pGraph->SetMargin(40);
+
+		vecpGraph.push_back(pGraph);
 		break;
 	}
 	case ID_SET_DRIVER:
 	{
 		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT || m_ManageTool.m_uiCurActiveTool == ID_DRAG)
 		{
-			//if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
+			if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
 			{
 				//选择工具 且 选中元素可驱动 则弹出原动件对话框
 				if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex!=-1)
@@ -455,6 +428,8 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 					MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
 				}
 			}
+			else
+				MessageBox(m_hWnd, TEXT("请先使用选择工具选择一个元素，再设为原动件。"), TEXT(""), MB_ICONINFORMATION);
 		}
 		else
 			MessageBox(m_hWnd, TEXT("请先使用选择工具选择一个元素，再设为原动件。"), TEXT(""), MB_ICONINFORMATION);

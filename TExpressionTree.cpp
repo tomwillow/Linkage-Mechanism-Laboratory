@@ -917,55 +917,61 @@ TCHAR * TExpressionTree::GetErrorInfo()
 	if (ErrorInfo != NULL)
 		delete[] ErrorInfo;
 	ErrorInfo = new TCHAR[64];
-	switch (eError)
+
+	::GetErrorInfo(eError, ErrorInfo);
+	return ErrorInfo;
+}
+
+	void GetErrorInfo(enumError err, TCHAR result[])
+	{
+		switch (err)
 	{
 	case ERROR_NO:
-		_tcscpy(ErrorInfo, TEXT("操作成功完成。"));
+		_tcscpy(result, TEXT("操作成功完成。"));
 		break;
 	case ERROR_ILLEGALCHAR:
-		_tcscpy(ErrorInfo, TEXT("错误：出现非法字符。"));
+		_tcscpy(result, TEXT("错误：出现非法字符。"));
 		break;
 	case ERROR_PARENTHESIS_NOT_MATCH:
-		_tcscpy(ErrorInfo, TEXT("错误：括号不匹配。"));
+		_tcscpy(result, TEXT("错误：括号不匹配。"));
 		break;
 	case ERROR_INVALID_VARNAME:
-		_tcscpy(ErrorInfo, TEXT("错误：不正确的变量名（必须以下划线\"_\"或英文字母开头）。"));
+		_tcscpy(result, TEXT("错误：不正确的变量名（必须以下划线\"_\"或英文字母开头）。"));
 		break;
 	case ERROR_WRONG_EXPRESSION:
-		_tcscpy(ErrorInfo, TEXT("错误：错误的表达式。"));
+		_tcscpy(result, TEXT("错误：错误的表达式。"));
 		break;
 	case ERROR_EMPTY_INPUT:
-		_tcscpy(ErrorInfo, TEXT("表达式为空。"));
+		_tcscpy(result, TEXT("表达式为空。"));
 		break;
 	case ERROR_DIVIDE_ZERO:
-		_tcscpy(ErrorInfo, TEXT("错误：不得除以0。"));
+		_tcscpy(result, TEXT("错误：不能除以0。"));
 		break;
 	case ERROR_UNDEFINED_VARIABLE:
-		_tcscpy(ErrorInfo, TEXT("错误：未定义的变量。"));
+		_tcscpy(result, TEXT("错误：未定义的变量。"));
 		break;
 	case ERROR_ZERO_POWEROF_ZERO:
-		_tcscpy(ErrorInfo, TEXT("错误：0的0次方。"));
+		_tcscpy(result, TEXT("错误：0的0次方。"));
 		break;
 	case ERROR_SUBS_NOT_EQUAL:
-		_tcscpy(ErrorInfo, TEXT("错误：替换与被替换数目不等。"));
+		_tcscpy(result, TEXT("错误：替换与被替换数目不等。"));
 		break;
 	case ERROR_NOT_LINK_VARIABLETABLE:
-		_tcscpy(ErrorInfo, TEXT("程序错误：未链接变量表。"));
+		_tcscpy(result, TEXT("程序错误：未链接变量表。"));
 		break;
 	case ERROR_OUTOF_DOMAIN:
-		_tcscpy(ErrorInfo, TEXT("错误：超出定义域。"));
+		_tcscpy(result, TEXT("错误：超出定义域。"));
 		break;
 	case ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT:
-		_tcscpy(ErrorInfo, TEXT("错误：变量名与初始值数量不对等。"));
+		_tcscpy(result, TEXT("错误：变量名与初始值数量不对等。"));
 		break;
 	case ERROR_I:
-		_tcscpy(ErrorInfo, TEXT("暂不支持虚数。"));
+		_tcscpy(result, TEXT("暂不支持虚数。"));
 		break;
 	default:
-		_tcscpy(ErrorInfo, TEXT("undefined error"));
+		_tcscpy(result, TEXT("undefined error"));
 		break;
 	}
-	return ErrorInfo;
 }
 
 bool TExpressionTree::IsIntAndEven(double n)
@@ -1043,7 +1049,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		Operator->ValueOrName.value = log(value1);
 		break;
 	case MATH_LOG10:
-		if (value1 < MIN_DOUBLE)
+		if (value1 < MIN_DOUBLE)//log(0)或log(负数)
 		{
 			//恢复修改并抛出异常
 			Operator->eType = NODE_FUNCTION;
@@ -1061,6 +1067,8 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		break;
 
 	case MATH_MOD://%
+		if ((int)value2 == 0)
+			throw eError = ERROR_DIVIDE_ZERO;
 		Operator->ValueOrName.value = (int)value1 % (int)value2;
 		break;
 	case MATH_AND://&
@@ -2328,6 +2336,7 @@ TCHAR * TExpressionTree::Solve(TCHAR *&var, double &value)
 
 }
 
+//读之前不清零，请自行处理
 TCHAR * TExpressionTree::Read(const TCHAR *expression, bool bOutput)
 {
 	std::queue<TNode *> InOrder;
@@ -2337,9 +2346,6 @@ TCHAR * TExpressionTree::Read(const TCHAR *expression, bool bOutput)
 	TCHAR *expr = new TCHAR[_tcslen(expression) + 1];
 	_tcscpy(expr, expression);
 	expr[_tcslen(expression)] = TEXT('\0');
-
-	Reset();
-	Release();
 
 	if (eError == ERROR_NO)
 		if ((eError = ReadToInOrder(expr, InOrder)) == ERROR_NO)

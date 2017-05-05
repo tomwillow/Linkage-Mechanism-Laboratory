@@ -118,3 +118,5 @@ public:
 	TExpressionTree();
 	~TExpressionTree();
 };
+
+void GetErrorInfo(enumError err, TCHAR result[]);
