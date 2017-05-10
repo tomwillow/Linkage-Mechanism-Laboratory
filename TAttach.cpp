@@ -237,6 +237,7 @@ bool TAttach::AttachLine_inner(DPOINT dptNowPos)
 		case ELEMENT_FRAMEPOINT:
 		case CONSTRAINT_COINCIDE:
 		case CONSTRAINT_COLINEAR:
+		case DRIVER:
 			break;
 		default:
 			assert(0);
@@ -396,6 +397,7 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 		//不吸附端点的元素
 		case CONSTRAINT_COLINEAR:
 		case CONSTRAINT_COINCIDE:
+		case DRIVER:
 			break;
 		default:
 			assert(0);

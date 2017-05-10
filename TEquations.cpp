@@ -62,6 +62,15 @@ size_t TEquations::GetEquationsCount()
 	return Equations.size();
 }
 
+void TEquations::DefineAVariable(String *pStr, TCHAR *input_str,double value)
+{
+	VariableTable.Define(pStr, input_str, value);
+
+	VariableTableUnsolved.VariableTable = VariableTable.VariableTable;
+	VariableTableUnsolved.VariableValue = VariableTable.VariableValue;
+
+}
+
 void TEquations::DefineVariable(String *pStr, TCHAR *input_str, TCHAR *input_num)
 {
 	VariableTable.Define(pStr, input_str, input_num);
@@ -71,7 +80,7 @@ void TEquations::DefineVariable(String *pStr, TCHAR *input_str, TCHAR *input_num
 
 }
 
-void TEquations::AddEquation(String *pStr, TCHAR *szInput, bool istemp)
+void TEquations::AddEquation(String *pStr,const TCHAR *szInput, bool istemp)
 {
 	TExpressionTree *temp = new TExpressionTree;
 	temp->LinkVariableTable(&VariableTable);
@@ -265,12 +274,61 @@ void TEquations::SubsVar(String *pStr, TPEquations &Equations, TVariableTable &L
 	}
 }
 
+void TEquations::Subs(String *pStr, TCHAR *subsVar, double value)
+{
+	if (eError != ERROR_NO)
+		return;
+
+		TCHAR *ptVar;
+	if (subsVar != NULL)
+	{
+			if ((ptVar = VariableTable.FindVariableTable(subsVar)) && VariableTableSolved.FindVariableTable(ptVar) == NULL)
+			{
+				VariableTableSolved.VariableTable.push_back(ptVar);
+				VariableTableSolved.VariableValue.push_back(value);
+			}
+		//VariableTableSolved.SetValueByVarTable(exceptVars);
+	}
+
+	if (pStr != NULL)
+	{
+		*pStr << TEXT(">>Subs: [") << ptVar;
+		*pStr << TEXT("] -> [");
+		*pStr << value;
+		*pStr << TEXT("]\r\n\r\n当前方程：\r\n");
+	}
+	for (auto pEquation : Equations)//遍历方程
+	{
+		pEquation->LinkVariableTable(&VariableTableUnsolved);
+
+		//替换
+		if (ptVar != NULL && _tcslen(ptVar) > 0)
+			pEquation->Subs(ptVar, value, false);
+
+		if (pStr != NULL)
+		{
+			*pStr += pEquation->OutputStr(false);
+			*pStr += TEXT("\r\n");
+		}
+	}
+
+	if (pStr != NULL)
+	{
+		*pStr += TEXT("\r\n");
+	}
+
+	//剔除掉被替换掉的变量
+	if (ptVar != NULL && _tcslen(ptVar) > 0)
+	{
+		VariableTableUnsolved.Remove(pStr, ptVar);
+	}
+}
+
 //已解出变量组加入 未解出变量组剔除
 void TEquations::Subs(String *pStr, TCHAR *subsVar, TCHAR *subsValue)//代入
 {
 	if (eError != ERROR_NO)
 		return;
-
 
 	TVariableTable exceptVars;
 	//若输入了替换变量，则进行定义
@@ -300,7 +358,7 @@ void TEquations::Subs(String *pStr, TCHAR *subsVar, TCHAR *subsValue)//代入
 	{
 		pEquation->LinkVariableTable(&VariableTableUnsolved);
 
-		//替换掉机架点坐标
+		//替换
 		if (subsVar != NULL && _tcslen(subsVar) > 0)
 			pEquation->Subs(subsVar, subsValue, false);
 

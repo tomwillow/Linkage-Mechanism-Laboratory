@@ -8,8 +8,6 @@ class TEdit :public TControl
 {
 private:
 protected:
-	TCHAR *Text;
-	bool bVisible;
 
 	//虚拟消息处理函数，可重载
 	virtual LRESULT TEdit::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -29,16 +27,8 @@ public:
 	TEdit();
 	~TEdit();
 	void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle = WS_EX_CLIENTEDGE);//创建Edit
-	void TEdit::SetPos(int x, int y, int width, int height);//设置大小及位置
-	void TEdit::SetPos(RECT rect);//设置大小及位置
-	void TEdit::SetVisible(bool bShow);//设置可见性
+
 	void TEdit::SetDefaultGuiFont();
-	void CDECL TEdit::SetText(TCHAR szFormat[], ...);//设置内容
-	void TEdit::GetText(TCHAR text[]);
-	TCHAR * TEdit::GetText();
-	int TEdit::GetLength();//获取字符串长度
 	void TEdit::SetSelect(int iStart, int iEnd);//选择
-	void TEdit::SetFont(HFONT hFont);
 	void TEdit::SetSelectAll();//全选
-	bool TEdit::GetVisible();
 };

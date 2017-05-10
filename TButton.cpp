@@ -41,10 +41,8 @@ void TButton::LoadUnCheckedIcon(HINSTANCE hInst, UINT uiIconId)
 	hIconUnChecked = LoadIcon(m_hInst, MAKEINTRESOURCE(uiIconId));
 }
 
-void TButton::CreateIconCheckBox(HINSTANCE hInst, HWND hParent, int x, int y, UINT id)
+void TButton::CreateIconCheckBox(HINSTANCE hInst, HWND hParent, int x, int y, int width, int height, UINT id)
 {
-	m_iWidth = 24;
-	m_iHeight = 24;
 	m_hParent = hParent;
 	m_hInst = hInst;
 	m_hWnd = CreateWindow(
@@ -52,7 +50,7 @@ void TButton::CreateIconCheckBox(HINSTANCE hInst, HWND hParent, int x, int y, UI
 		TEXT("°´Å¥"),
 		WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE | BS_ICON,//BS_ICON |BS_PUSHBUTTON ,
 		x, y,
-		m_iWidth, m_iHeight,
+		width, height,
 		m_hParent, (HMENU)id,
 		m_hInst,
 		NULL);
@@ -86,10 +84,8 @@ void TButton::LoadUnCheckedBitmap(HINSTANCE hInst, UINT uiBitmapId)
 	hBitmapUnChecked = LoadBitmap(m_hInst, MAKEINTRESOURCE(uiBitmapId));
 }
 
-void TButton::CreateBitmapCheckBox(HINSTANCE hInst, HWND hParent, int x, int y, UINT id)
+void TButton::CreateBitmapCheckBox(HINSTANCE hInst, HWND hParent, int x, int y, int width, int height, UINT id)
 {
-	m_iWidth = 20;
-	m_iHeight = 20;
 	m_hParent = hParent;
 	m_hInst = hInst;
 	m_hWnd = CreateWindow(
@@ -97,7 +93,7 @@ void TButton::CreateBitmapCheckBox(HINSTANCE hInst, HWND hParent, int x, int y, 
 		TEXT("°´Å¥"),
 		WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE | BS_BITMAP,//BS_Bitmap |BS_PUSHBUTTON ,
 		x, y,
-		m_iWidth, m_iHeight,
+		width, height,
 		m_hParent, (HMENU)id,
 		m_hInst,
 		NULL);

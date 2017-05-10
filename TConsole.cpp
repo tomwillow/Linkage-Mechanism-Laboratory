@@ -21,7 +21,7 @@ void TConsole::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	Edit.bMultiLine = true;
 	Edit.bNoHideSel = true;
 	Edit.CreateEditEx(hWnd, 0, m_hInst);
-	Edit.SetPos(ClientRect);
+	Edit.SetPosition(ClientRect);
 	Edit.SetDefaultGuiFont();
 	Edit.SetVisible(true);
 
@@ -37,7 +37,7 @@ void TConsole::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void TConsole::OnSize(WPARAM wParam, LPARAM lParam)
 {
-	Edit.SetPos(ClientRect);
+	Edit.SetPosition(ClientRect);
 }
 
 bool TConsole::OnClose()

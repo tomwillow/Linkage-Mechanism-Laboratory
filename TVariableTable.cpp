@@ -118,6 +118,52 @@ void TVariableTable::Remove(String *pStr,const TCHAR input_str[])
 	// return Output();
 }
 
+void TVariableTable::Define(String *pStr, TCHAR *input_str, double value)
+{
+	//复制输入串
+	TCHAR *ptVar = new TCHAR[_tcslen(input_str) + 1];
+	_tcscpy(ptVar, input_str);
+
+	//滤掉不合法输入
+		if (TMyString::isVariableName(ptVar) == false)
+		{
+			//出现不合法的变量名
+			if (pStr != NULL)
+			{
+				*pStr += TEXT("不合法的变量");
+				*pStr += ptVar;
+				*pStr += TEXT("。");
+			}
+			eError = ERROR_INVALID_VARNAME;
+			delete[] ptVar;
+			return;
+		}
+
+	if (pStr != NULL)
+		*pStr += TEXT(">>Define: ");
+	//
+		if (FindVariableTable(ptVar))//已有的不再定义
+		{
+			delete[] ptVar;
+		}
+		else
+		{//未定义的进行定义
+			VariableTable.push_back(ptVar);
+			VariableValue.push_back(value);
+
+			if (pStr != NULL)
+			{
+				*pStr += VariableTable.back();
+				*pStr += TEXT("(");
+				*pStr << VariableValue.back();
+				*pStr += TEXT(") ");
+			}
+		}
+
+	if (pStr != NULL)
+		*pStr += TEXT("\r\n\r\n");
+}
+
 //新定义的若与旧的重名可过滤掉重定义
 void TVariableTable::Define(String *pStr,TCHAR *input_str,TCHAR *input_num)
 {

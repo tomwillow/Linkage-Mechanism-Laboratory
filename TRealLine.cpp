@@ -172,3 +172,9 @@ DPOINT TRealLine::GetAbsolutePointByIndex(int PointIndexOfElement)const
 	}
 	throw(PointIndexOfElement);
 }
+
+void TRealLine::SetPhi(double phi)
+{
+	angle = phi;
+	SetPoint(ptBegin, dLength, angle);
+}

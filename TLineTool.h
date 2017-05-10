@@ -2,6 +2,8 @@
 #include <Windows.h>
 #include <vector>
 
+#include "String.h"
+
 #include "TTool.h"
 #include "DPOINT.h"
 #include "TElement.h"
@@ -37,6 +39,9 @@ private:
 	void TLineTool::InitialLine(DPOINT dptPos);
 	void Draw(HDC hdc);
 protected:
+	bool bCanBuildCoincide;
+	String sType;
+
 	TRealLine *MoveLine;//显示点的位置
 	EnumElementType myElementType;
 	virtual TElement * TLineTool::AddIntoShape(TRealLine &RealLine);

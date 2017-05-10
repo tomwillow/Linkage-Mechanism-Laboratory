@@ -14,6 +14,7 @@ class TSolver:public TTool
 {
 private:
 	String *pStr;
+	std::vector<String> vecStrDriver;
 	HWND hwndOutput;
 	//TCHAR *str;
 	TEquations *Equations;
@@ -27,6 +28,7 @@ private:
 		int i, j;
 		DPOINT SiP, SjP;
 	};
+
 	int TSolver::GetIdFromVariableStr(TCHAR varname[]);
 	void TSolver::Output(TCHAR szFormat[], ...);
 	void TSolver::Outputln(const TCHAR *szFormat, ...);
@@ -43,5 +45,8 @@ public:
 	void TSolver::ClearConstraint();
 	void TSolver::Demo();
 	void TSolver::ClearEuqations();
+	void TSolver::Solve(double t);
+	void TSolver::LinkpValue(std::vector<double *> &vecpValue);
+	void TSolver::GetResult(std::vector<double> &vecResult);
 };
 

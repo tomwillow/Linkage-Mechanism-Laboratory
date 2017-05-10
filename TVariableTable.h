@@ -21,6 +21,7 @@ public:
 	void TVariableTable::DeleteByAddress(TCHAR *var);//同时清除变量和数据
 	TCHAR * TVariableTable::FindVariableTable(TCHAR *varstr);//查找变量是否在变量表中，没有则返回NULL
 	void TVariableTable::Define(String *pStr, TCHAR *input_str, TCHAR *input_num = NULL);
+	void TVariableTable::Define(String *pStr, TCHAR *input_str, double value);
 	void TVariableTable::Output(String *pStr);
 	void TVariableTable::OutputValue(String *pStr);//输出 x=0 形式
 	void TVariableTable::Remove(String *pStr, const TCHAR input_str[]);

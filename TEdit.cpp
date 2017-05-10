@@ -5,7 +5,6 @@
 #include <CommCtrl.h>
 TEdit::TEdit()
 {
-	bVisible = false;
 	m_hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 
 	bMultiLine = false;
@@ -13,21 +12,15 @@ TEdit::TEdit()
 	bAutoVScrol = false;
 	bNoHideSel = false;
 
-	Text = NULL;
 }
 
 TEdit::~TEdit()
 {
 	::DeleteObject(m_hFont);
-
-	if (Text != NULL)
-		free(Text);
 }
 
 bool TEdit::OnKeyDown(WPARAM wParam, LPARAM lParam)
-{ 
-	//if (bSendParentUserMsg)
-	//	::PostMessage(m_hParent, WM_USER, wParam, lParam);
+{
 	return true; 
 }
 
@@ -35,26 +28,6 @@ LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 {
 	switch (uMsg)
 	{
-	//case WM_NCPAINT:
-	//{
-	//	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
-	//	HDC hdc;
-	//	PAINTSTRUCT ps;
-	//	RECT ClientRect;
-	//	hdc = BeginPaint(hWnd, &ps);
-
-	//	GetClientRect(hWnd, &ClientRect);
-	//	TDraw::SetMarginRect(&ClientRect, -2);
-
-	//	SetBkMode(hdc, TRANSPARENT);
-
-	//	LOGPEN logpen = { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) };
-	//	TDraw::DrawRect(hdc, ClientRect, logpen);
-
-	//	EndPaint(hWnd, &ps);
-	//	InvalidateRect(hWnd, &ClientRect, TRUE);
-	//	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
-	//}
 	case WM_CHAR:
 		if (OnChar(wParam, lParam))
 			return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
@@ -95,41 +68,6 @@ void TEdit::SetDefaultGuiFont()
 	SetFont(m_hFont);
 }
 
-void TEdit::SetFont(HFONT hFont)
-{
-	SendMessage(m_hWnd,             // Handle of edit control
-		WM_SETFONT,         // Message to change the font
-		(WPARAM)hFont,     // handle of the font
-		MAKELPARAM(TRUE, 0) // Redraw text
-		);
-}
-
-void TEdit::SetPos(int x, int y, int width, int height)
-{
-	::SetWindowPos(m_hWnd, HWND_TOP, x, y, width, height, 0);//SWP_SHOWWINDOW
-}
-
-//rect中各值均为坐标
-void TEdit::SetPos(RECT rect)
-{
-	::SetWindowPos(m_hWnd, HWND_TOP, rect.left,rect.top,rect.right-rect.left,rect.bottom-rect.top, 0);//SWP_SHOWWINDOW
-}
-
-void TEdit::SetVisible(bool bShow)
-{
-	bVisible = bShow;
-	::ShowWindow(m_hWnd, bShow ? SW_SHOWNORMAL : SW_HIDE);
-}
-
-bool TEdit::GetVisible()
-{
-	return bVisible;
-}
-
-int TEdit::GetLength()
-{
-	return ::GetWindowTextLength(m_hWnd);
-}
 
 void TEdit::SetSelect(int iStart, int iEnd)
 {
@@ -139,29 +77,4 @@ void TEdit::SetSelect(int iStart, int iEnd)
 void TEdit::SetSelectAll()
 {
 	SetSelect(0, GetLength());
-}
-
-void CDECL TEdit::SetText(TCHAR szFormat[], ...)
-{
-	TCHAR szBuffer[1024];
-	va_list pArgList;
-	va_start(pArgList, szFormat);
-	_vsntprintf_s(szBuffer, sizeof(szBuffer) / sizeof(TCHAR), szFormat, pArgList);
-	va_end(pArgList);
-
-	::SetWindowText(m_hWnd, szBuffer);
-}
-
-void TEdit::GetText(TCHAR text[])
-{
-	::GetWindowText(m_hWnd, text, GetLength()+1);//不知道为什么要加1才取得全
-}
-
-TCHAR * TEdit::GetText()
-{
-	//if (Text != NULL)
-	//	free(Text);
-	Text = (TCHAR *)realloc(Text, (GetLength() + 1)*sizeof(TCHAR));
-	GetText(Text);
-	return Text;
 }

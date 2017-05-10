@@ -20,5 +20,6 @@ public:
 	virtual bool TRealLine::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)override;
 	virtual const DPOINT TRealLine::GetRelativePointByIndex(int PointIndexOfElement) const override;
 	virtual DPOINT TRealLine::GetAbsolutePointByIndex(int PointIndexOfElement) const override;
+	virtual void TRealLine::SetPhi(double phi) override;
 };
 

@@ -279,3 +279,18 @@ DPOINT GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle)
 	return{ Org.x + dpt.x*cos(angle) - dpt.y*sin(angle),
 		Org.y + dpt.x*sin(angle) + dpt.y*cos(angle) };
 }
+
+void TElement::SetX(double x)
+{
+	dpt.x = x;
+}
+
+void TElement::SetY(double y)
+{
+	dpt.y = y;
+}
+
+void TElement::SetPhi(double phi)
+{
+	angle = phi;
+}

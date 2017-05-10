@@ -392,6 +392,8 @@ void TSelectTool::Draw(HDC hdc)
 			}
 			break;
 		}
+		case DRIVER:
+			break;
 		default:
 			assert(0);
 			break;

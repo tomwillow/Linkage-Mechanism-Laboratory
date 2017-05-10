@@ -15,13 +15,13 @@ public:
 
 	void TButton::LoadCheckedIcon(HINSTANCE hInst, UINT uiIconId);
 	void TButton::LoadUnCheckedIcon(HINSTANCE hInst, UINT uiIconId);
-	void TButton::CreateIconCheckBox(HINSTANCE hInst, HWND hParent, int x, int y, UINT id);
+	void TButton::CreateIconCheckBox(HINSTANCE hInst, HWND hParent, int x, int y,int width,int height, UINT id);
 	void TButton::SetIconIsChecked();
 	void TButton::SetIconIsUnChecked();
 
 	void TButton::LoadCheckedBitmap(HINSTANCE hInst, UINT uiBitmapId);
 	void TButton::LoadUnCheckedBitmap(HINSTANCE hInst, UINT uiBitmapId);
-	void TButton::CreateBitmapCheckBox(HINSTANCE hInst, HWND hParent, int x, int y, UINT id);
+	void TButton::CreateBitmapCheckBox(HINSTANCE hInst, HWND hParent, int x, int y, int width, int height, UINT id);
 	void TButton::SetBitmapIsChecked();
 	void TButton::SetBitmapIsUnChecked();
 

@@ -82,6 +82,8 @@ void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
 	case ELEMENT_POLYLINEBAR:
 		DrawPolylineBar(hdc, (TPolylineBar *)Element, pConfig);
 		break;
+	case DRIVER:
+		break;
 	default:
 		assert(0);
 		break;

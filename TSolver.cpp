@@ -21,6 +21,7 @@
 #include "TEquations.h"
 #include "TConstraintCoincide.h"
 #include "TConstraintColinear.h"
+#include "TDriver.h"
 
 TSolver::TSolver()
 {
@@ -161,6 +162,8 @@ void TSolver::ClearEuqations()
 	if (EquationsV != NULL)
 		delete EquationsV;
 	EquationsV = new TEquations;
+
+	vecStrDriver.clear();
 }
 
 void TSolver::RefreshEquations()
@@ -262,6 +265,14 @@ void TSolver::RefreshEquations()
 			//Solve时，建立Jacobian会替换掉
 			break;
 		}
+		case DRIVER:
+		{
+			TDriver *pDriver = (TDriver *)element;
+			String s;
+			s<< pDriver->sExprLeft<< TEXT("-") << pDriver->sExprRight;
+			vecStrDriver.push_back(s);
+			break;
+		}
 		}
 	}
 
@@ -303,72 +314,59 @@ void TSolver::SetElementPosition(TVariableTable &VariableTable)
 {
 	for (size_t i = 0; i < VariableTable.VariableTable.size(); i++)
 	{
-		enum enumQType{ x, y, phi ,other} eQType=other;
-		switch (VariableTable.VariableTable[i][0])
-		{
-		case TEXT('x'):
-			eQType = x;
-			break;
-		case TEXT('y'):
-			eQType = y;
-			break;
-		case TEXT('p'):
-			eQType = phi;
-			break;
-		default:
-			eQType = other;
-			break;
-		}
 		int id = GetIdFromVariableStr(VariableTable.VariableTable[i]);
 		TElement *element = pShape->GetElementById(id);
 		double &data = VariableTable.VariableValue[i];
 
-		switch (element->eType)
+		switch (VariableTable.VariableTable[i][0])
 		{
-		case ELEMENT_BAR:
-		case ELEMENT_REALLINE:
-		case ELEMENT_SLIDEWAY:
-		{
-			TBar *bar = (TBar *)element;
-			switch (eQType)
-			{
-			case x:
-				((TBar *)bar)->dpt.x = data;
-				break;
-			case y:
-				((TBar *)bar)->dpt.y = data;
-				break;
-			case phi:
-				data = MakeIn2Pi(data);
-				bar->SetPoint(bar->ptBegin, bar->dLength, data);
-				break;
-			}
+		case TEXT('x'):
+			element->SetX(data);
 			break;
-		}
-		case ELEMENT_FRAMEPOINT:
-		case ELEMENT_SLIDER:
-		case ELEMENT_POLYLINEBAR:
-		{
-			switch (eQType)
-			{
-			case x:
-				element->dpt.x = data;
-				break;
-			case y:
-				element->dpt.y = data;
-				break;
-			case phi:
-				data = MakeIn2Pi(data);
-				element->angle = data;
-				break;
-			}
+		case TEXT('y'):
+			element->SetY(data);
 			break;
-		}
+		case TEXT('p'):
+			element->SetPhi(data);//MakeIn2Pi
+			break;
 		default:
-			assert(0);
-			break;
+			continue;
 		}
+
 	}
+}
+
+void TSolver::LinkpValue(std::vector<double *> &vecpValue)
+{
+	vecpValue.clear();
+	TVariableTable &VariableTable = Equations->VariableTable;
+	for (size_t i = 0; i < VariableTable.VariableTable.size(); i++)
+	{
+		int id = GetIdFromVariableStr(VariableTable.VariableTable[i]);
+		TElement *element = pShape->GetElementById(id);
+		//double &data = VariableTable.VariableValue[i];
+
+		switch (VariableTable.VariableTable[i][0])
+		{
+		case TEXT('x'):
+			vecpValue.push_back(&(element->dpt.x));
+			break;
+		case TEXT('y'):
+			vecpValue.push_back(&(element->dpt.y));
+			break;
+		case TEXT('p'):
+			vecpValue.push_back(&(element->angle));
+			break;
+		default:
+			continue;
+		}
+
+	}
+}
+
+void TSolver::GetResult(std::vector<double> &vecResult)
+{
+	vecResult = Equations->VariableTable.VariableValue;
 }
 
 //求解
@@ -399,6 +397,45 @@ void TSolver::Solve()
 		RefreshWindowText();
 }
 
+void TSolver::Solve(double t)
+{
+	Equations->RemoveTempEquations();
+
+	Equations->DefineAVariable(pStr, TEXT("t"), t);
+	for (auto StrDriver:vecStrDriver)
+		Equations->AddEquation(pStr, StrDriver.c_str(), true);
+	Equations->Subs(pStr, subsVar, subsValue);
+
+	Equations->BuildEquationsV(pStr);//此时t还在变量组内
+	Equations->BuildEquationsA_Phitt(pStr);//
+
+	Equations->Subs(pStr, TEXT("t"),t);
+	//Equations->SimplifyEquations(pStr);
+
+	Equations->BuildVariableTableV(pStr);//
+	Equations->BuildVariableTableA(pStr);//
+
+	Equations->BuildJacobian(pStr);
+
+	//解出位置方程
+	Equations->SolveEquations(pStr);
+
+	if (Equations->hasSolved)
+	{
+		//解出速度方程
+		Equations->SubsV(pStr, TEXT("t"), t);//
+		Equations->SolveEquationsV(pStr);//
+
+		//解出加速度方程
+		Equations->SubsA(pStr, TEXT("t"), t);//
+		Equations->SolveEquationsA(pStr);
+
+		//设置位置
+		SetElementPosition(Equations->VariableTable);
+	}
+	RefreshWindowText();
+}
+
 void TSolver::Demo()
 {
 	//Outputln(Equations->VariableTable.Define(true, TEXT("x1 y1 phi1 x2 y2 phi2 l t"),TEXT("0 0 0 2.3 0 0 1.3 0")));
@@ -423,14 +460,14 @@ void TSolver::Demo()
 
 	Equations->RemoveTempEquations();
 
-	Equations->DefineVariable(pStr, TEXT("t"), TEXT("0"));
+	Equations->DefineAVariable(pStr, TEXT("t"), 0.1);
 	Equations->AddEquation(pStr, TEXT("phi2-ln(t)"), true);
 	Equations->Subs(pStr, subsVar, subsValue);
 
 	Equations->BuildEquationsV(pStr);//此时t还在变量组内
 	Equations->BuildEquationsA_Phitt(pStr);//
 
-	Equations->Subs(pStr, TEXT("t"),TEXT("0.1"));
+	Equations->Subs(pStr, TEXT("t"),0.1);
 	//Equations->SimplifyEquations(pStr);
 
 	Equations->BuildVariableTableV(pStr);//

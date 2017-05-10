@@ -11,6 +11,7 @@
 #include "TShape.h"
 #include "TToolTip.h"
 #include "TTreeViewContent.h"
+#include "TSolver.h"
 
 #include "TTransfer.h"
 #include "TExpressionTree.h"
@@ -23,9 +24,11 @@ extern TMainWindow win;
 namespace DialogAddDriver
 {
 	int iElementId;
+	double dElementValue;
 	TConfiguration *pConfig;
 	TTreeViewContent *pTreeViewContent;
 	TShape *pShape;
+	TSolver *pSolver;
 
 	TEdit EditA;
 	TEdit EditB;
@@ -130,6 +133,7 @@ namespace DialogAddDriver
 			pTreeViewContent = &(win.RightWindow.TreeViewContent);
 			pShape = &(win.m_Shape);
 			pConfig = &(win.m_Configuration);
+			pSolver = win.pSolver;
 
 			hToolTipError = NULL;
 
@@ -220,7 +224,6 @@ namespace DialogAddDriver
 					TCHAR szErr[64];
 					GetErrorInfo(err, szErr);
 					hToolTipError=CreateToolTip(hDlg, EditExprRight.m_hWnd, (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE),szErr);
-
 
 					return (LRESULT)hBrush;
 				}
@@ -353,36 +356,55 @@ namespace DialogAddDriver
 				}
 				break;
 			}
+			case IDC_BUTTON_SET_NOW_POS_IS_ORIGIN:
+			{
+				//计算t=0时刻的值，不等于当前位置则加上当前位置
+				TExpressionTree Expr,ExprTemp;
+				TVariableTable VariableTable;
+				VariableTable.Define(NULL, TEXT("t"), 0.0);
+				Expr.LinkVariableTable(&VariableTable); 
+				Expr.Read(EditExprRight.GetText(), false);
+				Expr.OutputStr();
+
+				ExprTemp = Expr;
+
+				ExprTemp.Subs(VariableTable.FindVariableTable(TEXT("t")), 0.0, false);
+
+				double value=0.0;
+				try
+				{
+					ExprTemp.Calc(&value);
+				}
+				catch (enumError &err)
+				{
+					break;
+				}
+
+				if (Expr.GetError()==ERROR_NO && ExprTemp.GetError() == ERROR_NO)
+				{
+					if (!ISEQUAL(value,dElementValue,precision))
+					{
+						Expr.operator+(dElementValue);
+						Expr.Simplify(false);
+
+						EditExprRight.SetText(Expr.OutputStr());
+					}
+				}
+				break;
+			}
 			case IDOK:
 			{
 				//添加约束
-				/*int len1,len2;
-
-				TCHAR *s, *temp;
-
-				len1 = ComboBox_GetTextLength(hComboDriverType) + 1;
-				len2 = ComboBox_GetTextLength(hComboExprType) + 1;
-				s = new TCHAR[len1+len2];
-				ComboBox_GetText(hComboDriverType,s, len1);
-
-				temp = new TCHAR[len2];
-				ComboBox_GetText(hComboExprType, temp, len2);
-
-				_tcscat(s, TEXT(" "));
-				_tcscat(s, temp);
-
-				pTreeViewContent->AddDriver(iElementId, s);
-
-				delete[] s;
-				delete[] temp;*/
-				//win.pSolver->AddMouseConstraint
 
 				TDriver Driver;
 				Driver.SetStyle(pConfig);
 
+				Driver.sExprLeft = EditExprLeft.GetText();
+				Driver.sExprRight = EditExprRight.GetText();
+
 				pTreeViewContent->AddItem(&Driver, pShape->iNextId);
 				pShape->AddElement(&Driver);
-
+				pSolver->RefreshEquations();
 			}
 			case IDCANCEL:
 				EndDialog(hDlg, 0);

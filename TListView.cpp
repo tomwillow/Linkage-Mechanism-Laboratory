@@ -52,7 +52,7 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 		{
 			RECT rect = GetGridRectInMargin(tempEdit.ListItemIndex, 1);//点击项内容区的坐标
 
-			tempEdit.SetPos(rect);
+			tempEdit.SetPosition(rect);
 			PostMessage(hWnd, WM_PAINT, 0, 0);
 		}
 		break;
@@ -95,7 +95,7 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 					tempEdit.eCtrlType = vecCtrlType[index];
 					tempEdit.pContent = vecpContent[index];
 					tempEdit.ListItemIndex = index;
-					tempEdit.SetPos(rect);
+					tempEdit.SetPosition(rect);
 
 					TCHAR buf[100];
 					ListView_GetItemText(hWnd, index, 1, buf, sizeof(buf)*sizeof(TCHAR));
@@ -198,7 +198,7 @@ void TListView::CreateListViewEx(HWND hParent, UINT id, HINSTANCE hInst)
 	//创建Edit
 	tempEdit.CreateEditEx(m_hWnd, 0, m_hInst);
 	tempEdit.SetDefaultGuiFont();
-	tempEdit.SetPos(10, 10, 100, 20);
+	tempEdit.SetPosition(10, 10, 100, 20);
 	tempEdit.SetVisible(false);
 
 	RegisterProc();

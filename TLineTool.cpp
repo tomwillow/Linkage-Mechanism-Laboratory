@@ -39,7 +39,9 @@ TLineTool::TLineTool()
 
 	pPrevLine = NULL;
 
-	//bShowDptText = false;
+	bShowTips = true;
+	sType = TEXT("线段");
+	bCanBuildCoincide = false;
 }
 
 
@@ -113,11 +115,24 @@ void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			ptMiddle.x = (LineDim->ptEnd.x + LineDim->ptBegin.x) / 2;
 			ptMiddle.y = (LineDim->ptEnd.y + LineDim->ptBegin.y) / 2;
 
-			LineEdit->SetPos(ptMiddle.x - width / 2, ptMiddle.y - height / 2, width, height);
+			LineEdit->SetPosition(ptMiddle.x - width / 2, ptMiddle.y - height / 2, width, height);
 			LineEdit->SetVisible(true);
 		}
 		else
 			LineEdit->SetVisible(false);
+	}
+
+	ptMouse = pConfig->RealToScreen(Attach->dptAttach);
+	if (ptMouse.x == ptPrevPos.x && ptMouse.y == ptPrevPos.y)
+		sTips = TEXT("长度为0:请移动光标或输入数据");
+	else
+	{
+		sTips = TEXT("点击或输入数据以建立");
+		sTips << sType;
+		if (bShowDimLine)
+			sTips << TEXT("\r\n（输入格式: 长度 or 长度<角度 or x坐标,y坐标（相对当前点））");
+		if (Attach->bAttachedEndpoint && bCanBuildCoincide)
+			sTips << TEXT("\r\n已吸附端点:自动建立重合约束");
 	}
 
 	//由Canvas刷新
@@ -128,9 +143,6 @@ void TLineTool::Draw(HDC hdc)
 {
 
 	Attach->Draw(hdc);//主叉由Attach提供
-
-	//if (bShowDptText)
-	//	TDraw::DrawCross(hdc, pConfig->RealToScreen(dptText), 18, { PS_SOLID, { 1, 0 }, pConfig->crPen });
 
 	//画临时线及尺寸线
 	if (dptHit.size() > 0)
@@ -156,9 +168,10 @@ void TLineTool::Draw(HDC hdc)
 		}
 
 	}
+
+	if (bShowTips)
+		TDraw::DrawTips(hdc, ptMouse, sTips.c_str(), pConfig);
 }
-
-
 
 TElement * TLineTool::AddIntoShape(TRealLine &RealLine)
 {
@@ -297,8 +310,11 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void TLineTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig)
 {
-	AddIntoTreeViewContent(pCoincide, id);
-	pShape->AddElement(pCoincide);
+	if (bCanBuildCoincide)
+	{
+		AddIntoTreeViewContent(pCoincide, id);
+		pShape->AddElement(pCoincide);
+	}
 }
 
 

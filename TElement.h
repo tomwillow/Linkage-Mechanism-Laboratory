@@ -54,6 +54,9 @@ public:
 	virtual void TElement::NoticeListView(TListView *pListView);
 	virtual const DPOINT TElement::GetRelativePointByIndex(int PointIndexOfElement) const;
 	virtual DPOINT TElement::GetAbsolutePointByIndex(int PointIndexOfElement) const;
+	virtual void TElement::SetX(double x);
+	virtual void TElement::SetY(double y);
+	virtual void TElement::SetPhi(double phi);
 };
 
 DPOINT GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);

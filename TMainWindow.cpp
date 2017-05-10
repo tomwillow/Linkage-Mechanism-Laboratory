@@ -18,6 +18,7 @@
 #include "DialogAddDriver.h"
 #include "DialogOption.h"
 #include "DialogAbout.h"
+#include "DialogAnimation.h"
 
 #include "TGraph.h"
 
@@ -77,6 +78,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.AddGroup(10, 0, ID_DRAW_COLINEAR, true, TEXT("共线约束"));
 	m_Toolbar.AddSeparator(0);
 	m_Toolbar.AddButton(11, ID_SET_DRIVER, true, TEXT("设为原动件"));
+	m_Toolbar.AddButton(12, ID_ANIMATION, true, TEXT("动画与测量"));
 	m_Toolbar.ShowToolbar();
 
 	//创建状态栏
@@ -97,13 +99,13 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	//创建真实切换按钮
 	m_CheckBoxShowReal.LoadCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_REAL);
 	m_CheckBoxShowReal.LoadUnCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_SIMPLE);
-	m_CheckBoxShowReal.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).top, IDR_STATUS_CHECKBOX_SHOW_REAL);
+	m_CheckBoxShowReal.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).top,20,20, IDR_STATUS_CHECKBOX_SHOW_REAL);
 	m_CheckBoxShowReal.SetCheckedAndBitmap(m_Configuration.bDrawReal);
 
 	//创建风格切换按钮
 	m_CheckBoxTheme.LoadCheckedBitmap(m_hInst, IDB_BITMAP_THEME_DARK);
 	m_CheckBoxTheme.LoadUnCheckedBitmap(m_hInst, IDB_BITMAP_THEME_BRIGHT);
-	m_CheckBoxTheme.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 0).top, IDR_STATUS_CHECKBOX_THEME);
+	m_CheckBoxTheme.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 0).top,20,20, IDR_STATUS_CHECKBOX_THEME);
 	m_CheckBoxTheme.SetCheckedAndBitmap(m_Configuration.bThemeDark);
 
 	//创建tooltip
@@ -394,7 +396,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		pGraph->UpdateWindow();
 
 
-		std::vector<DPOINT> dptVector,dptVector2;
+		std::vector<DPOINT> dptVector, dptVector2;
 		DPOINT dpt;
 		for (double x = 0; x < 1000; ++x)
 		{
@@ -406,8 +408,8 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			dptVector2.push_back(dpt);
 		}
 
-		pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 },true);
-		pGraph->InputDptVector(dptVector2, { PS_SOLID, { 1, 0 }, RGB(255,0,0) },true);
+		pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, true);
+		pGraph->InputDptVector(dptVector2, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, true);
 
 		pGraph->SetMargin(40);
 
@@ -421,8 +423,12 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
 			{
 				//选择工具 且 选中元素可驱动 则弹出原动件对话框
-				if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex!=-1)
-				DialogAddDriver::iElementId = m_Shape.Element[((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex]->id;
+				if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex != -1)
+				{
+					//预设
+					DialogAddDriver::iElementId = m_Shape.Element[((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex]->id;
+					DialogAddDriver::dElementValue = m_Shape.Element[((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex]->angle;
+				}
 				if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DialogAddDriver::DlgAddDriverProc))
 				{
 					MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
@@ -433,6 +439,14 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		}
 		else
 			MessageBox(m_hWnd, TEXT("请先使用选择工具选择一个元素，再设为原动件。"), TEXT(""), MB_ICONINFORMATION);
+		break;
+	}
+	case ID_ANIMATION:
+	{
+		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ANIMATION), m_hWnd, DialogAnimation::DlgAnimationProc))
+		{
+			MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
+		}
 		break;
 	}
 	case ID_OPTION:
@@ -515,9 +529,9 @@ void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 		return;
 	m_Toolbar.FreshSize();
 	m_Status.FreshSize();
-	m_Trackbar.MoveWindow(m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0));//Trackbar嵌入Status
-	m_CheckBoxShowReal.SetPos(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1));
-	m_CheckBoxTheme.SetPos(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1));
+	m_Trackbar.SetRect(m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0));//Trackbar嵌入Status
+	m_CheckBoxShowReal.SetPositionOnlyOrigin(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1));
+	m_CheckBoxTheme.SetPositionOnlyOrigin(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1));
 
 	SetRightWindowPos();
 

@@ -13,6 +13,9 @@ TSlidewayTool::TSlidewayTool()
 	delete MoveLine;
 	MoveLine = new TSlideway;
 	MoveLine->SetStyle(pConfig);
+
+	sType = TEXT("滑道");
+	bCanBuildCoincide = false;
 }
 
 
@@ -29,7 +32,7 @@ TElement * TSlidewayTool::AddIntoShape(TRealLine &RealLine)
 	return pShape->AddElement(&Slideway);
 }
 
-void TSlidewayTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig)//所有加入约束经过此处
-{
-
-}
+//void TSlidewayTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig)//所有加入约束经过此处
+//{
+//
+//}

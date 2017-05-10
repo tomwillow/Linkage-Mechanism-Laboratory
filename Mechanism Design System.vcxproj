@@ -72,9 +72,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CMyButton.cpp" />
     <ClCompile Include="DetectMemoryLeak.cpp" />
     <ClCompile Include="DialogAbout.cpp" />
     <ClCompile Include="DialogAddDriver.cpp" />
+    <ClCompile Include="DialogAnimation.cpp" />
     <ClCompile Include="DialogOption.cpp" />
     <ClCompile Include="FileFunction.cpp" />
     <ClCompile Include="RegisterFunction.cpp" />
@@ -136,11 +138,14 @@
     <ClCompile Include="TWindow.cpp" />
     <ClCompile Include="TTrackbar.cpp" />
     <ClCompile Include="TTransfer.cpp" />
+    <ClCompile Include="MyMath.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CMyButton.h" />
     <ClInclude Include="DetectMemoryLeak.h" />
     <ClInclude Include="DialogAbout.h" />
     <ClInclude Include="DialogAddDriver.h" />
+    <ClInclude Include="DialogAnimation.h" />
     <ClInclude Include="DialogOption.h" />
     <ClInclude Include="FileFunction.h" />
     <ClInclude Include="RegisterFunction.h" />

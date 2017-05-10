@@ -31,6 +31,18 @@
     <Filter Include="头文件\Common">
       <UniqueIdentifier>{f1ad9c79-dc98-4e28-8ab6-dc59cb8acee2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Dialog">
+      <UniqueIdentifier>{3748f537-6eec-4d57-aa7e-78844a5496a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Dialog">
+      <UniqueIdentifier>{67440813-8800-487f-a521-5ca1605a74f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Solver">
+      <UniqueIdentifier>{61582909-e875-45c7-85f1-48bab2f4a75b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Solver">
+      <UniqueIdentifier>{091bb2a2-18f7-4ef5-94ae-eb2d789c4b9f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -90,25 +102,10 @@
     <ClCompile Include="TControl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TExpressionTree.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TConsole.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TConsoleEdit.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TVariableTable.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TEquations.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TSolver.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogAddDriver.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TGraph.cpp">
@@ -177,9 +174,6 @@
     <ClCompile Include="TButton.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="DialogOption.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TPolylineBar.cpp">
       <Filter>源文件\Element</Filter>
     </ClCompile>
@@ -216,14 +210,41 @@
     <ClCompile Include="TConstraintColinearTool.cpp">
       <Filter>源文件\Tool</Filter>
     </ClCompile>
-    <ClCompile Include="DialogAbout.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TToolTip.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TDriver.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="MyMath.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogAbout.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogAddDriver.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogAnimation.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogOption.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="CMyButton.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TEquations.cpp">
+      <Filter>源文件\Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="TExpressionTree.cpp">
+      <Filter>源文件\Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="TVariableTable.cpp">
+      <Filter>源文件\Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="TSolver.cpp">
+      <Filter>源文件\Solver</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -284,28 +305,13 @@
     <ClInclude Include="TControl.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TExpressionTree.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TConsole.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TConsoleEdit.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TVariableTable.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TEquations.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TSolver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DetectMemoryLeak.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogAddDriver.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TGraph.h">
@@ -371,9 +377,6 @@
     <ClInclude Include="TButton.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="DialogOption.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TPolylineBarTool.h">
       <Filter>头文件\Tool</Filter>
     </ClInclude>
@@ -422,14 +425,38 @@
     <ClInclude Include="TConstraintColinearTool.h">
       <Filter>头文件\Tool</Filter>
     </ClInclude>
-    <ClInclude Include="DialogAbout.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TToolTip.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TDriver.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogAbout.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogAddDriver.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogOption.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogAnimation.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="CMyButton.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TSolver.h">
+      <Filter>头文件\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="TVariableTable.h">
+      <Filter>头文件\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="TExpressionTree.h">
+      <Filter>头文件\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="TEquations.h">
+      <Filter>头文件\Solver</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -52,7 +52,8 @@ enumError TExpressionTree::GetError()
 	return eError;
 }
 
-void TExpressionTree::DeleteNode(TNode *node)//删除node指向对象但不重置node指针
+//删除node指向对象 可删除任意位置节点，如被删节点存在父节点则父节点左右儿子置0
+void TExpressionTree::DeleteNode(TNode *node)
 {
 	if (node != NULL)
 	{
@@ -68,6 +69,7 @@ void TExpressionTree::DeleteNode(TNode *node)//删除node指向对象但不重置node指针
 	}
 }
 
+//遍历删除节点 未处理父节点，未判断左右儿子是否存在
 void TExpressionTree::DeleteNodeTraversal(TNode *node)
 {
 	if (node->left != NULL)
@@ -566,6 +568,7 @@ enumError TExpressionTree::InQueue2PostQueue(std::queue<TNode *> &InOrder, std::
 		return ERROR_NO;
 }
 
+//未判断result容量是否合适
 void TExpressionTree::Node2Str(const TNode &node, TCHAR *result)
 {
 	switch (node.eType)
@@ -684,7 +687,8 @@ TCHAR * TExpressionTree::OutputStr(bool bIgnoreError)
 		if (szOutput != NULL)
 			delete[] szOutput;
 
-		szOutput = new TCHAR[MAX_VAR_NAME * GetNodeNum(head)];
+		int len = MAX_VAR_NAME * GetNodeNum(head);
+		szOutput = new TCHAR[len==0?1:len];
 		szOutput[0] = TEXT('\0');
 
 		if (head != NULL)
@@ -1872,7 +1876,7 @@ TCHAR * TExpressionTree::OutputEmptyStr()
 	if (szOutput != NULL)
 		delete[] szOutput;
 	szOutput = new TCHAR[1];
-	_tcscpy(szOutput, TEXT(""));
+	szOutput[0] = TEXT('\0');
 	return szOutput;
 }
 
@@ -2421,6 +2425,7 @@ void TExpressionTree::Calc(TNode *now)
 	}
 }
 
+//计算表达式值 operateHeadNode决定是否操作本身的节点
 double TExpressionTree::Value(bool operateHeadNode)
 {
 	if (eError == ERROR_NO)
@@ -2454,6 +2459,7 @@ double TExpressionTree::Value(bool operateHeadNode)
 		throw(eError);
 }
 
+//复制出一棵临时树计算值
 TCHAR * TExpressionTree::Calc(double *result)
 {
 	if (eError == ERROR_NO)
@@ -2465,6 +2471,10 @@ TCHAR * TExpressionTree::Calc(double *result)
 
 			if (result != NULL)
 				*result = Duplicate->ValueOrName.value;
+
+			if (szOutput != NULL)
+				delete[] szOutput;
+			szOutput = new TCHAR[32];
 
 			Node2Str(*Duplicate, szOutput);
 			delete Duplicate;
@@ -2557,6 +2567,12 @@ bool TExpressionTree::HasOnlyOneVar()//只有一个变量
 
 TExpressionTree & TExpressionTree::operator*(double value)
 {
+	if (head == NULL)
+	{
+		eError = ERROR_EMPTY_INPUT;
+		return *this;
+	}
+
 	TNode *Multiply = NewNode(NODE_OPERATOR, MATH_MULTIPLY);
 	TNode *Value = NewNode(NODE_NUMBER);
 	Value->ValueOrName.value = value;
@@ -2568,6 +2584,52 @@ TExpressionTree & TExpressionTree::operator*(double value)
 	Value->parent = Multiply;
 
 	head = Multiply;
+
+	return *this;
+}
+
+TExpressionTree & TExpressionTree::operator+(double value)
+{
+	if (head == NULL)
+	{
+		eError = ERROR_EMPTY_INPUT;
+		return *this;
+	}
+
+	TNode *Add = NewNode(NODE_OPERATOR, MATH_ADD);
+	TNode *Value = NewNode(NODE_NUMBER);
+	Value->ValueOrName.value = value;
+
+	Add->left = head;
+	Add->right = Value;
+
+	head->parent = Add;
+	Value->parent = Add;
+
+	head = Add;
+
+	return *this;
+}
+
+TExpressionTree & TExpressionTree::operator-(double value)
+{
+	if (head == NULL)
+	{
+		eError = ERROR_EMPTY_INPUT;
+		return *this;
+	}
+
+	TNode *Substract = NewNode(NODE_OPERATOR, MATH_SUBSTRACT);
+	TNode *Value = NewNode(NODE_NUMBER);
+	Value->ValueOrName.value = value;
+
+	Substract->left = head;
+	Substract->right = Value;
+
+	head->parent = Substract;
+	Value->parent = Substract;
+
+	head = Substract;
 
 	return *this;
 }

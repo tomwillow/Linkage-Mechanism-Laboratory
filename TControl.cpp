@@ -9,26 +9,49 @@ TControl::TControl()
 	m_hWnd = NULL;
 	m_hParent = NULL;
 	m_hInst = NULL;
+
+	Text = NULL;
 }
 
 
 TControl::~TControl()
 {
+	if (Text != NULL)
+		free(Text);
 }
 
-void TControl::SetPos(RECT &rect)//只使用rect的left和top，如果没有设置m_iWidth和m_iHeight将出错
+//仅使用x,y坐标，width,height使用原大小
+void TControl::SetPositionOnlyOrigin(const RECT &rect)
 {
-	::MoveWindow(m_hWnd, rect.left, rect.top, m_iWidth,m_iHeight, true);
+	RECT rc;
+	GetClientRect(m_hWnd, &rc);
+	SetPosition(rect.left, rect.top, rc.right, rc.bottom);
 }
 
+//right和bottom保存的是宽和高
 void TControl::SetRect(RECT &rect)
 {
 	::MoveWindow(m_hWnd, rect.left,rect.top,  rect.right, rect.bottom, true);
 }
 
+//对角点坐标
 void TControl::SetRect(int x1, int y1, int x2, int y2)
 {
 	::MoveWindow(m_hWnd, x1, y1, x2 - x1, y2 - y1, true);
+}
+
+
+void TControl::SetPosition(int x, int y, int width, int height)
+{
+	::MoveWindow(m_hWnd, x, y, width, height, true);
+	//::SetWindowPos(m_hWnd, HWND_TOP, x, y, width, height, 0);//SWP_SHOWWINDOW
+}
+
+//rect中各值均为坐标
+void TControl::SetPosition(RECT rect)
+{
+	::MoveWindow(m_hWnd, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, true);
+	//::SetWindowPos(m_hWnd, HWND_TOP, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, 0);//SWP_SHOWWINDOW
 }
 
 LRESULT CALLBACK TControl::subControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -62,4 +85,87 @@ void TControl::RegisterProc()//创建窗口后注册
 LRESULT TControl::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)//虚拟消息处理函数，可重载
 {
 	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
+}
+
+void TControl::Invalidate()
+{
+	RECT rect;
+	GetClientRect(m_hWnd, &rect);
+	InvalidateRect(m_hWnd, &rect, FALSE);
+}
+
+void TControl::SetFont(HFONT hFont)
+{
+	SendMessage(m_hWnd,             // Handle of edit control
+		WM_SETFONT,         // Message to change the font
+		(WPARAM)hFont,     // handle of the font
+		MAKELPARAM(TRUE, 0) // Redraw text
+		);
+}
+
+void CDECL TControl::SetText(TCHAR szFormat[], ...)
+{
+	TCHAR szBuffer[1024];
+	va_list pArgList;
+	va_start(pArgList, szFormat);
+	_vsntprintf_s(szBuffer, sizeof(szBuffer) / sizeof(TCHAR), szFormat, pArgList);
+	va_end(pArgList);
+
+	::SetWindowText(m_hWnd, szBuffer);
+}
+
+void TControl::GetText(TCHAR text[])
+{
+	::GetWindowText(m_hWnd, text, GetLength() + 1);//不知道为什么要加1才取得全
+}
+
+TCHAR * TControl::GetText()
+{
+	//if (Text != NULL)
+	//	free(Text);
+	Text = (TCHAR *)realloc(Text, (GetLength() + 1)*sizeof(TCHAR));
+	GetText(Text);
+	return Text;
+}
+
+int TControl::GetLength()
+{
+	return ::GetWindowTextLength(m_hWnd);
+}
+
+void TControl::SetVisible(bool bShow)
+{
+	::ShowWindow(m_hWnd, bShow ? SW_SHOWNORMAL : SW_HIDE);
+}
+
+bool TControl::GetVisible()
+{
+	return (bool)IsWindowVisible(m_hWnd);
+}
+
+void TControl::SetEnable(bool bEnable)
+{
+	EnableWindow(m_hWnd, bEnable);
+}
+
+bool TControl::GetEnable()
+{
+	return (bool)IsWindowEnabled(m_hWnd);
+}
+
+void TControl::SetDouble(double d)
+{
+	int n = 6;//一开始就假定小数位数为6位
+	long temp = (long)(d * 1e6);//将6位小数全部取出，并舍弃计算后多余的可能是误差的小数部分
+	for (n = 6; n>0; n--)
+	{
+		if (0 != temp % 10) break;
+		temp = temp / 10;
+	}
+	SetText(TEXT("%.*f"),n, d);
+}
+
+double TControl::GetDouble()
+{
+	return _tcstod(GetText(), NULL);
 }

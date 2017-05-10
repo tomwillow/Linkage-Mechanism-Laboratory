@@ -114,6 +114,8 @@ public:
 	TExpressionTree& TExpressionTree::operator=(const TExpressionTree &expr);
 	TExpressionTree& TExpressionTree::operator+(const TExpressionTree &expr);
 	TExpressionTree & TExpressionTree::operator*(double value);
+	TExpressionTree & TExpressionTree::operator+(double value);
+	TExpressionTree & TExpressionTree::operator-(double value);
 
 	TExpressionTree();
 	~TExpressionTree();

@@ -15,13 +15,10 @@
 #include "TPolylineBar.h"
 #include "TConstraintCoincide.h"
 #include "TConstraintColinear.h"
+#include "TDriver.h"
 
 TShape::TShape()
 {
-	iNextId = 0;
-	nb = 0;
-	hasFrame = false;
-	iCoincideNum = 0;
 }
 
 TShape::~TShape()
@@ -68,6 +65,9 @@ std::vector<int> TShape::DeleteElement(int index)
 			hasFrame = false;
 			nb--;
 		}
+		break;
+	case DRIVER:
+		iDriverNum--;
 		break;
 	case ELEMENT_REALLINE:
 	case CONSTRAINT_COINCIDE://之后处理
@@ -130,10 +130,12 @@ void TShape::ReleaseAll()
 	for (auto pElement:Element)
 		delete pElement;
 	Element.clear();
+
 	iNextId = 0;
 	nb = 0;
 	hasFrame = false;
 	iCoincideNum = 0;
+	iDriverNum = 0;
 }
 
 int TShape::nc()
@@ -365,6 +367,15 @@ bool TShape::ReadFromFile(TCHAR szFileName[])
 				return false;
 			break;
 		}
+		case DRIVER:
+		{
+			TDriver temp;
+			if (temp.ReadFile(hf, now_pos, this))
+				AddElement(&temp);
+			else
+				return false;
+			break;
+		}
 		default:
 			return false;
 			assert(0);
@@ -441,6 +452,8 @@ size_t TShape::GetPickedElementIndex(const POINT &ptPos, const TConfiguration *p
 		case ELEMENT_POLYLINEBAR:
 			if (TDraw::PointInPolylineBar(ptPos, (TPolylineBar *)(*iter), pConfig))
 				return iter - Element.cbegin();
+			break;
+		case DRIVER:
 			break;
 		default:
 			assert(0);

@@ -97,7 +97,7 @@ void CDECL TStatus::SetText(int id, TCHAR szFormat[], ...)
 	}
 }
 
-//得到某块的Rect
+//得到某块的Rect，保存的是坐标
 RECT TStatus::GetPartRect(int id, int margin)
 {
 	for (UINT i = 0; i < m_iPartsNum; i++)
