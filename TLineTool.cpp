@@ -175,6 +175,8 @@ void TLineTool::Draw(HDC hdc)
 
 TElement * TLineTool::AddIntoShape(TRealLine &RealLine)
 {
+	RealLine.vecDpt.push_back(RealLine.GetRelativePointByIndex(0));
+	RealLine.vecDpt.push_back(RealLine.GetRelativePointByIndex(1));
 	return pShape->AddElement(&RealLine);
 }
 

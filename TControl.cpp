@@ -1,6 +1,7 @@
 #pragma once
 #include "DetectMemoryLeak.h"
 
+#include "tchar_head.h"
 #include "TControl.h"
 
 
@@ -153,6 +154,7 @@ bool TControl::GetEnable()
 	return (bool)IsWindowEnabled(m_hWnd);
 }
 
+//自动去掉小数末尾0，最多显示6位
 void TControl::SetDouble(double d)
 {
 	int n = 6;//一开始就假定小数位数为6位

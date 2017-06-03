@@ -398,18 +398,20 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		std::vector<DPOINT> dptVector, dptVector2;
 		DPOINT dpt;
-		for (double x = 0; x < 1000; ++x)
+		srand(GetTickCount());
+		for (int x = 0; x <50 * (rand() % 19 + 1); ++x)
+		//for (int x = 0; x <=100; ++x)
 		{
-			dpt.x = x;
-			dpt.y = sin(x / 50) * 50;
+			dpt.x = 120.234+x*0.01;
+			dpt.y = sin(x / 10.0) * 50;
 			dptVector.push_back(dpt);
 
-			dpt.y = cos(x / 50) * 50;
+			dpt.y = cos(x / 10.0) * 50;
 			dptVector2.push_back(dpt);
 		}
 
-		pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, true);
-		pGraph->InputDptVector(dptVector2, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, true);
+		pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, true,TEXT("y=sin(x/50)"));
+		pGraph->InputDptVector(dptVector2, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, true,TEXT("y=cos(x/50)"));
 
 		pGraph->SetMargin(40);
 

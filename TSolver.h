@@ -8,8 +8,11 @@
 #include "String.h"
 #include "DPOINT.h"
 
+#include "DialogAnimation.h"
+
 enum enumConditionType {CONDITION_COINCIDE,CONDITION_FRAMEPOINT};
 class TEquations;
+class TListBoxItem;
 class TSolver:public TTool
 {
 private:
@@ -18,7 +21,7 @@ private:
 	HWND hwndOutput;
 	//TCHAR *str;
 	TEquations *Equations;
-	TEquations *EquationsV;
+	//TEquations *EquationsV;
 	TCHAR subsVar[1000], subsValue[1000];
 	std::vector<int> idOrder;
 	double *Phi, *Phip;
@@ -45,8 +48,12 @@ public:
 	void TSolver::ClearConstraint();
 	void TSolver::Demo();
 	void TSolver::ClearEuqations();
-	void TSolver::Solve(double t);
+	bool TSolver::Solve(double t);
 	void TSolver::LinkpValue(std::vector<double *> &vecpValue);
 	void TSolver::GetResult(std::vector<double> &vecResult);
+	void TSolver::SubsFramePoint();
+
+	void TSolver::GetMesureResult(std::vector<DialogAnimation::TListBoxItem> &vecItems, std::vector<int> &vecIndex);
+	void TSolver::LinkMesureResult(const std::vector<DialogAnimation::TListBoxItem> &vecItems, std::vector<int> &vecIndex);
 };
 

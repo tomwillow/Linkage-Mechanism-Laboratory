@@ -9,7 +9,7 @@
 #include "FileFunction.h"
 #include "RegisterFunction.h"
 
-#include "TButton.h"
+#include "TCheckBox.h"
 
 #include "TMainWindow.h"
 extern TMainWindow win;
@@ -17,7 +17,7 @@ extern TMainWindow win;
 BOOL CALLBACK DlgOptionProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static HWND hCheckRegFile;
-	static TButton CheckRegFile;
+	static TCheckBox CheckRegFile;
 	static bool bHasRegFile;
 	switch (message)
 	{

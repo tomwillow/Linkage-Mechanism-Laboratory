@@ -43,6 +43,7 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	tempFramePoint.dpt = Attach->dptAttach;
 
+	tempFramePoint.vecDpt.clear();
 	tempFramePoint.vecDpt.push_back({ 0, 0 });
 
 	pTreeViewContent->AddItem(&tempFramePoint, pShape->iNextId);

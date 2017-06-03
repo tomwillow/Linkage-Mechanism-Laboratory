@@ -5,6 +5,7 @@
 TDriver::TDriver()
 {
 	eType = DRIVER;
+	
 }
 
 

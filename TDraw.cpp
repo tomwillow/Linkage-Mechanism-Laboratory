@@ -32,6 +32,17 @@ void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos)
 	::LineTo(hdc, ptSecondPos.x, ptSecondPos.y);
 }
 
+//画直线，带样式
+void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos,const LOGPEN &logpen)
+{
+	HPEN hPen;
+	hPen = ::CreatePenIndirect(&logpen);
+	::SelectObject(hdc, hPen);
+	DrawLine(hdc, ptFirstPos, ptSecondPos);
+
+	::DeleteObject(hPen);
+}
+
 //画直线，带样式，以logpenStyle为准
 void TDraw::DrawLine(HDC hdc, TLine Line)
 {
@@ -1012,8 +1023,8 @@ void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor)
 	::DeleteObject(hBrush);
 }
 
-//画网格，使用颜色crGridSmall,crGridBig
-void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *pConfig, COLORREF crGridBig, COLORREF crGridSmall)
+//画网格
+void TDraw::DrawGrid(HDC hdc,const RECT &rect,POINT ptOrg, COLORREF crGridBig, COLORREF crGridSmall,const TConfiguration *pConfig)
 {
 	int minGrid = 10;
 	int maxGrid = 40;
@@ -1037,14 +1048,14 @@ void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *pConfig, COLORREF crGri
 	}
 
 	//原点对小格大小取余，得到网格初始偏移量
-	int xOffset = pConfig->GetOrg().x % screenGrid.x;
-	int yOffset = pConfig->GetOrg().y % screenGrid.y;
+	int xOffset = ptOrg.x % screenGrid.x;
+	int yOffset = ptOrg.y % screenGrid.y;
 
 	//原点减去网格偏移量，除以格子大小得到到原点的格数。再对5取余，得到原点到左侧最近大格格数。
 	//用格数取余若得到xBigOffset则应画大格。
-	int xBigOffset = ((pConfig->GetOrg().x - xOffset) / screenGrid.x) % 5;
+	int xBigOffset = ((ptOrg.x - xOffset) / screenGrid.x) % 5;
 	if (xBigOffset < 0) xBigOffset = 5 + xBigOffset;
-	int yBigOffset = ((pConfig->GetOrg().y - yOffset) / screenGrid.y) % 5;
+	int yBigOffset = ((ptOrg.y - yOffset) / screenGrid.y) % 5;
 	if (yBigOffset < 0) yBigOffset = 5 + yBigOffset;
 
 	int x, y;
@@ -1209,12 +1220,26 @@ void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TCon
 	DrawConstraintCoincide(hdc, dpt[0], dpt[1], pCoincide->logpenStyleShow, pConfig);
 }
 
-void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen)
+void TDraw::DrawRect(HDC hdc, const RECT &rect,const LOGPEN &logpen)
 {
 	HPEN hPen = ::CreatePenIndirect(&logpen);
+	HBRUSH hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
+	::SelectObject(hdc, hBrush);
 	::SelectObject(hdc, hPen);
 	::Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
 	::DeleteObject(hPen);
+	::DeleteObject(hBrush);
+}
+
+void TDraw::DrawRect(HDC hdc, const RECT &rect,const LOGPEN &logpen, COLORREF crBk)
+{
+	HPEN hPen = ::CreatePenIndirect(&logpen);
+	HBRUSH hBrush = ::CreateSolidBrush(crBk);
+	::SelectObject(hdc, hPen);
+	::SelectObject(hdc, hBrush);
+	::Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+	::DeleteObject(hPen);
+	::DeleteObject(hBrush);
 }
 
 void TDraw::DrawPickSquare(HDC hdc, POINT pt)
@@ -1226,9 +1251,9 @@ void TDraw::DrawPickSquare(HDC hdc, POINT pt)
 
 	const int size = 10;
 	RECT rect = { pt.x - size / 2, pt.y - size / 2, pt.x + size / 2, pt.y + size / 2 };
-	DrawRect(hdc, rect, logpen);
-	rect = { rect.left + 1, rect.top + 1, rect.right - 1, rect.bottom - 1 };
-	FillRect(hdc, &rect, RGB(0, 127, 255));
+	DrawRect(hdc, rect, logpen,RGB(0, 127, 255));
+	//rect = { rect.left + 1, rect.top + 1, rect.right - 1, rect.bottom - 1 };
+	//FillRect(hdc, &rect, );
 }
 
 void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt)
@@ -1248,7 +1273,7 @@ void TDraw::SetMarginRect(RECT *rect, int margin)
 	rect->bottom -= margin;
 }
 
-//根据边缘量更改rect，不更改原来的recct
+//根据边缘量更改rect，不更改原来的rect margin为正则缩小
 RECT TDraw::GetMarginRect(RECT rect, int margin)
 {
 	RECT rc = rect;
@@ -1256,26 +1281,32 @@ RECT TDraw::GetMarginRect(RECT rect, int margin)
 	return rc;
 }
 
-POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max, RECT &rect)
+//根据边缘量更改rect，不更改原来的rect margin为正则缩小
+RECT TDraw::GetMarginRect(RECT rect, LONG margin_left,LONG margin_top,LONG margin_right,LONG margin_bottom)
+{
+	return{ rect.left + margin_left, rect.top + margin_top, rect.right - margin_right, rect.bottom - margin_bottom };
+}
+
+POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max,const RECT &rect)
 {
 	int X = int(rect.left + (rect.right - rect.left)*(dpt.x - x_min) / (x_max - x_min));
 	int Y = int(rect.top + (rect.bottom - rect.top)*(y_max - dpt.y) / (y_max - y_min));
 	return{ X, Y };
 }
 
-DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, double y_max, RECT &rect)
+DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, double y_max,const RECT &rect)
 {
 	double x = x_min + (x_max - x_min)*(pt.x - rect.left) / (rect.right - rect.left);
 	double y = y_max - (y_max - y_min)*(pt.y - rect.top) / (rect.bottom - rect.top);
 	return{ x, y };
 }
 
-void TDraw::DrawTextAdvance(HDC hdc, const TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format)
+void TDraw::DrawTextAdvance(HDC hdc, const TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format, int cEscapement,int cOrientation)
 {
 	long lfHeight;
 	HFONT hf;
 	lfHeight = -MulDiv(FontSize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-	hf = CreateFont(lfHeight, 0, 0, 0, FontWeight, 0, 0, 0, 0, 0, 0, 0, 0, FontName);
+	hf = CreateFont(lfHeight, 0, cEscapement, cOrientation, FontWeight, 0, 0, 0, 0, 0, 0, 0, 0, FontName);
 	SelectObject(hdc, hf);
 	SetTextColor(hdc, color);
 	DrawText(hdc, text, -1, rect, format);
@@ -1293,14 +1324,19 @@ void TDraw::DrawTips(HDC hdc, POINT &ptMouse, const TCHAR text[], TConfiguration
 	DrawSystemFontText(hdc, text, rc, pConfig->logpenFront.lopnColor, DT_CALCRECT);//不会画出来，只是用来刷新rc的
 	rcBk = rc;
 	SetMarginRect(&rcBk, -5);
-	FillRect(hdc, &rcBk, pConfig->crBackground);
-	DrawRect(hdc, rcBk, pConfig->logpenFront);
+	//FillRect(hdc, &rcBk, pConfig->crBackground);
+	DrawRect(hdc, rcBk, pConfig->logpenFront, pConfig->crBackground);
 	DrawSystemFontText(hdc, text, rc, pConfig->logpenFront.lopnColor, DT_LEFT | DT_TOP);//DT_CALCRECT
 }
 
 void TDraw::DrawSystemFontText(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format)
 {
 	DrawTextAdvance(hdc, text, &rect, 9, 400, color, TEXT("宋体"), format);
+}
+
+void TDraw::DrawSystemFontTextVertical(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format)
+{
+	DrawTextAdvance(hdc, text, &rect, 9, 400, color, TEXT("宋体"), format,900,900);
 }
 
 //判断点是否位于直线或直线的延长线上 

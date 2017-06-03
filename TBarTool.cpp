@@ -20,6 +20,9 @@ TBarTool::~TBarTool()
 
 TElement * TBarTool::AddIntoShape(TRealLine &RealLine)
 {
+	RealLine.vecDpt.push_back(RealLine.GetRelativePointByIndex(0));
+	RealLine.vecDpt.push_back(RealLine.GetRelativePointByIndex(1));
+
 	RealLine.eType = myElementType;
 	return pShape->AddElement((TBar *)&RealLine);
 }

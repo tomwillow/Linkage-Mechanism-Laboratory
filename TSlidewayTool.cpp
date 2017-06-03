@@ -26,6 +26,9 @@ TSlidewayTool::~TSlidewayTool()
 
 TElement * TSlidewayTool::AddIntoShape(TRealLine &RealLine)
 {
+	RealLine.vecDpt.push_back(RealLine.GetRelativePointByIndex(0));
+	RealLine.vecDpt.push_back(RealLine.GetRelativePointByIndex(1));
+
 	RealLine.eType = myElementType;
 	TSlideway Slideway;
 	Slideway= RealLine;

@@ -171,9 +171,6 @@
     <ClCompile Include="TDialogBox.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TButton.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TPolylineBar.cpp">
       <Filter>源文件\Element</Filter>
     </ClCompile>
@@ -245,6 +242,15 @@
     </ClCompile>
     <ClCompile Include="TSolver.cpp">
       <Filter>源文件\Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="TListBox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TCheckBox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TButton.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -374,9 +380,6 @@
     <ClInclude Include="TDialogBox.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TButton.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TPolylineBarTool.h">
       <Filter>头文件\Tool</Filter>
     </ClInclude>
@@ -457,6 +460,15 @@
     </ClInclude>
     <ClInclude Include="TEquations.h">
       <Filter>头文件\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="TListBox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TCheckBox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TButton.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

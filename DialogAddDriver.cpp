@@ -37,9 +37,9 @@ namespace DialogAddDriver
 	TEdit EditExprRight;
 	TEdit EditExprLeft;
 	TEdit LabelDriverUnit;
-	TButton CheckBoxPosition;
-	TButton CheckBoxV;
-	TButton CheckBoxA;
+	TCheckBox CheckBoxPosition;
+	TCheckBox CheckBoxV;
+	TCheckBox CheckBoxA;
 	TGraph *pGraph;
 	HWND hComboDriverType;
 	HWND hComboExprType;
@@ -312,9 +312,9 @@ namespace DialogAddDriver
 						//循环结束，送入数据
 						if (err == ERROR_NO)
 						{
-							pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, CheckBoxPosition.GetChecked());
-							pGraph->InputDptVector(dptVectorV, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, CheckBoxV.GetChecked());
-							pGraph->InputDptVector(dptVectorA, { PS_SOLID, { 1, 0 }, RGB(0, 255, 0) }, CheckBoxA.GetChecked());
+							pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, CheckBoxPosition.GetChecked(),TEXT("P"));
+							pGraph->InputDptVector(dptVectorV, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, CheckBoxV.GetChecked(),TEXT("V"));
+							pGraph->InputDptVector(dptVectorA, { PS_SOLID, { 1, 0 }, RGB(0, 255, 0) }, CheckBoxA.GetChecked(),TEXT("A"));
 						}
 					}//correct
 

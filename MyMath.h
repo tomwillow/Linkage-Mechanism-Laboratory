@@ -14,3 +14,13 @@
 #define MakeIn2Pi(a) ((abs(a)>2*M_PI)?(((a)/M_PI/2-(long)((a)/M_PI/2))*2*M_PI):(a))
 
 extern double precision;
+void SignificantDigit(double dNum, int iDigit, int &iResult, double &dResult, int &iPrecisionDigit);
+
+template<typename T>
+void swap(T &a, T &b)
+{
+	T t;
+	t = a;
+	a = b;
+	b = t;
+}

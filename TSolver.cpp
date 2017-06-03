@@ -22,12 +22,15 @@
 #include "TConstraintCoincide.h"
 #include "TConstraintColinear.h"
 #include "TDriver.h"
+#include "TElement.h"
+
+#include "DialogAnimation.h"
 
 TSolver::TSolver()
 {
 	hwndOutput = NULL;
 	Equations = NULL;
-	EquationsV = NULL;
+	//EquationsV = NULL;
 	pStr = NULL;
 }
 
@@ -55,26 +58,26 @@ void TSolver::SetHwnd(HWND hwnd)
 
 void TSolver::Outputln(const TCHAR *szFormat, ...)
 {
-	if (pStr!=NULL)
-	if (szFormat != NULL && _tcslen(szFormat) > 0)
-	{
-		TCHAR *szBuffer = new TCHAR[_tcslen(szFormat) + 1024];
-		va_list pArgList;
-		va_start(pArgList, szFormat);
-		_vsntprintf(szBuffer, _tcslen(szFormat) + 1024, szFormat, pArgList);
-		va_end(pArgList);
+	if (pStr != NULL)
+		if (szFormat != NULL && _tcslen(szFormat) > 0)
+		{
+			TCHAR *szBuffer = new TCHAR[_tcslen(szFormat) + 1024];
+			va_list pArgList;
+			va_start(pArgList, szFormat);
+			_vsntprintf(szBuffer, _tcslen(szFormat) + 1024, szFormat, pArgList);
+			va_end(pArgList);
 
-		//追加换行
-		*pStr += szBuffer;
-		*pStr+=TEXT("\r\n");
+			//追加换行
+			*pStr += szBuffer;
+			*pStr += TEXT("\r\n");
 
-		delete[] szBuffer;
-	}
+			delete[] szBuffer;
+		}
 }
 
 void TSolver::Output(TCHAR *szFormat, ...)
 {
-	if (szFormat == NULL || pStr==NULL)
+	if (szFormat == NULL || pStr == NULL)
 		return;
 	TCHAR szBuffer[1024];
 	va_list pArgList;
@@ -109,7 +112,7 @@ int TSolver::GetIdFromVariableStr(TCHAR varname[])
 void TSolver::ClearConstraint()
 {
 	Equations->RemoveTempEquations();
-	EquationsV->RemoveTempEquations();
+	//EquationsV->RemoveTempEquations();
 }
 
 //添加鼠标约束
@@ -132,7 +135,7 @@ void TSolver::AddMouseConstraint(int index, DPOINT dptm)
 
 		double phimp = 0;// TDraw::GetAngleFromPointReal({ 0, 0 }, dptmRelative);
 
-		_stprintf(temp, TEXT("(x%d-%f)*sin(phi%d-%f)-(y%d-%f)*cos(phi%d-%f)"), i, xm, i,phimp, i, ym, i,phimp);
+		_stprintf(temp, TEXT("(x%d-%f)*sin(phi%d-%f)-(y%d-%f)*cos(phi%d-%f)"), i, xm, i, phimp, i, ym, i, phimp);
 
 		TCHAR szVar[100], szValue[100];
 		_stprintf(szVar, TEXT("x%d y%d phi%d"), i, i, i);
@@ -159,9 +162,9 @@ void TSolver::ClearEuqations()
 		delete Equations;
 	Equations = new TEquations;
 
-	if (EquationsV != NULL)
-		delete EquationsV;
-	EquationsV = new TEquations;
+	//if (EquationsV != NULL)
+	//	delete EquationsV;
+	//EquationsV = new TEquations;
 
 	vecStrDriver.clear();
 }
@@ -175,9 +178,9 @@ void TSolver::RefreshEquations()
 	ClearEuqations();
 
 	//开始
-	Outputln(TEXT("自由度: DOF = nc - nh = nb*3 - nh = %d*3 - %d = %d"), pShape->nb,pShape->nh(), pShape->DOF());
+	Outputln(TEXT("自由度: DOF = nc - nh = nb*3 - nh = %d*3 - %d = %d"), pShape->nb, pShape->nh(), pShape->DOF());
 	int i, j;
-	DPOINT SiP, SjP,SiQ,SjQ;
+	DPOINT SiP, SjP, SiQ, SjQ;
 	TCHAR buffer1[1024], buffer2[1024];
 
 	Outputln(TEXT("\r\n约束方程:"));
@@ -238,16 +241,16 @@ void TSolver::RefreshEquations()
 			//读入方程
 			//推导结果：
 			/*
-			(cos(phii)*(yiP - yiQ) + sin(phii)*(xiP - xiQ))*(xi - xj + xiP*cos(phii) - xjP*cos(phij) - yiP*sin(phii) + yjP*sin(phij)) 
+			(cos(phii)*(yiP - yiQ) + sin(phii)*(xiP - xiQ))*(xi - xj + xiP*cos(phii) - xjP*cos(phij) - yiP*sin(phii) + yjP*sin(phij))
 			- (cos(phii)*(xiP - xiQ) - sin(phii)*(yiP - yiQ))*(yi - yj + yiP*cos(phii) - yjP*cos(phij) + xiP*sin(phii) - xjP*sin(phij))
 			*/
 			_stprintf(buffer1, TEXT("(cos(phi%d)*(%f-%f)+sin(phi%d)*(%f-%f))*(x%d-x%d+%f*cos(phi%d)-%f*cos(phi%d)-%f*sin(phi%d)+%f*sin(phi%d))\
-																	-(cos(phi%d)*(%f-%f)-sin(phi%d)*(%f-%f))*(y%d-y%d+%f*cos(phi%d)-%f*cos(phi%d)+%f*sin(phi%d)-%f*sin(phi%d))"),
-																	i, SiP.y, SiQ.y, i, SiP.x, SiQ.x, i, j, SiP.x, i, SjP.x, j, SiP.y, i, SjP.y, j,
-																	i, SiP.x, SiQ.x, i, SiP.y, SiQ.y, i, j, SiP.y, i, SjP.y, j, SiP.x, i, SjP.x, j);
+																										-(cos(phi%d)*(%f-%f)-sin(phi%d)*(%f-%f))*(y%d-y%d+%f*cos(phi%d)-%f*cos(phi%d)+%f*sin(phi%d)-%f*sin(phi%d))"),
+																										i, SiP.y, SiQ.y, i, SiP.x, SiQ.x, i, j, SiP.x, i, SjP.x, j, SiP.y, i, SjP.y, j,
+																										i, SiP.x, SiQ.x, i, SiP.y, SiQ.y, i, j, SiP.y, i, SjP.y, j, SiP.x, i, SjP.x, j);
 
 			_stprintf(buffer2, TEXT("(cos(phi%d-phi%d)*(%f-%f)+sin(phi%d-phi%d)*(%f-%f))*(%f-%f)-(cos(phi%d-phi%d)*(%f-%f)-sin(phi%d-phi%d)*(%f-%f))*(%f-%f)"),
-										i,j,SiP.y,SiQ.y,i,j,SiP.x,SiQ.x,SjP.x,SjQ.x,i,j,SiP.x,SiQ.x,i,j,SiP.y,SiQ.y,SjP.y,SjQ.y);
+				i, j, SiP.y, SiQ.y, i, j, SiP.x, SiQ.x, SjP.x, SjQ.x, i, j, SiP.x, SiQ.x, i, j, SiP.y, SiQ.y, SjP.y, SjQ.y);
 
 			Equations->AddEquation(pStr, buffer1, false);
 			Equations->AddEquation(pStr, buffer2, false);
@@ -261,7 +264,7 @@ void TSolver::RefreshEquations()
 			int id = element->id;
 
 			_stprintf(subsVar, TEXT("%s x%d y%d phi%d"), subsVar, id, id, id);
-			_stprintf(subsValue, TEXT("%s %f %f %f"), subsValue, element->dpt.x,element->dpt.y, element->angle);
+			_stprintf(subsValue, TEXT("%s %f %f %f"), subsValue, element->dpt.x, element->dpt.y, element->angle);
 			//Solve时，建立Jacobian会替换掉
 			break;
 		}
@@ -269,7 +272,7 @@ void TSolver::RefreshEquations()
 		{
 			TDriver *pDriver = (TDriver *)element;
 			String s;
-			s<< pDriver->sExprLeft<< TEXT("-") << pDriver->sExprRight;
+			s << pDriver->sExprLeft << TEXT("-(") << pDriver->sExprRight<<TEXT(")");
 			vecStrDriver.push_back(s);
 			break;
 		}
@@ -282,16 +285,16 @@ void TSolver::RefreshEquations()
 	if (pShape->DOF() == 1)
 		Outputln(TEXT("\r\n可以拖动。"));
 	else
-	if (pShape->DOF() > 1)
-		Outputln(TEXT("\r\n欠约束。"));
+		if (pShape->DOF() > 1)
+			Outputln(TEXT("\r\n欠约束。"));
 
-	if (pStr!=NULL)
+	if (pStr != NULL)
 		RefreshWindowText();
 }
 
 void TSolver::ClearOutput()
 {
-	if (pStr!=NULL)
+	if (pStr != NULL)
 		*pStr = TEXT("");
 }
 
@@ -336,6 +339,7 @@ void TSolver::SetElementPosition(TVariableTable &VariableTable)
 	}
 }
 
+//区分x y phi，按照变量表的顺序，将vecpValue链接到元素的值
 void TSolver::LinkpValue(std::vector<double *> &vecpValue)
 {
 	vecpValue.clear();
@@ -393,23 +397,34 @@ void TSolver::Solve()
 
 	Outputln(TEXT("\r\n耗时 %f s"), duration);
 
-	if (pStr!=NULL) 
+	if (pStr != NULL)
 		RefreshWindowText();
 }
 
-void TSolver::Solve(double t)
+void TSolver::SubsFramePoint()
 {
+	Equations->Subs(pStr, subsVar, subsValue);
+}
+
+//求解之前需要调用SubsFramePoint
+//返回是否求解成功
+bool TSolver::Solve(double t)
+{
+	//Equations->Subs(pStr, subsVar, subsValue);
+
 	Equations->RemoveTempEquations();
 
 	Equations->DefineAVariable(pStr, TEXT("t"), t);
-	for (auto StrDriver:vecStrDriver)
+
+	//加入驱动方程
+	for (auto StrDriver : vecStrDriver)
 		Equations->AddEquation(pStr, StrDriver.c_str(), true);
-	Equations->Subs(pStr, subsVar, subsValue);
+
 
 	Equations->BuildEquationsV(pStr);//此时t还在变量组内
 	Equations->BuildEquationsA_Phitt(pStr);//
 
-	Equations->Subs(pStr, TEXT("t"),t);
+	Equations->Subs(pStr, TEXT("t"), t);
 	//Equations->SimplifyEquations(pStr);
 
 	Equations->BuildVariableTableV(pStr);//
@@ -434,6 +449,74 @@ void TSolver::Solve(double t)
 		SetElementPosition(Equations->VariableTable);
 	}
 	RefreshWindowText();
+
+	return Equations->hasSolved;
+}
+
+void TSolver::GetMesureResult(std::vector<DialogAnimation::TListBoxItem> &vecItems, std::vector<int> &vecIndex)
+{
+	for (size_t i = 0; i < vecItems.size(); ++i)
+	{
+		TVariableTable *pVarTable;
+		switch (vecItems[i].type)
+		{
+			using namespace DialogAnimation;
+		case P:
+		{
+			pVarTable = &(Equations->VariableTable); 
+
+			DPOINT dptAb=vecItems[i].pElement->GetAbsolutePointByIndex(vecItems[i].index_of_point);
+			switch (vecItems[i].value_type)
+			{
+			case X:
+				vecItems[i].data.push_back(dptAb.x); break;
+			case Y:
+				vecItems[i].data.push_back(dptAb.y); break;
+			case PHI:
+				vecItems[i].data.push_back(pVarTable->VariableValue[vecIndex[i]]); break;
+			}
+			break;
+		}
+		case V:
+			pVarTable = &(Equations->VariableTableV);
+			vecItems[i].data.push_back(pVarTable->VariableValue[vecIndex[i]]);
+			break;
+		case A:
+			pVarTable = &(Equations->VariableTableA);
+			vecItems[i].data.push_back(pVarTable->VariableValue[vecIndex[i]]);
+			break;
+		}
+	}
+}
+
+void TSolver::LinkMesureResult(const std::vector<DialogAnimation::TListBoxItem> &vecItems, std::vector<int> &vecIndex)
+{
+	TCHAR temp[32];
+	for (auto &Item : vecItems)
+	{
+		switch (Item.value_type)
+		{
+			using namespace DialogAnimation;
+		case X:_tcscpy(temp, TEXT("x")); break;
+		case Y:_tcscpy(temp, TEXT("y")); break;
+		case PHI:_tcscpy(temp, TEXT("phi")); break;
+		}
+		_stprintf(temp, TEXT("%s%d"), temp, Item.id);
+		//至此得到变量名
+
+		//位置表和速度表项目顺序一致，得到变量索引
+		TVariableTable *pVarTable = &(Equations->VariableTable);
+
+		for (size_t i = 0; i < pVarTable->VariableTable.size(); ++i)
+		{
+			if (_tcscmp(pVarTable->VariableTable[i], temp) == 0)
+			{
+				vecIndex.push_back(i);
+				break;
+			}
+		}
+	}
+
 }
 
 void TSolver::Demo()
@@ -467,7 +550,7 @@ void TSolver::Demo()
 	Equations->BuildEquationsV(pStr);//此时t还在变量组内
 	Equations->BuildEquationsA_Phitt(pStr);//
 
-	Equations->Subs(pStr, TEXT("t"),0.1);
+	Equations->Subs(pStr, TEXT("t"), 0.1);
 	//Equations->SimplifyEquations(pStr);
 
 	Equations->BuildVariableTableV(pStr);//

@@ -17,8 +17,6 @@ private:
 
 	TJacobian Jacobian;
 	TPEquations Equations, EquationsV, EquationsA;
-	TVariableTable VariableTableV; //速度总变量表
-	TVariableTable VariableTableA; //速度总变量表
 	TVariableTable VariableTableSolved;//已解出变量表
 	TVariableTable VariableTableUnsolved;
 
@@ -41,6 +39,8 @@ public:
 
 	bool hasSolved;
 	TVariableTable VariableTable; //总变量表
+	TVariableTable VariableTableV; //速度总变量表
+	TVariableTable VariableTableA; //速度总变量表
 
 	TExpressionTree * TEquations::GetLastExpressionTree()
 	{

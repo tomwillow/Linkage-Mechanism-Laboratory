@@ -56,6 +56,8 @@ void TConfiguration::SetTheme(bool bDark)
 		crGridSmall = RGB(240, 240, 240);
 	}
 
+	logpenBlack = { PS_SOLID, { 1, 0 }, 0 };
+
 	logpen = { iStyle, { iWidth, 0 }, crPen };
 	logpenFront = { PS_SOLID, { 1, 0 }, crFront };
 	logpenAssist = { PS_DOT, { 1, 0 }, crFront };
@@ -65,6 +67,9 @@ void TConfiguration::SetTheme(bool bDark)
 
 	logpenConstraintLine = { PS_DOT, { 1, 0 }, crFront };
 	logpenColinearSymbol = { PS_SOLID, { 5, 0 }, crLink };
+
+	logpenGraphGridBig = { PS_SOLID, { 1, 0 }, crGraphGridBig };
+	logpenGraphGridSmall = { PS_SOLID, { 1, 0 }, crGraphGridSmall };
 }
 
 void TConfiguration::Initial(HWND hwnd)
@@ -173,12 +178,9 @@ LONG TConfiguration::LengthToScreenY(double ylen)
 	return (LONG)(ylen*DPUY);
 }
 
-POINT TConfiguration::LengthToScreen(DPOINT dpt)
+POINT TConfiguration::LengthToScreen(DPOINT dpt) const
 {
-	POINT pt;
-	pt.x = (LONG)(dpt.x*DPUX);
-	pt.y = (LONG)(dpt.y*DPUY);
-	return pt;
+	return {(LONG)(dpt.x*DPUX),(LONG)(dpt.y*DPUY)};
 }
 
 double TConfiguration::ScreenToLengthX(LONG xpixel)

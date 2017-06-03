@@ -41,6 +41,7 @@ public:
 
 	static RECT TDraw::GetMarginRect(RECT rect, int margin);
 	static void TDraw::SetMarginRect(RECT *rect, int margin);
+	static RECT TDraw::GetMarginRect(RECT rect, LONG margin_left, LONG margin_top, LONG margin_right, LONG margin_bottom);
 	static POINT TDraw::GetCenter(const POINT &pt1,const POINT &pt2);
 	static DPOINT TDraw::GetCenter(const DPOINT &pt1,const DPOINT &pt2);
 	static bool TDraw::ShowConstraintCoincideDotLine(TElement *element, const TConfiguration *pConfig);
@@ -69,9 +70,11 @@ public:
 	static void TDraw::DrawArc(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, bool bAlwaysDrawAngleBetween);
 	static void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2,bool bAlwaysDrawAngleBetween);
 	static void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, const LOGPEN &logpen, const COLORREF &crColor);
-	static void TDraw::DrawRect(HDC hdc, RECT &rect, LOGPEN &logpen);
+	static void TDraw::DrawRect(HDC hdc, const RECT &rect,const LOGPEN &logpen);
+	static void TDraw::DrawRect(HDC hdc, const RECT &rect,const LOGPEN &logpen, COLORREF crBk);
 	static void TDraw::DrawPickSquare(HDC hdc, POINT pt);
 	static void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos);
+	static void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos, const LOGPEN &logpen);
 	static void TDraw::DrawLine(HDC hdc, TLine Line);
 	static void TDraw::DrawPolyline(HDC hdc, const POINT *apt, int count, LOGPEN &logpen);
 
@@ -87,10 +90,11 @@ public:
 	static void TDraw::CalcBarRectCoor(POINT ptResult[4], const POINT &ptBegin, const POINT &ptEnd, double angle, int width);
 	static void TDraw::CalcSliderRectCoor(POINT aptResult[4], const POINT &pt, double angle, const TConfiguration *pConfig);
 	static void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor);
-	static void TDraw::DrawGrid(HDC hdc, RECT rect, TConfiguration *Config, COLORREF crGridBig, COLORREF crGridSmall);
+	static void TDraw::DrawGrid(HDC hdc, const RECT &rect, POINT ptOrg, COLORREF crGridBig, COLORREF crGridSmall, const TConfiguration *pConfig);
 	static void TDraw::DrawTips(HDC hdc, POINT &ptMouse, const TCHAR text[], TConfiguration *pConfig);
-	static void TDraw::DrawSystemFontText(HDC hdc,const TCHAR text[], RECT &rect, COLORREF color, UINT format);
-	static void TDraw::DrawTextAdvance(HDC hdc,const TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format);
+	static void TDraw::DrawSystemFontText(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format);
+	static void TDraw::DrawSystemFontTextVertical(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format);
+	static void TDraw::DrawTextAdvance(HDC hdc,const TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format,int cEscapement=0,int cOrientation=0);
 
 	static void TDraw::DrawSection(HDC hdc, int x1, int y1, int x2, int y2, int d, double angleDEG);
 	static void TDraw::DrawSection(HDC hdc, POINT apt[], int apt_num, int d, double angleDEG);
@@ -99,8 +103,8 @@ public:
 	static double TDraw::GetAngleBetweenPointScreen(const POINT &pt1, const POINT &ptO, const POINT &pt2);
 	static double TDraw::GetAngleFromPointScreen(POINT pt0, POINT pt);
 	static void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt);
-	static POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max, RECT &rect);
-	static DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, double y_max, RECT &rect);
+	static POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max,const RECT &rect);
+	static DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, double y_max,const RECT &rect);
 
 	//Ê°È¡ÏµÁÐ
 	static bool TDraw::PointInPolylineBar(POINT ptPos, TPolylineBar *pPolylineBar,const TConfiguration *pConfig);

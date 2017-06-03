@@ -46,6 +46,7 @@ public:
 	double dAnglePrecision = 1e-1;
 	units uUnits = UNITS_MM;
 	LOGPEN logpen;//当前画笔
+	LOGPEN logpenBlack;//
 	LOGPEN logpenFront;//画× 字 
 	LOGPEN logpenAssist;//辅助线：白色虚线
 	LOGPEN logpenMouseLine;//图 鼠标跟踪线：黑色虚线
@@ -60,6 +61,7 @@ public:
 
 	COLORREF crLink;//FramePoint 黑色
 	//Graph
+	LOGPEN logpenGraphGridSmall,logpenGraphGridBig;
 	COLORREF crGraphBackground, crGraphGridBig, crGraphGridSmall;
 
 	TConfiguration();
@@ -72,7 +74,7 @@ public:
 		Org.x = x;
 		Org.y = y;
 	}
-	POINT TConfiguration::GetOrg()
+	POINT TConfiguration::GetOrg() const
 	{
 		return Org;
 	}
@@ -90,7 +92,7 @@ public:
 
 	LONG TConfiguration::LengthToScreenX(double xlen)const;
 	LONG TConfiguration::LengthToScreenY(double ylen);
-	POINT TConfiguration::LengthToScreen(DPOINT dpt);
+	POINT TConfiguration::LengthToScreen(DPOINT dpt)const;
 
 	double TConfiguration::ScreenToLengthX(LONG xpixel);
 	double TConfiguration::ScreenToLengthY(LONG ypixel);

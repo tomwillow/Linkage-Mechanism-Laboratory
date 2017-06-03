@@ -192,7 +192,7 @@ void TCanvas::OnDraw(HDC hdc)
 
 	//画网格
 	if (Config->bDrawGrid)
-		TDraw::DrawGrid(hdc, ClientRect, Config,Config->crGridBig,Config->crGridSmall);
+		TDraw::DrawGrid(hdc, ClientRect,Config->GetOrg(),Config->crGridBig,Config->crGridSmall, Config);
 
 	//画坐标原点
 	TDraw::DrawAxes(hdc, Config->GetOrg().x, Config->GetOrg().y, Config->crCoordinate);
@@ -206,8 +206,5 @@ void TCanvas::OnDraw(HDC hdc)
 	//工具类绘制
 	if (win.m_ManageTool.m_pCurrentTool != NULL)
 		win.m_ManageTool.m_pCurrentTool->Draw(hdc);//工具在使用中的图形绘制交由工具类执行
-
-	return;
-
 
 }

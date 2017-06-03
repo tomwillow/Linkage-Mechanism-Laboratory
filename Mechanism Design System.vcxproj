@@ -52,6 +52,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,6 +84,7 @@
     <ClCompile Include="ShowMessage.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="TButton.cpp" />
+    <ClCompile Include="TCheckBox.cpp" />
     <ClCompile Include="TConstraintCoincideTool.cpp" />
     <ClCompile Include="TConstraintColinear.cpp" />
     <ClCompile Include="TConstraintColinearTool.cpp" />
@@ -112,6 +114,7 @@
     <ClCompile Include="TLineEdit.cpp" />
     <ClCompile Include="TLine.cpp" />
     <ClCompile Include="TLineTool.cpp" />
+    <ClCompile Include="TListBox.cpp" />
     <ClCompile Include="TListView.cpp" />
     <ClCompile Include="TListViewEdit.cpp" />
     <ClCompile Include="TMainWindow.cpp" />
@@ -152,6 +155,7 @@
     <ClInclude Include="ShowMessage.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="TButton.h" />
+    <ClInclude Include="TCheckBox.h" />
     <ClInclude Include="TConstraintCoincideTool.h" />
     <ClInclude Include="TConstraintColinear.h" />
     <ClInclude Include="TConstraintColinearTool.h" />
@@ -181,6 +185,7 @@
     <ClInclude Include="TLineEdit.h" />
     <ClInclude Include="TLine.h" />
     <ClInclude Include="TLineTool.h" />
+    <ClInclude Include="TListBox.h" />
     <ClInclude Include="TListView.h" />
     <ClInclude Include="TListViewEdit.h" />
     <ClInclude Include="TMainWindow.h" />
