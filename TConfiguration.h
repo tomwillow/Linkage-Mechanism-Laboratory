@@ -82,20 +82,20 @@ public:
 	double TConfiguration::GetProportion();
 	void TConfiguration::Initial(HWND hwnd);
 
-	double TConfiguration::ScreenToRealX(LONG x);
-	double TConfiguration::ScreenToRealY(LONG y);
-	DPOINT TConfiguration::ScreenToReal(POINT pt);
+	double TConfiguration::ScreenToRealX(LONG x)const;
+	double TConfiguration::ScreenToRealY(LONG y)const;
+	DPOINT TConfiguration::ScreenToReal(POINT pt)const;
 
-	LONG TConfiguration::RealToScreenX(double x);
-	LONG TConfiguration::RealToScreenY(double y);
+	LONG TConfiguration::RealToScreenX(double x)const;
+	LONG TConfiguration::RealToScreenY(double y)const;
 	POINT TConfiguration::RealToScreen(DPOINT dpt) const;
 
 	LONG TConfiguration::LengthToScreenX(double xlen)const;
-	LONG TConfiguration::LengthToScreenY(double ylen);
+	LONG TConfiguration::LengthToScreenY(double ylen)const;
 	POINT TConfiguration::LengthToScreen(DPOINT dpt)const;
 
-	double TConfiguration::ScreenToLengthX(LONG xpixel);
-	double TConfiguration::ScreenToLengthY(LONG ypixel);
-	DPOINT TConfiguration::ScreenToLength(POINT pt);
+	double TConfiguration::ScreenToLengthX(LONG xpixel)const;
+	double TConfiguration::ScreenToLengthY(LONG ypixel)const;
+	DPOINT TConfiguration::ScreenToLength(POINT pt)const;
 };
 

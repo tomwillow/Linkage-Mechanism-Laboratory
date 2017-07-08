@@ -24,5 +24,6 @@ public:
 	virtual bool TSlider::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)override;
 	const DPOINT TSlider::GetRelativePointByIndex(int PointIndexOfElement) const override;
 	DPOINT TSlider::GetAbsolutePointByIndex(int PointIndexOfElement) const override;
+	virtual const TCHAR * TSlider::GetElementTypeName(TCHAR name[]) override;//得到类型名称
 };
 

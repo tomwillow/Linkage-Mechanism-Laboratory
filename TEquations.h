@@ -11,34 +11,35 @@ private:
 	typedef std::vector<TExpressionTree *> TPEquations;
 	typedef std::vector<TPEquations> TJacobian;
 
-	const double epsilon = 1e-6;
 	enumError eError;
 	std::vector<bool> EquationIsTemp;
 
 	TJacobian Jacobian;
 	TPEquations Equations, EquationsV, EquationsA;
 	TVariableTable VariableTableSolved;//已解出变量表
-	TVariableTable VariableTableUnsolved;
 
-	void TEquations::CalcPhiValue(String *pStr,const TPEquations &Equations, TVector &PhiValue);
+	void TEquations::CalcPhiValue(Ostream *pOS,const TPEquations &Equations, TVector &PhiValue);
 	void TEquations::MatrixMultiplyVector(TVector &Result, const TMatrix &Matrix, const TVector &Vector);
-	void TEquations::CalcJacobianValue(String *pStr, TMatrix &JacobianValueResult, const TJacobian &Jacobian);
+	void TEquations::CalcJacobianValue(Ostream *pOS, TMatrix &JacobianValueResult, const TJacobian &Jacobian);
 	int TEquations::GetMaxAbsRowIndex(const TMatrix &A, int RowStart, int RowEnd, int Col);
 	void TEquations::SwapRow(TMatrix &A, TVector &b, int i, int j);
 	bool TEquations::AllIs0(TVector &V);
 	bool TEquations::VectorAdd(TVector &Va, const TVector &Vb);
-	void TEquations::Output(String *pStr, TMatrix& m);
-	void TEquations::Output(String *pStr, TVector& v);
+	void TEquations::Output(Ostream *pOS, TMatrix& m);
+	void TEquations::Output(Ostream *pOS, TVector& v);
 	void TEquations::ReleaseTPEquations(TPEquations &Equations);
 	void TEquations::ReleaseJacobian(TJacobian &Jacobian);
-	void TEquations::SubsVar(String *pStr, TPEquations &Equations, TVariableTable &LinkVariableTable, TCHAR *VarStr, double Value);
+	void TEquations::SubsVar(Ostream *pOS, TPEquations &Equations, TVariableTable &LinkVariableTable, TCHAR *VarStr, double Value);
 	void TEquations::BuildJacobian_inner(TJacobian &JacobianResult,const TPEquations &Equations,TVariableTable &VariableTable);
 public:
 	TEquations();
 	~TEquations();
 
+	double epsilon = 1e-12;
+	unsigned int max_step = 20;
 	bool hasSolved;
 	TVariableTable VariableTable; //总变量表
+	TVariableTable VariableTableUnsolved;
 	TVariableTable VariableTableV; //速度总变量表
 	TVariableTable VariableTableA; //速度总变量表
 
@@ -46,31 +47,29 @@ public:
 	{
 		return Equations.back();
 	}
-	void TEquations::BuildEquationsV(String *pStr);
-	void TEquations::BuildEquationsA_Phitt(String *pStr);
-	void TEquations::CalcEquationsARight(String *pStr, TVector &Right);
-	void TEquations::OutputPhi(String *pStr, TPEquations &Equations);
-	void TEquations::BuildJacobian(String *pStr);//建立Jacobian
+	void TEquations::BuildEquationsV(Ostream *pOS);
+	void TEquations::BuildEquationsA_Phitt(Ostream *pOS);
+	void TEquations::CalcEquationsARight(Ostream *pOS, TVector &Right);
+	void TEquations::OutputPhi(Ostream *pOS, TPEquations &Equations);
+	void TEquations::BuildJacobian(Ostream *pOS);//建立Jacobian
 	void TEquations::CopyJacobian(TJacobian &Result, const TJacobian &Origin);
-	//void TEquations::BuildJacobianV(String *pStr);//建立JacobianV
-	//void TEquations::BuildJacobianA(String *pStr);//建立JacobianA
-	void TEquations::OutputJacobian(String *pStr, const TJacobian &Jacobian);
-	void TEquations::BuildVariableTableV(String *pStr);
-	void TEquations::BuildVariableTableA(String *pStr);
+	void TEquations::OutputJacobian(Ostream *pOS, const TJacobian &Jacobian);
+	void TEquations::BuildVariableTableV(Ostream *pOS);
+	void TEquations::BuildVariableTableA(Ostream *pOS);
 	size_t TEquations::GetEquationsCount();
-	void TEquations::AddEquation(String *pStr,const TCHAR *szInput, bool istemp);//添加方程
+	void TEquations::AddEquation(Ostream *pOS,const TCHAR *szInput, bool istemp);//添加方程
 	void TEquations::RemoveTempEquations();//移除临时方程
 	enumError TEquations::SolveLinear(TMatrix &A, TVector &x, TVector &b);//解线性方程组 系数A，未知数x
-	void TEquations::SolveEquations(String *pStr);//求解方程组
-	void TEquations::SolveEquationsV(String *pStr);//求解方程组V
-	void TEquations::SolveEquationsA(String *pStr);//求解方程组A
-	void TEquations::SimplifyEquations(String *pStr);//将方程组中的简单方程解出
-	void TEquations::DefineVariable(String *pStr, TCHAR *input_str, TCHAR *input_num);
-	void TEquations::DefineAVariable(String *pStr, TCHAR *input_str, double value);
-	void TEquations::Subs(String *pStr, TCHAR *subsVar, double value);
-	void TEquations::Subs(String *pStr, TCHAR *subsVar, TCHAR *subsValue);//代入
-	void TEquations::SubsV(String *pStr, TCHAR *VarStr, double Value);
-	void TEquations::SubsA(String *pStr, TCHAR *VarStr, double Value);
+	void TEquations::SolveEquations(Ostream *pOS);//求解方程组
+	void TEquations::SolveEquationsV(Ostream *pOS);//求解方程组V
+	void TEquations::SolveEquationsA(Ostream *pOS);//求解方程组A
+	void TEquations::SimplifyEquations(Ostream *pOS);//将方程组中的简单方程解出
+	void TEquations::DefineVariable(Ostream *pOS,const TCHAR *input_str,const TCHAR *input_num=NULL);
+	void TEquations::DefineOneVariable(Ostream *pOS, TCHAR *input_str, double value);
+	void TEquations::Subs(Ostream *pOS,const TCHAR *subsVar, double value);
+	void TEquations::Subs(Ostream *pOS,const TCHAR *subsVar,const TCHAR *subsValue);//代入
+	void TEquations::SubsV(Ostream *pOS, TCHAR *VarStr, double Value);
+	void TEquations::SubsA(Ostream *pOS, TCHAR *VarStr, double Value);
 	void TEquations::CalcJacobianMultiplyVector(TPEquations &EquationsResult, const TJacobian &Jacobian, const TVector &Vector);
 
 };

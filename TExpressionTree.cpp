@@ -7,7 +7,7 @@
 #include "TExpressionTree.h"
 #include <Windows.h>
 #include "TTransfer.h"
-#include "TMyString.h"
+#include "TCHAR_Function.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -260,6 +260,42 @@ int TExpressionTree::GetOperateNum(TExpressionTree::enumMathOperator eOperator)
 	}
 }
 
+bool TExpressionTree::inAssociativeLaws(enumMathOperator eOperator)
+{
+	switch (eOperator)
+	{
+	case MATH_SQRT:
+	case MATH_SIN:
+	case MATH_COS:
+	case MATH_TAN:
+	case MATH_ARCSIN:
+	case MATH_ARCCOS:
+	case MATH_ARCTAN:
+	case MATH_LN:
+	case MATH_LOG10:
+	case MATH_EXP:
+
+	case MATH_POSITIVE://正负号
+	case MATH_NEGATIVE:
+
+	case MATH_MOD://%
+	case MATH_AND://&
+	case MATH_OR://|
+	case MATH_POWER://^
+	case MATH_DIVIDE:
+	case MATH_SUBSTRACT:
+
+	case MATH_LEFT_PARENTHESIS:
+	case MATH_RIGHT_PARENTHESIS:
+		return false;
+
+	case MATH_ADD:
+	case MATH_MULTIPLY:
+		return true;
+	}
+	assert(0);
+}
+
 /* 是基本运算符 */
 bool TExpressionTree::isBaseOperator(TCHAR c)
 {
@@ -446,7 +482,7 @@ bool TExpressionTree::isLegal(TCHAR c)
 {
 	if (isDoubleChar(c)) return true;
 	if (isBaseOperator(c)) return true;
-	if (TMyString::isAlphaCharOrUnderline(c)) return true;
+	if (TCHAR_Function::isAlphaCharOrUnderline(c)) return true;
 	return false;
 }
 
@@ -616,17 +652,30 @@ void TExpressionTree::TraverseInOrder(TNode *now, TCHAR *output, TCHAR *buffer)
 	if (GetOperateNum(now->eOperator) != 1)//非一元运算符才输出，即一元运算符的输出顺序已改变
 	{
 		if (now->eType == NODE_OPERATOR)//本级为运算符
-			//父运算符存在，为二元，且优先级高于本级，则添加括号
-			if ((now->parent != NULL && GetOperateNum(now->parent->eOperator) == 2 &&
-				(
-				Rank(now->parent->eOperator) > Rank(now->eOperator)
-				||//两级都是右结合且优先级相等
-				(Rank(now->parent->eOperator) == Rank(now->eOperator) && (isLeft2Right(now->parent->eOperator) == false && isLeft2Right(now->eOperator) == false))
+			if (now->parent!=NULL)
+			if (
+				(GetOperateNum(now->parent->eOperator) == 2 &&//父运算符存在，为二元，
+					(
+						Rank(now->parent->eOperator) > Rank(now->eOperator)//父级优先级高于本级->加括号
+						||
+						(//两级优先级相等
+							Rank(now->parent->eOperator) == Rank(now->eOperator) && 
+								(
+									//本级为父级的右子树 且父级不满足结合律->加括号
+									(inAssociativeLaws(now->parent->eOperator)==false && now==now->parent->right)
+									||
+									////两级都是右结合
+									(isLeft2Right(now->parent->eOperator) == false && isLeft2Right(now->eOperator) == false)
+								)
+						)
+					)
 				)
+
+				//||
+
+				////父运算符存在，为除号，且本级为分子，则添加括号
+				//(now->parent->eOperator == MATH_DIVIDE && now == now->parent->right)
 				)
-				||
-				//父运算符存在，为除号，且本级为分母，则添加括号
-				(now->parent != NULL && now->parent->eOperator == MATH_DIVIDE && now == now->parent->right))
 			{
 				_tcscat(output, TEXT("("));
 				has_parenthesis = 1;
@@ -688,7 +737,7 @@ TCHAR * TExpressionTree::OutputStr(bool bIgnoreError)
 			delete[] szOutput;
 
 		int len = MAX_VAR_NAME * GetNodeNum(head);
-		szOutput = new TCHAR[len==0?1:len];
+		szOutput = new TCHAR[len == 0 ? 1 : len];
 		szOutput[0] = TEXT('\0');
 
 		if (head != NULL)
@@ -703,15 +752,15 @@ enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> 
 {
 	if (_tcslen(expression) == 0)
 		return ERROR_EMPTY_INPUT;
-	TMyString::Replace(expression, TEXT(" "), TEXT(""));
-	TMyString::Replace(expression, TEXT("\t"), TEXT(""));
-	TMyString::Replace(expression, TEXT("\r"), TEXT(""));
-	TMyString::Replace(expression, TEXT("\n"), TEXT(""));
+	TCHAR_Function::Replace(expression, TEXT(" "), TEXT(""));
+	TCHAR_Function::Replace(expression, TEXT("\t"), TEXT(""));
+	TCHAR_Function::Replace(expression, TEXT("\r"), TEXT(""));
+	TCHAR_Function::Replace(expression, TEXT("\n"), TEXT(""));
 
 	//过滤掉所有多余的加减
-	TMyString::ReplaceLoop(expression, TEXT("--"), TEXT("+"));
-	TMyString::ReplaceLoop(expression, TEXT("+-"), TEXT("-"));
-	TMyString::ReplaceLoop(expression, TEXT("-+"), TEXT("-"));
+	TCHAR_Function::ReplaceLoop(expression, TEXT("--"), TEXT("+"));
+	TCHAR_Function::ReplaceLoop(expression, TEXT("+-"), TEXT("-"));
+	TCHAR_Function::ReplaceLoop(expression, TEXT("-+"), TEXT("-"));
 
 	TCHAR *start = expression;
 	TCHAR *end = expression + _tcslen(expression);
@@ -821,7 +870,7 @@ enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> 
 						ReleaseVectorTNode(PreInOrder);
 						return eError = ERROR_NOT_LINK_VARIABLETABLE;
 					}
-					if (TMyString::isAlphaCharOrUnderline(Data[i].start[0]) == false)//变量名首字符需为下划线或字母
+					if (TCHAR_Function::isAlphaCharOrUnderline(Data[i].start[0]) == false)//变量名首字符需为下划线或字母
 					{
 						ReleaseVectorTNode(PreInOrder);
 						return eError = ERROR_INVALID_VARNAME;
@@ -926,9 +975,9 @@ TCHAR * TExpressionTree::GetErrorInfo()
 	return ErrorInfo;
 }
 
-	void GetErrorInfo(enumError err, TCHAR result[])
-	{
-		switch (err)
+void GetErrorInfo(enumError err, TCHAR result[])
+{
+	switch (err)
 	{
 	case ERROR_NO:
 		_tcscpy(result, TEXT("操作成功完成。"));
@@ -2039,7 +2088,7 @@ TCHAR * TExpressionTree::Subs(TCHAR *ptVar, double value, bool output)
 }
 
 //替换  vars变量串 nums数字串 以空格分隔，支持表达式替换
-TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums, bool output)
+TCHAR * TExpressionTree::Subs(const TCHAR *vars, const TCHAR *nums, bool output)
 {
 	if (eError == ERROR_NO)
 	{
@@ -2052,14 +2101,14 @@ TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums, bool output)
 		TCHAR *nNums = new TCHAR[_tcslen(nums) + 1];
 		_tcscpy(nVars, vars);
 		_tcscpy(nNums, nums);
-		TMyString::Trim(nVars);
-		TMyString::Trim(nNums);
-		TMyString::ReplaceLoop(nVars, TEXT("  "), TEXT(" "));
-		TMyString::ReplaceLoop(nNums, TEXT("  "), TEXT(" "));
+		TCHAR_Function::Trim(nVars);
+		TCHAR_Function::Trim(nNums);
+		TCHAR_Function::ReplaceLoop(nVars, TEXT("  "), TEXT(" "));
+		TCHAR_Function::ReplaceLoop(nNums, TEXT("  "), TEXT(" "));
 		std::vector<TCHAR *> VarsVector;
 		std::vector<TCHAR *> NumsVector;
-		TMyString::Split(nVars, VarsVector, TEXT(" "));
-		TMyString::Split(nNums, NumsVector, TEXT(" "));
+		TCHAR_Function::Split(nVars, VarsVector, TEXT(" "));
+		TCHAR_Function::Split(nNums, NumsVector, TEXT(" "));
 
 		if (VarsVector.size() == NumsVector.size())//替换与被替换元素数目相等
 		{
@@ -2082,7 +2131,6 @@ TCHAR * TExpressionTree::Subs(TCHAR *vars, TCHAR *nums, bool output)
 						for (size_t j = 0; j < VarsPos.size(); j++)
 						{
 							TNode *newNode = CopyNodeTree(Expr.head);
-							//ReplaceNodeVariable(newNode, newVariableTable);
 
 							//连接到新节点
 							if (VarsPos[j] != head)
@@ -2278,7 +2326,7 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 			Solve(parent, write_pos->left);
 			break;
 		case MATH_SIN:
-			write_pos->eType = NODE_OPERATOR;
+			write_pos->eType = NODE_FUNCTION;
 			write_pos->eOperator = MATH_ARCSIN;
 
 			write_pos->left = new TNode;
@@ -2288,7 +2336,7 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 			Solve(parent, write_pos->left);
 			break;
 		case MATH_COS:
-			write_pos->eType = NODE_OPERATOR;
+			write_pos->eType = NODE_FUNCTION;
 			write_pos->eOperator = MATH_ARCCOS;
 
 			write_pos->left = new TNode;
@@ -2298,7 +2346,7 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 			Solve(parent, write_pos->left);
 			break;
 		case MATH_TAN:
-			write_pos->eType = NODE_OPERATOR;
+			write_pos->eType = NODE_FUNCTION;
 			write_pos->eOperator = MATH_ARCTAN;
 
 			write_pos->left = new TNode;
@@ -2334,9 +2382,13 @@ TCHAR * TExpressionTree::Solve(TCHAR *&var, double &value)
 	Solve(LastVarNode, ResultNow);
 
 	Result.head = ResultNow;
+
+	szOutput = new TCHAR[_tcslen(Result.OutputStr()) + 1];
+	_tcscpy(szOutput, Result.OutputStr());
+
 	value = Result.Value(true);
 
-	return OutputEmptyStr();
+	return szOutput;
 
 }
 
@@ -2516,6 +2568,7 @@ void TExpressionTree::Vpa_inner(TNode *now)
 	}
 }
 
+//仅将变量表内置数值代入，不进行计算
 TCHAR * TExpressionTree::Vpa(bool bOutput)
 {
 	if (eError == ERROR_NO)

@@ -47,7 +47,7 @@ void TDrawTranslucent::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *
 	}
 }
 
-//所有绘制x坐标均-left，y坐标-top
+//开启透明后，所有绘制操作中的x坐标均需要-left，y坐标-top
 //只要画的不是黑色 背景就是黑色 -> bNeedDrawBlack=false
 //标准开头（注销在EndTranslucent中完成，不需手动处理）
 //HDC hBitmapDC;

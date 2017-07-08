@@ -8,6 +8,7 @@ class TFramePoint:public TElement
 public:
 	TFramePoint();
 	~TFramePoint();
-	void TFramePoint::NoticeListView(TListView *pListView);
+	void TFramePoint::NoticeListView(TListView *pListView) override;
+	const TCHAR * TFramePoint::GetElementTypeName(TCHAR name[]) override;//得到类型名称
 };
 

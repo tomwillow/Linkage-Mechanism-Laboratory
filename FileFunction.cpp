@@ -4,7 +4,8 @@
 
 #include <Windows.h>
 
-//成功取得返回true 传入index=1则得到传入文件名
+//传入index=1则得到传入文件名
+//成功取得返回true 
 bool GetCommandLineByIndex(int index, TCHAR *assigned)
 {
 	int iCmdLineCount = -1;
@@ -59,8 +60,9 @@ bool GetFileExists(TCHAR filename[])
 	}
 }
 
-//改动szFile等同于改动ofn.lpstrFile
-void InitialOpenFileName(OPENFILENAME *ofn, HWND hwnd, TCHAR szFile[], DWORD nMaxFile)
+//lpstrFilter格式：TEXT("机构设计文件(*.mds)\0*.mds\0\0")
+//ofn不另设空间保存文件地址，改动szFile等同于改动ofn.lpstrFile
+void InitialOpenFileName(OPENFILENAME *ofn, HWND hwnd, TCHAR szFile[], TCHAR lpstrFilter[], DWORD nMaxFile)
 {
 	// Initialize OPENFILENAME
 	ZeroMemory(ofn, sizeof(OPENFILENAME));
@@ -69,9 +71,29 @@ void InitialOpenFileName(OPENFILENAME *ofn, HWND hwnd, TCHAR szFile[], DWORD nMa
 	ofn->lpstrFile = szFile;
 	ofn->lpstrFile[0] = TEXT('\0');
 	ofn->nMaxFile = nMaxFile;
-	ofn->lpstrFilter = TEXT("机构设计文件(*.mds)\0*.mds\0\0");
+	ofn->lpstrFilter = lpstrFilter;//两个\0表示结束
 	ofn->nFilterIndex = 1;
 	ofn->lpstrFileTitle = NULL;
 	ofn->nMaxFileTitle = 0;
 	ofn->lpstrInitialDir = NULL;
+}
+
+BOOL OpenFileDialog(HWND hWnd, TCHAR szFileName[], TCHAR lpstrFilter[])
+{
+	OPENFILENAME ofn;
+	InitialOpenFileName(&ofn, hWnd, szFileName, lpstrFilter);
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;//限定文件必须存在
+	return GetOpenFileName(&ofn);
+}
+
+
+BOOL SaveFileDialog(HWND hWnd, TCHAR szFileName[], TCHAR lpstrFilter[],TCHAR lpstrDefExt[])
+{
+	OPENFILENAME ofn;
+	InitialOpenFileName(&ofn, hWnd, szFileName, lpstrFilter);
+
+	ofn.Flags = OFN_PATHMUSTEXIST;
+	ofn.lpstrDefExt = lpstrDefExt;
+
+	return GetSaveFileName(&ofn);
 }

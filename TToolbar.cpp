@@ -26,16 +26,6 @@ LRESULT TToolbar::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, 
 	case WM_USER:
 		SetGroupChecked(wParam);
 		break;
-	case WM_COMMAND:
-		int a;
-		a = 10;
-		break;
-	case WM_LBUTTONDOWN:
-		//SetGruopChecked(2);
-		int i;
-		i = 10;
-		break;
-		
 	}
 		return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 }
@@ -149,9 +139,11 @@ void TToolbar::AddGroup(int IconIndex, int iGroupNum, int idCommand, bool Enable
 		mapGroup[iGroupNum].insert(idCommand);
 	else
 	{
-		std::set<int> setAGroup;
-		setAGroup.insert(idCommand);
-		mapGroup.insert(std::map<int, std::set<int> >::value_type(iGroupNum, setAGroup));
+		//std::set<int> setAGroup;
+		//setAGroup.insert(idCommand);
+		//mapGroup.insert(std::map<int, std::set<int> >::value_type(iGroupNum, setAGroup));
+
+		mapGroup[iGroupNum].insert(idCommand);
 	}
 	AddElement(IconIndex, idCommand, Enable ? TBSTATE_ENABLED : 0, BTNS_CHECKGROUP, NULL, NULL, (INT_PTR)iString);
 }
@@ -178,12 +170,4 @@ void TToolbar::FreshSize()
 {
 	// Resize the toolbar, and then show it.
 	SendMessage(m_hWnd, TB_AUTOSIZE, 0, 0);
-}
-
-//获得工具栏大小
-RECT TToolbar::GetClientRect()
-{
-	RECT rect;
-	::GetClientRect(m_hWnd, &rect);
-	return rect;
 }

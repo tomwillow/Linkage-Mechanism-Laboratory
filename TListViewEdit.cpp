@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "TListViewEdit.h"
-#include "TMyString.h"
+#include "TCHAR_Function.h"
 #include "TTransfer.h"
 #include "DPOINT.h"
 
@@ -14,14 +14,11 @@
 TListViewEdit::TListViewEdit()
 {
 	ListItemIndex = -1;
-	Text = NULL;
 }
 
 
 TListViewEdit::~TListViewEdit()
 {
-	if (Text != NULL)
-		delete[] Text;
 }
 
 void TListViewEdit::ChangeSource()
@@ -36,11 +33,11 @@ void TListViewEdit::ChangeSource()
 	case CTRLTYPE_COOR_P1_EDIT:
 	case CTRLTYPE_COOR_P2_EDIT:
 	{
-		this->GetText(Text);
+		this->GetText();
 
 		DPOINT dpt;
 		std::vector<TCHAR *>szNums;
-		TMyString::Split(Text, szNums, TEXT(","));//切分坐标
+		TCHAR_Function::Split(Text, szNums, TEXT(","));//切分坐标
 
 		if (szNums.size() == 2)//确实是坐标
 		{
@@ -70,12 +67,12 @@ void TListViewEdit::ChangeSource()
 		{
 			MessageBeep(1);
 		}
-		TMyString::ReleaseVectorTCHAR(szNums);
+		TCHAR_Function::ReleaseVectorTCHAR(szNums);
 		break;
 	}
 	case CTRLTYPE_DOUBLE_EDIT:
 	{
-		this->GetText(Text);
+		this->GetText();
 
 		double value = TTransfer::TCHAR2double(Text);
 		*((double *)pContent) = value;
@@ -83,22 +80,36 @@ void TListViewEdit::ChangeSource()
 	}
 	case CTRLTYPE_INT_EDIT:
 	{
-		this->GetText(Text);
+		this->GetText();
 
 		*((int *)pContent) = TTransfer::TCHAR2int(Text);
 		break;
 	}
 	case CTRLTYPE_ANGLE_VALUE_EDIT:
 	{
-		this->GetText(Text);
+		this->GetText();
 
 		double DegAngle = TTransfer::TCHAR2double(Text);
 		*((double *)pContent) = DEG2REG(DegAngle);
 		break;
 	}
+	case CTRLTYPE_COLOR_HEX:
+	{
+		this->GetText();
+
+		pElement->SetColor(_tcstol(Text, NULL, 16));
+		break;
+	}
+	case CTRLTYPE_LINE_WIDTH:
+	{
+		this->GetText();
+
+		pElement->SetLineWidth(TTransfer::TCHAR2int(Text));
+		break;
+	}
 	case CTRLTYPE_LEN_EDIT:
 	{
-		this->GetText(Text);
+		this->GetText();
 
 		double len = TTransfer::TCHAR2double(Text);
 		TRealLine *pRealLine = (TRealLine *)pElement;
@@ -107,7 +118,7 @@ void TListViewEdit::ChangeSource()
 	}
 	case CTRLTYPE_ANGLE_EDIT:
 	{
-		this->GetText(Text);
+		this->GetText();
 
 		double DegAngle = TTransfer::TCHAR2double(Text);
 		TRealLine *pRealLine = (TRealLine *)pElement;
@@ -140,28 +151,4 @@ bool TListViewEdit::OnKillFocus(WPARAM wParam, LPARAM lParam)
 	this->SetVisible(false);
 	PostMessage(m_hParent, WM_USER, 0, 0);//通知ListView更新
 	return true;
-}
-
-void CDECL TListViewEdit::SetText(TCHAR szFormat[], ...)
-{
-	TCHAR szBuffer[1024];
-	va_list pArgList;
-	va_start(pArgList, szFormat);
-	_vsntprintf_s(szBuffer, sizeof(szBuffer) / sizeof(TCHAR), szFormat, pArgList);
-	va_end(pArgList);
-
-	::SetWindowText(m_hWnd, szBuffer);
-
-	Text = new TCHAR[sizeof(TCHAR)*(GetLength() + 1)];
-	_tcscpy(Text, szBuffer);
-
-}
-
-
-void TListViewEdit::GetText(TCHAR text[])
-{
-	Text = new TCHAR[sizeof(TCHAR)*(GetLength() + 1)];
-	::GetWindowText(m_hWnd, Text, GetLength() + 1);//不知道为什么要加1才取得全
-
-	_tcscpy(text, Text);
 }

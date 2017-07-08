@@ -11,17 +11,11 @@ TEdit::TEdit()
 	bAutoHScrol = false;
 	bAutoVScrol = false;
 	bNoHideSel = false;
-
 }
 
 TEdit::~TEdit()
 {
 	::DeleteObject(m_hFont);
-}
-
-bool TEdit::OnKeyDown(WPARAM wParam, LPARAM lParam)
-{
-	return true; 
 }
 
 LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -13,6 +13,11 @@ TDriver::~TDriver()
 {
 }
 
+const TCHAR * TDriver::GetElementTypeName(TCHAR name[])//得到类型名称
+{
+	return _tcscpy(name, TEXT("驱动"));
+}
+
 bool TDriver::WriteFile(HANDLE &hf, DWORD &now_pos)
 {
 	TElement::WriteFile(hf, now_pos);

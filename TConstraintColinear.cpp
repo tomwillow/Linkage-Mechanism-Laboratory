@@ -24,6 +24,11 @@ TConstraintColinear::~TConstraintColinear()
 {
 }
 
+const TCHAR * TConstraintColinear::GetElementTypeName(TCHAR name[])//得到类型名称
+{
+	return _tcscpy(name, TEXT("共线"));
+}
+
 void TConstraintColinear::NoticeListView(TListView *pListView)
 {
 	pListView->DeleteAllItems();
@@ -33,7 +38,7 @@ void TConstraintColinear::NoticeListView(TListView *pListView)
 	pListView->id = id;
 	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
 	pListView->AddAttributeItem(TEXT("名称"), CTRLTYPE_EDIT, &Name, Name);
-	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, TEXT("重合"));
+	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, GetElementTypeName(buffer));
 	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
 	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
 	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);

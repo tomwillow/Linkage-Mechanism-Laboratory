@@ -37,7 +37,7 @@ namespace DialogAddDriver
 	TEdit EditExprRight;
 	TEdit EditExprLeft;
 	TEdit LabelDriverUnit;
-	TCheckBox CheckBoxPosition;
+	TCheckBox CheckBoxDisplacement;
 	TCheckBox CheckBoxV;
 	TCheckBox CheckBoxA;
 	TGraph *pGraph;
@@ -51,14 +51,14 @@ namespace DialogAddDriver
 		//根据类型选择单位
 		switch (ComboBox_GetCurSel(hComboDriverType))
 		{
-		case 0://位置
-			LabelDriverUnit.SetText(TEXT("deg"));
+		case 0://位移
+			LabelDriverUnit.SetText(TEXT("rad"));
 			break;
 		case 1://速度
-			LabelDriverUnit.SetText(TEXT("deg/sec"));
+			LabelDriverUnit.SetText(TEXT("rad/sec"));
 			break;
 		case 2://加速度
-			LabelDriverUnit.SetText(TEXT("deg/sec^2"));
+			LabelDriverUnit.SetText(TEXT("rad/sec^2"));
 			break;
 		}
 
@@ -73,7 +73,7 @@ namespace DialogAddDriver
 			LabelB.SetVisible(false);
 			switch (ComboBox_GetCurSel(hComboDriverType))
 			{
-			case 0://位置
+			case 0://位移
 				EditExprRight.SetText(TEXT("%f"), TTransfer::TCHAR2double(EditA.GetText()));
 				break;
 			case 1://速度
@@ -92,7 +92,7 @@ namespace DialogAddDriver
 			LabelB.SetVisible(true);
 			switch (ComboBox_GetCurSel(hComboDriverType))
 			{
-			case 0://位置
+			case 0://位移
 				EditExprRight.SetText(TEXT("%f*t+%f"), TTransfer::TCHAR2double(EditA.GetText()), TTransfer::TCHAR2double(EditB.GetText()));
 				break;
 			case 1://速度
@@ -109,7 +109,7 @@ namespace DialogAddDriver
 			LabelB.SetVisible(false);
 			switch (ComboBox_GetCurSel(hComboDriverType))
 			{
-			case 0://位置
+			case 0://位移
 				break;
 			case 1://速度
 				break;
@@ -144,7 +144,9 @@ namespace DialogAddDriver
 			//
 			pGraph = new TGraph(&(win.m_Configuration));
 			pGraph->bShowMouseLine = true;
-			pGraph->SetMargin(10);
+			pGraph->bShowLabelX = false;
+			pGraph->bShowLabelY = false;
+			pGraph->bShowTitle = false;
 			pGraph->CreateEx(0, TEXT("图表"), TEXT("图表"),
 				WS_CHILD,
 				300,
@@ -159,7 +161,7 @@ namespace DialogAddDriver
 
 			//
 			hComboDriverType = GetDlgItem(hDlg, IDC_COMBO_DRIVER_TYPE);
-			ComboBox_AddString(hComboDriverType, TEXT("位置"));
+			ComboBox_AddString(hComboDriverType, TEXT("位移"));
 			ComboBox_AddString(hComboDriverType, TEXT("速度"));
 			ComboBox_AddString(hComboDriverType, TEXT("加速度"));
 			ComboBox_SetCurSel(hComboDriverType, 0);
@@ -184,10 +186,10 @@ namespace DialogAddDriver
 			EditExprLeft.LinkControl(GetDlgItem(hDlg, IDC_EDIT_FORMULAR_L));
 			EditExprRight.LinkControl(GetDlgItem(hDlg, IDC_EDIT_FORMULAR_R));
 
-			CheckBoxPosition.LinkControl(GetDlgItem(hDlg, IDC_CHECK_POSITION));
+			CheckBoxDisplacement.LinkControl(GetDlgItem(hDlg, IDC_CHECK_D));
 			CheckBoxV.LinkControl(GetDlgItem(hDlg, IDC_CHECK_V));
 			CheckBoxA.LinkControl(GetDlgItem(hDlg, IDC_CHECK_A));
-			CheckBoxPosition.SetChecked(true);
+			CheckBoxDisplacement.SetChecked(true);
 
 			//test
 			ComboBox_SetCurSel(hComboDriverType, 0);
@@ -312,7 +314,7 @@ namespace DialogAddDriver
 						//循环结束，送入数据
 						if (err == ERROR_NO)
 						{
-							pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, CheckBoxPosition.GetChecked(),TEXT("P"));
+							pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, CheckBoxDisplacement.GetChecked(),TEXT("D"));
 							pGraph->InputDptVector(dptVectorV, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, CheckBoxV.GetChecked(),TEXT("V"));
 							pGraph->InputDptVector(dptVectorA, { PS_SOLID, { 1, 0 }, RGB(0, 255, 0) }, CheckBoxA.GetChecked(),TEXT("A"));
 						}
@@ -332,8 +334,8 @@ namespace DialogAddDriver
 				break;
 			}
 
-			case IDC_CHECK_POSITION:
-				pGraph->SetPointDataVisible(0, CheckBoxPosition.GetChecked());
+			case IDC_CHECK_D:
+				pGraph->SetPointDataVisible(0, CheckBoxDisplacement.GetChecked());
 				pGraph->Invalidate();
 				break;
 			case IDC_CHECK_V:

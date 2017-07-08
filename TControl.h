@@ -13,6 +13,7 @@ public:
 	TControl();
 	~TControl();
 	void TControl::LinkControl(HWND hwnd);
+	RECT TControl::GetClientRect();
 	void TControl::SetRect(RECT &rect);
 	void TControl::SetRect(int x1, int y1, int x2, int y2); 
 	//void TControl::SetPos(RECT &rect);

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "DetectMemoryLeak.h"
 #include <Windows.h>
 #include <process.h>
 #pragma comment(lib,"winmm.lib")//timeGetTime
@@ -28,6 +29,7 @@ namespace DialogAnimation
 	int frame_start, frame_end, frame_now;
 	bool isPlaying;
 	bool isAnalyzing;
+	bool thread_is_running;
 
 	std::vector<TListBoxItem> vecItemsLeft,vecItemsRight;
 
@@ -61,8 +63,11 @@ namespace DialogAnimation
 	TGraph *pGraph;
 
 	RECT rectDlg;
-	HWND hDlg; 
+	HWND hDlg;
+	HINSTANCE hInst;
 	
+	static HFONT hFont;
+
 	int CALLBACK EnumFontFamProc(LPENUMLOGFONT lpelf, LPNEWTEXTMETRIC lpntm, DWORD nFontType, long lParam)
 	{
 		//if (_tcscpy(lpelf->elfLogFont.lfFaceName, (TCHAR *)lParam) == 0)
@@ -73,11 +78,11 @@ namespace DialogAnimation
 
 	BOOL CALLBACK DlgAnimationProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	{
-		static HFONT hFont;
 		switch (message)
 		{
 		case WM_INITDIALOG:
 		{
+			hInst = (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE);
 			pSolver = (win.pSolver);
 			pCanvas = &(win.Canvas);
 			pShape = &(win.m_Shape);
@@ -93,10 +98,13 @@ namespace DialogAnimation
 				CW_USEDEFAULT,
 				CW_USEDEFAULT,
 				CW_USEDEFAULT,
-				win.m_hWnd, (HMENU)0, (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE));
+				win.m_hWnd, (HMENU)LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_GRAPH)), (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE));
 			pGraph->SetDoubleBuffer(true);
 			pGraph->ShowWindow(SW_HIDE);
 			pGraph->UpdateWindow();
+
+			pGraph->sLabelX = TEXT("time (sec)");
+			pGraph->sLabelY = TEXT(" ");
 
 			GetClientRect(hDlg, &rectDlg);
 			DialogAnimation::hDlg = hDlg;
@@ -164,6 +172,7 @@ namespace DialogAnimation
 
 			isPlaying = false;
 			isAnalyzing = false;
+			thread_is_running = false;
 			//COLORREF cr = RGB(0, 113, 188);
 
 			EditTimeStart.LinkControl(GetDlgItem(hDlg, IDC_EDIT_TIME_START));
@@ -346,7 +355,7 @@ namespace DialogAnimation
 
 					vecItemsRight.push_back(vecItemsLeft[ItemIndex]);
 					vecItemsRight.back().type = type;
-					vecItemsRight.back().s = TEXT("位置: ") + vecItemsRight.back().s;
+					vecItemsRight.back().s = TEXT("位移: ") + vecItemsRight.back().s;
 					ListBoxRight.AddString(vecItemsRight.back().s.c_str());
 				}
 				break;
@@ -393,8 +402,14 @@ namespace DialogAnimation
 			}
 			case IDC_BUTTON_REMOVE_MESURE:
 			{
+				int ItemIndex = ListBoxRight.GetCurSel();
+				if (ItemIndex != -1)
+				{
+					auto iter = vecItemsRight.begin() + ItemIndex;
+					vecItemsRight.erase(iter);
 
-				ListBoxRight.DeleteCurSel();
+					ListBoxRight.DeleteCurSel();
+				}
 				break;
 			}
 			case IDC_BUTTON_SHOW_GRAPH:
@@ -409,15 +424,34 @@ namespace DialogAnimation
 			}
 			return TRUE;
 		case WM_CLOSE:
-			pGraph->bRealClose = true;
-			if (pGraph != NULL)
-				delete pGraph;
+			if (thread_is_running)
+			{
+				isPlaying = false;
+				isAnalyzing = false;
 
-			DeleteObject(hFont);
-			EndDialog(hDlg, 0);
+				_beginthread(PrepareClose, 0, NULL);
+			}
+			else
+			{
+		pGraph->bRealClose = true;
+		if (pGraph != NULL)
+			delete pGraph;
+
+		DeleteObject(hFont);
+		EndDialog(hDlg, 0);
+
+			}
 			return TRUE;
 		}
 		return FALSE;
+	}
+
+	VOID PrepareClose(PVOID pvoid)
+	{
+		while (thread_is_running)
+			continue;
+
+		SendMessage(hDlg, WM_CLOSE, 0, 0);
 	}
 
 	void SetPlayerEnable(bool bEnable)
@@ -487,6 +521,8 @@ namespace DialogAnimation
 
 	VOID AnalyzeProc(PVOID pvoid)
 	{
+		thread_is_running = true;
+
 		ButtonRun.SetText(TEXT("中止分析"));
 		SetMesureControlEnable(false);//禁用
 
@@ -501,7 +537,7 @@ namespace DialogAnimation
 		time_start = EditTimeStart.GetDouble();
 		time_end = EditTimeEnd.GetDouble();
 		fps = EditFPS.GetDouble();
-		frame_start = 0;
+		frame_start = time_start*fps;
 		frame_end = time_end*fps;
 
 		TrackbarTime.SetRange(frame_end);
@@ -529,7 +565,10 @@ namespace DialogAnimation
 
 		std::vector<double> vect;
 
+		pSolver->ClearOutput();
+
 		bool hasSolved;
+		pSolver->Solve(time_start - spf);//调试发现每次的第一帧加速度计算都不正常，但后面正常。无法排除bug，先减一帧计算
 		for (time_now = time_start, frame_now = frame_start; time_now <= time_end; time_now += spf, frame_now++)
 		{
 			//求解
@@ -581,9 +620,10 @@ namespace DialogAnimation
 			}
 		}
 
-		DialogAnimation::vecItemsRight;
+		//DialogAnimation::vecItemsRight;
 
 		//加载曲线数据
+		pGraph->bDraw = false;
 		pGraph->Clear();
 		for (auto &Item : vecItemsRight)
 		{
@@ -600,6 +640,9 @@ namespace DialogAnimation
 			pGraph->InputDptVector(vect, Item.data, { PS_SOLID, { 1, 0 }, cr }, true,Item.s.c_str());
 
 		}
+
+		pGraph->bDraw = true;
+		pGraph->Refresh();
 
 		ButtonShowGraph.SetEnable(!vecItemsRight.empty());
 
@@ -621,10 +664,13 @@ namespace DialogAnimation
 		isAnalyzing = false;
 		ButtonRun.SetText(TEXT("开始分析"));
 		SetMesureControlEnable(true);//解禁
+
+		thread_is_running = false;
 	}
 
 	VOID PlayProc(PVOID pvoud)
 	{
+		thread_is_running = true;
 		DWORD start = timeGetTime();//当前真实时间
 		int frame_start_this_time = frame_now;//本轮播放的起始帧
 
@@ -633,7 +679,10 @@ namespace DialogAnimation
 		while (frame_now < frame_end)
 		{
 			if (isPlaying == false)
+			{
+				thread_is_running = false;
 				return;
+			}
 
 			now = timeGetTime();
 			frame_now = (now - start) / 1000.0*fps+frame_start_this_time;//得到当前应处理的帧
@@ -661,6 +710,7 @@ namespace DialogAnimation
 
 		//_endthread();
 		//return 0;
+		thread_is_running = false;
 	}
 
 	//初始化左列表
@@ -671,34 +721,38 @@ namespace DialogAnimation
 
 		TCHAR temp[32];
 		String s,s_dpt;
-		for (auto pElement : pShape->Element)
+		for (auto pElement : pShape->Element)//遍历所有元素
 		{
-			s.clear();
-			s << TEXT("ID:") << pElement->id;
-			s << TEXT(" ") << pElement->GetElementTypeName(temp);
-			s << TEXT(" ") << pElement->Name;
-			for (size_t i = 0; i < pElement->vecDpt.size();++i)
+			if (pElement->CanBeDragged)//非机架及RealLine,Driver,Constraint
 			{
-				for (auto ValueType : { X, Y, PHI })//x,y,phi各加一个
+				s.clear();
+				s << TEXT("ID:") << pElement->id;
+				s << TEXT(" ") << pElement->GetElementTypeName(temp);
+				s << TEXT(" ") << pElement->Name;
+				for (size_t i = 0; i < pElement->vecDpt.size(); ++i)//遍历每个相对点
 				{
-					s_dpt.clear();
-					s_dpt << TEXT("pt") << i;
-					switch (ValueType)
+					for (auto ValueType : { X, Y, PHI })//x,y,phi各加一个
 					{
-					case X:s_dpt << TEXT(" x"); break;
-					case Y:s_dpt << TEXT(" y"); break;
-					case PHI:s_dpt << TEXT(" phi"); break;
+						if (i != 0 && ValueType == PHI) continue;//只有第一个点有phi参数
+						s_dpt.clear();
+						s_dpt << TEXT("pt") << i;
+						switch (ValueType)
+						{
+						case X:s_dpt << TEXT(" x"); break;
+						case Y:s_dpt << TEXT(" y"); break;
+						case PHI:s_dpt << TEXT(" phi"); break;
+						}
+						ListBoxLeft.AddString((s + s_dpt).c_str());
+
+						TListBoxItem tempItem;
+						tempItem.id = pElement->id;
+						tempItem.index_of_point = i;
+						tempItem.s = s + s_dpt;
+						tempItem.pElement = pElement;
+
+						tempItem.value_type = ValueType;
+						vecItemsLeft.push_back(tempItem);
 					}
-					ListBoxLeft.AddString((s + s_dpt).c_str());
-
-					TListBoxItem tempItem;
-					tempItem.id = pElement->id;
-					tempItem.index_of_point = i;
-					tempItem.s = s + s_dpt;
-					tempItem.pElement = pElement;
-
-					tempItem.value_type = ValueType;
-					vecItemsLeft.push_back(tempItem);
 				}
 			}
 		}

@@ -17,6 +17,7 @@ private:
 	void TToolbar::CreateImageList(UINT uMsg, int cx, int cy, UINT BitmapID, COLORREF crMask);
 	void TToolbar::AddElement(int BitmapIndex, int idCommand, BYTE fsState, BYTE fsStyle, BYTE bReverse[], DWORD_PTR dwData, INT_PTR iString);
 	LRESULT TToolbar::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+	void TToolbar::SetGroupChecked(int idCommand);
 protected:
 
 public:
@@ -35,7 +36,5 @@ public:
 	void TToolbar::AddSeparator(int iWidth);
 	void TToolbar::ShowToolbar();
 	void TToolbar::FreshSize();
-	RECT TToolbar::GetClientRect();
-	void TToolbar::SetGroupChecked(int idCommand);
 };
 

@@ -4,7 +4,7 @@
 #include "TMainWindow.h"
 
 extern TMainWindow win;
-TTool::TTool()
+TTool::TTool() :ClientRect(win.Canvas.ClientRect)
 {
 	//pwin = &win;
 	hInst = win.m_hInst;

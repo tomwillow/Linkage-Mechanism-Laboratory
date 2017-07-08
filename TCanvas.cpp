@@ -16,19 +16,19 @@
 extern TMainWindow win;
 TCanvas::TCanvas()
 {
-	Config = NULL;
+	pConfig = NULL;
 	bMButtonPressing = false;
 }
 
 
 TCanvas::~TCanvas()
 {
-	Config = NULL;
+	pConfig = NULL;
 }
 
 void TCanvas::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	Config = &(win.m_Configuration);
+	pConfig = &(win.m_Configuration);
 	m_hWnd = hWnd;
 }
 
@@ -49,7 +49,7 @@ void TCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 	win.OnCommand(wParam, lParam);
 }
 
-void TCanvas::OnKeyDown(WPARAM wParam, LPARAM lParam)	
+void TCanvas::OnKeyDown(WPARAM wParam, LPARAM lParam)
 {
 	DealMessage(m_hWnd, WM_KEYDOWN, wParam, lParam);
 }
@@ -74,23 +74,22 @@ void TCanvas::OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	ptPos.x = LOWORD(lParam);
 	ptPos.y = HIWORD(lParam);
 
-	switch (Config->uUnits)
+	switch (pConfig->uUnits)
 	{
 	case UNITS_MM:
-		win.m_Status.SetText(IDR_STATUS_COORDINATE, TEXT("(%.3f mm,%.3f mm)"), Config->ScreenToReal(ptPos).x, Config->ScreenToReal(ptPos).y);
+		win.m_Status.SetText(IDR_STATUS_COORDINATE, TEXT("(%.3f mm,%.3f mm)"), pConfig->ScreenToReal(ptPos).x, pConfig->ScreenToReal(ptPos).y);
 		break;
 	case UNITS_INCH:
-		win.m_Status.SetText(IDR_STATUS_COORDINATE, TEXT("(%.3f in,%.3f in)"), Config->ScreenToReal(ptPos).x, Config->ScreenToReal(ptPos).y);
+		win.m_Status.SetText(IDR_STATUS_COORDINATE, TEXT("(%.3f in,%.3f in)"), pConfig->ScreenToReal(ptPos).x, pConfig->ScreenToReal(ptPos).y);
 		break;
 	}
 
 	//若中键按下，拖动坐标原点并刷新显示
 	if (bMButtonPressing)
 	{
-		Config->SetOrg(Config->GetOrg().x + (ptPos.x - uiMoveStartX),
-			Config->GetOrg().y + (ptPos.y - uiMoveStartY));
-		uiMoveStartX = ptPos.x;
-		uiMoveStartY = ptPos.y;
+		pConfig->SetOrg(pConfig->GetOrg().x + (ptPos.x - uiMoveStart.x),
+			pConfig->GetOrg().y + (ptPos.y - uiMoveStart.y));
+		uiMoveStart = ptPos;
 	}
 
 	DealMessage(hWnd, uMsg, wParam, lParam);
@@ -109,8 +108,8 @@ void TCanvas::OnSetCursor(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void TCanvas::OnMButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	bMButtonPressing = true;
-	uiMoveStartX = LOWORD(lParam);
-	uiMoveStartY = HIWORD(lParam);
+	uiMoveStart.x = LOWORD(lParam);
+	uiMoveStart.y = HIWORD(lParam);
 	PostMessage(hWnd, WM_SETCURSOR, 0, 0);
 }
 
@@ -127,59 +126,29 @@ void TCanvas::OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	POINT ptPos;
 	ptPos.x = LOWORD(lParam);
 	ptPos.y = HIWORD(lParam);
+
 	//WM_MOUSEWHEEL事件获得的是相对于屏幕的绝对坐标
 	ScreenToClient(hWnd, &ptPos);
 
 	//首先取得鼠标位置到原点的实际距离，在比例变动后以相同的实际距离推断新的原点位置。
 	//变动前后的依据是实际距离不变。
-	double xlen = Config->ScreenToLengthX(ptPos.x - Config->GetOrg().x);
-	double ylen = Config->ScreenToLengthY(ptPos.y - Config->GetOrg().y);
+	double xlen = pConfig->ScreenToLengthX(ptPos.x - pConfig->GetOrg().x);
+	double ylen = pConfig->ScreenToLengthY(ptPos.y - pConfig->GetOrg().y);
 
-	double OldProportion = Config->GetProportion();
-	if (zDelta > 0)//向前滚
-		Config->SetDPU(Config->GetProportion() * 2);
+	if (zDelta > 0)
+		pConfig->SetDPU(win.m_Trackbar.GetNextValue());
 	else
-		Config->SetDPU(Config->GetProportion() / 2);
+		pConfig->SetDPU(win.m_Trackbar.GetPrevValue());
 
-	Config->SetOrg(ptPos.x - Config->LengthToScreenX(xlen), ptPos.y - Config->LengthToScreenY(ylen));
+	pConfig->SetOrg(ptPos.x - pConfig->LengthToScreenX(xlen), ptPos.y - pConfig->LengthToScreenY(ylen));
 
-	win.m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("比例："), Config->GetProportion() * 100);
-	win.m_Status.SetText(IDR_STATUS_PROPORTION, TEXT("%.0f%%"), Config->GetProportion() * 100);
+	win.m_Trackbar.SetPosByValue(pConfig->GetProportion(), 1e-6);
 
-	int iProportion = (int)(Config->GetProportion() * 100);
-	if (iProportion < 12.5)
-		win.m_Trackbar.SetPos(0);
-	else
-		if (iProportion > 800)
-			win.m_Trackbar.SetPos(6);
-		else
-			switch (iProportion)
-		{
-			case 13:
-				win.m_Trackbar.SetPos(0);
-				break;
-			case 25:
-				win.m_Trackbar.SetPos(1);
-				break;
-			case 50:
-				win.m_Trackbar.SetPos(2);
-				break;
-			case 100:
-				win.m_Trackbar.SetPos(3);
-				break;
-			case 200:
-				win.m_Trackbar.SetPos(4);
-				break;
-			case 400:
-				win.m_Trackbar.SetPos(5);
-				break;
-			case 800:
-				win.m_Trackbar.SetPos(6);
-				break;
-		}
+	//因为原来也是0，SetPos后也是0，SetPos不激发NOTIFY，所以手动发
+	PostMessage(m_hParent, WM_NOTIFY, MAKELONG(IDR_TRACKBAR, 0), 0);
 
 	DealMessage(hWnd, uMsg, wParam, lParam);
-	::InvalidateRect(m_hWnd, &ClientRect, false);
+	Invalidate();
 }
 
 
@@ -188,19 +157,19 @@ void TCanvas::OnDraw(HDC hdc)
 	SetBkMode(hdc, TRANSPARENT);
 
 	//填充背景
-	TDraw::FillRect(hdc, &ClientRect, Config->crBackground);
+	TDraw::FillRect(hdc, &ClientRect, pConfig->crBackground);
 
 	//画网格
-	if (Config->bDrawGrid)
-		TDraw::DrawGrid(hdc, ClientRect,Config->GetOrg(),Config->crGridBig,Config->crGridSmall, Config);
+	if (pConfig->bDrawGrid)
+		TDraw::DrawGrid(hdc, ClientRect, pConfig->GetOrg(), pConfig->crGridBig, pConfig->crGridSmall, pConfig);
 
 	//画坐标原点
-	TDraw::DrawAxes(hdc, Config->GetOrg().x, Config->GetOrg().y, Config->crCoordinate);
+	TDraw::DrawAxes(hdc, pConfig->GetOrg().x, pConfig->GetOrg().y, pConfig->crCoordinate);
 
 	//图形绘制
-	for (auto pElement: win.m_Shape.Element)
+	for (auto pElement : win.m_Shape.Element)
 	{
-		TDraw::DrawElement(hdc, pElement, Config);
+		TDraw::DrawElement(hdc, pElement, pConfig);
 	}
 
 	//工具类绘制

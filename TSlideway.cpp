@@ -12,8 +12,13 @@ TSlideway::TSlideway()
 
 	ShadowQuadrant = 4;
 	ShadowLength = 40;
+	SlidewayStyle = 0;
 }
 
+const TCHAR * TSlideway::GetElementTypeName(TCHAR name[])//得到类型名称
+{
+	return _tcscpy(name, TEXT("滑道"));
+}
 
 TSlideway::~TSlideway()
 {
@@ -41,6 +46,8 @@ bool TSlideway::WriteFile(HANDLE &hf, DWORD &now_pos)
 	now_pos += sizeof(ShadowLength);
 	::WriteFile(hf, &ShadowQuadrant, sizeof(ShadowQuadrant), &now_pos, NULL);
 	now_pos += sizeof(ShadowQuadrant);
+	::WriteFile(hf, &SlidewayStyle, sizeof(SlidewayStyle), &now_pos, NULL);
+	now_pos += sizeof(SlidewayStyle);
 
 	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
 		return false;
@@ -56,6 +63,8 @@ bool TSlideway::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 	now_pos += sizeof(ShadowLength);
 	::ReadFile(hf, &ShadowQuadrant, sizeof(ShadowQuadrant), &now_pos, NULL);
 	now_pos += sizeof(ShadowQuadrant);
+	::ReadFile(hf, &SlidewayStyle, sizeof(SlidewayStyle), &now_pos, NULL);
+	now_pos += sizeof(SlidewayStyle);
 
 	if (GetLastError() != 0)
 		return false;
@@ -69,4 +78,5 @@ void TSlideway::NoticeListView(TListView *pListView)
 	
 	pListView->AddAttributeItem(TEXT("阴影长度"), CTRLTYPE_INT_EDIT, &ShadowLength, TEXT("%d"), ShadowLength);
 	pListView->AddAttributeItem(TEXT("阴影位置"), CTRLTYPE_INT_EDIT, &ShadowQuadrant, TEXT("%d"), ShadowQuadrant);
+	pListView->AddAttributeItem(TEXT("样式"), CTRLTYPE_INT_EDIT, &SlidewayStyle, TEXT("%d"), SlidewayStyle);
 }

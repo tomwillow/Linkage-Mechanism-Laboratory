@@ -3,7 +3,7 @@
 
 #include "TCanvas.h"
 #include "resource.h"
-#include "TMyString.h"
+#include "TCHAR_Function.h"
 #include "TTreeViewContent.h"
 
 #include "TConfiguration.h"
@@ -170,7 +170,7 @@ void TLineTool::Draw(HDC hdc)
 	}
 
 	if (bShowTips)
-		TDraw::DrawTips(hdc, ptMouse, sTips.c_str(), pConfig);
+		TDraw::DrawTips(hdc, ptMouse, ClientRect, sTips.c_str(), pConfig);
 }
 
 TElement * TLineTool::AddIntoShape(TRealLine &RealLine)
@@ -254,7 +254,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		LineEdit->GetText(buffer);
 
 		std::vector<TCHAR *>szNums;
-		TMyString::Split(buffer, szNums, TEXT(","));//切分坐标
+		TCHAR_Function::Split(buffer, szNums, TEXT(","));//切分坐标
 
 		enum enumInputType{ INPUT_BAD, INPUT_LENGTH, INPUT_COORDINATE, INPUT_LENGTH_ANGLE } eInputType;
 		if (szNums.size() == 2)//确实是坐标
@@ -266,7 +266,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		else
 		{
 			szNums.clear();
-			TMyString::Split(buffer, szNums, TEXT("<"));
+			TCHAR_Function::Split(buffer, szNums, TEXT("<"));
 			length = TTransfer::TCHAR2double(szNums[0]);
 			if (abs(length) > 1e-6)//长度>0
 				if (szNums.size() == 2)
@@ -281,7 +281,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			else
 				eInputType = INPUT_BAD;
 		}
-		TMyString::ReleaseVectorTCHAR(szNums);
+		TCHAR_Function::ReleaseVectorTCHAR(szNums);
 		//已得到dpt,length,angle
 
 		switch (eInputType)

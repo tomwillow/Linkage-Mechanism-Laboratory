@@ -88,7 +88,7 @@ void TFramePointTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 void TFramePointTool::Draw(HDC hdc)
 {
 	if (bShowTips)
-		TDraw::DrawTips(hdc, ptMouse, sTips.c_str(), pConfig);
+		TDraw::DrawTips(hdc, ptMouse, ClientRect, sTips.c_str(), pConfig);
 
 	TDraw::DrawFramePoint(hdc, &tempFramePoint, pConfig);
 	//已存储点由Canvas负责绘制

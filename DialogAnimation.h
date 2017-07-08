@@ -26,5 +26,6 @@ namespace DialogAnimation
 	void SetPlayerButtonEnableWhenDragTrackbar();
 	VOID AnalyzeProc(PVOID pvoid);
 	VOID PlayProc(PVOID pvoid);
+	VOID PrepareClose(PVOID pvoid);
 	void InitialListBoxLeft();
 }

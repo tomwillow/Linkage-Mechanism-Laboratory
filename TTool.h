@@ -24,6 +24,7 @@ protected:
 	TListView *pListView;
 	TTreeViewContent *pTreeViewContent;
 	TSolver *pSolver;
+	RECT &ClientRect;
 	//void TTool::RefreshTreeViewContent();
 	POINT ptMouse;
 	bool bShowTips;

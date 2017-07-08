@@ -7,6 +7,9 @@
 #include "TToolTip.h"
 
 #include "String.h"
+#include "TTransfer.h"
+
+#include "TDraw.h"
 
 #include "TConstraintCoincide.h" 
 #include "TConstraintColinear.h"
@@ -114,8 +117,8 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	//创建Trackbar
 	m_Trackbar.CreateTrackbar(m_Status.m_hWnd, this->m_hInst, m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0), IDR_TRACKBAR);
-	m_Trackbar.SetRange(6);
-	m_Trackbar.SetPos(3);
+	m_Trackbar.SetRangeAndValue({0.01,0.05,0.1, 0.125, 0.25, 0.5, 1, 2, 4, 8 ,16,32,64});
+	m_Trackbar.SetPosByValue(1.0, 1e-6);
 
 	//创建右窗口
 	RightWindow.CreateEx(0, TEXT("RightWindow"), TEXT("RightWindow"),
@@ -166,32 +169,23 @@ void TMainWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (wmId == IDR_TRACKBAR)
 	{
 		//拖动了Trackbar
-		switch (m_Trackbar.GetPos())
-		{
-		case 0:
-			m_Configuration.SetDPU(0.125); break;
-		case 1:
-			m_Configuration.SetDPU(0.25); break;
-		case 2:
-			m_Configuration.SetDPU(0.5); break;
-		case 3:
-			m_Configuration.SetDPU(1.0); break;
-		case 4:
-			m_Configuration.SetDPU(2.0); break;
-		case 5:
-			m_Configuration.SetDPU(4.0); break;
-		case 6:
-			m_Configuration.SetDPU(8.0); break;
-		}
-		m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("比例："), m_Configuration.GetProportion() * 100);
-		m_Status.SetText(IDR_STATUS_PROPORTION, TEXT("%.0f%%"), m_Configuration.GetProportion() * 100);
-		InvalidateRect(Canvas.m_hWnd, &Canvas.ClientRect, false);
+		m_Configuration.SetDPU(m_Trackbar.GetNowValue());
+
+		m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("比例："));
+		
+		TCHAR temp[64];
+		TTransfer::double2TCHAR_AutoTrim0(m_Configuration.GetProportion() * 100, temp);
+		m_Status.SetText(IDR_STATUS_PROPORTION, TEXT("%s%%"), temp);
+
+		Canvas.Invalidate();
 	}
 }
 
 
 void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
+	static TCHAR lpstrFilterMDS[] = TEXT("机构设计文件(*.mds)\0*.mds\0\0");
+
 	int wmId = LOWORD(wParam);
 	int wmEvent = HIWORD(wParam);
 	TManageTool *p_Managetool = &m_ManageTool;
@@ -228,10 +222,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (wmEvent != ID_OPEN_NOCHECK)
 		{
 			//准备打开对话框
-			OPENFILENAME ofn;
-			InitialOpenFileName(&ofn, m_hWnd, szFileName);
-			ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;//限定文件必须存在
-			if (GetOpenFileName(&ofn) == FALSE)
+			if (OpenFileDialog(m_hWnd, szFileName, lpstrFilterMDS) == FALSE)
 				break;
 		}
 
@@ -265,13 +256,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			if (_tcslen(szFileName) == 0 || GetFileExists(szFileName) == false)//没有当前文件或者当前文件已失效
 			{
 				//弹出对话框
-				OPENFILENAME ofn;
-				InitialOpenFileName(&ofn, m_hWnd, szFileName);
-
-				ofn.Flags = OFN_PATHMUSTEXIST;
-				ofn.lpstrDefExt = TEXT("mds");
-
-				if (GetSaveFileName(&ofn) == FALSE)
+				if (SaveFileDialog(m_hWnd, szFileName, lpstrFilterMDS, TEXT("mds")) == FALSE)
 					return;
 			}
 
@@ -286,13 +271,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	break;
 	case ID_SAVEAS:
 	{
-		OPENFILENAME ofn;
-		InitialOpenFileName(&ofn, m_hWnd, szFileName);
-
-		ofn.Flags = OFN_PATHMUSTEXIST;
-		ofn.lpstrDefExt = TEXT("mds");
-
-		if (GetSaveFileName(&ofn) == FALSE)
+		if (SaveFileDialog(m_hWnd, szFileName, lpstrFilterMDS, TEXT("mds")) == FALSE)
 			return;
 
 		this->OnCommand(MAKELONG(ID_SAVE, ID_SAVE_NOCHECK), 0);
@@ -388,7 +367,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			m_hWnd, (HMENU)0, m_hInst);
+			m_hWnd, (HMENU)LoadMenu(m_hInst, MAKEINTRESOURCE(IDR_MENU_GRAPH)), m_hInst);
 		pGraph->SetDoubleBuffer(true);
 		pGraph->ShowWindow(SW_SHOWNORMAL);
 
@@ -399,10 +378,13 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		std::vector<DPOINT> dptVector, dptVector2;
 		DPOINT dpt;
 		srand(GetTickCount());
+		double b = rand();
+		double t = double(rand() % 10) / double(rand() % 100);
 		for (int x = 0; x <50 * (rand() % 19 + 1); ++x)
-		//for (int x = 0; x <=100; ++x)
+		//for (int x = -99; x <=100; ++x)
 		{
-			dpt.x = 120.234+x*0.01;
+			dpt.x = b+x*t;
+			//dpt.x = x;
 			dpt.y = sin(x / 10.0) * 50;
 			dptVector.push_back(dpt);
 
@@ -413,7 +395,10 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, true,TEXT("y=sin(x/50)"));
 		pGraph->InputDptVector(dptVector2, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, true,TEXT("y=cos(x/50)"));
 
-		pGraph->SetMargin(40);
+		//pGraph->SetMargin(40);
+
+		pGraph->sLabelX = TEXT("x");
+		pGraph->sLabelY = TEXT("y");
 
 		vecpGraph.push_back(pGraph);
 		break;
@@ -493,6 +478,18 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		pSolver->Solve();
 		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
 		break;
+	case ID_SAVE_CAPTURE:
+	{
+		TCHAR szFileNamePNG[MAX_PATH];
+		if (SaveFileDialog(m_hWnd, szFileNamePNG, TEXT("PNG File\0*.png\0\0"), TEXT("png")))
+		{
+			if (TDraw::CaptureWindowToFile(Canvas.m_hWnd, szFileNamePNG))
+				MessageBox(NULL, TEXT("保存成功。"), TEXT(""), 0);
+			else
+				MessageBox(NULL, TEXT("保存失败。"), TEXT(""), MB_ICONERROR);
+		}
+		break;
+	}
 	case ID_VIEW_SUITABLE:
 		//DPOINT center;
 		//double left, right, top, bottom;

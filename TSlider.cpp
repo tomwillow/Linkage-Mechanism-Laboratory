@@ -11,6 +11,8 @@ TSlider::TSlider()
 	eType = ELEMENT_SLIDER;
 	
 	dpt_1 = { 1, 0 };
+
+	CanBeDragged = true;
 }
 
 
@@ -18,6 +20,10 @@ TSlider::~TSlider()
 {
 }
 
+const TCHAR * TSlider::GetElementTypeName(TCHAR name[])//得到类型名称
+{
+	return _tcscpy(name, TEXT("滑块"));
+}
 
 void TSlider::NoticeListView(TListView *pListView)
 {

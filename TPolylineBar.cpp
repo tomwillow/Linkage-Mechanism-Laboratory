@@ -8,11 +8,18 @@ TPolylineBar::TPolylineBar()
 {
 	_tcscpy(Name, TEXT(""));
 	eType = ELEMENT_POLYLINEBAR;
+
+	CanBeDragged = true;
 }
 
 
 TPolylineBar::~TPolylineBar()
 {
+}
+
+const TCHAR * TPolylineBar::GetElementTypeName(TCHAR name[])//得到类型名称
+{
+	return _tcscpy(name, TEXT("多段杆"));
 }
 
 void TPolylineBar::NoticeListView(TListView *pListView)

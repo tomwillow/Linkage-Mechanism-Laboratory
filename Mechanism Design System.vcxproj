@@ -73,7 +73,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CMyButton.cpp" />
     <ClCompile Include="DetectMemoryLeak.cpp" />
     <ClCompile Include="DialogAbout.cpp" />
     <ClCompile Include="DialogAddDriver.cpp" />
@@ -119,7 +118,7 @@
     <ClCompile Include="TListViewEdit.cpp" />
     <ClCompile Include="TMainWindow.cpp" />
     <ClCompile Include="TManageTool.cpp" />
-    <ClCompile Include="TMyString.cpp" />
+    <ClCompile Include="TCHAR_Function.cpp" />
     <ClCompile Include="TPolylineBar.cpp" />
     <ClCompile Include="TPolylineBarTool.cpp" />
     <ClCompile Include="TRealLine.cpp" />
@@ -144,7 +143,6 @@
     <ClCompile Include="MyMath.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CMyButton.h" />
     <ClInclude Include="DetectMemoryLeak.h" />
     <ClInclude Include="DialogAbout.h" />
     <ClInclude Include="DialogAddDriver.h" />
@@ -190,7 +188,7 @@
     <ClInclude Include="TListViewEdit.h" />
     <ClInclude Include="TMainWindow.h" />
     <ClInclude Include="TManageTool.h" />
-    <ClInclude Include="TMyString.h" />
+    <ClInclude Include="TCHAR_Function.h" />
     <ClInclude Include="TPolylineBar.h" />
     <ClInclude Include="TPolylineBarTool.h" />
     <ClInclude Include="TRealLine.h" />
@@ -233,6 +231,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="svpng.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

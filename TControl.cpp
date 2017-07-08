@@ -4,6 +4,7 @@
 #include "tchar_head.h"
 #include "TControl.h"
 
+#include "TTransfer.h"
 
 TControl::TControl()
 {
@@ -25,7 +26,7 @@ TControl::~TControl()
 void TControl::SetPositionOnlyOrigin(const RECT &rect)
 {
 	RECT rc;
-	GetClientRect(m_hWnd, &rc);
+	::GetClientRect(m_hWnd, &rc);
 	SetPosition(rect.left, rect.top, rc.right, rc.bottom);
 }
 
@@ -90,9 +91,7 @@ LRESULT TControl::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, 
 
 void TControl::Invalidate()
 {
-	RECT rect;
-	GetClientRect(m_hWnd, &rect);
-	InvalidateRect(m_hWnd, &rect, FALSE);
+	InvalidateRect(m_hWnd, &GetClientRect(), FALSE);
 }
 
 void TControl::SetFont(HFONT hFont)
@@ -157,17 +156,20 @@ bool TControl::GetEnable()
 //自动去掉小数末尾0，最多显示6位
 void TControl::SetDouble(double d)
 {
-	int n = 6;//一开始就假定小数位数为6位
-	long temp = (long)(d * 1e6);//将6位小数全部取出，并舍弃计算后多余的可能是误差的小数部分
-	for (n = 6; n>0; n--)
-	{
-		if (0 != temp % 10) break;
-		temp = temp / 10;
-	}
-	SetText(TEXT("%.*f"),n, d);
+	TCHAR s[64];
+	TTransfer::double2TCHAR_AutoTrim0(d, s);
+	SetText(s);
 }
 
 double TControl::GetDouble()
 {
 	return _tcstod(GetText(), NULL);
+}
+
+//获得工具栏大小
+RECT TControl::GetClientRect()
+{
+	RECT rect;
+	::GetClientRect(m_hWnd, &rect);
+	return rect;
 }

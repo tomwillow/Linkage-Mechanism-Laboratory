@@ -192,9 +192,6 @@
     <ClCompile Include="String.cpp">
       <Filter>源文件\Common</Filter>
     </ClCompile>
-    <ClCompile Include="TMyString.cpp">
-      <Filter>源文件\Common</Filter>
-    </ClCompile>
     <ClCompile Include="TTransfer.cpp">
       <Filter>源文件\Common</Filter>
     </ClCompile>
@@ -228,9 +225,6 @@
     <ClCompile Include="DialogOption.cpp">
       <Filter>源文件\Dialog</Filter>
     </ClCompile>
-    <ClCompile Include="CMyButton.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TEquations.cpp">
       <Filter>源文件\Solver</Filter>
     </ClCompile>
@@ -251,6 +245,9 @@
     </ClCompile>
     <ClCompile Include="TButton.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TCHAR_Function.cpp">
+      <Filter>源文件\Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -413,9 +410,6 @@
     <ClInclude Include="TTransfer.h">
       <Filter>头文件\Common</Filter>
     </ClInclude>
-    <ClInclude Include="TMyString.h">
-      <Filter>头文件\Common</Filter>
-    </ClInclude>
     <ClInclude Include="TDrawTranslucent.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -446,9 +440,6 @@
     <ClInclude Include="DialogAnimation.h">
       <Filter>头文件\Dialog</Filter>
     </ClInclude>
-    <ClInclude Include="CMyButton.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TSolver.h">
       <Filter>头文件\Solver</Filter>
     </ClInclude>
@@ -469,6 +460,9 @@
     </ClInclude>
     <ClInclude Include="TButton.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TCHAR_Function.h">
+      <Filter>头文件\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -507,5 +501,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="svpng.inc">
+      <Filter>头文件\Common</Filter>
+    </None>
   </ItemGroup>
 </Project>

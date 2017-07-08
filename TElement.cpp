@@ -8,7 +8,7 @@
 #include "TElement.h"
 
 #include "TListView.h"
-TElement::TElement() :available(true)
+TElement::TElement() :available(true), CanBeDragged(false)
 {
 	id = -1;
 	eType = ELEMENT_NULL;
@@ -44,42 +44,10 @@ void TElement::SetStyle(TConfiguration *pConfig)
 		SetStyle(pConfig->logpen);
 }
 
-TCHAR * TElement::GetElementTypeName(TCHAR name[])
+const TCHAR * TElement::GetElementTypeName(TCHAR name[])
 {
-	switch (eType)
-	{
-	case ELEMENT_REALLINE:
-		_tcscpy(name, TEXT("线"));
-		break;
-	case ELEMENT_FRAMEPOINT:
-		_tcscpy(name, TEXT("机架"));
-		break;
-	case ELEMENT_BAR:
-		_tcscpy(name, TEXT("连杆"));
-		break;
-	case ELEMENT_SLIDEWAY:
-		_tcscpy(name, TEXT("滑道"));
-		break;
-	case ELEMENT_SLIDER:
-		_tcscpy(name, TEXT("滑块"));
-		break;
-	case ELEMENT_POLYLINEBAR:
-		_tcscpy(name, TEXT("多段杆"));
-		break;
-	case CONSTRAINT_COINCIDE:
-		_tcscpy(name, TEXT("重合"));
-		break;
-	case CONSTRAINT_COLINEAR:
-		_tcscpy(name, TEXT("共线"));
-		break;
-	case DRIVER:
-		_tcscpy(name, TEXT("驱动"));
-		break;
-	default:
-		assert(0);
-		break;
-	}
-	return name;
+	assert(0);
+	return _tcscpy(name, TEXT("未定义"));
 }
 
 TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[])
@@ -254,14 +222,24 @@ void TElement::NoticeListView(TListView *pListView)
 	pListView->id = id;
 	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
 	pListView->AddAttributeItem(TEXT("名称"), CTRLTYPE_EDIT, &Name, Name);
-	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, TEXT("机架"));
+	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, GetElementTypeName(buffer));
 	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
-	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
-	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
+	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_LINE_WIDTH, this, TEXT("%d"), this->logpenStyle.lopnWidth);
+	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_COLOR_HEX, this, TEXT("0x%X"), this->logpenStyle.lopnColor);
 	pListView->AddAttributeItem(TEXT("Alpha"), CTRLTYPE_INT_EDIT, &alpha, TEXT("%d"), alpha);
 
 	//pListView->AddAttributeItem(TEXT("原点"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
 	//pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), REG2DEG(angle));
+}
+
+void TElement::SetLineWidth(LONG width)
+{
+	logpenStyle.lopnWidth = logpenStyleShow.lopnWidth = { width,0 };
+}
+
+void TElement::SetColor(COLORREF cr)
+{
+	logpenStyle.lopnColor = logpenStyleShow.lopnColor = cr;
 }
 
 DPOINT TElement::GetAbsolutePointByIndex(int PointIndexOfElement) const

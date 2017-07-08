@@ -19,6 +19,11 @@ TRealLine::~TRealLine()
 {
 }
 
+const TCHAR * TRealLine::GetElementTypeName(TCHAR name[])//得到类型名称
+{
+	return _tcscpy(name, TEXT("线"));
+}
+
 void TRealLine::NoticeListView(TListView *pListView)
 {
 	TElement::NoticeListView(pListView);

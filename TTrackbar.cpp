@@ -29,6 +29,11 @@ void TTrackbar::SetRange(int num)
 	SendMessage(m_hWnd, TBM_SETRANGE, 0, MAKELONG(0, num));
 }
 
+int TTrackbar::GetRange()
+{
+	return SendMessage(m_hWnd, TBM_GETRANGEMAX, 0, 0)-SendMessage(m_hWnd, TBM_GETRANGEMIN, 0, 0);
+}
+
 void TTrackbar::SetPos(int pos)
 {
 	SendMessage(m_hWnd, TBM_SETPOS, TRUE, pos);

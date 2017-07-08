@@ -2,6 +2,7 @@
 
 #include "TTransfer.h"
 #include <Windows.h>
+#include <stdio.h>//stprintf
 
 double TTransfer::TCHAR2double(TCHAR s[])
 {
@@ -51,5 +52,18 @@ TCHAR * TTransfer::double2TCHAR(double d, TCHAR s[], int iDigit)
 	_tcscat(szFormat, s);
 	_stprintf(s, szFormat, d);
 
+	return s;
+}
+
+TCHAR * TTransfer::double2TCHAR_AutoTrim0(double d, TCHAR s[])
+{
+	int n = 6;//一开始就假定小数位数为6位
+	long temp = (long)(d * 1e6);//将6位小数全部取出，并舍弃计算后多余的可能是误差的小数部分
+	for (n = 6; n > 0; n--)
+	{
+		if (0 != temp % 10) break;
+		temp = temp / 10;
+	}
+	_stprintf(s, TEXT("%.*f"), n, d);
 	return s;
 }

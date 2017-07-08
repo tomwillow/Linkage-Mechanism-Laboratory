@@ -24,6 +24,7 @@ public:
 	static void TDraw::MoveByDelta(POINT apt[], int apt_num, long dx, long dy);
 	static void TDraw::MoveByDelta(std::vector<POINT> &vecpt, long dx, long dy);
 	static void TDraw::Move(POINT apt[], int apt_num, double angle, double dist);
+	static void TDraw::MoveRect(RECT &rc, int left, int top);
 	static void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta);
 	static void TDraw::MirrorX(POINT apt[], int apt_num, int Oy);
 	static void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect, bool YPlusIsUP);
@@ -61,6 +62,7 @@ public:
 	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config);
 	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen,const TConfiguration *Config);
 	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config);
+	static void TDraw::DrawSlidewaySingle(HDC hdc, const LOGPEN &logpen, const DPOINT &dptBegin, const DPOINT &dptEnd, double dAngle, int ShadowQuadrant, int ShadowLength, TConfiguration *pConfig);
 	static void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig);
 	static void TDraw::DrawConstraintCoincide(HDC hdc, DPOINT dpt0, DPOINT dpt1,const LOGPEN &logpen, const TConfiguration *pConfig);
 	static void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TConfiguration *pConfig);
@@ -91,7 +93,9 @@ public:
 	static void TDraw::CalcSliderRectCoor(POINT aptResult[4], const POINT &pt, double angle, const TConfiguration *pConfig);
 	static void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor);
 	static void TDraw::DrawGrid(HDC hdc, const RECT &rect, POINT ptOrg, COLORREF crGridBig, COLORREF crGridSmall, const TConfiguration *pConfig);
-	static void TDraw::DrawTips(HDC hdc, POINT &ptMouse, const TCHAR text[], TConfiguration *pConfig);
+
+	static void TDraw::DrawTips(HDC hdc, POINT &ptMouse,const RECT &rcLimited, const TCHAR text[], TConfiguration *pConfig);
+	static POINT TDraw::GetSystemFontSize(HDC hdc, const TCHAR text[]);
 	static void TDraw::DrawSystemFontText(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format);
 	static void TDraw::DrawSystemFontTextVertical(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format);
 	static void TDraw::DrawTextAdvance(HDC hdc,const TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format,int cEscapement=0,int cOrientation=0);
@@ -103,6 +107,10 @@ public:
 	static double TDraw::GetAngleBetweenPointScreen(const POINT &pt1, const POINT &ptO, const POINT &pt2);
 	static double TDraw::GetAngleFromPointScreen(POINT pt0, POINT pt);
 	static void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt);
+	static int TDraw::DPOINT2POINTXLEN(double x1, double x2, double x_min, double x_max, const RECT &rect);
+	static int TDraw::DPOINT2POINTYLEN(double y1, double y2, double y_min, double y_max, const RECT &rect);
+	static int TDraw::DPOINT2POINTX(double x, double x_min, double x_max, const RECT &rect);
+	static int TDraw::DPOINT2POINTY(double y, double y_min, double y_max, const RECT &rect);
 	static POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max,const RECT &rect);
 	static DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, double y_max,const RECT &rect);
 
@@ -123,5 +131,8 @@ public:
 	static void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, bool bNeedDrawBlack);
 	static void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, BYTE alpha, bool bNeedDrawBlack);
 	static void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, BYTE alpha, bool bNeedDrawBlack);
+
+	//
+	static bool TDraw::CaptureWindowToFile(HWND hWnd, TCHAR szFileName[]);
 };
 

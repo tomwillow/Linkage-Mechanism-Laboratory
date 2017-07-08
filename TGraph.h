@@ -23,9 +23,9 @@ private:
 		double x_len, y_len;
 		LOGPEN logpen;
 	};
+	std::vector<TPointData> vecPointData;
 
 	TConfiguration *pConfig;
-	std::vector<TPointData> vecPointData;
 	TLine LineMouseX, LineMouseY;
 	POINT ptMouse;
 	DPOINT dptMouse;
@@ -33,34 +33,65 @@ private:
 	int iPickPointDataIndex;
 	int iPick;
 
-	int iMargin;
+
+	int iMarginTop,iMarginBottom,iMarginLeft,iMarginRight;
+	LONG lTextHeight;
+	LONG lInterval=2;//刻度与刻度文字间隔
+	LONG lScaleBottomHeight;//刻度+间隔+刻度文字 总高度
+	LONG lScaleLeftWidth;//刻度+间隔+刻度文字 总宽度
 
 	struct TGridLineAndScale
 	{
-		POINT ptGridUp;
+		POINT ptGridStart;
 		POINT ptScaleBegin;
 		POINT ptScaleEnd;
 		RECT rcScaleText;
-		String szScale;
+		String sScale;
 	};
-	std::vector<TGridLineAndScale> vecGridLineAndScaleX;
+	std::vector<TGridLineAndScale> vecGridLineAndScale;
+
+	struct TGridScaleSmall
+	{
+		POINT ptBegin;
+		POINT ptEnd;
+	};
+	std::vector<TGridScaleSmall> vecGridScaleSmall;
+
+	HMENU hMenuData;
 
 	void TGraph::OnSize(WPARAM wParam, LPARAM lParam);
 	void TGraph::OnDraw(HDC hdc);
 	bool TGraph::OnClose();
 	void TGraph::OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void TGraph::OnLButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	void TGraph::OnCommand(WPARAM wParam, LPARAM lParam);
 	void TGraph::CalcPointArray(const RECT &rcGraph);
 	void TGraph::DrawLegend(HDC hdc, const LOGPEN &logpenBorder);
+	void TGraph::CalcGridAndScale(HDC hdc, LONG &lBottomSize, LONG &lLeftSize,LONG &lRightSize, LONG lScaleLong, LONG lInterval);
 	void TGraph::DrawGridAndScale(HDC hdc);
+	bool TGraph::SaveToCSV(TCHAR szFileName[]);
 public:
-	bool bRealClose = true;
+	bool bDraw = true;//如果为false，则OnDraw事件中不动作
+	bool bRealClose = true;//如果为true，则关闭时关闭窗口。否则只隐藏窗口
 	bool bShowMouseLine = false;
+	bool bAdaptiveMargin = true;
+	bool bShowTitle = true;
+	bool bShowLabelX = true;
+	bool bShowLabelY = true;
+	bool bShowLegend = true;//显示图例
+	bool bShowGridBig = true;
+	bool bShowGridSmall = true;
+
+	//x,y轴标签
+	String sLabelX;
+	String sLabelY;
+
 	TGraph(TConfiguration *pConfig);
 	~TGraph();
-	void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOGPEN &logpen, bool visible, const TCHAR szLegend[]=TEXT(""));
-	void TGraph::InputDptVector(const std::vector<double> &vecX, const std::vector<double> &vecY, const LOGPEN &logpen, bool visible, const TCHAR szLegend[]=TEXT(""));
+	void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOGPEN &logpen, bool visible, const TCHAR szLegend[] = TEXT(""));
+	void TGraph::InputDptVector(const std::vector<double> &vecX, const std::vector<double> &vecY, const LOGPEN &logpen, bool visible, const TCHAR szLegend[] = TEXT(""));
 	void TGraph::Clear();
+	void TGraph::Refresh();//刷新 等同于调用OnSize
 	void TGraph::AttachPoint();
 	void TGraph::SetMargin(int iMargin);
 	void TGraph::SetPointDataVisible(int index,bool visible);

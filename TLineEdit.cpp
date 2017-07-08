@@ -26,8 +26,3 @@ bool TLineEdit::OnKeyDown(WPARAM wParam, LPARAM lParam)
 	}
 	return true;
 }
-
-bool TLineEdit::OnChar(WPARAM wParam, LPARAM lParam)
-{
-	return true;
-}

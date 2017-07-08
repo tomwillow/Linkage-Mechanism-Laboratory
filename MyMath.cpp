@@ -4,7 +4,7 @@
 #include "String.h"
 #include "TTransfer.h"
 
-double precision = 1e-6;
+double precision = 1e-12;
 
 //ÊäÈë 1.0232 3
 //Êä³ö 102 1.02 2
@@ -30,7 +30,7 @@ void SignificantDigit(double dNum, int iDigit, int &iResult, double &dResult,int
 		++now;
 	}
 
-	if (dNum > pow(10, iDigit))
+	if (dNum > pow(10, iDigit-1))
 	{
 		while (*now != TEXT('.') && *now != TEXT('\0'))
 			*now++ = TEXT('0');
@@ -59,7 +59,7 @@ void SignificantDigit(double dNum, int iDigit, int &iResult, double &dResult,int
 			iPrecisionDigit = _tcslen(sz)-1;
 	}
 
-	if (dNum > pow(10, iDigit))
+	if (dNum > pow(10, iDigit-1))
 	{
 		*(start + iDigit) = TEXT('\0');
 	}

@@ -3,8 +3,12 @@
 #include "tchar_head.h"
 
 #include <iostream>
-#include <string>
 #include <fstream>
+#include <sstream>
+
+#include <string>
+
+using std::endl;
 
 #ifdef _UNICODE
 
@@ -13,28 +17,46 @@ using std::wstring;
 
 //#define String std::basic_string<TCHAR>
 
-using std::wofstream;
-#define Ofstream wofstream
+using std::wostream;
+#define Ostream wostream
 
 using std::wifstream;
 #define Ifstream wifstream
 
+using std::wofstream;
+#define Ofstream wofstream
+
+using std::wistringstream;
+#define Istringstream wistringstream
+
+using std::wostringstream;
+#define Ostringstream wostringstream
+
 using std::wcout;
-#define COUT wcout;
+#define COUT wcout
 
 #else
 
 using std::string;
 #define String string
 
-using std::ofstream;
-#define Ofstream ofstream
+using std::ostream;
+#define Ostream ostream
 
 using std::ifstream;
 #define Ifstream ifstream
 
+using std::ofstream;
+#define Ofstream ofstream
+
+using std::istringstream;
+#define Istringstream istringstream
+
+using std::ostringstream;
+#define Ostringstream ostringstream
+
 using std::cout;
-#define COUT cout;
+#define COUT cout
 
 #endif
 
@@ -52,7 +74,7 @@ inline String & operator<<(String &s, size_t i)
 #ifdef _UNICODE
 	_itow_s(i, temp, 10);
 #else
-	_itoa(i, temp, 10);
+	_itoa_s(i, temp, 10);
 #endif
 	s += temp;
 	return s;
@@ -64,7 +86,7 @@ inline String & operator<<(String &s, int i)
 #ifdef _UNICODE
 	_itow_s(i, temp, 10);
 #else
-	_itoa(i, temp, 10);
+	_itoa_s(i, temp, 10);
 #endif
 	s += temp;
 	return s;

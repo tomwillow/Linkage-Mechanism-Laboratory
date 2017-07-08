@@ -220,5 +220,5 @@ void TPolylineBarTool::Draw(HDC hdc)
 	pAttach->Draw(hdc);
 
 	if (bShowTips)
-		TDraw::DrawTips(hdc, ptMouse, sTips.c_str(), pConfig);
+		TDraw::DrawTips(hdc, ptMouse, ClientRect, sTips.c_str(), pConfig);
 }

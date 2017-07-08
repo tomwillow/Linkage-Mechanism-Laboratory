@@ -16,6 +16,11 @@ TFramePoint::~TFramePoint()
 {
 }
 
+const TCHAR * TFramePoint::GetElementTypeName(TCHAR name[])//得到类型名称
+{
+	return _tcscpy(name, TEXT("机架"));
+}
+
 void TFramePoint::NoticeListView(TListView *pListView)
 {
 	TElement::NoticeListView(pListView);

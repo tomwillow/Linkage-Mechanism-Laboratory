@@ -131,7 +131,10 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 
 			pCanvas->Invalidate();
 
-			sTips = TEXT("移动鼠标可预览拖动结果");
+			if (pShape->Element[iPickIndex]->CanBeDragged)
+				sTips = TEXT("移动鼠标可预览拖动结果");
+			else
+				sTips = TEXT("该构件不可拖动");
 
 			return;
 		}
@@ -175,7 +178,10 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 				sTips = TEXT("再次点击可进行移动");
 				return;
 			case SELECT_DRAG:
-				sTips = TEXT("再次点击可进行拖动");
+				if (pShape->Element[iHoverIndex]->CanBeDragged)
+					sTips = TEXT("再次点击可进行拖动");
+				else
+					sTips = TEXT("该构件不可拖动");
 				return;
 			}
 		}
@@ -245,6 +251,7 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 					//非拾取状态再次点击同一对象进入拾取
 					bDrag = true;
 					Cursor = IDC_HAND;
+					pSolver->RecordStartDragPos(iPickIndex, pConfig->ScreenToReal(ptPos));
 				}
 				iPrevPickIndex = iPickIndex;
 			}
@@ -402,7 +409,7 @@ void TSelectTool::Draw(HDC hdc)
 	}
 
 	if (bShowTips)
-		TDraw::DrawTips(hdc, ptMouse, sTips.c_str(), pConfig);
+		TDraw::DrawTips(hdc, ptMouse, ClientRect, sTips.c_str(), pConfig);
 }
 
 //仅用于添加原动件时的判断

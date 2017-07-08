@@ -13,8 +13,9 @@
 #include "TDraw.h"
 
 #include "TConfiguration.h"
+#include "FileFunction.h"
 
-TGraph::TGraph(TConfiguration *pConfig)
+TGraph::TGraph(TConfiguration *pConfig) :iMarginTop(0), iMarginBottom(0), iMarginLeft(0), iMarginRight(0)
 {
 	this->pConfig = pConfig;
 
@@ -24,7 +25,6 @@ TGraph::TGraph(TConfiguration *pConfig)
 	iPick = -1;
 	iPickPointDataIndex = -1;
 
-	iMargin = 0;
 }
 
 
@@ -36,27 +36,78 @@ TGraph::~TGraph()
 
 void TGraph::Clear()
 {
+	//for (size_t i = 0; i < vecPointData.size();++i)
+	//	DeleteMenu(GetMenu(m_hWnd), ID_MENU_GRAPH_DATA_START + i, MF_BYCOMMAND);
+
+	DeleteMenu(GetMenu(m_hWnd), (UINT)hMenuData, 0);
+
 	for (auto PointData : vecPointData)
 		delete[] PointData.ptArray;
 
 	vecPointData.clear();
 
+	vecGridLineAndScale.clear();
+	vecGridScaleSmall.clear();
+
 	iPick = -1;
 	iPickPointDataIndex = -1;
+
 }
 
 void TGraph::SetMargin(int iMargin)
 {
-	this->iMargin = iMargin;
+	iMarginTop=iMarginBottom=iMarginLeft=iMarginRight=iMargin;
+
+	OnSize(0, 0);
+}
+
+void TGraph::Refresh()//刷新 等同于调用OnSize
+{
 	OnSize(0, 0);
 }
 
 void TGraph::OnSize(WPARAM wParam, LPARAM lParam)
 {
-	rcGraph = TDraw::GetMarginRect(ClientRect, iMargin);
-	CalcPointArray(rcGraph);
-	Invalidate();
+	if (!bDraw)
+		return;
 
+	LONG lScaleLong = 6;//刻度长度
+	LONG lScaleRightWidth;
+
+	rcGraph = ClientRect;
+	//if (GetMenu(m_hWnd))
+	//	rcGraph.bottom-=GetSystemMetrics(SM_CYMENUSIZE);
+
+	//预计算间距
+	{
+		HDC hdc = GetDC(m_hWnd);
+		lTextHeight = TDraw::GetSystemFontSize(hdc, TEXT("test")).y;
+		CalcGridAndScale(hdc, lScaleBottomHeight ,lScaleLeftWidth,lScaleRightWidth, lScaleLong, lInterval);
+		ReleaseDC(m_hWnd, hdc);
+
+		iMarginLeft =(bShowLabelY?( lTextHeight + lInterval):0) + lScaleLeftWidth;
+		iMarginBottom = lScaleBottomHeight +(bShowLabelX?( lInterval + lTextHeight):0);
+		iMarginTop = bShowTitle?(lTextHeight + lInterval):0;
+		iMarginRight = lScaleRightWidth;
+	}
+
+	//间距生效
+	rcGraph.top += iMarginTop;
+	rcGraph.bottom -= iMarginBottom;
+	rcGraph.left += iMarginLeft;
+	rcGraph.right -= iMarginRight;
+
+	TDraw::SetMarginRect(&rcGraph, 10);
+
+	CalcPointArray(rcGraph);
+
+	{
+		HDC hdc = GetDC(m_hWnd);
+		CalcGridAndScale(hdc, lScaleBottomHeight, lScaleLeftWidth,lScaleRightWidth, lScaleLong, lInterval);
+		ReleaseDC(m_hWnd, hdc);
+	}
+
+	Invalidate();
 }
 
 void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOGPEN &logpen, bool visible, const TCHAR szLegend[])
@@ -91,10 +142,26 @@ void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOG
 	//设置Legend大小
 	RECT rcTemp;
 	ZeroMemory(&rcTemp, sizeof(rcTemp));
-	TDraw::DrawSystemFontText(GetDC(m_hWnd), PointData.sLegend.c_str(), rcTemp, 0, DT_CALCRECT);
+	HDC hdc = GetDC(m_hWnd);
+	TDraw::DrawSystemFontText(hdc, PointData.sLegend.c_str(), rcTemp, 0, DT_CALCRECT);
+	ReleaseDC(m_hWnd, hdc);
 	PointData.lLegendWidth = rcTemp.right - rcTemp.left;
 	PointData.lLegendHeight = rcTemp.bottom - rcTemp.top;
 
+	//添加Menu
+	HMENU hMenu = GetMenu(m_hWnd);
+	HMENU hMenuView = GetSubMenu(hMenu, 1);
+	if (vecPointData.empty())//第一条数据则新建 数据 菜单句柄
+	{
+		hMenuData = CreateMenu();
+		InsertMenu(hMenuView, 1, MF_POPUP | MF_BYPOSITION, (UINT)hMenuData, TEXT("数据"));
+	}
+
+	AppendMenu(hMenuData, MF_CHECKED, ID_MENU_GRAPH_DATA_START + vecPointData.size(), PointData.sLegend.c_str());
+
+
+
+	//入库
 	vecPointData.push_back(PointData);
 
 	OnSize(0, 0);
@@ -102,10 +169,13 @@ void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOG
 	//CalcPointArray();
 
 	//Invalidate();
+
+	//添加点必定经过此处
+
 }
 
 
-void TGraph::InputDptVector(const std::vector<double> &vecX, const std::vector<double> &vecY, const LOGPEN &logpen, bool visible,const TCHAR szLegend[])
+void TGraph::InputDptVector(const std::vector<double> &vecX, const std::vector<double> &vecY, const LOGPEN &logpen, bool visible, const TCHAR szLegend[])
 {
 	if (vecX.size() != vecY.size()) return;
 
@@ -156,102 +226,297 @@ void TGraph::CalcPointArray(const RECT &rcGraph)
 
 void TGraph::SetPointDataVisible(int index, bool visible)
 {
-	if (index < vecPointData.size())
+	if (index>=0 && (size_t)index < vecPointData.size())
 		vecPointData[index].Show = visible;
 }
 
 void TGraph::DrawGridAndScale(HDC hdc)
 {
+	for (auto &GridLineAndScale : vecGridLineAndScale)
+	{
+		//画刻度线	
+		TDraw::DrawLine(hdc, GridLineAndScale.ptScaleBegin, GridLineAndScale.ptScaleEnd, pConfig->logpenBlack);	
+		
+		//画刻度字
+		TDraw::DrawSystemFontText(hdc, GridLineAndScale.sScale.c_str(), GridLineAndScale.rcScaleText, 0, DT_CENTER);
+
+		//画大网格
+		if (bShowGridBig)
+		TDraw::DrawLine(hdc, GridLineAndScale.ptGridStart, GridLineAndScale.ptScaleBegin, pConfig->logpenGraphGridBig);
+	}
+
+	//画小网格
+	if (bShowGridSmall)
+	for (auto &GridScaleSmall : vecGridScaleSmall)
+	{
+		TDraw::DrawLine(hdc, GridScaleSmall.ptBegin, GridScaleSmall.ptEnd, pConfig->logpenGraphGridSmall);
+	}
+}
+
+void CalcGridParameters(HDC hdc,bool isX,const RECT &rcGraph,double v_min,double v_max,
+	int &x_all_scale_count,int &x_precision_digit,double &x_start,double &x_step, double &x_step_small, int &small_grid_per_big_grid,bool &bDrawSmallGrid)
+{
 
 	int width = rcGraph.right - rcGraph.left;//显示区宽度
 	int height = rcGraph.bottom - rcGraph.top;//显示区高度
-	LONG lScaleXHeight = 24;//刻度+刻度文字 总高度
-	LONG lScaleYWidth = 16;
 
-	double x_len = x_max - x_min;
-	double y_len = y_max - y_min;
+	double x_len = v_max - v_min;
 
 	double x_all_scale_len(0.0);//刻度区实际范围
 	int x_all_scale_number(0);//小刻度数量
-	int x_all_scale_count(0);//大刻度数量
-
-	int x_precision_digit(0);//有效数字结束处位于原数字的第几位 在小数点右边则为正
 
 	SignificantDigit(x_len, 2, x_all_scale_number, x_all_scale_len, x_precision_digit);
 
-	int min_px_per_grid = 10;
-	int x_max_grid = width / min_px_per_grid;
+	double num = pow(10, x_precision_digit );//+ (v_min < 0 ? -1 : -1)
+	x_start = trunc(v_min*num) / num;//x刻度开始位置
 
-	double num = pow(10, x_precision_digit + (x_min < 0 ? -1 : -1));
-	double x_start = trunc(x_min*num) / num;//x刻度开始位置
-
-	int units_per_big_grid;
-	if (x_all_scale_number == 10)
+	//试算刻度文字宽度
+	LONG min_px_between_2_scale;//两个大网格间的允许最小像素，低于此值则大网格间隔加倍
 	{
-		units_per_big_grid = 1;
+		RECT rcTemp;
+		TCHAR szScaleX[64];
+		TTransfer::double2TCHAR(x_start, szScaleX, x_precision_digit);
+		rcTemp = { 0, 0, 0, 0 };
+		TDraw::DrawSystemFontText(hdc, szScaleX, rcTemp, 0, DT_CALCRECT);
+		if (isX)
+			min_px_between_2_scale = rcTemp.right;
+		else
+		min_px_between_2_scale = rcTemp.bottom;
+	}
+
+	int units_per_big_grid = 1;
+	x_all_scale_count = x_all_scale_number / units_per_big_grid;//每5个单位一个大刻度
+	x_step = x_all_scale_len / x_all_scale_number * units_per_big_grid;//每个大刻度间实际距离
+
+	LONG px_between_2_scale;
+	while (1)
+	{
+		px_between_2_scale = isX ? TDraw::DPOINT2POINTXLEN(x_start, x_start + x_step, v_min, v_max, rcGraph) : TDraw::DPOINT2POINTYLEN(x_start, x_start + x_step, v_min, v_max, rcGraph);
+		if (px_between_2_scale <= 0)
+		{
+			x_all_scale_count = 0;
+			break;
+		}
+		if (px_between_2_scale >= min_px_between_2_scale + 4)
+			break;
+
+		switch (units_per_big_grid)
+		{
+		case 1:units_per_big_grid = 2; break;
+		case 2:units_per_big_grid = 5; break;
+		default:
+			units_per_big_grid *= 2;
+		}
+		x_all_scale_count = x_all_scale_number / units_per_big_grid;//每5个单位一个大刻度
+		x_step = x_all_scale_len / x_all_scale_number * units_per_big_grid;//每个大刻度间实际距离
+	}
+
+	//将x起点起算至刚好位于整格的前一格
+	//before: x_min=136.4 x_strat=100 x_step=5
+	//after: x_start=135
+	if (x_start < v_min)
+	{
+		while (x_start < v_min)
+		{
+			x_start += x_step;
+		}
+		x_start -= x_step;
+		++x_all_scale_count;
 	}
 	else
-		if (x_all_scale_number <= 20)
-			units_per_big_grid = 5;
+	{
+		while (x_start > v_min)
+		{
+			x_start -= x_step;
+			++x_all_scale_count;
+		}
+	}
+
+	while (x_start + x_step*x_all_scale_count < v_max)
+	{
+		++x_all_scale_count;
+	}
+
+	small_grid_per_big_grid = units_per_big_grid;
+	x_step_small = x_step / small_grid_per_big_grid;//小网格间隔
+	{
+		int x_step_small_px = isX ? TDraw::DPOINT2POINTXLEN(x_start, x_start + x_step_small, v_min, v_max, rcGraph) : TDraw::DPOINT2POINTYLEN(x_start, x_start + x_step_small, v_min, v_max, rcGraph);
+		if (x_step_small_px > 20)
+		{
+			//缩小小网格
+
+			while (x_step_small_px > 20)
+			{
+				switch (small_grid_per_big_grid)
+				{
+				case 1:small_grid_per_big_grid = 2; break;
+				case 2:small_grid_per_big_grid = 5; break;
+				default:small_grid_per_big_grid *= 2; break;
+				}
+				x_step_small = x_step / small_grid_per_big_grid;
+				x_step_small_px = isX ? TDraw::DPOINT2POINTXLEN(x_start, x_start + x_step_small, v_min, v_max, rcGraph) : TDraw::DPOINT2POINTYLEN(x_start, x_start + x_step_small, v_min, v_max, rcGraph);
+			}
+		}
 		else
-			if (x_all_scale_number > 80)
-				units_per_big_grid = 10;
-			else
-				units_per_big_grid = 5;
+			if (x_step_small_px < 10)
+				bDrawSmallGrid = false;
+		//else 4-20 维持原状
+	}
+}
 
-	x_all_scale_count = x_all_scale_number / units_per_big_grid;//每5个单位一个大刻度
+void TGraph::CalcGridAndScale(HDC hdc, LONG &lBottomSize, LONG &lLeftSize,LONG &lRightSize,LONG lScaleLong,LONG lInterval)
+{
+	//X网格参数
+	int x_all_scale_count;
+	int x_precision_digit(0);//有效数字结束处位于原数字的第几位 在小数点右边则为正
+	double x_start;//x刻度开始位置
+	double x_step;//每个大刻度间实际距离
+	double x_step_small;
+	int x_small_grid_per_big_grid;
+	bool bDrawSmallGridX = true;
 
-	double x_step = x_all_scale_len / x_all_scale_number * units_per_big_grid;// 
+	CalcGridParameters(hdc, true, rcGraph, x_min,x_max, 
+		x_all_scale_count, x_precision_digit, x_start, x_step, x_step_small, x_small_grid_per_big_grid, bDrawSmallGridX);
 
-	DPOINT dpt;
-	POINT ptBegin, ptEnd;
-	POINT ptGridBigTop;
-	LONG lScaleLong = 6;
+	//Y网格参数
+	int y_all_scale_count;
+	int y_precision_digit(0);//有效数字结束处位于原数字的第几位 在小数点右边则为正
+	double y_start;//x刻度开始位置
+	double y_step;//每个大刻度间实际距离
+	double y_step_small;
+	int y_small_grid_per_big_grid;
+	bool bDrawSmallGridY = true;
 
-	vecGridLineAndScaleX.clear();
-	TGridLineAndScale GridLineAndScaleX;
-	for (int i = -1; i <= x_all_scale_count + 2; ++i)
+	CalcGridParameters(hdc, false, rcGraph, y_min,y_max, 
+		y_all_scale_count, y_precision_digit, y_start,y_step,y_step_small, y_small_grid_per_big_grid, bDrawSmallGridY);
+
+	vecGridLineAndScale.clear();
+	vecGridScaleSmall.clear();
+
+	vecGridLineAndScale.reserve(x_all_scale_count*2);
+	vecGridScaleSmall.reserve((x_all_scale_count*2) * 10);
+
+	TGridLineAndScale GridLineAndScale;
+	TGridScaleSmall GridScaleSmall;
+
+	TCHAR szScale[64];
+	DPOINT dpt, dptSmall;
+
+	//存入X网格数据
+	lBottomSize = 0;
+	lRightSize = 0;
+	for (int i = 0; i < x_all_scale_count+1; ++i)
 	{
 		dpt.x = x_start + x_step*i;
-		ptEnd = ptBegin = TDraw::DPOINT2POINT(dpt, x_min, x_max, y_min, y_max, rcGraph);
-		ptBegin.y = rcGraph.bottom;
-		ptEnd.y = ptBegin.y + lScaleLong;
-		TDraw::DrawLine(hdc, ptBegin, ptEnd, pConfig->logpenBlack);//画刻度线
+		GridLineAndScale.ptScaleEnd = GridLineAndScale.ptScaleBegin = TDraw::DPOINT2POINT(dpt, x_min, x_max, y_min, y_max, rcGraph);
+		GridLineAndScale.ptScaleBegin.y = rcGraph.bottom;
+		GridLineAndScale.ptScaleEnd.y = GridLineAndScale.ptScaleBegin.y + lScaleLong;
+		//TDraw::DrawLine(hdc, ptBegin, ptEnd, pConfig->logpenBlack);//画刻度线
 
 		//画刻度文字
-		TCHAR szScaleX[64];
-		TTransfer::double2TCHAR(dpt.x, szScaleX, x_precision_digit);
-		RECT rcScaleX = { 0, 0, 0, 0 };
-		TDraw::DrawSystemFontText(hdc, szScaleX, rcScaleX, 0, DT_CALCRECT);
+		TTransfer::double2TCHAR(dpt.x, szScale, x_precision_digit);
+		GridLineAndScale.sScale = szScale;
+		GridLineAndScale.rcScaleText = { 0, 0, 0, 0 };
+		TDraw::DrawSystemFontText(hdc, szScale, GridLineAndScale.rcScaleText, 0, DT_CALCRECT);
 
-		rcScaleX.left = ptEnd.x - rcScaleX.right / 2;
-		rcScaleX.right = ptEnd.x + rcScaleX.right / 2;
-		rcScaleX.top = ptEnd.y + 2;
-		rcScaleX.bottom = rcScaleX.top + lTextHeight;
-		TDraw::DrawSystemFontText(hdc, szScaleX, rcScaleX, 0, DT_CENTER);
+		GridLineAndScale.rcScaleText.left = GridLineAndScale.ptScaleEnd.x - GridLineAndScale.rcScaleText.right / 2;
+		GridLineAndScale.rcScaleText.right = GridLineAndScale.ptScaleEnd.x + GridLineAndScale.rcScaleText.right / 2;
+		GridLineAndScale.rcScaleText.top = GridLineAndScale.ptScaleEnd.y + lInterval;
+		GridLineAndScale.rcScaleText.bottom = GridLineAndScale.rcScaleText.top + GridLineAndScale.rcScaleText.bottom;
+		//TDraw::DrawSystemFontText(hdc, szScaleX, rcScaleX, 0, DT_CENTER);
 
 		//画大网格线
-		ptGridBigTop.x = ptBegin.x;
-		ptGridBigTop.y = rcGraph.top;
-		TDraw::DrawLine(hdc, ptGridBigTop, ptBegin, pConfig->logpenGraphGridBig);
+		GridLineAndScale.ptGridStart.x = GridLineAndScale.ptScaleBegin.x;
+		GridLineAndScale.ptGridStart.y = rcGraph.top;
+		//TDraw::DrawLine(hdc, ptGridBigTop, ptBegin, pConfig->logpenGraphGridBig);
 
 		//画小网格线
-		double x_step_small = x_step / units_per_big_grid;
-		DPOINT dptSmall;
-		POINT ptGridSmallTop, ptGridSmallBottom;
-		for (int j = 1; j < units_per_big_grid; ++j)
-		{
-			dptSmall.x = dpt.x + x_step_small*j;
-			ptGridSmallTop = ptGridSmallBottom = TDraw::DPOINT2POINT(dptSmall, x_min, x_max, y_min, y_max, rcGraph);
-			ptGridSmallTop.y = rcGraph.top;
-			ptGridSmallBottom.y = rcGraph.bottom;
-			TDraw::DrawLine(hdc, ptGridSmallTop, ptGridSmallBottom, pConfig->logpenGraphGridSmall);
-		}
+		if (bDrawSmallGridX)
+			for (int j = 1; j < x_small_grid_per_big_grid; ++j)
+			{
+				dptSmall.x = dpt.x + x_step_small*j;
+				GridScaleSmall.ptEnd = GridScaleSmall.ptBegin = TDraw::DPOINT2POINT(dptSmall, x_min, x_max, y_min, y_max, rcGraph);
+				if (GridScaleSmall.ptBegin.x<rcGraph.left || GridScaleSmall.ptBegin.x>rcGraph.right)
+					continue;
+				GridScaleSmall.ptBegin.y = rcGraph.top;
+				GridScaleSmall.ptEnd.y = rcGraph.bottom;
+				//TDraw::DrawLine(hdc, ptGridSmallTop, ptGridSmallBottom, pConfig->logpenGraphGridSmall);
+				vecGridScaleSmall.push_back(GridScaleSmall);
+			}
+
+		//大网格若超出范围则不画
+		if (GridLineAndScale.ptScaleBegin.x<rcGraph.left || GridLineAndScale.ptScaleBegin.x>rcGraph.right)
+			continue;
+
+
+		LONG newBottomSize = GridLineAndScale.rcScaleText.bottom - rcGraph.bottom;
+		if (newBottomSize > lBottomSize) lBottomSize = newBottomSize;
+
+		LONG newRightSize = GridLineAndScale.rcScaleText.right - rcGraph.right;
+		if (newRightSize > lRightSize) lRightSize = newRightSize;
+
+		vecGridLineAndScale.push_back(GridLineAndScale);
+	}
+
+	//存入Y网格数据
+	lLeftSize = 0;
+	for (int i = 0; i < y_all_scale_count + 1; ++i)
+	{
+		dpt.y = y_start + y_step*i;
+		GridLineAndScale.ptScaleEnd = GridLineAndScale.ptScaleBegin = TDraw::DPOINT2POINT(dpt, x_min, x_max, y_min, y_max, rcGraph);
+		GridLineAndScale.ptScaleBegin.x = rcGraph.left;
+		GridLineAndScale.ptScaleEnd.x = GridLineAndScale.ptScaleBegin.x - lScaleLong;
+		//TDraw::DrawLine(hdc, ptBegin, ptEnd, pConfig->logpenBlack);//画刻度线
+
+		//画刻度文字
+		TTransfer::double2TCHAR(dpt.y, szScale, y_precision_digit);
+		GridLineAndScale.sScale = szScale;
+		GridLineAndScale.rcScaleText = { 0, 0, 0, 0 };
+		POINT ptScaleTextSize = TDraw::GetSystemFontSize(hdc, szScale);
+
+		GridLineAndScale.rcScaleText.right = GridLineAndScale.ptScaleEnd.x - lInterval;
+		GridLineAndScale.rcScaleText.left = GridLineAndScale.rcScaleText.right - ptScaleTextSize.x;
+		GridLineAndScale.rcScaleText.top = GridLineAndScale.ptScaleEnd.y - ptScaleTextSize.y / 2;
+		GridLineAndScale.rcScaleText.bottom = GridLineAndScale.ptScaleEnd.y + ptScaleTextSize.y / 2;
+		//TDraw::DrawSystemFontTeyt(hdc, szScaley, rcScaley, 0, DT_CENTER);
+
+
+		//画大网格线
+		GridLineAndScale.ptGridStart.x = rcGraph.right; 
+		GridLineAndScale.ptGridStart.y =GridLineAndScale.ptScaleBegin.y;
+		//TDraw::DrawLine(hdc, ptGridBigTop, ptBegin, pConfig->logpenGraphGridBig);
+
+
+		//画小网格线
+		if (bDrawSmallGridY)
+			for (int j = 1; j < y_small_grid_per_big_grid; ++j)
+			{
+				dptSmall.y = dpt.y + y_step_small*j;
+				GridScaleSmall.ptEnd = GridScaleSmall.ptBegin = TDraw::DPOINT2POINT(dptSmall, x_min, x_max, y_min, y_max, rcGraph);
+				if (GridScaleSmall.ptBegin.y<rcGraph.top || GridScaleSmall.ptBegin.y>rcGraph.bottom)
+					continue;
+				GridScaleSmall.ptBegin.x = rcGraph.left;
+				GridScaleSmall.ptEnd.x = rcGraph.right;
+				//TDraw::DrawLine(hdc, ptGridSmallTop, ptGridSmallBottom, pConfig->logpenGraphGridSmall);
+				vecGridScaleSmall.push_back(GridScaleSmall);
+			}
+
+		//大网格若超出范围则不画
+		if (GridLineAndScale.ptScaleBegin.y<rcGraph.top || GridLineAndScale.ptScaleBegin.y>rcGraph.bottom)
+			continue;
+			
+		LONG newLeftSize = rcGraph.left - GridLineAndScale.rcScaleText.left;
+		if (newLeftSize > lLeftSize) lLeftSize = newLeftSize;
+
+		vecGridLineAndScale.push_back(GridLineAndScale);
 	}
 }
 
 void TGraph::OnDraw(HDC hdc)
 {
+	if (!bDraw)
+		return;
+
 	SetBkMode(hdc, TRANSPARENT);
 
 	//填充大背景
@@ -260,43 +525,45 @@ void TGraph::OnDraw(HDC hdc)
 	//填充图背景-白色
 	TDraw::FillRect(hdc, &(rcGraph), RGB(255, 255, 255));
 
-
-	DPOINT dptOrg{ 0, 0 };
-	POINT ptOrg = TDraw::DPOINT2POINT(dptOrg, x_min, x_max, y_min, y_max, rcGraph);
-
-	//画网格
-	//TDraw::DrawGrid(hdc, (rcGraph),ptOrg, pConfig->crGraphGridBig, pConfig->crGraphGridSmall, pConfig);
-
-
 	//标题
-	LONG lTextHeight(12);
-
-	RECT rcTitle;
-	rcTitle.left = rcGraph.left;
-	rcTitle.right = rcGraph.right;
-	rcTitle.bottom = rcGraph.top - 4;
-	rcTitle.top = rcTitle.bottom - lTextHeight;
-	TDraw::DrawSystemFontText(hdc, TEXT("Measure Result"), rcTitle, 0, DT_CENTER | DT_BOTTOM);
+	if (bShowTitle)
+	{
+		RECT rcTitle;
+		rcTitle.left = rcGraph.left;
+		rcTitle.right = rcGraph.right;
+		rcTitle.bottom = rcGraph.top - lInterval;
+		rcTitle.top = rcTitle.bottom - lTextHeight - lInterval;
+		TDraw::DrawSystemFontText(hdc, TEXT("Measured Results"), rcTitle, 0, DT_CENTER | DT_BOTTOM);
+	}
 
 	//scale
 	DrawGridAndScale(hdc);
 
+	//画黑框
+	TDraw::DrawRect(hdc, TDraw::GetMarginRect(rcGraph, -1), pConfig->logpenBlack);
+
 	//x坐标单位
-	RECT rcUnitsX;
-	rcUnitsX.left = rcGraph.left;
-	rcUnitsX.right = rcGraph.right;
-	rcUnitsX.top = rcGraph.bottom + lScaleXHeight;
-	rcUnitsX.bottom = rcUnitsX.top + lTextHeight;
-	TDraw::DrawSystemFontText(hdc, TEXT("Time(sec)"), rcUnitsX, 0, DT_CENTER | DT_TOP);
+	if (bShowLabelX)
+	{
+		RECT rcUnitsX;
+		rcUnitsX.left = rcGraph.left;
+		rcUnitsX.right = rcGraph.right;
+		rcUnitsX.top = rcGraph.bottom + lScaleBottomHeight + lInterval;
+		rcUnitsX.bottom = rcUnitsX.top + lTextHeight + lInterval;
+		TDraw::DrawSystemFontText(hdc, sLabelX.c_str(), rcUnitsX, 0, DT_CENTER | DT_TOP);
+	}
 
 	//y坐标单位
-	RECT rcUnitsY = { 0, 0, 0, 0 };
-	TDraw::DrawSystemFontText(hdc, TEXT("Position(mm)"), rcUnitsY, 0, DT_CALCRECT);
-	rcUnitsY.top = rcGraph.top ;
-	rcUnitsY.bottom = rcGraph.bottom +rcUnitsY.right;
-	rcUnitsY.right = rcGraph.left - lScaleYWidth;
-	rcUnitsY.left = rcUnitsY.right - lTextHeight;
-	TDraw::DrawSystemFontTextVertical(hdc, TEXT("Position(mm)"), rcUnitsY, 0, DT_VCENTER|DT_SINGLELINE);
+	if (bShowLabelY)
+	{
+		RECT rcUnitsY = { 0, 0, 0, 0 };
+		TDraw::DrawSystemFontText(hdc, sLabelY.c_str(), rcUnitsY, 0, DT_CALCRECT);
+		rcUnitsY.top = rcGraph.top;
+		rcUnitsY.bottom = rcGraph.bottom + rcUnitsY.right;
+		rcUnitsY.right = rcGraph.left - lScaleLeftWidth - lInterval;
+		rcUnitsY.left = rcUnitsY.right - lTextHeight - lInterval;
+		TDraw::DrawSystemFontTextVertical(hdc, sLabelY.c_str(), rcUnitsY, 0, DT_VCENTER | DT_SINGLELINE);
+	}
 
 	//画鼠标线
 	if (bShowMouseLine && PtInRect(&(rcGraph), ptMouse))
@@ -319,28 +586,25 @@ void TGraph::OnDraw(HDC hdc)
 		_stprintf(szCoordinate, TEXT("(%f,%f)"), vecPointData[iPickPointDataIndex].dptVector[iPick].x, vecPointData[iPickPointDataIndex].dptVector[iPick].y);
 
 		//显示坐标
-		TDraw::DrawTips(hdc, ptMouse, szCoordinate, pConfig);
+		TDraw::DrawTips(hdc, ptMouse,ClientRect, szCoordinate, pConfig);
 
 		//画方块
 		TDraw::DrawPickSquare(hdc, vecPointData[iPickPointDataIndex].ptArray[iPick]);
 	}
 
 	//画图例
-	DrawLegend(hdc, pConfig->logpenBlack);
-
-	//画黑框
-	TDraw::DrawRect(hdc, TDraw::GetMarginRect(rcGraph, -1), pConfig->logpenBlack);
+	if (bShowLegend)
+		DrawLegend(hdc, pConfig->logpenBlack);
 
 }
 
 void TGraph::DrawLegend(HDC hdc, const LOGPEN &logpenBorder)
 {
 
-	POINT ptUpperRight = { rcGraph.right - 10, rcGraph.top + 10 };
-	LONG lTextHeight(0);
+	POINT ptUpperRight = { rcGraph.right - 10, rcGraph.top + 10 };//离边缘距离10
 	LONG lAllTextWidth(0), lAllTextHeight(0);
-	LONG lLineLong = 12;
-	LONG lDistFromLineAndText = 4;
+	LONG lLineLong = 12;//图例示范线长度
+	LONG lDistFromLineAndText = 4;//内外框间距
 	for (auto &PointData : vecPointData)
 	{
 		if (PointData.Show)
@@ -462,5 +726,120 @@ bool TGraph::OnClose()
 	{
 	ShowWindow(SW_HIDE);
 	return false;
+	}
+}
+
+bool TGraph::SaveToCSV(TCHAR szFileName[])
+{
+	Ofstream ofs(szFileName);
+	
+	if (!ofs)
+		return false;
+
+	bool bShareXData=true;
+	size_t x_num;
+	if (!vecPointData.empty())
+	{
+		x_num = vecPointData[0].dptVector.size();
+		for (auto &PointData : vecPointData)
+			if (x_num != PointData.dptVector.size())
+			{
+				bShareXData = false;
+				break;
+			}
+	}
+	else
+		return true;
+
+	size_t col = vecPointData.size();
+	if (bShareXData)
+	{
+		ofs.imbue(std::locale("", std::locale::all ^ std::locale::numeric));
+
+		ofs << TEXT("t,");
+		for (auto &PointData : vecPointData)
+			ofs << PointData.sLegend<< TEXT(",");
+		ofs << endl;
+
+		for (size_t i = 0; i < x_num; ++i)
+		{
+			ofs << vecPointData[0].dptVector[i].x << TEXT(",");
+			for (size_t j = 0; j < col; ++j)
+			{
+				ofs << vecPointData[j].dptVector[i].y << TEXT(",");
+			}
+			ofs << endl;
+		}
+	}
+	else
+		assert(0);
+
+	ofs.close();
+	return true;
+}
+
+void TGraph::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	int wmId = LOWORD(wParam);
+	int wmEvent = HIWORD(wParam);
+	HMENU hMenu = GetMenu(m_hWnd);
+	switch (wmId)
+	{
+	case ID_SAVE_AS_PICTURE:
+		TCHAR szFileNamePNG[MAX_PATH];
+		if (SaveFileDialog(m_hWnd, szFileNamePNG, TEXT("PNG File\0*.png\0\0"), TEXT("png")))
+		{
+			if (TDraw::CaptureWindowToFile(m_hWnd, szFileNamePNG))
+				MessageBox(NULL, TEXT("保存成功。"), TEXT(""), 0);
+			else
+				MessageBox(NULL, TEXT("保存失败。"), TEXT(""), MB_ICONERROR);
+		}
+		break;
+	case ID_SAVE_AS_CSV:
+		TCHAR szFileNameCSV[MAX_PATH];
+		if (SaveFileDialog(m_hWnd, szFileNameCSV, TEXT("CSV File\0*.csv\0\0"), TEXT("csv")))
+		{
+			if (SaveToCSV(szFileNameCSV))
+				MessageBox(NULL, TEXT("保存成功。"), TEXT(""), 0);
+			else
+				MessageBox(NULL, TEXT("保存失败。"), TEXT(""), MB_ICONERROR);
+		}
+		break;
+	case ID_MENU_GRAPH_SHOW_TITLE:
+	{
+		bool bChecked = GetMenuState(hMenu, wmId, MF_BYCOMMAND) == MF_CHECKED;
+		CheckMenuItem(hMenu, wmId, bChecked ? MF_UNCHECKED : MF_CHECKED);
+		bShowTitle = !bChecked;
+		Invalidate();
+		break;
+	}
+	case ID_MENU_GRAPH_SHOW_GRID:
+	{
+		bool bChecked = GetMenuState(hMenu, wmId, MF_BYCOMMAND) == MF_CHECKED;
+		CheckMenuItem(hMenu, wmId, bChecked ? MF_UNCHECKED : MF_CHECKED);
+		bShowGridBig = bShowGridSmall = !bChecked;
+		Invalidate();
+		break;
+	}
+	case ID_MENU_GRAPH_SHOW_LEGEND:
+	{
+		bool bChecked = GetMenuState(hMenu, wmId, MF_BYCOMMAND) == MF_CHECKED;
+		CheckMenuItem(hMenu, wmId, bChecked ? MF_UNCHECKED : MF_CHECKED);
+		bShowLegend = !bChecked;
+		Invalidate();
+		break;
+	}
+	default:
+		size_t index = wmId - ID_MENU_GRAPH_DATA_START;
+
+		bool bChecked=GetMenuState(hMenu, wmId, MF_BYCOMMAND)==MF_CHECKED;
+
+		if (index < vecPointData.size())
+		{
+			vecPointData[index].Show = !bChecked;
+			CheckMenuItem(hMenu, wmId, bChecked ? MF_UNCHECKED : MF_CHECKED);
+		}
+		Invalidate();
+		break;
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "DetectMemoryLeak.h"
 #include "TListView.h"
+#include "TCanvas.h"
 
 #include "TEdit.h"
 
@@ -26,7 +27,7 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 	{
 	case WM_USER:
 	{
-			if (tempEdit.Text != NULL)
+			//if (tempEdit.Text != NULL)
 			{
 				//Ë¢ÐÂTreeViewContent
 				pTreeViewContent->DeleteAllItems();
@@ -85,6 +86,8 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 				case CTRLTYPE_INT_EDIT:
 				case CTRLTYPE_DOUBLE_EDIT:
 				case CTRLTYPE_ANGLE_VALUE_EDIT:
+				case CTRLTYPE_COLOR_HEX:
+				case CTRLTYPE_LINE_WIDTH:
 				case CTRLTYPE_COOR_P1_EDIT:
 				case CTRLTYPE_COOR_P2_EDIT:
 				case CTRLTYPE_LEN_EDIT:
@@ -112,6 +115,8 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 					ptClickPos.y = yPos - rect.top;
 
 					PostMessage(tempEdit.m_hWnd, WM_LBUTTONDOWN, 0, (LPARAM)MAKELONG(ptClickPos.x,ptClickPos.y));
+
+					win.Canvas.Invalidate();
 
 					return NULL;
 

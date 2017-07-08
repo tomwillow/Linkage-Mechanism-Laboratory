@@ -2,7 +2,7 @@
 #include <vector>
 #include <Windows.h>
 
-//#include "String.h"
+#include "String.h"
 
 #include "DPOINT.h"
 
@@ -40,13 +40,14 @@ public:
 	double angle;
 
 	unsigned char alpha;
+	bool CanBeDragged;
 
 	TElement();
 	virtual ~TElement();
 	void TElement::SetStyle(const LOGPEN &logpen);//设置样式
 	void TElement::SetStyle(TConfiguration *pConfig);//设置样式
 	TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[]);//得到线型名称
-	TCHAR * TElement::GetElementTypeName(TCHAR name[]);//得到类型名称
+	virtual const TCHAR * TElement::GetElementTypeName(TCHAR name[]);//得到类型名称
 	TElement& TElement::operator=(const TElement &element);
 	virtual void TElement::BuildpDpt();
 	virtual bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos);
@@ -57,6 +58,8 @@ public:
 	virtual void TElement::SetX(double x);
 	virtual void TElement::SetY(double y);
 	virtual void TElement::SetPhi(double phi);
+	void TElement::SetColor(COLORREF cr);
+	void TElement::SetLineWidth(LONG width);
 };
 
 DPOINT GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);

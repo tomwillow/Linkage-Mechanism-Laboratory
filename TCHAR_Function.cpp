@@ -2,19 +2,19 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_NON_CONFORMING_SWPRINTFS
 
-#include "TMyString.h"
+#include "TCHAR_Function.h"
 #include <Windows.h>
 
-TMyString::TMyString()
+TCHAR_Function::TCHAR_Function()
 {
 }
 
 
-TMyString::~TMyString()
+TCHAR_Function::~TCHAR_Function()
 {
 }
 
-void TMyString::Split(TCHAR *src, std::vector<TCHAR *> &result, TCHAR *sub)
+void TCHAR_Function::Split(TCHAR *src, std::vector<TCHAR *> &result, TCHAR *sub)
 {
 	int srclen = _tcslen(src);
 	int sublen = _tcslen(sub);
@@ -38,7 +38,7 @@ void TMyString::Split(TCHAR *src, std::vector<TCHAR *> &result, TCHAR *sub)
 	result.push_back(tempstr);
 }
 
-void TMyString::Trim(TCHAR *str)
+void TCHAR_Function::Trim(TCHAR *str)
 {
 	TCHAR *start = str, *end = str+_tcslen(str)-1;
 	while (*start == TEXT(' '))
@@ -53,7 +53,7 @@ void TMyString::Trim(TCHAR *str)
 	str[end - start+1] = TEXT('\0');
 }
 
-void TMyString::ReleaseVectorTCHAR(std::vector<TCHAR *> &szVector)
+void TCHAR_Function::ReleaseVectorTCHAR(std::vector<TCHAR *> &szVector)
 {
 	for (auto &sz:szVector)
 	{
@@ -61,7 +61,7 @@ void TMyString::ReleaseVectorTCHAR(std::vector<TCHAR *> &szVector)
 	}
 }
 
-void TMyString::ReplaceLoop(TCHAR *src, TCHAR *sub, TCHAR *dest)
+void TCHAR_Function::ReplaceLoop(TCHAR *src, TCHAR *sub, TCHAR *dest)
 {
 	while (1)
 	{
@@ -70,7 +70,7 @@ void TMyString::ReplaceLoop(TCHAR *src, TCHAR *sub, TCHAR *dest)
 	}
 }
 
-int TMyString::Replace(TCHAR *src, TCHAR *sub, TCHAR *dest)
+int TCHAR_Function::Replace(TCHAR *src, TCHAR *sub, TCHAR *dest)
 {
 	int srclen = _tcslen(src);
 	if (srclen == 0) return 0;
@@ -108,7 +108,7 @@ int TMyString::Replace(TCHAR *src, TCHAR *sub, TCHAR *dest)
 }
 
 /* ×Ö·ûÊÇa-zA-z»ò_ */
-bool TMyString::isAlphaCharOrUnderline(TCHAR c)
+bool TCHAR_Function::isAlphaCharOrUnderline(TCHAR c)
 {
 	if ((c >= TEXT('a') && c <= TEXT('z')) || (c >= TEXT('A') && c <= TEXT('Z'))
 		|| c == TEXT('_'))
@@ -117,7 +117,7 @@ bool TMyString::isAlphaCharOrUnderline(TCHAR c)
 		return false;
 }
 
-bool TMyString::isNumberChar(TCHAR c)
+bool TCHAR_Function::isNumberChar(TCHAR c)
 {
 	if (c >= TEXT('0') && c <= TEXT('9'))
 		return true;
@@ -125,7 +125,7 @@ bool TMyString::isNumberChar(TCHAR c)
 		return false;
 }
 
-bool TMyString::isVariableName(TCHAR *varname)
+bool TCHAR_Function::isVariableName(TCHAR *varname)
 {
 	if (isAlphaCharOrUnderline(*varname) == false)
 		return false;

@@ -51,6 +51,7 @@ void TEquations::RemoveTempEquations()
 	}
 
 	ReleaseTPEquations(EquationsV);
+	ReleaseTPEquations(EquationsA);
 
 	//VariableTableUnsolved = VariableTable;
 	//VariableTableUnsolved.bShared = true;
@@ -62,25 +63,24 @@ size_t TEquations::GetEquationsCount()
 	return Equations.size();
 }
 
-void TEquations::DefineAVariable(String *pStr, TCHAR *input_str,double value)
+void TEquations::DefineOneVariable(Ostream *pOS, TCHAR *input_str, double value)
 {
-	VariableTable.Define(pStr, input_str, value);
+	VariableTable.Define(pOS, input_str, value);
 
 	VariableTableUnsolved.VariableTable = VariableTable.VariableTable;
 	VariableTableUnsolved.VariableValue = VariableTable.VariableValue;
 
 }
 
-void TEquations::DefineVariable(String *pStr, TCHAR *input_str, TCHAR *input_num)
+void TEquations::DefineVariable(Ostream *pOS,const TCHAR *input_str,const TCHAR *input_num)
 {
-	VariableTable.Define(pStr, input_str, input_num);
+	VariableTable.Define(pOS, input_str, input_num);
 
 	VariableTableUnsolved.VariableTable = VariableTable.VariableTable;
 	VariableTableUnsolved.VariableValue = VariableTable.VariableValue;
-
 }
 
-void TEquations::AddEquation(String *pStr,const TCHAR *szInput, bool istemp)
+void TEquations::AddEquation(Ostream *pOS, const TCHAR *szInput, bool istemp)
 {
 	TExpressionTree *temp = new TExpressionTree;
 	temp->LinkVariableTable(&VariableTable);
@@ -90,7 +90,7 @@ void TEquations::AddEquation(String *pStr,const TCHAR *szInput, bool istemp)
 
 	if ((eError = temp->GetError()) != ERROR_NO)//若出错
 	{
-		if (pStr != NULL) *pStr += temp->GetErrorInfo();
+		if (pOS != NULL) *pOS << temp->GetErrorInfo();
 		delete temp;
 		return;
 	}
@@ -101,27 +101,23 @@ void TEquations::AddEquation(String *pStr,const TCHAR *szInput, bool istemp)
 
 	hasSolved = false;
 
-	//if (output)
-	//	return temp->OutputStr();
-	//else
-	//	return NULL;
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT(">>Add:\r\n");
-		*pStr += temp->OutputStr();
-		*pStr += TEXT("\r\n\r\n");
+		*pOS << TEXT(">>Add:\r\n");
+		*pOS << temp->OutputStr();
+		*pOS << TEXT("\r\n\r\n");
 	}
 }
 
 //逐个方程对t求导，得到速度方程组右边
-void TEquations::BuildEquationsV(String *pStr)
+void TEquations::BuildEquationsV(Ostream *pOS)
 {
-	bool bOutput = pStr == NULL ? false : true;
+	bool bOutput = pOS == NULL ? false : true;
 
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT(">>BuildEquationsV: \r\n");
-		*pStr += TEXT("当前方程：\r\n");
+		*pOS << TEXT(">>BuildEquationsV: \r\n");
+		*pOS << TEXT("当前方程：\r\n");
 	}
 
 	TExpressionTree *pEquatemp;
@@ -135,23 +131,23 @@ void TEquations::BuildEquationsV(String *pStr)
 
 		EquationsV.push_back(pEquatemp);
 
-		if (pStr != NULL)
+		if (pOS != NULL)
 		{
-			*pStr += pEquatemp->OutputStr();
-			*pStr += TEXT("\r\n");
+			*pOS << pEquatemp->OutputStr();
+			*pOS << TEXT("\r\n");
 		}
 	}
 }
 
 //逐个方程对t求导，得到速度方程组右边
-void TEquations::BuildEquationsA_Phitt(String *pStr)
+void TEquations::BuildEquationsA_Phitt(Ostream *pOS)
 {
-	bool bOutput = pStr == NULL ? false : true;
+	bool bOutput = pOS == NULL ? false : true;
 
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT(">>Build Equations A: \r\n");
-		*pStr += TEXT("当前方程：\r\n");
+		*pOS << TEXT(">>Build Equations A: \r\n");
+		*pOS << TEXT("当前方程：\r\n");
 	}
 
 	TExpressionTree *pEquatemp;
@@ -165,10 +161,10 @@ void TEquations::BuildEquationsA_Phitt(String *pStr)
 
 		EquationsA.push_back(pEquatemp);
 
-		if (pStr != NULL)
+		if (pOS != NULL)
 		{
-			*pStr += pEquatemp->OutputStr();
-			*pStr += TEXT("\r\n");
+			*pOS << pEquatemp->OutputStr();
+			*pOS << TEXT("\r\n");
 		}
 	}
 }
@@ -180,16 +176,22 @@ void TEquations::CalcJacobianMultiplyVector(TPEquations &EquationsResult, const 
 	for (auto &Line : Jacobian)
 	{
 		expr = new TExpressionTree;
-		for (auto iter = Line.begin(); iter != Line.end();++iter)
+		for (auto iter = Line.begin(); iter != Line.end(); ++iter)
 		{
 			//Jacobian每项乘以q'
 			(**iter)*Vector[iter - Line.begin()];
-			(*iter)->Simplify(false);
+			//(*iter)->Simplify(false);
 
 			//加起来
 			*expr + (**iter);
 		}
-		expr->Simplify(false);
+#ifdef _DEBUG
+		expr->OutputStr(false);
+#endif
+		//expr->Simplify(false);
+#ifdef _DEBUG
+		expr->OutputStr(false);
+#endif
 		EquationsResult.push_back(expr);
 	}
 }
@@ -211,55 +213,73 @@ void TEquations::MatrixMultiplyVector(TVector &Result, const TMatrix &Matrix, co
 
 
 //应在解出位置、速度方程后调用
-void TEquations::CalcEquationsARight(String *pStr,TVector &Right)
+void TEquations::CalcEquationsARight(Ostream *pOS, TVector &Right)
 {
 	//复制Jacobian矩阵
 	TJacobian JacobianTemp;
 	CopyJacobian(JacobianTemp, Jacobian);
-	//OutputJacobian(pStr, JacobianTemp);
+#ifdef _DEBUG
+	OutputJacobian(pOS, JacobianTemp);
+#endif
 
 	//Jacobian*q' 乘以q'
 	TPEquations EquationsTemp;
 	CalcJacobianMultiplyVector(EquationsTemp, JacobianTemp, VariableTableV.VariableValue);
-	//OutputPhi(pStr, EquationsTemp);
+#ifdef _DEBUG
+	OutputPhi(pOS, EquationsTemp);
+#endif
 
 	//(Jacobian*q')q  对q求导
 	BuildJacobian_inner(JacobianTemp, EquationsTemp, VariableTableA);
-	//OutputJacobian(pStr, JacobianTemp);
+#ifdef _DEBUG
+	OutputJacobian(pOS, JacobianTemp);
+#endif
 
 	//Vpa: (Jacobian*q')q
 	TMatrix MatrixTemp;
-	CalcJacobianValue(pStr, MatrixTemp, JacobianTemp);
-	//Output(pStr, MatrixTemp);
+	CalcJacobianValue(pOS, MatrixTemp, JacobianTemp);
+#ifdef _DEBUG
+	Output(pOS, MatrixTemp);
+#endif
 
 	// *q'
 	MatrixMultiplyVector(Right, MatrixTemp, VariableTableV.VariableValue);
+#ifdef _DEBUG
+	Output(pOS, Right);
+#endif
 
 	//-Phitt
 	TVector Phitt;
-	CalcPhiValue(pStr, EquationsA, Phitt);
+	CalcPhiValue(pOS, EquationsA, Phitt);
+#ifdef _DEBUG
+	Output(pOS, Phitt);
+#endif
 
 	//-Right-Phitt
 	for (auto &iter = Right.begin(); iter != Right.end(); ++iter)
 		(*iter) = -(*iter) + Phitt[iter - Right.begin()];
+
+#ifdef _DEBUG
+	Output(pOS, Right);
+#endif
 
 	ReleaseJacobian(JacobianTemp);
 	ReleaseTPEquations(EquationsTemp);
 }
 
 //替换单一变量
-void TEquations::SubsV(String *pStr, TCHAR *VarStr, double Value)
+void TEquations::SubsV(Ostream *pOS, TCHAR *VarStr, double Value)
 {
-	SubsVar(pStr, EquationsV, VariableTable, VarStr, Value);
+	SubsVar(pOS, EquationsV, VariableTable, VarStr, Value);
 }
 
 //替换单一变量
-void TEquations::SubsA(String *pStr, TCHAR *VarStr, double Value)
+void TEquations::SubsA(Ostream *pOS, TCHAR *VarStr, double Value)
 {
-	SubsVar(pStr, EquationsA, VariableTable, VarStr, Value);
+	SubsVar(pOS, EquationsA, VariableTable, VarStr, Value);
 }
 
-void TEquations::SubsVar(String *pStr, TPEquations &Equations, TVariableTable &LinkVariableTable, TCHAR *VarStr, double Value)
+void TEquations::SubsVar(Ostream *pOS, TPEquations &Equations, TVariableTable &LinkVariableTable, TCHAR *VarStr, double Value)
 {
 	if (eError != ERROR_NO)
 		return;
@@ -274,28 +294,28 @@ void TEquations::SubsVar(String *pStr, TPEquations &Equations, TVariableTable &L
 	}
 }
 
-void TEquations::Subs(String *pStr, TCHAR *subsVar, double value)
+void TEquations::Subs(Ostream *pOS,const TCHAR *subsVar, double value)
 {
 	if (eError != ERROR_NO)
 		return;
 
-		TCHAR *ptVar;
+	TCHAR *ptVar=NULL;
 	if (subsVar != NULL)
 	{
-			if ((ptVar = VariableTable.FindVariableTable(subsVar)) && VariableTableSolved.FindVariableTable(ptVar) == NULL)
-			{
-				VariableTableSolved.VariableTable.push_back(ptVar);
-				VariableTableSolved.VariableValue.push_back(value);
-			}
+		if ((ptVar = VariableTable.FindVariableTable(subsVar)) && VariableTableSolved.FindVariableTable(ptVar) == NULL)
+		{
+			VariableTableSolved.VariableTable.push_back(ptVar);
+			VariableTableSolved.VariableValue.push_back(value);
+		}
 		//VariableTableSolved.SetValueByVarTable(exceptVars);
 	}
 
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr << TEXT(">>Subs: [") << ptVar;
-		*pStr << TEXT("] -> [");
-		*pStr << value;
-		*pStr << TEXT("]\r\n\r\n当前方程：\r\n");
+		*pOS << TEXT(">>Subs: [") << ptVar;
+		*pOS << TEXT("] -> [");
+		*pOS << value;
+		*pOS << TEXT("]\r\n\r\n当前方程：\r\n");
 	}
 	for (auto pEquation : Equations)//遍历方程
 	{
@@ -305,27 +325,27 @@ void TEquations::Subs(String *pStr, TCHAR *subsVar, double value)
 		if (ptVar != NULL && _tcslen(ptVar) > 0)
 			pEquation->Subs(ptVar, value, false);
 
-		if (pStr != NULL)
+		if (pOS != NULL)
 		{
-			*pStr += pEquation->OutputStr(false);
-			*pStr += TEXT("\r\n");
+			*pOS << pEquation->OutputStr(false);
+			*pOS << TEXT("\r\n");
 		}
 	}
 
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT("\r\n");
+		*pOS << TEXT("\r\n");
 	}
 
 	//剔除掉被替换掉的变量
 	if (ptVar != NULL && _tcslen(ptVar) > 0)
 	{
-		VariableTableUnsolved.Remove(pStr, ptVar);
+		VariableTableUnsolved.Remove(pOS, ptVar);
 	}
 }
 
 //已解出变量组加入 未解出变量组剔除
-void TEquations::Subs(String *pStr, TCHAR *subsVar, TCHAR *subsValue)//代入
+void TEquations::Subs(Ostream *pOS,const TCHAR *subsVar,const TCHAR *subsValue)//代入
 {
 	if (eError != ERROR_NO)
 		return;
@@ -334,7 +354,7 @@ void TEquations::Subs(String *pStr, TCHAR *subsVar, TCHAR *subsValue)//代入
 	//若输入了替换变量，则进行定义
 	if (subsVar != NULL)
 	{
-		exceptVars.Define(pStr, subsVar, subsValue);
+		exceptVars.Define(pOS, subsVar, subsValue);
 		TCHAR *ptVar;
 		for (size_t i = 0; i < exceptVars.VariableTable.size(); ++i)
 		{
@@ -347,12 +367,12 @@ void TEquations::Subs(String *pStr, TCHAR *subsVar, TCHAR *subsValue)//代入
 		//VariableTableSolved.SetValueByVarTable(exceptVars);
 	}
 
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr << TEXT(">>Subs: [") << subsVar;
-		*pStr += TEXT("] -> [");
-		*pStr += subsValue;
-		*pStr += TEXT("]\r\n\r\n当前方程：\r\n");
+		*pOS << TEXT(">>Subs: [") << subsVar;
+		*pOS << TEXT("] -> [");
+		*pOS << subsValue;
+		*pOS << TEXT("]\r\n\r\n当前方程：\r\n");
 	}
 	for (auto pEquation : Equations)//遍历方程
 	{
@@ -362,35 +382,35 @@ void TEquations::Subs(String *pStr, TCHAR *subsVar, TCHAR *subsValue)//代入
 		if (subsVar != NULL && _tcslen(subsVar) > 0)
 			pEquation->Subs(subsVar, subsValue, false);
 
-		if (pStr != NULL)
+		if (pOS != NULL)
 		{
-			*pStr += pEquation->OutputStr(false);
-			*pStr += TEXT("\r\n");
+			*pOS << pEquation->OutputStr(false);
+			*pOS << TEXT("\r\n");
 		}
 	}
 
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT("\r\n");
+		*pOS << TEXT("\r\n");
 	}
 
 	//剔除掉被替换掉的变量
 	if (subsVar != NULL && _tcslen(subsVar) > 0)
 	{
-		VariableTableUnsolved.Remove(pStr, subsVar);
+		VariableTableUnsolved.Remove(pOS, subsVar);
 	}
 
 }
 
 //将未解出变量赋值给速度变量组
-void TEquations::BuildVariableTableV(String *pStr)
+void TEquations::BuildVariableTableV(Ostream *pOS)
 {
 	VariableTableV = VariableTableUnsolved;
 	VariableTableV.bShared = true;
 }
 
 //将未解出变量赋值给速度变量组
-void TEquations::BuildVariableTableA(String *pStr)
+void TEquations::BuildVariableTableA(Ostream *pOS)
 {
 	VariableTableA = VariableTableUnsolved;
 	VariableTableA.bShared = true;
@@ -426,7 +446,7 @@ void TEquations::ReleaseJacobian(TJacobian &Jacobian)
 	Jacobian.clear();
 }
 
-void TEquations::BuildJacobian_inner(TJacobian &JacobianResult,const TPEquations &Equations,TVariableTable &VariableTable)
+void TEquations::BuildJacobian_inner(TJacobian &JacobianResult, const TPEquations &Equations, TVariableTable &VariableTable)
 {
 	if (eError != ERROR_NO)
 		return;
@@ -443,7 +463,7 @@ void TEquations::BuildJacobian_inner(TJacobian &JacobianResult,const TPEquations
 		//以未解出变量建立雅可比矩阵
 		Equations[i]->LinkVariableTable(&VariableTable);
 
-		Equations[i]->Simplify(false);
+		//Equations[i]->Simplify(false);
 		for (size_t j = 0; j < VariableTable.VariableTable.size(); j++)
 		{
 			temp = new TExpressionTree;
@@ -456,103 +476,99 @@ void TEquations::BuildJacobian_inner(TJacobian &JacobianResult,const TPEquations
 }
 
 //链接VariableTableUnsolved
-void TEquations::BuildJacobian(String *pStr)
+void TEquations::BuildJacobian(Ostream *pOS)
 {
 	BuildJacobian_inner(Jacobian, Equations, VariableTableUnsolved);
 
 	//纯输出
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT(">>Build Jacobian:\r\n\r\n");
+		*pOS << TEXT(">>Build Jacobian:\r\n\r\n");
 
-		OutputPhi(pStr, Equations);
+		OutputPhi(pOS, Equations);
 
-		OutputJacobian(pStr, Jacobian);
+		OutputJacobian(pOS, Jacobian);
 	}
 }
 
-void TEquations::OutputPhi(String *pStr,TPEquations &Equations)
+void TEquations::OutputPhi(Ostream *pOS, TPEquations &Equations)
 {
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT("Phi(1x");
-		*pStr << Equations.size();
-		*pStr << TEXT(")=\r\n[");
+		*pOS << TEXT("Phi(1x");
+		*pOS << Equations.size();
+		*pOS << TEXT(")=\r\n[");
 		for (auto iter = Equations.begin(); iter != Equations.end(); ++iter)
 		{
-			*pStr += (*iter)->OutputStr();
+			*pOS << (*iter)->OutputStr();
 			if (iter != Equations.end() - 1)
-				*pStr += TEXT(";\r\n");
+				*pOS << TEXT(";\r\n");
 		}
-		*pStr += TEXT("]\r\n\r\n");
+		*pOS << TEXT("]\r\n\r\n");
 	}
 }
 
-void TEquations::OutputJacobian(String *pStr,const TJacobian &Jacobian)
+void TEquations::OutputJacobian(Ostream *pOS, const TJacobian &Jacobian)
 {
 	//纯输出
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT("Jacobian(");
-		*pStr << (Jacobian.size()>0 ? Jacobian[0].size() : 1) << TEXT("x") << Jacobian.size();
-		*pStr << TEXT(")=\r\n[");
+		*pOS << TEXT("Jacobian(");
+		*pOS << (Jacobian.size() > 0 ? Jacobian[0].size() : 1) << TEXT("x") << Jacobian.size();
+		*pOS << TEXT(")=\r\n[");
 		for (size_t ii = 0; ii < Jacobian.size(); ii++)
 		{
 			for (size_t jj = 0; jj < Jacobian[ii].size(); jj++)
 			{
-				*pStr += Jacobian[ii][jj]->OutputStr();
-				*pStr += TEXT(" ");
+				*pOS << Jacobian[ii][jj]->OutputStr();
+				*pOS << TEXT(" ");
 			}
 			if (ii != Jacobian.size() - 1)
-				*pStr += TEXT(";\r\n");
+				*pOS << TEXT(";\r\n");
 		}
-		*pStr += TEXT("]\r\n\r\n");
+		*pOS << TEXT("]\r\n\r\n");
 	}
 }
 
-void TEquations::Output(String *pStr, TMatrix& m)
+void TEquations::Output(Ostream *pOS, TMatrix& m)
 {
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		TCHAR *temp = new TCHAR[20];
-		*pStr += TEXT("[");
+		static TCHAR temp[64];
+		*pOS << TEXT("[");
 		for (size_t i = 0; i < m.size(); i++)
 		{
 			for (size_t j = 0; j < m[i].size(); j++)
 			{
 				_stprintf(temp, TEXT("%f"), m[i][j]);
-				*pStr += temp;
-				*pStr += TEXT(" ");
+				*pOS << temp;
+				*pOS << TEXT(" ");
 			}
 			if (i != m.size() - 1)
-				*pStr += TEXT(";\r\n");
+				*pOS << TEXT(";\r\n");
 		}
-		*pStr += TEXT("]");
-
-		delete[] temp;
+		*pOS << TEXT("]\r\n\r\n");
 	}
 }
 
-void TEquations::Output(String *pStr, TVector& v)
+void TEquations::Output(Ostream *pOS, TVector& v)
 {
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		TCHAR *temp = new TCHAR[20];
-		*pStr += TEXT("[");
-		for (auto value:v)
+		static TCHAR temp[64];
+		*pOS << TEXT("[");
+		for (auto value : v)
 		{
 			_stprintf(temp, TEXT("%f"), value);
-			*pStr += temp;
-			*pStr += TEXT(" ");
+			*pOS << temp;
+			*pOS << TEXT(" ");
 		}
-		*pStr += TEXT("]");
-		delete[] temp;
-
+		*pOS << TEXT("]\r\n\r\n");
 	}
 }
 
 //利用变量表中的值计算雅可比
-void TEquations::CalcJacobianValue(String *pStr, TMatrix &JacobianValueResult,const TJacobian &Jacobian)
+void TEquations::CalcJacobianValue(Ostream *pOS, TMatrix &JacobianValueResult, const TJacobian &Jacobian)
 {
 	JacobianValueResult.clear();
 	JacobianValueResult.resize(Jacobian.size());
@@ -570,12 +586,12 @@ void TEquations::CalcJacobianValue(String *pStr, TMatrix &JacobianValueResult,co
 			}
 			catch (enumError& err)
 			{
-				if (pStr != NULL)
+				if (pOS != NULL)
 				{
-					*pStr += TEXT("ERROR:");
-					*pStr += temp->OutputStr(true);
-					*pStr += TEXT("\r\nJacobian计算出错:");
-					*pStr += temp->GetErrorInfo();
+					*pOS << TEXT("ERROR:");
+					*pOS << temp->OutputStr(true);
+					*pOS << TEXT("\r\nJacobian计算出错:");
+					*pOS << temp->GetErrorInfo();
 				}
 				delete temp;
 				throw err;
@@ -586,7 +602,7 @@ void TEquations::CalcJacobianValue(String *pStr, TMatrix &JacobianValueResult,co
 }
 
 //利用变量表中的值计算，方程中不前缀负号，计算出值加负号
-void TEquations::CalcPhiValue(String *pStr,const TPEquations &Equations, TVector &PhiValue)
+void TEquations::CalcPhiValue(Ostream *pOS, const TPEquations &Equations, TVector &PhiValue)
 {
 	PhiValue.clear();
 	TExpressionTree *temp;
@@ -601,12 +617,12 @@ void TEquations::CalcPhiValue(String *pStr,const TPEquations &Equations, TVector
 		}
 		catch (enumError& err)
 		{
-			if (pStr != NULL)
+			if (pOS != NULL)
 			{
-				*pStr += TEXT("ERROR:");
-				*pStr += temp->OutputStr(true);
-				*pStr += TEXT("\r\nPhi计算出错:");
-				*pStr += temp->GetErrorInfo();
+				*pOS << TEXT("ERROR:");
+				*pOS << temp->OutputStr(true);
+				*pOS << TEXT("\r\nPhi计算出错:");
+				*pOS << temp->GetErrorInfo();
 			}
 			delete temp;
 			throw err;
@@ -661,22 +677,22 @@ enumError TEquations::SolveLinear(TMatrix &A, TVector &x, TVector &b)
 		if ((n = A[0].size()) != m)//不是方阵
 		{
 			if (m > n)
-				return ERROR_OVER_DETERMINED_EQUATIONS;
-			x.resize(n);
-			//return ERROR_INDETERMINATE_EQUATION;
+				return ERROR_OVER_DETERMINED_EQUATIONS;//过定义方程组
+			else//不定方程组
+				x.resize(n);
 		}
 
 	std::vector<decltype(m)> TrueRowNumber(n);
 
 	//列主元消元法
-	for (decltype(m) y = 0, x = 0; y < m; y++, x++)
+	for (decltype(m) y = 0, x = 0; y < m && x<n; y++, x++)
 	{
 		//if (A[i].size() != m)
 
-		//交换本行与最大行
+		//从当前行(y)到最后一行(m-1)中，找出x列最大的一行与y行交换
 		SwapRow(A, b, y, GetMaxAbsRowIndex(A, y, m - 1, x));
 
-		while (abs(A[y][x]) < epsilon)//x一直递增到非0
+		while (abs(A[y][x]) < epsilon)//如果当前值为0  x一直递增到非0
 		{
 			x++;
 			if (x == n)
@@ -773,7 +789,7 @@ enumError TEquations::SolveLinear(TMatrix &A, TVector &x, TVector &b)
 
 bool TEquations::AllIs0(TVector &V)
 {
-	for (auto value: V)
+	for (auto value : V)
 	{
 		if (abs(value) >= epsilon)
 			return false;
@@ -793,7 +809,7 @@ bool TEquations::VectorAdd(TVector &Va, const TVector &Vb)
 }
 
 
-void TEquations::SolveEquationsV(String *pStr)//求解方程组V
+void TEquations::SolveEquationsV(Ostream *pOS)//求解方程组V
 {
 	if (eError != ERROR_NO)
 		return;
@@ -801,19 +817,19 @@ void TEquations::SolveEquationsV(String *pStr)//求解方程组V
 	TMatrix JacobianV;
 	TVector Phi;
 	TVector &dQ = VariableTableV.VariableValue;
-	CalcPhiValue(pStr, EquationsV, Phi);
-	CalcJacobianValue(pStr, JacobianV, Jacobian);
+	CalcPhiValue(pOS, EquationsV, Phi);
+	CalcJacobianValue(pOS, JacobianV, Jacobian);
 	SolveLinear(JacobianV, dQ, Phi);
 
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT(">>SolveEquationsV:\r\n");
-		if (pStr != NULL) *pStr += TEXT("\r\n得到结果：\r\n");
-		VariableTableV.OutputValue(pStr);
+		*pOS << TEXT(">>SolveEquationsV:\r\n");
+		if (pOS != NULL) *pOS << TEXT("\r\n得到结果：\r\n");
+		VariableTableV.OutputValue(pOS);
 	}
 }
 
-void TEquations::SolveEquationsA(String *pStr)//求解方程组A
+void TEquations::SolveEquationsA(Ostream *pOS)//求解方程组A
 {
 	if (eError != ERROR_NO)
 		return;
@@ -821,121 +837,118 @@ void TEquations::SolveEquationsA(String *pStr)//求解方程组A
 	TMatrix JacobianA;
 	TVector Phi;
 	TVector &ddQ = VariableTableA.VariableValue;
-	CalcJacobianValue(pStr, JacobianA, Jacobian);
-	CalcEquationsARight(pStr,Phi);
+	CalcJacobianValue(pOS, JacobianA, Jacobian);//JacobianA与Jacobian相等
+	CalcEquationsARight(pOS, Phi);
 	SolveLinear(JacobianA, ddQ, Phi);
 
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT(">>SolveEquationsA:\r\n");
-		if (pStr != NULL) *pStr += TEXT("\r\n得到结果：\r\n");
-		VariableTableA.OutputValue(pStr);
+		*pOS << TEXT(">>SolveEquationsA:\r\n");
+		if (pOS != NULL) *pOS << TEXT("\r\n得到结果：\r\n");
+		VariableTableA.OutputValue(pOS);
 	}
 }
 
 //牛顿-拉夫森方法求解
-void TEquations::SolveEquations(String *pStr)
+void TEquations::SolveEquations(Ostream *pOS)
 {
 	if (eError != ERROR_NO)
 		return;
 
 	if (hasSolved == false)
 	{
-		if (pStr != NULL)
+		if (pOS != NULL)
 		{
-			*pStr += TEXT(">>SolveEquations:\r\n");
-			*pStr += TEXT("当前未知量：\r\n");
+			*pOS << TEXT(">>SolveEquations:\r\n");
+			*pOS << TEXT("当前未知量：\r\n");
 		}
-		VariableTableUnsolved.Output(pStr);//输出当前变量
-
-		//BuildJacobian(pStr);//建立Jacobian, subsVar, subsValue
+		VariableTableUnsolved.Output(pOS);//输出当前变量
 
 		TMatrix JacobianValue;
 		TVector PhiValue, DeltaQ, &Q = VariableTableUnsolved.VariableValue;
 		TVector VariableValueBackup = VariableTableUnsolved.VariableValue;
-		int n = 0;
+		 unsigned int n = 0;
 
 		while (1)
 		{
-			if (pStr != NULL)
+			if (pOS != NULL)
 			{
-				*pStr += TEXT("q(");
-				*pStr << n;
-				//*pStr += TTransfer::int2TCHAR(n, buffer);
-				*pStr += TEXT(")=\r\n");
-				Output(pStr, Q);
-				*pStr += TEXT("\r\n");
+				*pOS << TEXT("q(");
+				*pOS << n;
+				*pOS << TEXT(")=\r\n");
+				Output(pOS, Q);
+				*pOS << TEXT("\r\n");
 			}
 
 			try
 			{
-				CalcJacobianValue(pStr, JacobianValue,Jacobian);
+				CalcJacobianValue(pOS, JacobianValue, Jacobian);
 			}
 			catch (enumError& err)
 			{
-				if (pStr != NULL) *pStr += TEXT("无法计算。\r\n");
+				if (pOS != NULL) *pOS << TEXT("无法计算。\r\n");
 				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return;
 			}
 
-			if (pStr != NULL)
+			if (pOS != NULL)
 			{
-				*pStr += TEXT("Jacobian(");
-				*pStr << n;
-				*pStr += TEXT(")=\r\n");
-				Output(pStr, JacobianValue);
-				*pStr += TEXT("\r\n");
+				*pOS << TEXT("Jacobian(");
+				*pOS << n;
+				*pOS << TEXT(")=\r\n");
+				Output(pOS, JacobianValue);
+				*pOS << TEXT("\r\n");
 			}
 
 			try
 			{
-				CalcPhiValue(pStr, Equations, PhiValue);
+				CalcPhiValue(pOS, Equations, PhiValue);
 			}
 			catch (enumError& err)
 			{
-				if (pStr != NULL) *pStr += TEXT("无法计算。\r\n");
+				if (pOS != NULL) *pOS << TEXT("无法计算。\r\n");
 				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return;
 			}
-			if (pStr != NULL)
+			if (pOS != NULL)
 			{
-				*pStr += TEXT("Phi(");
-				*pStr << n;
-				*pStr += TEXT(")=\r\n");
-				Output(pStr, PhiValue);
-				*pStr += TEXT("\r\n");
+				*pOS << TEXT("Phi(");
+				*pOS << n;
+				*pOS << TEXT(")=\r\n");
+				Output(pOS, PhiValue);
+				*pOS << TEXT("\r\n");
 			}
 
 			switch (SolveLinear(JacobianValue, DeltaQ, PhiValue))
 			{
 			case ERROR_SINGULAR_MATRIX:
 				//矩阵奇异
-				if (pStr != NULL) *pStr += TEXT("Jacobian矩阵奇异且无解（存在矛盾方程）。\r\n");
+				if (pOS != NULL) *pOS << TEXT("Jacobian矩阵奇异且无解（初值不合适或者存在矛盾方程）。\r\n");
 				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return;
 			case ERROR_INDETERMINATE_EQUATION:
-				if (pStr != NULL) *pStr += TEXT("不定方程组。返回一组特解。\r\n");
+				if (pOS != NULL) *pOS << TEXT("不定方程组。返回一组特解。\r\n");
 				break;
 			case ERROR_JACOBI_ROW_NOT_EQUAL_PHI_ROW:
-				if (pStr != NULL) *pStr += TEXT("Jacobian矩阵与Phi向量行数不等，程序出错。\r\n");
+				if (pOS != NULL) *pOS << TEXT("Jacobian矩阵与Phi向量行数不等，程序出错。\r\n");
 				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return;
 			case ERROR_INFINITY_SOLUTIONS:
-				if (pStr != NULL) *pStr += TEXT("Jacobian矩阵奇异，但有无穷多解（存在等价方程）。返回一组特解。\r\n");
+				if (pOS != NULL) *pOS << TEXT("Jacobian矩阵奇异，但有无穷多解（存在等价方程）。返回一组特解。\r\n");
 				break;
 			case ERROR_OVER_DETERMINED_EQUATIONS:
-				if (pStr != NULL) *pStr += TEXT("矛盾方程组，无法求解。\r\n");
+				if (pOS != NULL) *pOS << TEXT("矛盾方程组，无法求解。\r\n");
 				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return;
 			}
 
-			if (pStr != NULL)//输出DeltaQ
+			if (pOS != NULL)//输出DeltaQ
 			{
-				*pStr += TEXT("Δq(");
-				*pStr << n;
-				*pStr += TEXT(")=\r\n");
-				Output(pStr, DeltaQ);
-				*pStr += TEXT("\r\n\r\n");
+				*pOS << TEXT("Δq(");
+				*pOS << n;
+				*pOS << TEXT(")=\r\n");
+				Output(pOS, DeltaQ);
+				*pOS << TEXT("\r\n\r\n");
 			}
 
 			VectorAdd(Q, DeltaQ);
@@ -943,9 +956,9 @@ void TEquations::SolveEquations(String *pStr)
 			if (AllIs0(DeltaQ))
 				break;
 
-			if (n > 19)//
+			if (n > max_step - 1)//
 			{
-				if (pStr != NULL) *pStr += TEXT("超过20步仍未收敛。\r\n");
+				if (pOS != NULL) *pOS << TEXT("超过") << max_step << TEXT("步仍未收敛。\r\n");
 				VariableTableUnsolved.VariableValue = VariableValueBackup;
 				return;
 			}
@@ -957,18 +970,13 @@ void TEquations::SolveEquations(String *pStr)
 
 		hasSolved = true;
 	}
-	else
-	{
-		//VariableTable.SetValueByVarTable(VariableTableSolved);
-	}
 
-	if (pStr != NULL) *pStr += TEXT("\r\n得到结果：\r\n");
-	VariableTable.OutputValue(pStr);
-
+	if (pOS != NULL) *pOS << TEXT("\r\n得到结果：\r\n");
+	VariableTableUnsolved.OutputValue(pOS);
 }
 
 
-void TEquations::SimplifyEquations(String *pStr)//将方程组中的简单方程解出
+void TEquations::SimplifyEquations(Ostream *pOS)//将方程组中的简单方程解出
 {
 	if (eError != ERROR_NO)
 		return;
@@ -982,7 +990,7 @@ void TEquations::SimplifyEquations(String *pStr)//将方程组中的简单方程解出
 			TExpressionTree *pExpr = Equations[i];
 
 			//代入
-			pExpr->Subs(VariableTableSolved.VariableTable, VariableTableSolved.VariableValue, pStr != NULL);
+			pExpr->Subs(VariableTableSolved.VariableTable, VariableTableSolved.VariableValue, pOS != NULL);
 
 			if (pExpr->CheckOnlyOneVar())
 			{
@@ -1001,22 +1009,22 @@ void TEquations::SimplifyEquations(String *pStr)//将方程组中的简单方程解出
 	}
 
 	//清除已解出变量
-	for (auto pVar:VariableTableSolved.VariableTable)
+	for (auto pVar : VariableTableSolved.VariableTable)
 	{
 		VariableTableUnsolved.DeleteByAddress(pVar);
 	}
 
-	if (pStr != NULL) *pStr += TEXT(">>Simplify:\r\n\r\n");
+	if (pOS != NULL) *pOS << TEXT(">>Simplify:\r\n\r\n");
 
 	//清理掉已解出方程
 	for (int i = vecHasSolved.size() - 1; i >= 0; --i)
 	{
 		if (vecHasSolved[i] == true)
 		{
-			if (pStr != NULL)
+			if (pOS != NULL)
 			{
-				*pStr += Equations[i]->OutputStr();
-				*pStr += TEXT("\r\n");
+				*pOS << Equations[i]->OutputStr();
+				*pOS << TEXT("\r\n");
 			}
 			delete Equations[i];
 			auto iter = Equations.begin() + i;
@@ -1033,10 +1041,10 @@ void TEquations::SimplifyEquations(String *pStr)//将方程组中的简单方程解出
 	if (VariableTableUnsolved.VariableTable.size() == 0)
 		hasSolved = true;//false由AddEquation触发
 
-	if (pStr != NULL)
+	if (pOS != NULL)
 	{
-		*pStr += TEXT("\r\n解得：\r\n");
-		VariableTableSolved.OutputValue(pStr);
-		*pStr += TEXT("\r\n");
+		*pOS << TEXT("\r\n解得：\r\n");
+		VariableTableSolved.OutputValue(pOS);
+		*pOS << TEXT("\r\n");
 	}
 }

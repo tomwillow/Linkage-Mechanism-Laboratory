@@ -3,6 +3,8 @@
 #include "MyMath.h"
 #include "tchar_head.h"
 
+#include "svpng.inc"
+
 #include "TDraw.h"
 
 #include "TDrawTranslucent.h"
@@ -265,6 +267,58 @@ void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pv
 	DeleteObject(hBitmapDC);
 }
 
+bool TDraw::CaptureWindowToFile(HWND hWnd, TCHAR szFileName[])
+{
+	RECT rc;
+	GetClientRect(hWnd, &rc);
+
+	HDC hdc = GetDC(hWnd);
+
+	LONG width = rc.right;
+	LONG height = rc.bottom;
+
+	HDC hBitmapDC = CreateCompatibleDC(NULL);
+
+	BITMAPINFO bmpInfo = { 0 };
+	bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bmpInfo.bmiHeader.biWidth = width;
+	bmpInfo.bmiHeader.biHeight = height;//正数，说明数据从下到上，如未负数，则从上到下  
+	bmpInfo.bmiHeader.biPlanes = 1;
+	bmpInfo.bmiHeader.biBitCount = 32;
+	bmpInfo.bmiHeader.biCompression = BI_RGB;
+
+	VOID* pvBits;
+	HBITMAP hBitmap = CreateDIBSection(hBitmapDC, &bmpInfo, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
+	SelectObject(hBitmapDC, hBitmap);
+
+	BitBlt(hBitmapDC, 0, 0, width, height, hdc, 0, 0, SRCCOPY);
+
+	//将hBitmap中数据存出
+	unsigned char *rgb = new unsigned char[width*height * 3];
+	unsigned char *p = rgb;
+	unsigned x, y;
+	FILE *fp = _wfopen(szFileName, TEXT("wb"));
+	UINT32 data;
+	for (y = 0; y < height; y++)
+		for (x = 0; x < width; x++)
+		{
+			data = *((UINT32*)(pvBits)+(height-1-y)*width + x);
+			*p++ = data >> 16;
+			*p++ = data >> 8;
+			*p++ = data;
+		}
+	svpng(fp, width, height, rgb, 0);
+	fclose(fp);
+	delete rgb;
+
+	DeleteObject(hBitmap);
+	DeleteObject(hBitmapDC);
+
+	ReleaseDC(hWnd, hdc);
+
+	return true;
+}
+
 //根据ITU - R BT 601
 //亮度值Y = 0.299r + 0.587g + 0.114b
 COLORREF TDraw::GetBrighterColor(COLORREF cr)
@@ -310,12 +364,6 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	ptEnd.y -= top;
 	MoveByDelta(pt, 4, -left, -top);
 
-	//HDC hBitmapDC;
-	//HBITMAP hBitmap;
-	//VOID *pvBits;
-	//StartTranslucent(hBitmapDC, hBitmap, pvBits, left, top, width, height, logpen.lopnColor == 0);
-	//HDC hdcOld = hdc;
-	//hdc = hBitmapDC;
 	TDrawTranslucent Translucent;
 	Translucent.Start(hdc, alpha, left, top, width, height, logpen.lopnColor == 0);
 
@@ -335,8 +383,6 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	::DeleteObject(hBrush);
 	//画完
 
-	//EndTranslucent(hdcOld, hBitmapDC, hBitmap, pvBits, left, top, width, height, alpha, logpen.lopnColor == 0);
-	//hdc = hdcOld;
 	Translucent.End();
 
 }
@@ -549,15 +595,13 @@ void TDraw::DrawCircle(HDC hdc, POINT pt, int r, LOGPEN logpen)
 //画圆 没有样式
 void TDraw::DrawCircle(HDC hdc, POINT pt, int r)
 {
-	::Ellipse(hdc, pt.x - r, pt.y - r, pt.x + r, pt.y + r);
+	::Ellipse(hdc, pt.x - r, pt.y - r, pt.x + r+1, pt.y + r+1);
 }
 
 //画机架点
 void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *pConfig)
 {
 	POINT ptO = pConfig->RealToScreen(pFramePoint->dpt);
-	//画圆
-	//::Ellipse(hdc, ptO.x - FRAMEPOINT_R, ptO.y - FRAMEPOINT_R, ptO.x + FRAMEPOINT_R, ptO.y + FRAMEPOINT_R);
 
 	//设置圆下方的两个点
 	POINT ptA1, ptB1;
@@ -583,7 +627,7 @@ void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *pC
 	ptH2 = { LONG(ptO.x + pConfig->FRAMEPOINT_B / 2.0), LONG(ptH1.y) };
 
 
-	if (pConfig->bDrawReal)
+	if (pConfig->bDrawReal)//仿真显示
 	{
 		HPEN hPen = (HPEN)::GetStockObject(NULL_PEN);
 		HBRUSH hBrush = CreateSolidBrush(pConfig->crLink);
@@ -627,45 +671,75 @@ void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *pC
 
 void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *pConfig)
 {
+	if (Slideway->SlidewayStyle == 0)
+		DrawSlidewaySingle(hdc, Slideway->logpenStyleShow, Slideway->ptBegin, Slideway->ptEnd, Slideway->dAngle, Slideway->ShadowQuadrant, Slideway->ShadowLength, pConfig);
+	else
+	{
+		DPOINT dptBegin[2], dptEnd[2];
+		int ShadowQuadrant[2];
+		int d_screen =pConfig->bDrawReal?( pConfig->BAR_R  + 4):6;
+		double d = pConfig->ScreenToLengthX(d_screen);
+		dptBegin[0] = { Slideway->ptBegin.x + d*sin(Slideway->dAngle), Slideway->ptBegin.y - d*cos(Slideway->dAngle) };
+		dptEnd[0] = { Slideway->ptEnd.x + d*sin(Slideway->dAngle), Slideway->ptEnd.y - d*cos(Slideway->dAngle) };
+		dptBegin[1] = { Slideway->ptBegin.x - d*sin(Slideway->dAngle), Slideway->ptBegin.y + d*cos(Slideway->dAngle) };
+		dptEnd[1] = { Slideway->ptEnd.x - d*sin(Slideway->dAngle), Slideway->ptEnd.y + d*cos(Slideway->dAngle) };
+		switch (Slideway->ShadowQuadrant)
+		{
+		case 1:ShadowQuadrant[0] = 4;ShadowQuadrant[1] = 1; break;
+		case 2:ShadowQuadrant[0] = 3; ShadowQuadrant[1] = 2; break;
+		case 3:ShadowQuadrant[0] = 3; ShadowQuadrant[1] = 2; break;
+		case 4:ShadowQuadrant[0] = 4; ShadowQuadrant[1] = 1; break;
+		}
+		DrawSlidewaySingle(hdc, Slideway->logpenStyleShow, dptBegin[0], dptEnd[0], Slideway->dAngle, ShadowQuadrant[0], Slideway->ShadowLength, pConfig);
+		DrawSlidewaySingle(hdc, Slideway->logpenStyleShow, dptBegin[1], dptEnd[1], Slideway->dAngle, ShadowQuadrant[1], Slideway->ShadowLength, pConfig);
+
+	}
+}
+
+void TDraw::DrawSlidewaySingle(HDC hdc, const LOGPEN &logpen,const DPOINT &dptBegin,const DPOINT &dptEnd, double dAngle, int ShadowQuadrant,int ShadowLength, TConfiguration *pConfig)
+{
 	HPEN hPen;
 	HBRUSH hBrush;
+
+	//画笔不同
 	if (pConfig->bDrawReal)
 		hPen = ::CreatePen(PS_SOLID, 2, 0);
 	else
-		hPen = ::CreatePenIndirect(&Slideway->logpenStyleShow);
+		hPen = ::CreatePenIndirect(&logpen);
+
 	hBrush = (HBRUSH)::GetStockObject(NULL_BRUSH);
 	::SelectObject(hdc, hPen);
 	::SelectObject(hdc, hBrush);
 
-	POINT ptBegin = pConfig->RealToScreen(Slideway->ptBegin);
-	POINT ptEnd = pConfig->RealToScreen(Slideway->ptEnd);
+	POINT ptBegin = pConfig->RealToScreen(dptBegin);
+	POINT ptEnd = pConfig->RealToScreen(dptEnd);
 
-	double angleDEG = REG2DEG(Slideway->dAngle) + 45;
+	double angleDEG = REG2DEG(dAngle) + 45;
 	POINT pt[4];
-	switch (Slideway->ShadowQuadrant)
+	switch (ShadowQuadrant)
 	{
 	case 1:
 		pt[0] = ptEnd;
 		pt[1] = { pt[0].x, pt[0].y + pConfig->FRAMEPOINT_SECTION_H };
-		pt[2] = { pt[1].x - Slideway->ShadowLength, pt[1].y };
+		pt[2] = { pt[1].x - ShadowLength, pt[1].y };
 		pt[3] = { pt[2].x, pt[0].y };
 		break;
 	case 2:
 		pt[0] = ptBegin;
 		pt[1] = { pt[0].x, pt[0].y + pConfig->FRAMEPOINT_SECTION_H };
-		pt[2] = { pt[1].x + Slideway->ShadowLength, pt[1].y };
+		pt[2] = { pt[1].x + ShadowLength, pt[1].y };
 		pt[3] = { pt[2].x, pt[0].y };
 		break;
 	case 3:
 		pt[0] = ptBegin;
 		pt[1] = { pt[0].x, pt[0].y - pConfig->FRAMEPOINT_SECTION_H };
-		pt[2] = { pt[1].x + Slideway->ShadowLength, pt[1].y };
+		pt[2] = { pt[1].x + ShadowLength, pt[1].y };
 		pt[3] = { pt[2].x, pt[0].y };
 		break;
 	case 4:
 		pt[0] = ptEnd;
 		pt[1] = { pt[0].x, pt[0].y - pConfig->FRAMEPOINT_SECTION_H };
-		pt[2] = { pt[1].x - Slideway->ShadowLength, pt[1].y };
+		pt[2] = { pt[1].x - ShadowLength, pt[1].y };
 		pt[3] = { pt[2].x, pt[0].y };
 		break;
 	default:
@@ -674,7 +748,7 @@ void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *pConfig)
 	}
 
 	DrawLine(hdc, ptBegin, ptEnd);
-	Rotate(pt, 4, pt[0].x, pt[0].y, Slideway->dAngle);
+	Rotate(pt, 4, pt[0].x, pt[0].y, dAngle);
 	MirrorX(pt, 4, pt[0].y);
 
 	DrawSection(hdc, pt, 4, 10, angleDEG);
@@ -936,6 +1010,14 @@ void TDraw::MoveByDelta(POINT apt[], int apt_num, long dx, long dy)
 	}
 }
 
+void TDraw::MoveRect(RECT &rc, int left, int top)
+{
+	rc.left -= left;
+	rc.right -= left;
+	rc.top -= top;
+	rc.bottom -= top;
+}
+
 //将点集apt向angle方向移动dist距离，apt为屏幕坐标
 void TDraw::Move(POINT apt[], int apt_num, double angle, double dist)
 {
@@ -1170,7 +1252,6 @@ bool TDraw::ShowConstraintColinearDotLine(const TConstraintColinear *pColinear, 
 		if (PointInRealLineOrExtension(Q1, dptIntersection, P2, Q2, pConfig) != -1)//Q1也在P2 Q2上
 			return false;//P1Q1 P2Q2共线，不绘制
 
-
 	return true;
 
 }
@@ -1249,11 +1330,9 @@ void TDraw::DrawPickSquare(HDC hdc, POINT pt)
 	logpen.lopnWidth = { 1, 0 };
 	logpen.lopnColor = RGB(101, 101, 101);
 
-	const int size = 10;
+	int size = 10;
 	RECT rect = { pt.x - size / 2, pt.y - size / 2, pt.x + size / 2, pt.y + size / 2 };
 	DrawRect(hdc, rect, logpen,RGB(0, 127, 255));
-	//rect = { rect.left + 1, rect.top + 1, rect.right - 1, rect.bottom - 1 };
-	//FillRect(hdc, &rect, );
 }
 
 void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt)
@@ -1281,17 +1360,37 @@ RECT TDraw::GetMarginRect(RECT rect, int margin)
 	return rc;
 }
 
-//根据边缘量更改rect，不更改原来的rect margin为正则缩小
+//根据边缘量更改rect，不更改原来的rect,margin为正 则缩小
 RECT TDraw::GetMarginRect(RECT rect, LONG margin_left,LONG margin_top,LONG margin_right,LONG margin_bottom)
 {
 	return{ rect.left + margin_left, rect.top + margin_top, rect.right - margin_right, rect.bottom - margin_bottom };
 }
 
+int TDraw::DPOINT2POINTXLEN(double x1, double x2, double x_min, double x_max, const RECT &rect)
+{
+	return DPOINT2POINTX(x2, x_min, x_max, rect) - DPOINT2POINTX(x1, x_min, x_max, rect);
+}
+
+int TDraw::DPOINT2POINTYLEN(double y1, double y2, double y_min, double y_max, const RECT &rect)
+{
+	return DPOINT2POINTY(y1, y_min, y_max, rect) - DPOINT2POINTY(y2, y_min,y_max, rect);
+}
+
+int TDraw::DPOINT2POINTX(double x, double x_min, double x_max, const RECT &rect)
+{
+	return int(rect.left + (rect.right - rect.left)*(x - x_min) / (x_max - x_min));
+}
+
+int TDraw::DPOINT2POINTY(double y, double y_min, double y_max, const RECT &rect)
+{
+	return int(rect.top + (rect.bottom - rect.top)*(y_max - y) / (y_max - y_min));
+}
+
 POINT TDraw::DPOINT2POINT(DPOINT &dpt, double x_min, double x_max, double y_min, double y_max,const RECT &rect)
 {
-	int X = int(rect.left + (rect.right - rect.left)*(dpt.x - x_min) / (x_max - x_min));
-	int Y = int(rect.top + (rect.bottom - rect.top)*(y_max - dpt.y) / (y_max - y_min));
-	return{ X, Y };
+	//int X = int(rect.left + (rect.right - rect.left)*(dpt.x - x_min) / (x_max - x_min));
+	//int Y = int(rect.top + (rect.bottom - rect.top)*(y_max - dpt.y) / (y_max - y_min));
+	return{ DPOINT2POINTX(dpt.x,x_min,x_max,rect), DPOINT2POINTY(dpt.y,y_min,y_max,rect) };
 }
 
 DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, double y_max,const RECT &rect)
@@ -1313,20 +1412,41 @@ void TDraw::DrawTextAdvance(HDC hdc, const TCHAR text[], RECT *rect, long FontSi
 	DeleteObject(hf);
 }
 
-void TDraw::DrawTips(HDC hdc, POINT &ptMouse, const TCHAR text[], TConfiguration *pConfig)
+void TDraw::DrawTips(HDC hdc, POINT &ptMouse,const RECT &rcLimited, const TCHAR text[], TConfiguration *pConfig)
 {
 	if (_tcslen(text) == 0)
 		return;
 	RECT rc, rcBk;
-	rc.left = ptMouse.x + 22;
-	rc.top = ptMouse.y + 22;
+	LONG dist = 22;
+	rc.left = ptMouse.x + dist;
+	rc.top = ptMouse.y + dist;
 
 	DrawSystemFontText(hdc, text, rc, pConfig->logpenFront.lopnColor, DT_CALCRECT);//不会画出来，只是用来刷新rc的
+	LONG width = rc.right - rc.left;
+	LONG height = rc.bottom - rc.top;
 	rcBk = rc;
-	SetMarginRect(&rcBk, -5);
-	//FillRect(hdc, &rcBk, pConfig->crBackground);
+	SetMarginRect(&rcBk, -5);//扩大5px
+
+	if (rcBk.right>rcLimited.right)
+	{
+		MoveRect(rc, dist * 2 + width, 0);
+		MoveRect(rcBk, dist * 2 + width, 0);
+	}
+	if (rcBk.bottom>rcLimited.bottom)
+	{
+		MoveRect(rc, 0,dist * 2 + height);
+		MoveRect(rcBk,0, dist * 2 + height);
+	}
+
 	DrawRect(hdc, rcBk, pConfig->logpenFront, pConfig->crBackground);
 	DrawSystemFontText(hdc, text, rc, pConfig->logpenFront.lopnColor, DT_LEFT | DT_TOP);//DT_CALCRECT
+}
+
+POINT TDraw::GetSystemFontSize(HDC hdc, const TCHAR text[])
+{
+	RECT rc = { 0, 0, 0, 0 };
+	DrawSystemFontText(hdc, text, rc, 0, DT_CALCRECT);//不会画出来，只是用来刷新rc的
+	return{ rc.right, rc.bottom };
 }
 
 void TDraw::DrawSystemFontText(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format)
@@ -1345,30 +1465,7 @@ void TDraw::DrawSystemFontTextVertical(HDC hdc, const TCHAR text[], RECT &rect, 
 //容差采用pConfig内数据
 int TDraw::PointInRealLineOrExtension(const DPOINT &dptPos, DPOINT &dptIntersection, const DPOINT dptBegin, const DPOINT dptEnd,const TConfiguration *pConfig)
 {
-	//int status = -1;
-
-	//POINT ptPos = pConfig->RealToScreen(dptPos);
-	//POINT pt1 = pConfig->RealToScreen(dptBegin);
-	//POINT pt2 = pConfig->RealToScreen(dptEnd);
-	//double length = TDraw::Distance(pt1, pt2);
-	//double length1 = TDraw::Distance(ptPos, pt1);
-	//double length2 = TDraw::Distance(ptPos, pt2);
-
-	//if (abs(length1 - (length + length2)) < dScreenTolerance)
-	//{
-	//	status = 2;
-	//}
-	//else
-	//	if (abs(length2 - (length + length1)) < dScreenTolerance)
-	//		status = 1;
-	//	else
-	//		if (abs(length1 + length2 - length) < dScreenTolerance)
-	//			status = 0;
-
-	//if (status != -1)
-	//{
-
-	if (pConfig->LengthToScreenX(Distance(dptBegin, dptEnd)) < 0.5)//两点重合
+	if (Distance(dptBegin, dptEnd) < precision)//两点重合
 	{
 			return -1;
 	}

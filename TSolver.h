@@ -16,15 +16,12 @@ class TListBoxItem;
 class TSolver:public TTool
 {
 private:
-	String *pStr;
-	std::vector<String> vecStrDriver;
-	HWND hwndOutput;
-	//TCHAR *str;
-	TEquations *Equations;
-	//TEquations *EquationsV;
-	TCHAR subsVar[1000], subsValue[1000];
-	std::vector<int> idOrder;
-	double *Phi, *Phip;
+	Ostream *pOS;
+	std::vector<String> vecStrDriver;//驱动方程
+	HWND hwndOutput;//输出窗口句柄
+	TEquations *Equations;//约束方程
+	String subsVar, subsValue;//机架点变量名及值
+	std::vector<int> idOrder;//
 	struct TCondition
 	{
 		enumConditionType eType;
@@ -32,10 +29,12 @@ private:
 		DPOINT SiP, SjP;
 	};
 
+	double dRelativeAngle;
+
 	int TSolver::GetIdFromVariableStr(TCHAR varname[]);
 	void TSolver::Output(TCHAR szFormat[], ...);
 	void TSolver::Outputln(const TCHAR *szFormat, ...);
-	void TSolver::SetElementPosition(TVariableTable &VariableTable);
+	void TSolver::SetElementDisplacement(const TVariableTable &VariableTable);
 public:
 	TSolver();
 	~TSolver();
@@ -43,6 +42,7 @@ public:
 	void TSolver::ClearOutput();
 	void TSolver::RefreshEquations();
 	void TSolver::AddMouseConstraint(int index, DPOINT dpt);
+	void TSolver::RecordStartDragPos(int index, DPOINT dpt);
 	void TSolver::SetHwnd(HWND hwnd);
 	void TSolver::RefreshWindowText();
 	void TSolver::ClearConstraint();

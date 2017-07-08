@@ -5,9 +5,9 @@ class TConfiguration;
 class TCanvas:public TWindow
 {
 private:
-	TConfiguration *Config;
+	TConfiguration *pConfig;
 	bool bMButtonPressing;
-	UINT uiMoveStartX, uiMoveStartY;
+	POINT uiMoveStart;
 	void TCanvas::OnCommand(WPARAM wParam, LPARAM lParam) override;
 public:
 	TCanvas();

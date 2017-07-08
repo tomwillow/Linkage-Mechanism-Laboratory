@@ -5,10 +5,10 @@
 
 TConfiguration::TConfiguration()
 {
-	vecColorLib.push_back(RGB(85,160,77));
+	vecColorLib.push_back(RGB(85, 160, 77));
 	vecColorLib.push_back(RGB(83, 98, 164));
 	vecColorLib.push_back(RGB(157, 78, 104));
-	vecColorLib.push_back(RGB(164,139,84));
+	vecColorLib.push_back(RGB(164, 139, 84));
 	PrevRandomColor = vecColorLib[0];
 
 	crDot = RGB(0, 255, 0);
@@ -85,7 +85,7 @@ void TConfiguration::Initial(HWND hwnd)
 	ReleaseDC(hwnd, hdc);
 
 	Org = { 0, 0 };
-	
+
 	SetDPU(dProportion);
 
 	//SetBrightStyle();
@@ -101,11 +101,10 @@ LOGPEN TConfiguration::GetRandomColorLogpen()
 	do
 	{
 		color = vecColorLib[rand() % vecColorLib.size()];
-	} 
-	while (color == PrevRandomColor);
+	} while (color == PrevRandomColor);
 	PrevRandomColor = color;
 
-	return{ iStyle, { iWidth, 0 },color };
+	return{ iStyle, { iWidth, 0 }, color };
 }
 
 void TConfiguration::SetDPU(double Proportion)
@@ -133,38 +132,38 @@ double TConfiguration::GetProportion()
 	return dProportion;
 }
 
-DPOINT TConfiguration::ScreenToReal(POINT pt)
+DPOINT TConfiguration::ScreenToReal(POINT pt) const
 {
 	DPOINT dpt;
-		dpt.x = double(pt.x - Org.x) / DPUX;
-		dpt.y = -double(pt.y - Org.y) / DPUY;
+	dpt.x = double(pt.x - Org.x) / DPUX;
+	dpt.y = -double(pt.y - Org.y) / DPUY;
 	return dpt;
 }
 
-double TConfiguration::ScreenToRealX(LONG x)
+double TConfiguration::ScreenToRealX(LONG x)const
 {
-		return double(x - Org.x) / DPUX;
+	return double(x - Org.x) / DPUX;
 }
 
-double TConfiguration::ScreenToRealY(LONG y)
+double TConfiguration::ScreenToRealY(LONG y)const
 {
-		return -double(y - Org.y) / DPUY;
+	return -double(y - Org.y) / DPUY;
 }
 
-LONG TConfiguration::RealToScreenX(double x)
+LONG TConfiguration::RealToScreenX(double x)const
 {
-		return (LONG)(x*DPUX + Org.x);
+	return (LONG)(x*DPUX + Org.x);
 }
 
-LONG TConfiguration::RealToScreenY(double y)
+LONG TConfiguration::RealToScreenY(double y)const
 {
-		return (LONG)(-y*DPUY + Org.y);
+	return (LONG)(-y*DPUY + Org.y);
 }
 POINT TConfiguration::RealToScreen(DPOINT dpt) const
 {
 	POINT pt;
-		pt.x = (LONG)(dpt.x*DPUX + Org.x);
-		pt.y = (LONG)(-dpt.y*DPUY + Org.y);
+	pt.x = (LONG)(dpt.x*DPUX + Org.x);
+	pt.y = (LONG)(-dpt.y*DPUY + Org.y);
 	return pt;
 }
 
@@ -173,27 +172,27 @@ LONG TConfiguration::LengthToScreenX(double xlen)const
 	return (LONG)(xlen*DPUX);
 }
 
-LONG TConfiguration::LengthToScreenY(double ylen)
+LONG TConfiguration::LengthToScreenY(double ylen)const
 {
 	return (LONG)(ylen*DPUY);
 }
 
 POINT TConfiguration::LengthToScreen(DPOINT dpt) const
 {
-	return {(LONG)(dpt.x*DPUX),(LONG)(dpt.y*DPUY)};
+	return{ (LONG)(dpt.x*DPUX), (LONG)(dpt.y*DPUY) };
 }
 
-double TConfiguration::ScreenToLengthX(LONG xpixel)
+double TConfiguration::ScreenToLengthX(LONG xpixel)const
 {
-	return (double)(xpixel)/DPUX;
+	return (double)(xpixel) / DPUX;
 }
 
-double TConfiguration::ScreenToLengthY(LONG ypixel)
+double TConfiguration::ScreenToLengthY(LONG ypixel)const
 {
-	return (double)(ypixel)/DPUY;
+	return (double)(ypixel) / DPUY;
 }
 
-DPOINT TConfiguration::ScreenToLength(POINT pt)
+DPOINT TConfiguration::ScreenToLength(POINT pt)const
 {
-	return {pt.x/DPUX ,pt.y/DPUY };
+	return{ pt.x / DPUX, pt.y / DPUY };
 }
