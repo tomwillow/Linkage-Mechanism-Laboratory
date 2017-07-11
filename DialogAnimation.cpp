@@ -31,12 +31,12 @@ namespace DialogAnimation
 	bool isAnalyzing;
 	bool thread_is_running;
 
-	std::vector<TListBoxItem> vecItemsLeft,vecItemsRight;
+	std::vector<TListBoxItem> vecItemsLeft, vecItemsRight;
 
 	std::vector<double *> vecpValue;//用于拖动时改变数据
 	std::vector<std::vector<double>> vecSeries;
 
-	TCHAR szPlay[8],szPause[8];
+	TCHAR szPlay[8], szPause[8];
 	TButton ButtonRun;
 	TButton ButtonPlay;
 	TButton ButtonFirstFrame;
@@ -65,15 +65,15 @@ namespace DialogAnimation
 	RECT rectDlg;
 	HWND hDlg;
 	HINSTANCE hInst;
-	
+
 	static HFONT hFont;
 
 	int CALLBACK EnumFontFamProc(LPENUMLOGFONT lpelf, LPNEWTEXTMETRIC lpntm, DWORD nFontType, long lParam)
 	{
 		//if (_tcscpy(lpelf->elfLogFont.lfFaceName, (TCHAR *)lParam) == 0)
-			return 10;
+		return 10;
 		//else
-			//return 0;
+		//return 0;
 	}
 
 	BOOL CALLBACK DlgAnimationProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -143,9 +143,9 @@ namespace DialogAnimation
 			lf.lfWeight = 700;
 			_tcscpy(lf.lfFaceName, szFontName);
 
-			int iRet = EnumFontFamiliesEx(hdc, &lf, (FONTENUMPROC)EnumFontFamProc,0, 0);
+			int iRet = EnumFontFamiliesEx(hdc, &lf, (FONTENUMPROC)EnumFontFamProc, 0, 0);
 
-			if (iRet==10)
+			if (iRet == 10)
 			{
 				hFont = CreateFontIndirect(&lf);
 				//hFont = CreateFont(lfHeight, 0, 0, 0, 700, 0, 0, 0, 0, 0, 0, 0, 0, TEXT("Segoe UI symbol"));
@@ -219,10 +219,10 @@ namespace DialogAnimation
 				UpdateWindow(hDlg);
 
 				if (!vecSeries.empty())
-				for (size_t i = 0; i < vecpValue.size(); ++i)
-				{
-					*(vecpValue[i]) = vecSeries[frame_now][i];
-				}
+					for (size_t i = 0; i < vecpValue.size(); ++i)
+					{
+						*(vecpValue[i]) = vecSeries[frame_now][i];
+					}
 
 				for (auto pElement : pShape->Element)//刷新线的起始点
 				{
@@ -262,7 +262,7 @@ namespace DialogAnimation
 
 					//AnalyzeProc感知
 
-					ButtonRun.SetText(TEXT("开始分析"));
+					//ButtonRun.SetText(TEXT("开始分析"));
 				}
 				//SetPlayerEnable(true);
 
@@ -433,12 +433,12 @@ namespace DialogAnimation
 			}
 			else
 			{
-		pGraph->bRealClose = true;
-		if (pGraph != NULL)
-			delete pGraph;
+				pGraph->bRealClose = true;
+				if (pGraph != NULL)
+					delete pGraph;
 
-		DeleteObject(hFont);
-		EndDialog(hDlg, 0);
+				DeleteObject(hFont);
+				EndDialog(hDlg, 0);
 
 			}
 			return TRUE;
@@ -524,11 +524,12 @@ namespace DialogAnimation
 		thread_is_running = true;
 
 		ButtonRun.SetText(TEXT("中止分析"));
-		SetMesureControlEnable(false);//禁用
+		SetMesureControlEnable(false);//禁用测量框
 
-		//禁用播放按钮
+		//禁用播放器
 		SetPlayerEnable(false);
 
+		//禁用时间帧率修改
 		EditTimeStart.SetEnable(false);
 		EditTimeEnd.SetEnable(false);
 		EditFPS.SetEnable(false);
@@ -544,7 +545,7 @@ namespace DialogAnimation
 
 		double spf = 1 / fps;
 
-		std::vector<double> vecSingle;
+		std::vector<double> vecSingle;//本次位移数据
 
 		//准备记录坐标数据
 		vecSeries.clear();
@@ -561,7 +562,7 @@ namespace DialogAnimation
 
 		//链接测量数据
 		std::vector<int> vecIndexOfVarTable;
-		pSolver->LinkMesureResult(vecItemsRight,vecIndexOfVarTable);
+		pSolver->LinkMesureResult(vecItemsRight, vecIndexOfVarTable);
 
 		std::vector<double> vect;
 
@@ -572,16 +573,16 @@ namespace DialogAnimation
 		for (time_now = time_start, frame_now = frame_start; time_now <= time_end; time_now += spf, frame_now++)
 		{
 			//求解
-			if (hasSolved = pSolver->Solve(time_now))
+			if ((hasSolved = pSolver->Solve(time_now)) && isAnalyzing == true)
 			{
 				//时间数组 x
 				vect.push_back(time_now);
 
 				//设置界面
-				TrackbarTime.SetPos(frame_now);
-				SetEditTimeAndEditFrame();
-				InvalidateRect(hDlg, &rectDlg, FALSE);
-				UpdateWindow(hDlg);
+				TrackbarTime.SetPos(frame_now);//走时间轴
+				SetEditTimeAndEditFrame();//时间及当前帧
+				InvalidateRect(hDlg, &rectDlg, FALSE);//刷新界面
+				UpdateWindow(hDlg);//刷新界面
 
 				//刷新画布
 				pCanvas->Invalidate();
@@ -593,10 +594,9 @@ namespace DialogAnimation
 				vecSeries.push_back(vecSingle);//存入一组坐标数据
 
 				//保存测量数据
-				pSolver->GetMesureResult(vecItemsRight, vecIndexOfVarTable);
+				pSolver->GetMesureResult(vecItemsRight, vecIndexOfVarTable);//存入待测位移、速度、加速度
 			}
-
-			if (isAnalyzing == false || hasSolved==false)
+			else
 			{
 				if (hasSolved == false)
 				{
@@ -605,6 +605,9 @@ namespace DialogAnimation
 					frame_now--;
 				}
 
+				//停止分析
+
+				//设置截止时间为当前时间
 				time_end = time_now;
 				frame_end = frame_now;
 				EditTimeEnd.SetDouble(time_end);
@@ -627,32 +630,31 @@ namespace DialogAnimation
 		pGraph->Clear();
 		for (auto &Item : vecItemsRight)
 		{
-			COLORREF cr;
+			LOGPEN logpen;
 			switch (Item.type)
 			{
 			case P:
-				cr = RGB(0, 0, 0); break;
+				logpen = { PS_SOLID, { 1, 0 }, RGB(0, 0, 0) }; break;
 			case V:
-				cr = RGB(0, 200, 0); break;
+				logpen = { PS_DASH, { 1, 0 }, RGB(0, 200, 0) }; break;
 			case A:
-				cr = RGB(200, 0, 0); break;
+				logpen = { PS_DASHDOT, { 1, 0 }, RGB(200, 0, 0) }; break;
 			}
-			pGraph->InputDptVector(vect, Item.data, { PS_SOLID, { 1, 0 }, cr }, true,Item.s.c_str());
+			pGraph->InputDptVector(vect, Item.data,logpen, true, Item.s.c_str());
 
 		}
 
 		pGraph->bDraw = true;
 		pGraph->Refresh();
 
-		ButtonShowGraph.SetEnable(!vecItemsRight.empty());
+		ButtonShowGraph.SetEnable(!vecItemsRight.empty());//有测量数据则显示图表按钮可用
 
-		SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_SHOW_GRAPH, 0), 0);
-		//if (pGraph != NULL && !vecItemsRight.empty())
-		//	pGraph->ShowWindow(SW_SHOWNORMAL);
+		SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_SHOW_GRAPH, 0), 0);//按下显示图表按钮
 
-		//启用播放按钮
+		//启用播放器
 		SetPlayerEnable(true);
 
+		//启用时间帧率修改
 		EditTimeStart.SetEnable(true);
 		EditTimeEnd.SetEnable(true);
 		EditFPS.SetEnable(true);
@@ -660,7 +662,6 @@ namespace DialogAnimation
 		//回到第一帧
 		SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_FIRST_FRAME, 0), 0);
 
-		//SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_RUN, 0), 0);
 		isAnalyzing = false;
 		ButtonRun.SetText(TEXT("开始分析"));
 		SetMesureControlEnable(true);//解禁
@@ -685,7 +686,7 @@ namespace DialogAnimation
 			}
 
 			now = timeGetTime();
-			frame_now = (now - start) / 1000.0*fps+frame_start_this_time;//得到当前应处理的帧
+			frame_now = (now - start) / 1000.0*fps + frame_start_this_time;//得到当前应处理的帧
 			if (frame_now == frame_prev)//和上一次处理相同，则不刷新
 				continue;
 
@@ -705,8 +706,8 @@ namespace DialogAnimation
 			SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_PLAY, 0), 0);
 		}
 		else
-		//放完自动停止
-		SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_PLAY, 0), 0);
+			//放完自动停止
+			SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_PLAY, 0), 0);
 
 		//_endthread();
 		//return 0;
@@ -720,7 +721,7 @@ namespace DialogAnimation
 		vecItemsRight.clear();
 
 		TCHAR temp[32];
-		String s,s_dpt;
+		String s, s_dpt;
 		for (auto pElement : pShape->Element)//遍历所有元素
 		{
 			if (pElement->CanBeDragged)//非机架及RealLine,Driver,Constraint

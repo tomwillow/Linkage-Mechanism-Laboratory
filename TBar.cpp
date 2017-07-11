@@ -2,6 +2,7 @@
 #include "tchar_head.h"
 #include <stdio.h>
 
+#include "TDraw.h"
 #include "TBar.h"
 
 TBar::TBar() 
@@ -23,3 +24,8 @@ const TCHAR * TBar::GetElementTypeName(TCHAR name[])//得到类型名称
 }
 
 //不通知listview，由realline通知
+
+void TBar::Draw(HDC hdc, const TConfiguration* pConfig)
+{
+	TDraw::DrawBar(hdc, this, pConfig);
+}

@@ -219,6 +219,8 @@
     <ResourceCompile Include="Mechanism Design System.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Resource\BITMAP_AXES_HIDE.bmp" />
+    <Image Include="Resource\BITMAP_AXES_SHOW.bmp" />
     <Image Include="Resource\BITMAP_SCHOOL.bmp" />
     <Image Include="Resource\bitmap_show_real.bmp" />
     <Image Include="Resource\bitmap_show_simple.bmp" />

@@ -88,6 +88,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Status.Create(hWnd, IDR_STATUS, m_hInst, 24);
 	m_Status.AddPart(IDR_STATUS_COORDINATE, 160, PT_FIXED);//坐标
 	m_Status.AddPart(0, 0, PT_NONE);
+	m_Status.AddPart(IDR_STATUS_CHECKBOX_AXES, 22, PT_FIXED);//
 	m_Status.AddPart(IDR_STATUS_CHECKBOX_SHOW_REAL, 22, PT_FIXED);//连杆绘制/真实绘制
 	m_Status.AddPart(IDR_STATUS_CHECKBOX_THEME, 22, PT_FIXED);//
 	m_Status.AddPart(IDR_STATUS_PROPORTIONNAME, 40, PT_FIXED);//比例：
@@ -108,12 +109,19 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	//创建风格切换按钮
 	m_CheckBoxTheme.LoadCheckedBitmap(m_hInst, IDB_BITMAP_THEME_DARK);
 	m_CheckBoxTheme.LoadUnCheckedBitmap(m_hInst, IDB_BITMAP_THEME_BRIGHT);
-	m_CheckBoxTheme.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 0).top,20,20, IDR_STATUS_CHECKBOX_THEME);
+	m_CheckBoxTheme.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 0).top, 20, 20, IDR_STATUS_CHECKBOX_THEME);
 	m_CheckBoxTheme.SetCheckedAndBitmap(m_Configuration.bThemeDark);
+
+	//创建坐标轴切换按钮
+	m_CheckBoxAxes.LoadCheckedBitmap(m_hInst, IDB_BITMAP_AXES_SHOW);
+	m_CheckBoxAxes.LoadUnCheckedBitmap(m_hInst, IDB_BITMAP_AXES_HIDE);
+	m_CheckBoxAxes.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_AXES, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_AXES, 0).top, 20, 20, IDR_STATUS_CHECKBOX_AXES);
+	m_CheckBoxAxes.SetCheckedAndBitmap(m_Configuration.bDrawAxes);
 
 	//创建tooltip
 	CreateToolTip(m_Status.m_hWnd, m_CheckBoxShowReal.m_hWnd, m_hInst, TEXT("点击以切换 真实/简图 显示"));
 	CreateToolTip(m_Status.m_hWnd, m_CheckBoxTheme.m_hWnd, m_hInst, TEXT("点击以切换 深色/浅色 背景"));
+	CreateToolTip(m_Status.m_hWnd, m_CheckBoxAxes.m_hWnd, m_hInst, TEXT("点击以切换显示坐标轴"));
 
 	//创建Trackbar
 	m_Trackbar.CreateTrackbar(m_Status.m_hWnd, this->m_hInst, m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0), IDR_TRACKBAR);
@@ -325,6 +333,19 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		}
 		Canvas.Invalidate();
 		break;
+	case IDR_STATUS_CHECKBOX_AXES:
+		if (m_CheckBoxAxes.GetChecked())
+		{
+			m_CheckBoxAxes.SetBitmapIsChecked();
+			m_Configuration.bDrawAxes = true;
+		}
+		else
+		{
+			m_CheckBoxAxes.SetBitmapIsUnChecked();
+			m_Configuration.bDrawAxes = false;
+		}
+		Canvas.Invalidate();
+		break;
 	case ID_ANALYZE_MECHANISM://分析机构
 		if (pConsole == NULL)
 			OnCommand(ID_SHOW_CONSOLE, 0);
@@ -531,6 +552,7 @@ void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 	m_Trackbar.SetRect(m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0));//Trackbar嵌入Status
 	m_CheckBoxShowReal.SetPositionOnlyOrigin(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1));
 	m_CheckBoxTheme.SetPositionOnlyOrigin(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1));
+	m_CheckBoxAxes.SetPositionOnlyOrigin(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_AXES, 1));
 
 	SetRightWindowPos();
 

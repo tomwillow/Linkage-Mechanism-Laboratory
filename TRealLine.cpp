@@ -3,6 +3,7 @@
 #include "MyMath.h"
 #include "TRealLine.h"
 
+#include "TConfiguration.h"
 #include "TDraw.h"
 #include "TListView.h"
 
@@ -182,4 +183,27 @@ void TRealLine::SetPhi(double phi)
 {
 	angle = phi;
 	SetPoint(ptBegin, dLength, angle);
+}
+
+void TRealLine::Draw(HDC hdc, const TConfiguration* pConfig)
+{
+	TDraw::DrawRealLine(hdc, ptBegin, ptEnd, logpenStyleShow, pConfig);
+}
+
+void TRealLine::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
+{
+	//»­Ê°È¡·½¸ñ
+	TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(ptBegin));
+	TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(ptEnd));
+}
+
+void TRealLine::ChangePos(DPOINT dptDelta)
+{
+	ptBegin += dptDelta;
+	ptEnd += dptDelta;
+}
+
+bool TRealLine::Picked(const POINT &ptPos, const TConfiguration *pConfig)
+{
+	return TDraw::PointInRealLine(ptPos, this, pConfig);
 }

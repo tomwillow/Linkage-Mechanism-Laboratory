@@ -15,5 +15,6 @@ public:
 	bool TDriver::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape) override;
 	virtual void TDriver::NoticeListView(TListView *pListView) override;
 	virtual const TCHAR * TDriver::GetElementTypeName(TCHAR name[]) override;//得到类型名称
+	virtual void TDriver::ChangePos(DPOINT dptDelta)override{}
 };
 

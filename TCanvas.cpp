@@ -163,13 +163,13 @@ void TCanvas::OnDraw(HDC hdc)
 	if (pConfig->bDrawGrid)
 		TDraw::DrawGrid(hdc, ClientRect, pConfig->GetOrg(), pConfig->crGridBig, pConfig->crGridSmall, pConfig);
 
-	//画坐标原点
-	TDraw::DrawAxes(hdc, pConfig->GetOrg().x, pConfig->GetOrg().y, pConfig->crCoordinate);
+	if (pConfig->bDrawAxes)//画坐标原点
+		TDraw::DrawAxes(hdc, pConfig->GetOrg().x, pConfig->GetOrg().y, pConfig->crCoordinate);
 
 	//图形绘制
 	for (auto pElement : win.m_Shape.Element)
 	{
-		TDraw::DrawElement(hdc, pElement, pConfig);
+		pElement->Draw(hdc, pConfig);
 	}
 
 	//工具类绘制

@@ -343,69 +343,7 @@ void TSelectTool::Draw(HDC hdc)
 {
 	if (iPickIndex != -1)
 	{
-		TElement *pElement = pShape->Element[iPickIndex];
-		switch (pElement->eType)
-		{
-		case ELEMENT_BAR:
-		case ELEMENT_REALLINE:
-		case ELEMENT_SLIDEWAY:
-			//画拾取方格
-			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pElement)->ptBegin));
-			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TRealLine *)pElement)->ptEnd));
-			break;
-
-		case ELEMENT_FRAMEPOINT:
-			//画拾取方格
-			TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(((TFramePoint *)pElement)->dpt));
-			break;
-		case CONSTRAINT_COINCIDE:
-		{
-			TConstraintCoincide *temp = ((TConstraintCoincide *)pElement);
-			if (TDraw::ShowConstraintCoincideDotLine(temp, pConfig))
-			{
-				//画拾取方格
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(temp->GetLinkDpt(0)));
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(temp->GetLinkDpt(1)));
-			}
-			else
-			{
-				//画重合点
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(temp->GetLinkDpt(0)));
-			}
-		}
-		break;
-		case ELEMENT_POLYLINEBAR:
-		case ELEMENT_SLIDER:
-		{
-			for (auto iter = pElement->vecDpt.begin(); iter != pElement->vecDpt.end(); ++iter)
-				//画拾取方格
-				TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(TDraw::GetAbsolute(*iter, pElement->dpt, pElement->angle)));
-		}
-		break;
-		case CONSTRAINT_COLINEAR:
-		{
-			TConstraintColinear *temp = ((TConstraintColinear *)pElement);
-			POINT ptCenter1, ptCenter2;
-			if (TDraw::ShowConstraintColinearDotLine(temp, ptCenter1, ptCenter2, pConfig))
-			{
-				//画拾取方格
-				TDraw::DrawPickSquare(hdc, ptCenter1);
-				TDraw::DrawPickSquare(hdc, ptCenter2);
-			}
-			else
-			{
-				//画重合点
-				TDraw::DrawPickSquare(hdc, ptCenter1);
-			}
-			break;
-		}
-		case DRIVER:
-			break;
-		default:
-			assert(0);
-			break;
-		}
-
+		pShape->Element[iPickIndex]->DrawPickSquare(hdc, pConfig);
 	}
 
 	if (bShowTips)
@@ -417,12 +355,7 @@ bool TSelectTool::CanBeDriver()
 {
 	if (iPickIndex != -1)
 	{
-		switch (pShape->Element[iPickIndex]->eType)
-		{
-		case ELEMENT_BAR:
-		case ELEMENT_SLIDER:
-			return true;
-		}
+		return pShape->Element[iPickIndex]->CanBeDragged;
 	}
 	return false;
 }

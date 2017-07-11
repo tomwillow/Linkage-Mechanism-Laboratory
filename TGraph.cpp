@@ -99,7 +99,7 @@ void TGraph::OnSize(WPARAM wParam, LPARAM lParam)
 
 	TDraw::SetMarginRect(&rcGraph, 10);
 
-	CalcPointArray(rcGraph);
+	CalcPointArray(rcGraph);//计算显示点
 
 	{
 		HDC hdc = GetDC(m_hWnd);
@@ -114,12 +114,15 @@ void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOG
 {
 	TPointData PointData;
 	PointData.dptVector = dptInputVector;
+
+	//最大最小得到初值
 	if (PointData.dptVector.size() > 0)
 	{
 		PointData.x_max = PointData.x_min = PointData.dptVector[0].x;
 		PointData.y_max = PointData.y_min = PointData.dptVector[0].y;
 	}
 
+	//得到数据点边界
 	for (auto dpt : PointData.dptVector)
 	{
 		if (dpt.x > PointData.x_max) PointData.x_max = dpt.x;
@@ -131,7 +134,7 @@ void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOG
 	PointData.y_len = PointData.y_max - PointData.y_min;
 
 	PointData.iPtCount = PointData.dptVector.size();
-	PointData.ptArray = new POINT[PointData.iPtCount];
+	PointData.ptArray = new POINT[PointData.iPtCount];//此时仅初始化，没有计算
 
 	PointData.logpen = logpen;
 
@@ -156,7 +159,6 @@ void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOG
 		hMenuData = CreateMenu();
 		InsertMenu(hMenuView, 1, MF_POPUP | MF_BYPOSITION, (UINT)hMenuData, TEXT("数据"));
 	}
-
 	AppendMenu(hMenuData, MF_CHECKED, ID_MENU_GRAPH_DATA_START + vecPointData.size(), PointData.sLegend.c_str());
 
 
@@ -205,21 +207,12 @@ void TGraph::CalcPointArray(const RECT &rcGraph)
 		if (PointData.y_min < y_min) y_min = PointData.y_min;
 	}
 
-	//double x_len = x_max - x_min;
-	//double y_len = y_max - y_min;
-	//double delta_y = 0.1*y_len;
-	//y_max += delta_y;
-	//y_min -= delta_y;
-
-
 	for (auto &PointData : vecPointData)
 	{
-		//PointData.y_max += delta_y;
-		//PointData.y_min -= delta_y;
-		//PointData.y_len += 2 * delta_y;
 		for (size_t i = 0; i < PointData.dptVector.size(); ++i)
 		{
-			PointData.ptArray[i] = TDraw::DPOINT2POINT(PointData.dptVector[i], x_min, x_max, y_min, y_max, rcGraph);
+			//PointData.ptArray[i] = TDraw::DPOINT2POINT(PointData.dptVector[i], x_min, x_max, y_min, y_max, rcGraph);
+			PointData.ptArray[i] = TDraw::DPOINT2POINT(PointData.dptVector[i], PointData.x_min, PointData.x_max, PointData.y_min, PointData.y_max, rcGraph);
 		}
 	}
 }
@@ -603,7 +596,7 @@ void TGraph::DrawLegend(HDC hdc, const LOGPEN &logpenBorder)
 
 	POINT ptUpperRight = { rcGraph.right - 10, rcGraph.top + 10 };//离边缘距离10
 	LONG lAllTextWidth(0), lAllTextHeight(0);
-	LONG lLineLong = 12;//图例示范线长度
+	LONG lLineLong = 36;//图例示范线长度
 	LONG lDistFromLineAndText = 4;//内外框间距
 	for (auto &PointData : vecPointData)
 	{

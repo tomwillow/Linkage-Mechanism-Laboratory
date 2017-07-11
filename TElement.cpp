@@ -8,7 +8,7 @@
 #include "TElement.h"
 
 #include "TListView.h"
-TElement::TElement() :available(true), CanBeDragged(false)
+TElement::TElement() :available(true), CanBeDragged(false), IsConstraint(false)
 {
 	id = -1;
 	eType = ELEMENT_NULL;
@@ -50,7 +50,7 @@ const TCHAR * TElement::GetElementTypeName(TCHAR name[])
 	return _tcscpy(name, TEXT("Œ¥∂®“Â"));
 }
 
-TCHAR * TElement::GetLineStyleName(UINT linestyle, TCHAR name[])
+TCHAR * GetLineStyleName(UINT linestyle, TCHAR name[])
 {
 	switch (linestyle)
 	{
@@ -271,4 +271,14 @@ void TElement::SetY(double y)
 void TElement::SetPhi(double phi)
 {
 	angle = phi;
+}
+
+void TElement::ChangePos(DPOINT dptDelta)
+{
+	dpt += dptDelta;
+}
+
+bool TElement::Picked(const POINT &ptPos, const TConfiguration *pConfig)
+{
+	return false;
 }

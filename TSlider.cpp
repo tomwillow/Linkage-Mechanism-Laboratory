@@ -2,6 +2,9 @@
 #include "tchar_head.h"
 
 #include "TSlider.h"
+
+#include "TConfiguration.h"
+#include "TDraw.h"
 #include "TListView.h"
 #include "MyMath.h"
 
@@ -99,4 +102,21 @@ DPOINT TSlider::GetAbsolutePointByIndex(int PointIndexOfElement) const
 		return GetAbsolute(dpt_1, dpt, angle);
 	else
 		return TElement::GetAbsolutePointByIndex(PointIndexOfElement);
+}
+
+void TSlider::Draw(HDC hdc, const TConfiguration* pConfig)
+{
+	TDraw::DrawSlider(hdc, this, pConfig);
+}
+
+void TSlider::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
+{
+	for (auto &Dpt : vecDpt)
+		//»­Ê°È¡·½¸ñ
+		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(TDraw::GetAbsolute(Dpt, dpt, angle)));
+}
+
+bool TSlider::Picked(const POINT &ptPos, const TConfiguration *pConfig)
+{
+	return TDraw::PointInSlider(ptPos, this, pConfig);
 }

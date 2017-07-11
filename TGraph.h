@@ -16,7 +16,7 @@ private:
 		bool Show;
 		std::vector<DPOINT> dptVector;//真实数据
 		String sLegend;
-		LONG lLegendWidth, lLegendHeight;
+		LONG lLegendWidth, lLegendHeight;//对应图例的宽高
 		int iPtCount;//点数量
 		POINT *ptArray;//坐标点
 		double x_max, y_max, x_min, y_min;
@@ -33,7 +33,6 @@ private:
 	int iPickPointDataIndex;
 	int iPick;
 
-
 	int iMarginTop,iMarginBottom,iMarginLeft,iMarginRight;
 	LONG lTextHeight;
 	LONG lInterval=2;//刻度与刻度文字间隔
@@ -48,14 +47,14 @@ private:
 		RECT rcScaleText;
 		String sScale;
 	};
-	std::vector<TGridLineAndScale> vecGridLineAndScale;
+	std::vector<TGridLineAndScale> vecGridLineAndScale;//大网格线及刻度线集合
 
 	struct TGridScaleSmall
 	{
 		POINT ptBegin;
 		POINT ptEnd;
 	};
-	std::vector<TGridScaleSmall> vecGridScaleSmall;
+	std::vector<TGridScaleSmall> vecGridScaleSmall;//小网格线集合
 
 	HMENU hMenuData;
 

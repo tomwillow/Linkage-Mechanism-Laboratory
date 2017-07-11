@@ -11,10 +11,12 @@ public:
 	~DPOINT();
 	DPOINT(double x, double y);
 
-	DPOINT& operator=(const DPOINT &dpt);
-	DPOINT& operator=(std::initializer_list<double> init_list);
-	DPOINT& operator+(DPOINT &dpt);
-	DPOINT& operator-(DPOINT &dpt);
+	DPOINT& DPOINT::operator=(const DPOINT &dpt);
+	DPOINT& DPOINT::operator=(std::initializer_list<double> init_list);
+	DPOINT& DPOINT::operator+(DPOINT &dpt);
+	DPOINT& DPOINT::operator-(DPOINT &dpt);
+	DPOINT& DPOINT::operator+=(DPOINT &dpt);
+	DPOINT& DPOINT::operator-=(DPOINT &dpt);
 };
 
 Ofstream& operator<<(Ofstream& out, DPOINT &dpt);

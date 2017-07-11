@@ -67,43 +67,7 @@ void TDraw::DrawPolyline(HDC hdc, const POINT *apt, int count, LOGPEN &logpen)
 	::DeleteObject(hPen);
 }
 
-void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig)
-{
-	switch (Element->eType)
-	{
-	case ELEMENT_REALLINE:
-		DrawRealLine(hdc, ((TRealLine *)Element)->ptBegin, ((TRealLine *)Element)->ptEnd, ((TRealLine *)Element)->logpenStyleShow, pConfig);
-		break;
-	case ELEMENT_FRAMEPOINT:
-		DrawFramePoint(hdc, (TFramePoint *)Element, pConfig);
-		break;
-	case ELEMENT_BAR:
-		DrawBar(hdc, (TBar *)Element, pConfig);
-		break;
-	case ELEMENT_SLIDEWAY:
-		DrawSlideway(hdc, (TSlideway *)Element, pConfig);
-		break;
-	case CONSTRAINT_COINCIDE:
-		DrawConstraintCoincide(hdc, (TConstraintCoincide *)Element, pConfig);
-		break;
-	case CONSTRAINT_COLINEAR:
-		DrawConstraintColinear(hdc, (TConstraintColinear *)Element, pConfig);
-		break;
-	case ELEMENT_SLIDER:
-		DrawSlider(hdc, (TSlider *)Element, pConfig);
-		break;
-	case ELEMENT_POLYLINEBAR:
-		DrawPolylineBar(hdc, (TPolylineBar *)Element, pConfig);
-		break;
-	case DRIVER:
-		break;
-	default:
-		assert(0);
-		break;
-	}
-}
-
-void TDraw::DrawBar(HDC hdc, TBar *pBar, TConfiguration *pConfig)
+void TDraw::DrawBar(HDC hdc, TBar *pBar, const TConfiguration *pConfig)
 {
 	if (pConfig->bDrawReal)
 		DrawBarTranslucent(hdc, pBar, pConfig);
@@ -121,7 +85,7 @@ void TDraw::CalcBarLineEndpoint(POINT &ptBegin, POINT &ptEnd, int distBegin, int
 	ptEnd = { LONG(ptEnd.x + distEnd*cos(theta2)), LONG(ptEnd.y - distEnd*sin(theta2)) };
 }
 
-void TDraw::DrawBarSimple(HDC hdc, TBar *Bar, TConfiguration *pConfig)
+void TDraw::DrawBarSimple(HDC hdc, TBar *Bar, const TConfiguration *pConfig)
 {
 	HPEN hPen;
 	HBRUSH hBrush;
@@ -159,7 +123,7 @@ void TDraw::DrawBarSimple(HDC hdc, TBar *Bar, TConfiguration *pConfig)
 	::DeleteObject(hBrush);
 }
 
-void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config)
+void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, const TConfiguration *Config)
 {
 	DrawRealLine(hdc, RealLine.ptBegin, RealLine.ptEnd, RealLine.logpenStyleShow, Config);
 }
@@ -175,7 +139,7 @@ void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, c
 	::DeleteObject(hPen);
 }
 
-void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, TConfiguration *pConfig)
+void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, const TConfiguration *pConfig)
 {
 	DrawBarTranslucent(hdc, pConfig->RealToScreen(pBar->ptBegin), pConfig->RealToScreen(pBar->ptEnd), pBar->angle, pBar->alpha, pBar->logpenStyleShow, pConfig);
 }
@@ -332,7 +296,7 @@ COLORREF TDraw::GetBrighterColor(COLORREF cr)
 	return RGB(0.299 * 256 / y*GetRValue(cr), 0.587 * 256 / y*GetGValue(cr), 0.114 * 256 / y*GetBValue(cr));
 }
 
-void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, TConfiguration *pConfig)
+void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, const TConfiguration *pConfig)
 {
 	POINT pt[4];
 	CalcBarRectCoor(pt, ptBegin, ptEnd, angle, pConfig->BAR_R * 2);
@@ -431,7 +395,7 @@ bool TDraw::PointInPolylineBar(POINT ptPos, TPolylineBar *pPolylineBar, const TC
 	return PtInRegion(hRgn, ptPos.x, ptPos.y);
 }
 
-void TDraw::DrawPolylineBarSimple(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration *pConfig)
+void TDraw::DrawPolylineBarSimple(HDC hdc, TPolylineBar *pPolylineBar, const TConfiguration *pConfig)
 {
 	if (pPolylineBar->vecDpt.empty())
 	{
@@ -495,7 +459,7 @@ void TDraw::DrawPolylineBarSimple(HDC hdc, TPolylineBar *pPolylineBar, TConfigur
 	DeleteObject(hPen);
 }
 
-void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration *pConfig)
+void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *pPolylineBar, const TConfiguration *pConfig)
 {
 	if (pConfig->bDrawReal)
 		DrawPolylineBarTranslucent(hdc, pPolylineBar, pConfig);
@@ -503,7 +467,7 @@ void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration 
 		DrawPolylineBarSimple(hdc, pPolylineBar, pConfig);
 }
 
-void TDraw::DrawPolylineBarTranslucent(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration *pConfig)
+void TDraw::DrawPolylineBarTranslucent(HDC hdc, TPolylineBar *pPolylineBar, const TConfiguration *pConfig)
 {
 	HRGN hRgn;
 	CalcPolylineBarRgn(hRgn, pPolylineBar, pConfig);
@@ -599,7 +563,7 @@ void TDraw::DrawCircle(HDC hdc, POINT pt, int r)
 }
 
 //画机架点
-void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *pConfig)
+void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, const TConfiguration *pConfig)
 {
 	POINT ptO = pConfig->RealToScreen(pFramePoint->dpt);
 
@@ -669,7 +633,7 @@ void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *pC
 	}
 }
 
-void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *pConfig)
+void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, const TConfiguration *pConfig)
 {
 	if (Slideway->SlidewayStyle == 0)
 		DrawSlidewaySingle(hdc, Slideway->logpenStyleShow, Slideway->ptBegin, Slideway->ptEnd, Slideway->dAngle, Slideway->ShadowQuadrant, Slideway->ShadowLength, pConfig);
@@ -696,7 +660,7 @@ void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *pConfig)
 	}
 }
 
-void TDraw::DrawSlidewaySingle(HDC hdc, const LOGPEN &logpen,const DPOINT &dptBegin,const DPOINT &dptEnd, double dAngle, int ShadowQuadrant,int ShadowLength, TConfiguration *pConfig)
+void TDraw::DrawSlidewaySingle(HDC hdc, const LOGPEN &logpen, const DPOINT &dptBegin, const DPOINT &dptEnd, double dAngle, int ShadowQuadrant, int ShadowLength, const TConfiguration *pConfig)
 {
 	HPEN hPen;
 	HBRUSH hBrush;
@@ -1256,7 +1220,7 @@ bool TDraw::ShowConstraintColinearDotLine(const TConstraintColinear *pColinear, 
 
 }
 
-void TDraw::DrawConstraintColinear(HDC hdc, TConstraintColinear *pColinear, TConfiguration *pConfig)
+void TDraw::DrawConstraintColinear(HDC hdc, TConstraintColinear *pColinear, const TConfiguration *pConfig)
 {
 	POINT ptCenter1, ptCenter2;
 
@@ -1291,7 +1255,7 @@ void TDraw::DrawConstraintCoincide(HDC hdc, DPOINT dpt0, DPOINT dpt1, const LOGP
 }
 
 //自带真实渲染
-void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TConfiguration *pConfig)
+void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, const TConfiguration *pConfig)
 {
 	//比较p1,p2，距离大则画虚线
 	DPOINT dpt[2];
@@ -1661,7 +1625,7 @@ void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POI
 	::DeleteObject(hBrush);
 }
 
-void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig)
+void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, const TConfiguration *pConfig)
 {
 	//画线
 	if (pConfig->bDrawReal == false)

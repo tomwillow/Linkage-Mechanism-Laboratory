@@ -2,6 +2,7 @@
 
 #include "tchar_head.h"
 
+#include "TDraw.h"
 #include "TShape.h"
 #include "TListView.h"
 #include "TConstraintColinear.h"
@@ -17,6 +18,8 @@ TConstraintColinear::TConstraintColinear()
 	PointBeginIndexOfElement[1] = -1;
 	PointEndIndexOfElement[0] = -1;
 	PointEndIndexOfElement[1] = -1;
+
+	IsConstraint = true;
 }
 
 
@@ -105,4 +108,30 @@ void TConstraintColinear::GetLinkDpt(int iLinkIndex, DPOINT &P, DPOINT &Q)const
 {
 	P = pElement[iLinkIndex]->GetAbsolutePointByIndex(PointBeginIndexOfElement[iLinkIndex]);
 	Q = pElement[iLinkIndex]->GetAbsolutePointByIndex(PointEndIndexOfElement[iLinkIndex]);
+}
+
+void TConstraintColinear::Draw(HDC hdc, const TConfiguration* pConfig)
+{
+	TDraw::DrawConstraintColinear(hdc, this, pConfig);
+}
+
+void TConstraintColinear::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
+{
+	POINT ptCenter1, ptCenter2;
+	if (TDraw::ShowConstraintColinearDotLine(this, ptCenter1, ptCenter2, pConfig))
+	{
+		//画拾取方格
+		TDraw::DrawPickSquare(hdc, ptCenter1);
+		TDraw::DrawPickSquare(hdc, ptCenter2);
+	}
+	else
+	{
+		//画重合点
+		TDraw::DrawPickSquare(hdc, ptCenter1);
+	}
+}
+
+bool TConstraintColinear::Picked(const POINT &ptPos, const TConfiguration *pConfig)
+{
+	return TDraw::PickConstraintColinear(ptPos,this, pConfig);
 }

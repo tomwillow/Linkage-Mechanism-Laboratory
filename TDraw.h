@@ -50,24 +50,23 @@ public:
 
 	static COLORREF TDraw::GetBrighterColor(COLORREF cr);
 
-	static void TDraw::DrawElement(HDC hdc, TElement *Element, TConfiguration *pConfig);
-	static void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, TConfiguration *Config);
-	static void TDraw::DrawBar(HDC hdc, TBar *Bar, TConfiguration *Config);
-	static void TDraw::DrawBarSimple(HDC hdc, TBar *Bar, TConfiguration *Config);
-	static void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, TConfiguration *pConfig);
-	static void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, TConfiguration *pConfig);
-	static void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *PolylineBar, TConfiguration *pConfig);
-	static void TDraw::DrawPolylineBarSimple(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration *pConfig);
-	static void TDraw::DrawPolylineBarTranslucent(HDC hdc, TPolylineBar *pPolylineBar, TConfiguration *pConfig);
-	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, TConfiguration *Config);
+	static void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint,const TConfiguration *Config);
+	static void TDraw::DrawBar(HDC hdc, TBar *Bar,const TConfiguration *Config);
+	static void TDraw::DrawBarSimple(HDC hdc, TBar *Bar, const TConfiguration *Config);
+	static void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, const TConfiguration *pConfig);
+	static void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, const TConfiguration *pConfig);
+	static void TDraw::DrawPolylineBar(HDC hdc, TPolylineBar *PolylineBar, const TConfiguration *pConfig);
+	static void TDraw::DrawPolylineBarSimple(HDC hdc, TPolylineBar *pPolylineBar, const TConfiguration *pConfig);
+	static void TDraw::DrawPolylineBarTranslucent(HDC hdc, TPolylineBar *pPolylineBar, const TConfiguration *pConfig);
+	static void TDraw::DrawRealLine(HDC hdc, TRealLine &RealLine, const TConfiguration *Config);
 	static void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen,const TConfiguration *Config);
-	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slideway, TConfiguration *Config);
-	static void TDraw::DrawSlidewaySingle(HDC hdc, const LOGPEN &logpen, const DPOINT &dptBegin, const DPOINT &dptEnd, double dAngle, int ShadowQuadrant, int ShadowLength, TConfiguration *pConfig);
-	static void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, TConfiguration *pConfig);
+	static void TDraw::DrawSlideway(HDC hdc, TSlideway *Slidewayconst, const TConfiguration *Config);
+	static void TDraw::DrawSlidewaySingle(HDC hdc, const LOGPEN &logpen, const DPOINT &dptBegin, const DPOINT &dptEnd, double dAngle, int ShadowQuadrant, int ShadowLength, const TConfiguration *pConfig);
+	static void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, const TConfiguration *pConfig);
 	static void TDraw::DrawConstraintCoincide(HDC hdc, DPOINT dpt0, DPOINT dpt1,const LOGPEN &logpen, const TConfiguration *pConfig);
-	static void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, TConfiguration *pConfig);
+	static void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, const TConfiguration *pConfig);
 	static void TDraw::DrawConstraintColinear_inner(HDC hdc, const POINT &pt1, const POINT &pt2,LOGPEN logpen, const TConfiguration *pConfig);
-	static void TDraw::DrawConstraintColinear(HDC hdc, TConstraintColinear *pColinear, TConfiguration *pConfig);
+	static void TDraw::DrawConstraintColinear(HDC hdc, TConstraintColinear *pColinear, const TConfiguration *pConfig);
 
 	static void TDraw::DrawArc(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, bool bAlwaysDrawAngleBetween);
 	static void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2,bool bAlwaysDrawAngleBetween);

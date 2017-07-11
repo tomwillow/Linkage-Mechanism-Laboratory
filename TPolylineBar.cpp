@@ -2,6 +2,8 @@
 #include "MyMath.h"
 #include "TPolylineBar.h"
 
+#include "TConfiguration.h"
+#include "TDraw.h"
 #include "TListView.h"
 
 TPolylineBar::TPolylineBar()
@@ -36,4 +38,21 @@ void TPolylineBar::NoticeListView(TListView *pListView)
 		_stprintf(buffer, TEXT("P%d"), i);
 		pListView->AddAttributeItem(buffer, CTRLTYPE_COOR_EDIT, &(vecDpt[i]), TEXT("%.3f,%.3f"), vecDpt[i].x, vecDpt[i].y);
 	}
+}
+
+void TPolylineBar::Draw(HDC hdc, const TConfiguration* pConfig)
+{
+	TDraw::DrawPolylineBar(hdc, this, pConfig);
+}
+
+void TPolylineBar::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
+{
+	for (auto &Dpt: vecDpt)
+		//»­Ê°È¡·½¸ñ
+		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(TDraw::GetAbsolute(Dpt,dpt, angle)));
+}
+
+bool TPolylineBar::Picked(const POINT &ptPos, const TConfiguration *pConfig)
+{
+	return TDraw::PointInPolylineBar(ptPos, this, pConfig);
 }

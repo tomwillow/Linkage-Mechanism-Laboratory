@@ -3,14 +3,13 @@
 #include "tchar_head.h"
 #include <stdio.h>
 
-#include "TDraw.h"
-
-#include "TShape.h"
-#include "TDraw.h"
 #include "TConstraintCoincide.h"
 
+#include "TDraw.h"
+#include "TConfiguration.h"
+#include "TShape.h"
+
 #include "TListView.h"
-#include "TRealLine.h"
 
 TConstraintCoincide::TConstraintCoincide()
 {
@@ -20,6 +19,8 @@ TConstraintCoincide::TConstraintCoincide()
 	//pDpt[0] = NULL;
 	//pDpt[1] = NULL;
 	_tcscpy(Name, TEXT(""));
+
+	IsConstraint = true;
 }
 
 
@@ -134,4 +135,29 @@ bool TConstraintCoincide::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)
 		return false;
 	else
 		return true;
+}
+
+void TConstraintCoincide::Draw(HDC hdc, const TConfiguration* pConfig)
+{
+	TDraw::DrawConstraintCoincide(hdc, this, pConfig);
+}
+
+void TConstraintCoincide::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
+{
+	if (TDraw::ShowConstraintCoincideDotLine(this, pConfig))
+	{
+		//画拾取方格
+		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(GetLinkDpt(0)));
+		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(GetLinkDpt(1)));
+	}
+	else
+	{
+		//画重合点
+		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(GetLinkDpt(0)));
+	}
+}
+
+bool TConstraintCoincide::Picked(const POINT &ptPos, const TConfiguration *pConfig)
+{
+	return TDraw::PickConstraintCoincide(ptPos,this, pConfig);
 }

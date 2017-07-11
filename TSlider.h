@@ -23,7 +23,10 @@ public:
 	virtual bool TSlider::WriteFile(HANDLE &hf, DWORD &now_pos)override;
 	virtual bool TSlider::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)override;
 	const DPOINT TSlider::GetRelativePointByIndex(int PointIndexOfElement) const override;
-	DPOINT TSlider::GetAbsolutePointByIndex(int PointIndexOfElement) const override;
 	virtual const TCHAR * TSlider::GetElementTypeName(TCHAR name[]) override;//得到类型名称
+	virtual void TSlider::Draw(HDC hdc, const TConfiguration* pConfig) override;
+	virtual void TSlider::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) override;
+	DPOINT TSlider::GetAbsolutePointByIndex(int PointIndexOfElement) const override;
+	virtual bool TSlider::Picked(const POINT &ptPos, const TConfiguration *pConfig)override;
 };
 

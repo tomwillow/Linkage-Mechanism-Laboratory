@@ -51,3 +51,17 @@ Ofstream& operator<<(Ofstream& out, DPOINT &dpt)
 	out << dpt.x << dpt.y;
 	return out;
 }
+
+DPOINT& DPOINT::operator+=(DPOINT &dpt)
+{
+	x += dpt.x;
+	y += dpt.y;
+	return *this;
+}
+
+DPOINT& DPOINT::operator-=(DPOINT &dpt)
+{
+	x -= dpt.x;
+	y -= dpt.y;
+	return *this;
+}

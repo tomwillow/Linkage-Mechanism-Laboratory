@@ -3,6 +3,8 @@
 #include <stdio.h>
 
 #include "TSlideway.h"
+
+#include "TDraw.h"
 #include "TListView.h"
 
 TSlideway::TSlideway()
@@ -79,4 +81,9 @@ void TSlideway::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("阴影长度"), CTRLTYPE_INT_EDIT, &ShadowLength, TEXT("%d"), ShadowLength);
 	pListView->AddAttributeItem(TEXT("阴影位置"), CTRLTYPE_INT_EDIT, &ShadowQuadrant, TEXT("%d"), ShadowQuadrant);
 	pListView->AddAttributeItem(TEXT("样式"), CTRLTYPE_INT_EDIT, &SlidewayStyle, TEXT("%d"), SlidewayStyle);
+}
+
+void TSlideway::Draw(HDC hdc, const TConfiguration* pConfig)
+{
+	TDraw::DrawSlideway(hdc, this, pConfig);
 }

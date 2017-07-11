@@ -161,30 +161,7 @@ void TShape::GetCoordinateById(int id, double *x, double *y, double *theta)
 
 void TShape::ChangePos(int index, DPOINT dptDelta)
 {
-	TElement *temp = Element[index];
-	switch (temp->eType)
-	{
-	case ELEMENT_POLYLINEBAR:
-	case ELEMENT_SLIDER:
-	case ELEMENT_FRAMEPOINT:
-		((TFramePoint *)temp)->dpt.x += dptDelta.x;
-		((TFramePoint *)temp)->dpt.y += dptDelta.y;
-		break;
-	case ELEMENT_BAR:
-	case ELEMENT_REALLINE:
-	case ELEMENT_SLIDEWAY:
-		((TRealLine *)temp)->ptBegin.x += dptDelta.x;
-		((TRealLine *)temp)->ptBegin.y += dptDelta.y;
-		((TRealLine *)temp)->ptEnd.x += dptDelta.x;
-		((TRealLine *)temp)->ptEnd.y += dptDelta.y;
-		break;
-	case CONSTRAINT_COINCIDE://不可移动
-	case CONSTRAINT_COLINEAR:
-		break;
-	default:
-		assert(0);
-		break;
-	}
+	Element[index]->ChangePos(dptDelta);
 }
 
 void TShape::GetCoordinateByIndex(int index, double *x, double *y, double *theta)
@@ -194,26 +171,9 @@ void TShape::GetCoordinateByIndex(int index, double *x, double *y, double *theta
 
 void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, double *theta)
 {
-	switch (element->eType)
-	{
-	case ELEMENT_BAR:
-	case ELEMENT_REALLINE:
-	case ELEMENT_SLIDEWAY:
-		*x = ((TBar *)element)->ptBegin.x;
-		*y = ((TBar *)element)->ptBegin.y;
-		*theta = ((TBar *)element)->dAngle;
-		break;
-	case ELEMENT_FRAMEPOINT:
-	case ELEMENT_POLYLINEBAR:
-	case ELEMENT_SLIDER:
 		*x = element->dpt.x;
 		*y = element->dpt.y;
 		*theta = element->angle;
-		break;
-	default:
-		assert(0);
-		break;
-	}
 }
 
 void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SQ, int &i)
@@ -238,40 +198,28 @@ void TShape::GetSijP(const TConstraintCoincide *pCoincide, DPOINT &SiP, DPOINT &
 	return;
 }
 
-DWORD TShape::GetSizeOfElement(EnumElementType eType)
-{
-	switch (eType)
-	{
-	case ELEMENT_BAR:
-		return sizeof(TBar);
-	case ELEMENT_REALLINE:
-		return sizeof(TRealLine);
-	case ELEMENT_FRAMEPOINT:
-		return sizeof(TFramePoint);
-	case ELEMENT_SLIDEWAY:
-		return sizeof(TSlideway);
-	case ELEMENT_SLIDER:
-		return sizeof(TSlider);
-	case CONSTRAINT_COINCIDE:
-		return sizeof(TConstraintCoincide);
-	case CONSTRAINT_COLINEAR:
-		return sizeof(TConstraintColinear);
-	default:
-		assert(0);
-		return 0;
-	}
-}
-
 bool TShape::ReadFromFile(TCHAR szFileName[])
 {
-	HANDLE hf;
-	hf = CreateFile(szFileName,
+	HANDLE hf= CreateFile(szFileName,
 		GENERIC_READ,
 		0,
 		(LPSECURITY_ATTRIBUTES)NULL,
 		OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL,
 		(HANDLE)NULL);
+
+	bool success = ReadFromFile_inner(hf);
+
+	CloseHandle(hf);
+
+	if (!success)
+		ReleaseAll();
+
+	return success;
+}
+
+bool TShape::ReadFromFile_inner(HANDLE hf)
+{
 	if (GetLastError() != 0)
 		return false;
 
@@ -298,7 +246,7 @@ bool TShape::ReadFromFile(TCHAR szFileName[])
 		case ELEMENT_BAR:
 		{
 			TBar temp;
-			if (temp.ReadFile(hf, now_pos,this))
+			if (temp.ReadFile(hf, now_pos, this))
 				AddElement(&temp);
 			else
 				return false;
@@ -378,13 +326,10 @@ bool TShape::ReadFromFile(TCHAR szFileName[])
 		}
 		default:
 			return false;
-			assert(0);
+			//assert(0);
 			break;
 		}
 	}
-
-	CloseHandle(hf);
-	return true;
 }
 
 bool TShape::SaveToFile(TCHAR szFileName[])
@@ -423,42 +368,10 @@ bool TShape::SaveToFile(TCHAR szFileName[])
 
 size_t TShape::GetPickedElementIndex(const POINT &ptPos, const TConfiguration *pConfig)
 {
-	for (auto iter = Element.cbegin(); iter != Element.cend();++iter)
+	for (auto iter = Element.cbegin(); iter != Element.cend(); ++iter)
 	{
-		switch ((*iter)->eType)
-		{
-		case ELEMENT_BAR:
-		case ELEMENT_REALLINE:
-		case ELEMENT_SLIDEWAY:
-			if (TDraw::PointInRealLine(ptPos, (TRealLine *)(*iter), pConfig))//发现拾取
-				return iter-Element.cbegin();
-			break;
-		case ELEMENT_FRAMEPOINT:
-			if (TDraw::PointInFramePoint(pConfig->RealToScreen(((TFramePoint *)(*iter))->dpt), ptPos, pConfig))
-				return iter - Element.cbegin();
-			break;
-		case ELEMENT_SLIDER:
-			if (TDraw::PointInSlider(ptPos, (TSlider *)(*iter), pConfig))
-				return iter - Element.cbegin();
-			break;
-		case CONSTRAINT_COINCIDE:
-			if (TDraw::PickConstraintCoincide(ptPos, (*iter), pConfig))
-				return iter - Element.cbegin();
-			break;
-		case CONSTRAINT_COLINEAR:
-			if (TDraw::PickConstraintColinear(ptPos,(TConstraintColinear *)(*iter),pConfig))
-				return iter - Element.cbegin();
-			break;
-		case ELEMENT_POLYLINEBAR:
-			if (TDraw::PointInPolylineBar(ptPos, (TPolylineBar *)(*iter), pConfig))
-				return iter - Element.cbegin();
-			break;
-		case DRIVER:
-			break;
-		default:
-			assert(0);
-			break;
-		}
+		if ((*iter)->Picked(ptPos,pConfig))
+			return iter - Element.cbegin();
 	}
 	return -1;
 }

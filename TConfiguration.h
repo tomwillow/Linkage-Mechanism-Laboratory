@@ -26,6 +26,7 @@ private:
 	COLORREF crPen, crDash, crDot;
 
 public:
+	bool bDrawAxes = true;
 	bool bDrawReal=true;
 	bool bThemeDark = true;
 	bool bRandomColor = true;
