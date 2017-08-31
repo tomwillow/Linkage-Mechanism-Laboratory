@@ -454,7 +454,7 @@ void TSolver::GetMesureResult(std::vector<DialogAnimation::TListBoxItem> &vecIte
 		switch (vecItems[i].type)
 		{
 			using namespace DialogAnimation;
-		case P:
+		case D:
 		{
 			pVarTable = &(Equations->VariableTable); //Ö¸ÏòVariableTable
 

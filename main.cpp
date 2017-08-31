@@ -8,6 +8,7 @@
 #include "ControlStyle.h"
 #include "resource.h"
 
+#include "main.h"
 #include "TWindow.h"
 #include "TMainWindow.h"
 #include "TCanvas.h"
@@ -31,7 +32,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine
 	if (!InitCommonControlsEx(&iccx))
 		return FALSE;
 
-	const TCHAR szAppTitle[] = TEXT("机构设计系统");
 
 	win.LoadTitleIcon(hInstance, IDI_ICON);
 	win.CreateEx(0, szAppTitle,szAppTitle,

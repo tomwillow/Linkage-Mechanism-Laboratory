@@ -464,6 +464,9 @@
     <ClInclude Include="TCHAR_Function.h">
       <Filter>头文件\Common</Filter>
     </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Mechanism Design System.rc">

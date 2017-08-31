@@ -104,7 +104,6 @@ namespace DialogAnimation
 			pGraph->UpdateWindow();
 
 			pGraph->sLabelX = TEXT("time (sec)");
-			pGraph->sLabelY = TEXT(" ");
 
 			GetClientRect(hDlg, &rectDlg);
 			DialogAnimation::hDlg = hDlg;
@@ -345,7 +344,7 @@ namespace DialogAnimation
 				int ItemIndex = ListBoxLeft.GetCurSel();
 				if (ItemIndex != -1)
 				{
-					enumListBoxItemType type = P;
+					enumListBoxItemType type = D;
 					for (auto Item : vecItemsRight)
 						if (Item.id == vecItemsLeft[ItemIndex].id &&
 							Item.index_of_point == vecItemsLeft[ItemIndex].index_of_point &&
@@ -355,7 +354,9 @@ namespace DialogAnimation
 
 					vecItemsRight.push_back(vecItemsLeft[ItemIndex]);
 					vecItemsRight.back().type = type;
-					vecItemsRight.back().s = TEXT("位移: ") + vecItemsRight.back().s;
+					vecItemsRight.back().s = GetTypeName(type) + TEXT(": ") + vecItemsRight.back().s;
+					vecItemsRight.back().sUnit = GetUnitName(type, vecItemsRight.back().value_type);
+
 					ListBoxRight.AddString(vecItemsRight.back().s.c_str());
 				}
 				break;
@@ -375,7 +376,9 @@ namespace DialogAnimation
 
 					vecItemsRight.push_back(vecItemsLeft[ItemIndex]);
 					vecItemsRight.back().type = type;
-					vecItemsRight.back().s = TEXT("速度: ") + vecItemsRight.back().s;
+					vecItemsRight.back().s = GetTypeName(type) + TEXT(": ") + vecItemsRight.back().s;
+					vecItemsRight.back().sUnit = GetUnitName(type, vecItemsRight.back().value_type);
+
 					ListBoxRight.AddString(vecItemsRight.back().s.c_str());
 				}
 				break;
@@ -395,7 +398,9 @@ namespace DialogAnimation
 
 					vecItemsRight.push_back(vecItemsLeft[ItemIndex]);
 					vecItemsRight.back().type = type;
-					vecItemsRight.back().s = TEXT("加速度: ") + vecItemsRight.back().s;
+					vecItemsRight.back().s = GetTypeName(type) + TEXT(": ") + vecItemsRight.back().s;
+					vecItemsRight.back().sUnit = GetUnitName(type, vecItemsRight.back().value_type);
+
 					ListBoxRight.AddString(vecItemsRight.back().s.c_str());
 				}
 				break;
@@ -633,14 +638,14 @@ namespace DialogAnimation
 			LOGPEN logpen;
 			switch (Item.type)
 			{
-			case P:
+			case D:
 				logpen = { PS_SOLID, { 1, 0 }, RGB(0, 0, 0) }; break;
 			case V:
 				logpen = { PS_DASH, { 1, 0 }, RGB(0, 200, 0) }; break;
 			case A:
 				logpen = { PS_DASHDOT, { 1, 0 }, RGB(200, 0, 0) }; break;
 			}
-			pGraph->InputDptVector(vect, Item.data,logpen, true, Item.s.c_str());
+			pGraph->InputDptVector(vect, Item.data, logpen, true, Item.s.c_str(), Item.sUnit.c_str());
 
 		}
 
@@ -728,24 +733,26 @@ namespace DialogAnimation
 			{
 				s.clear();
 				s << TEXT("ID:") << pElement->id;
-				s << TEXT(" ") << pElement->GetElementTypeName(temp);
+				s << TEXT(" ") << pElement->GetElementTypeName(temp);//“连杆”
 				s << TEXT(" ") << pElement->Name;
 				for (size_t i = 0; i < pElement->vecDpt.size(); ++i)//遍历每个相对点
 				{
 					for (auto ValueType : { X, Y, PHI })//x,y,phi各加一个
 					{
 						if (i != 0 && ValueType == PHI) continue;//只有第一个点有phi参数
+
+						TListBoxItem tempItem;
+
 						s_dpt.clear();
 						s_dpt << TEXT("pt") << i;
 						switch (ValueType)
 						{
-						case X:s_dpt << TEXT(" x"); break;
-						case Y:s_dpt << TEXT(" y"); break;
-						case PHI:s_dpt << TEXT(" phi"); break;
+						case X:s_dpt << TEXT(" x");  break;
+						case Y:s_dpt << TEXT(" y");  break;
+						case PHI:s_dpt << TEXT(" phi");  break;
 						}
 						ListBoxLeft.AddString((s + s_dpt).c_str());
 
-						TListBoxItem tempItem;
 						tempItem.id = pElement->id;
 						tempItem.index_of_point = i;
 						tempItem.s = s + s_dpt;
@@ -757,5 +764,35 @@ namespace DialogAnimation
 				}
 			}
 		}
+	}
+
+	String GetTypeName(enumListBoxItemType type)
+	{
+		switch (type)
+		{
+		case D:return TEXT("位移"); break;
+		case V:return TEXT("速度"); break;
+		case A:return TEXT("加速度"); break;
+		}
+	}
+
+	String GetUnitName(enumListBoxItemType type, enumListBoxItemValueType value_type)
+	{
+		String s = GetTypeName(type);
+		s << TEXT(" (");
+		switch (value_type)
+		{
+		case X:s<< TEXT("mm"); break;
+		case Y:s << TEXT("mm"); break;
+		case PHI:s << TEXT("rad"); break;
+		}
+
+		switch (type)
+		{
+		case D:s << TEXT(")"); break;
+		case V:s << TEXT("/s)"); break;
+		case A:s << TEXT("/s^2)"); break;
+		}
+		return s;
 	}
 }

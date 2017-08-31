@@ -60,7 +60,7 @@ bool GetFileExists(TCHAR filename[])
 	}
 }
 
-//lpstrFilter格式：TEXT("机构设计文件(*.mds)\0*.mds\0\0")
+//lpstrFilter格式：TEXT("机构设计文件(*.lml)\0*.lml\0\0")
 //ofn不另设空间保存文件地址，改动szFile等同于改动ofn.lpstrFile
 void InitialOpenFileName(OPENFILENAME *ofn, HWND hwnd, TCHAR szFile[], TCHAR lpstrFilter[], DWORD nMaxFile)
 {

@@ -192,7 +192,7 @@ void TMainWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	static TCHAR lpstrFilterMDS[] = TEXT("机构设计文件(*.mds)\0*.mds\0\0");
+	static TCHAR lpstrFilterLML[] = TEXT("机构设计文件(*.lml)\0*.lml\0\0");
 
 	int wmId = LOWORD(wParam);
 	int wmEvent = HIWORD(wParam);
@@ -230,7 +230,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (wmEvent != ID_OPEN_NOCHECK)
 		{
 			//准备打开对话框
-			if (OpenFileDialog(m_hWnd, szFileName, lpstrFilterMDS) == FALSE)
+			if (OpenFileDialog(m_hWnd, szFileName, lpstrFilterLML) == FALSE)
 				break;
 		}
 
@@ -264,7 +264,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			if (_tcslen(szFileName) == 0 || GetFileExists(szFileName) == false)//没有当前文件或者当前文件已失效
 			{
 				//弹出对话框
-				if (SaveFileDialog(m_hWnd, szFileName, lpstrFilterMDS, TEXT("mds")) == FALSE)
+				if (SaveFileDialog(m_hWnd, szFileName, lpstrFilterLML, TEXT("lml")) == FALSE)
 					return;
 			}
 
@@ -279,7 +279,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	break;
 	case ID_SAVEAS:
 	{
-		if (SaveFileDialog(m_hWnd, szFileName, lpstrFilterMDS, TEXT("mds")) == FALSE)
+		if (SaveFileDialog(m_hWnd, szFileName, lpstrFilterLML, TEXT("lml")) == FALSE)
 			return;
 
 		this->OnCommand(MAKELONG(ID_SAVE, ID_SAVE_NOCHECK), 0);
@@ -409,17 +409,17 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			dpt.y = sin(x / 10.0) * 50;
 			dptVector.push_back(dpt);
 
-			dpt.y = cos(x / 10.0) * 50;
+			dpt.y = cos(x / 10.0);
 			dptVector2.push_back(dpt);
 		}
 
-		pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, true,TEXT("y=sin(x/50)"));
-		pGraph->InputDptVector(dptVector2, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, true,TEXT("y=cos(x/50)"));
+		pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, true,TEXT("y=sin(x/50)"),TEXT("mm/s"));
+		pGraph->InputDptVector(dptVector2, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, true,TEXT("y=cos(x/50)"),TEXT("mm^2/s"));
 
 		//pGraph->SetMargin(40);
 
 		pGraph->sLabelX = TEXT("x");
-		pGraph->sLabelY = TEXT("y");
+		//pGraph->sLabelY = TEXT("y");
 
 		vecpGraph.push_back(pGraph);
 		break;

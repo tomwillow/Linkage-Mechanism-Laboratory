@@ -6,6 +6,7 @@
 
 #include "resource.h"
 
+#include "main.h"
 #include "FileFunction.h"
 #include "RegisterFunction.h"
 
@@ -28,7 +29,7 @@ BOOL CALLBACK DlgOptionProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 
 		TCHAR szSelfFileName[MAX_PATH];
 		GetCommandLineByIndex(0, szSelfFileName);
-		bHasRegFile=CheckFileAssociation(TEXT("mdsfile"), szSelfFileName);
+		bHasRegFile=CheckFileAssociation(TEXT("lml files"), szSelfFileName);
 		CheckRegFile.SetChecked(bHasRegFile);
 
 
@@ -51,9 +52,9 @@ BOOL CALLBACK DlgOptionProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 				GetCommandLineByIndex(0, szSelfFileName);
 				long err_code;
 				if (CheckRegFile.GetChecked())
-					err_code = RegisterFileAssociation(TEXT(".mds"), TEXT("mdsfile"), szSelfFileName, szSelfFileName, IDI_ICON_FILE, TEXT("机构设计系统"));
+					err_code = RegisterFileAssociation(TEXT(".lml"), TEXT("lml files"), szSelfFileName, szSelfFileName, IDI_ICON_FILE,szAppTitle);
 				else
-					err_code = UnRegisterFileAssociation(TEXT(".mds"), TEXT("mdsfile"));
+					err_code = UnRegisterFileAssociation(TEXT(".lml"), TEXT("lml files"));
 				switch (err_code)
 				{
 				case 0:

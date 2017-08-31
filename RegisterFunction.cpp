@@ -50,7 +50,7 @@ bool CheckFileAssociation(TCHAR *strAppKey, TCHAR *strAppName)
 //-------------------------------------------------------------------------  
 // @return              : 0表示成功，其他表示错误码  
 //-------------------------------------------------------------------------  
-int RegisterFileAssociation(TCHAR *strExt, TCHAR *strAppKey, TCHAR *strAppName, TCHAR *strDefaultIcon, int iResourceId, TCHAR *strDescribe)
+int RegisterFileAssociation(TCHAR *strExt, TCHAR *strAppKey, TCHAR *strAppName, TCHAR *strDefaultIcon, int iResourceId,const TCHAR *strDescribe)
 {
 	TCHAR strTemp[MAX_PATH];
 	long ret;
@@ -119,7 +119,7 @@ int UnRegisterFileAssociation(TCHAR *strExt, TCHAR *strAppKey)
 //-------------------------------------------------------------------------  
 // @return              : 0表示成功，其他表示错误码  
 //-------------------------------------------------------------------------  
-int WriteRegKey(HKEY root, TCHAR * subDir, TCHAR * regKey, TCHAR * regValue)
+int WriteRegKey(HKEY root, TCHAR * subDir, TCHAR * regKey,const TCHAR * regValue)
 {
 	TCHAR strTemp[_MAX_PATH];
 	HKEY hKey;

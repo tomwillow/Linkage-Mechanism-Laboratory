@@ -6,15 +6,20 @@
 class TElement;
 namespace DialogAnimation
 {
-	enum enumListBoxItemType{ P, V, A };
+	enum enumListBoxItemType{ D, V, A };
+	String GetTypeName(enumListBoxItemType type);
+
 	enum enumListBoxItemValueType{ X, Y, PHI };
+	String GetUnitName(enumListBoxItemType type, enumListBoxItemValueType value_type);
+
 	struct TListBoxItem
 	{
 		int id;
 		int index_of_point;
 		enumListBoxItemType type;//P,V,A
 		enumListBoxItemValueType value_type;//X,Y,PHI
-		String s;
+		String s;//ÏîÄ¿Ãû³Æ
+		String sUnit;
 		std::vector<double> data;
 		TElement *pElement;
 	};

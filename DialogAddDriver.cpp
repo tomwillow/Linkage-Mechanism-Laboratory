@@ -145,7 +145,6 @@ namespace DialogAddDriver
 			pGraph = new TGraph(&(win.m_Configuration));
 			pGraph->bShowMouseLine = true;
 			pGraph->bShowLabelX = false;
-			pGraph->bShowLabelY = false;
 			pGraph->bShowTitle = false;
 			pGraph->CreateEx(0, TEXT("Í¼±í"), TEXT("Í¼±í"),
 				WS_CHILD,
