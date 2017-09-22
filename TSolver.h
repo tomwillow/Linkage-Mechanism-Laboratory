@@ -42,7 +42,9 @@ public:
 	void TSolver::ClearOutput();
 	void TSolver::RefreshEquations();
 	void TSolver::AddMouseConstraint(int index, DPOINT dpt);
+	void TSolver::AddMouseConstraint(TElement *pElement, DPOINT dptm);
 	void TSolver::RecordStartDragPos(int index, DPOINT dpt);
+	void TSolver::RecordStartDragPos(TElement *pElement, DPOINT dpt);
 	void TSolver::SetHwnd(HWND hwnd);
 	void TSolver::RefreshWindowText();
 	void TSolver::ClearConstraint();

@@ -121,8 +121,17 @@ void TManageTool::Message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 		m_pCurrentTool->OnLButtonDown(hWnd, wParam, ptPos);
 		break;
+	case WM_LBUTTONUP:
+		m_pCurrentTool->OnLButtonUp(hWnd, wParam, ptPos);
+		break;
 	case WM_RBUTTONDOWN:
 		m_pCurrentTool->OnRButtonDown(hWnd, wParam, ptPos);
+		break;
+	case WM_RBUTTONUP:
+		m_pCurrentTool->OnRButtonUp(hWnd, wParam, ptPos);
+		break;
+	case WM_HOTKEY:
+		m_pCurrentTool->OnHotKey(hWnd, wParam, lParam);
 		break;
 	case WM_MOUSEWHEEL:
 		m_pCurrentTool->OnMouseWheel(hWnd, wParam, ptPos);

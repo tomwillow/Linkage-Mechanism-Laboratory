@@ -58,10 +58,28 @@ void TCanvas::OnLButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	SetFocus(hWnd);
 	DealMessage(hWnd, uMsg, wParam, lParam);
-	InvalidateRect(this->m_hWnd, &(this->ClientRect), false);
+	Invalidate();
+}
+
+void TCanvas::OnLButtonUp(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	SetFocus(hWnd);
+	DealMessage(hWnd, uMsg, wParam, lParam);
 }
 
 void TCanvas::OnRButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	SetFocus(hWnd);
+	DealMessage(hWnd, uMsg, wParam, lParam);
+}
+
+void TCanvas::OnRButtonUp(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	SetFocus(hWnd);
+	DealMessage(hWnd, uMsg, wParam, lParam);
+}
+
+void TCanvas::OnHotKey(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	SetFocus(hWnd);
 	DealMessage(hWnd, uMsg, wParam, lParam);

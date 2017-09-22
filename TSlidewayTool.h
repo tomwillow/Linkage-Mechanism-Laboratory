@@ -8,6 +8,7 @@ private:
 public:
 	TSlidewayTool();
 	~TSlidewayTool();
-	TElement * TSlidewayTool::AddIntoShape(TRealLine &RealLine);
+	TElement * TSlidewayTool::AddIntoShape(TRealLine &RealLine)override;
+	void TSlidewayTool::AddIntoTreeViewContent(TElement *Element, int id)override;
 };
 

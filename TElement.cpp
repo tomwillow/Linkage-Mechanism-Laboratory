@@ -3,12 +3,13 @@
 #include "MyMath.h"
 #include <stdio.h>
 
+#include "TDraw.h"
 #include "TConfiguration.h"
 #include "ShowMessage.h"
 #include "TElement.h"
 
 #include "TListView.h"
-TElement::TElement() :available(true), CanBeDragged(false), IsConstraint(false)
+TElement::TElement() :available(true), CanBeDragged(false), IsConstraint(false) , bDrawSquare(false)
 {
 	id = -1;
 	eType = ELEMENT_NULL;
@@ -44,36 +45,30 @@ void TElement::SetStyle(TConfiguration *pConfig)
 		SetStyle(pConfig->logpen);
 }
 
-const TCHAR * TElement::GetElementTypeName(TCHAR name[])
+const String TElement::GetElementTypeName()
 {
 	assert(0);
-	return _tcscpy(name, TEXT("未定义"));
+	return TEXT("未定义");
 }
 
-TCHAR * GetLineStyleName(UINT linestyle, TCHAR name[])
+const String GetLineStyleName(UINT linestyle)
 {
 	switch (linestyle)
 	{
 	case PS_SOLID:
-		_tcscpy(name, TEXT("实线"));
-		break;
+		return TEXT("实线");
 	case PS_DASH:
-		_tcscpy(name, TEXT("线段"));
-		break;
+		return TEXT("线段");
 	case PS_DOT:
-		_tcscpy(name, TEXT("虚线"));
-		break;
+		return TEXT("虚线");
 	case PS_DASHDOT:
-		_tcscpy(name, TEXT("点划线"));
-		break;
+		return TEXT("点划线");
 	case PS_DASHDOTDOT:
-		_tcscpy(name, TEXT("双点划线"));
-		break;
+		return TEXT("双点划线");
 	default:
 		assert(0);
 		break;
 	}
-	return name;
 }
 
 TElement& TElement::operator=(const TElement &element)
@@ -217,13 +212,11 @@ void TElement::NoticeListView(TListView *pListView)
 {
 	pListView->DeleteAllItems();
 
-	TCHAR buffer[16];
-
 	pListView->id = id;
 	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
 	pListView->AddAttributeItem(TEXT("名称"), CTRLTYPE_EDIT, &Name, Name);
-	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, GetElementTypeName(buffer));
-	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
+	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, GetElementTypeName().c_str());
+	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle).c_str());
 	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_LINE_WIDTH, this, TEXT("%d"), this->logpenStyle.lopnWidth);
 	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_COLOR_HEX, this, TEXT("0x%X"), this->logpenStyle.lopnColor);
 	pListView->AddAttributeItem(TEXT("Alpha"), CTRLTYPE_INT_EDIT, &alpha, TEXT("%d"), alpha);
@@ -278,7 +271,85 @@ void TElement::ChangePos(DPOINT dptDelta)
 	dpt += dptDelta;
 }
 
-bool TElement::Picked(const POINT &ptPos, const TConfiguration *pConfig)
+void RegularRect(RECT &rect)
 {
+	if (rect.left > rect.right) std::swap(rect.left, rect.right);
+	if (rect.top > rect.bottom) std::swap(rect.top, rect.bottom);
+}
+
+void TElement::SetStateNormal()
+{
+	bDrawSquare = false;
+	logpenStyleShow=logpenStyle;
+}
+
+void TElement::SetStateHover()
+{
+	logpenStyleShow.lopnStyle = PS_DOT;
+	logpenStyleShow.lopnColor = TDraw::GetBrighterColor(logpenStyle.lopnColor);
+}
+
+void TElement::SetStateUnHover()
+{
+	logpenStyleShow.lopnStyle = logpenStyle.lopnStyle;
+	logpenStyleShow.lopnColor = logpenStyle.lopnColor;
+}
+
+void TElement::SetStateChosen()
+{
+	bDrawSquare = true;
+	logpenStyleShow.lopnStyle = logpenStyle.lopnStyle;
+	logpenStyleShow.lopnColor = TDraw::GetBrighterColor(logpenStyle.lopnColor);
+}
+
+bool TElement::InSelect(RECT rect, bool bSelCross, const TConfiguration *pConfig)
+{
+	return bSelCross ? InSelCross(rect, pConfig) : InSelWindow(rect, pConfig);
+}
+
+bool RectInRect(const RECT &rcBig, const RECT &rcSmall)
+{
+	POINT pt1 = { rcSmall.left, rcSmall.top }, pt2 = { rcSmall.right, rcSmall.bottom };
+	return PtInRect(&rcBig, pt1) && PtInRect(&rcBig, pt2);
+}
+
+bool RectCrossRect(const RECT &rcBig, const RECT &rcSmall)
+{
+	POINT pt1 = { rcSmall.left, rcSmall.top },
+		pt2 = { rcSmall.right, rcSmall.bottom },
+		pt3 = { rcSmall.left, rcSmall.bottom },
+		pt4 = { rcSmall.right, rcSmall.top };
+	return PtInRect(&rcBig, pt1) || PtInRect(&rcBig, pt2) || PtInRect(&rcBig, pt3) || PtInRect(&rcBig, pt4);
+}
+
+bool APointInRect(const RECT &rect, POINT *apt, int count)
+{
+	for (int i = 0; i < count; ++i)
+		if (!PtInRect(&rect, apt[i]))
+			return false;
+	return true;
+}
+
+bool APointCrossRect(const RECT &rect, POINT *apt, int count)
+{
+	for (int i = 0; i < count; ++i)
+		if (PtInRect(&rect, apt[i]))
+			return true;
+	return false;
+}
+
+bool VecPointInRect(const RECT &rect, std::vector<POINT> &vecpt)
+{
+	for (auto &pt:vecpt)
+		if (!PtInRect(&rect, pt))
+			return false;
+	return true;
+}
+
+bool VecPointCrossRect(const RECT &rect, std::vector<POINT> &vecpt)
+{
+	for (auto &pt : vecpt)
+		if (PtInRect(&rect, pt))
+			return true;
 	return false;
 }

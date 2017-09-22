@@ -1,6 +1,7 @@
 #pragma once
 #include "DetectMemoryLeak.h"
 
+#include <algorithm>
 #include "TSlider.h"
 
 #include "TShape.h"
@@ -40,7 +41,7 @@ TElement* TShape::GetElementById(int id)
 int TShape::CalcFrameNum()
 {
 	int num = 0;
-	for (auto pElement:Element)
+	for (auto pElement : Element)
 	{
 		if (pElement->eType == ELEMENT_FRAMEPOINT)
 			num++;
@@ -48,6 +49,46 @@ int TShape::CalcFrameNum()
 	return num;
 }
 
+std::vector<int> TShape::Delete(std::set<TElement *> &DeleteLists)
+{
+	std::vector<int> InfluencedId;
+	TElement *p1, *p2;
+	//先加入关联约束
+	for (auto pElement : Element)
+	{
+		if (pElement->eType == CONSTRAINT_COINCIDE)
+		{
+			p1 = ((TConstraintCoincide *)pElement)->pElement[0];
+			p2 = ((TConstraintCoincide *)pElement)->pElement[1];
+			if (DeleteLists.find(p1) != DeleteLists.end() || DeleteLists.find(p2) != DeleteLists.end())
+			{
+				DeleteLists.insert(pElement);
+				InfluencedId.push_back(pElement->id);
+			}
+		}
+		//if (pElement->eType == CONSTRAINT_COLINEAR)
+		//{
+		//	p1 = ((TConstraintCoincide *)pElement)->pElement[0];
+		//	p2 = ((TConstraintCoincide *)pElement)->pElement[1];
+		//	if (DeleteLists.find(p1) != DeleteLists.end() || DeleteLists.find(p2) != DeleteLists.end())
+		//	{
+		//		DeleteLists.insert(pElement);
+		//		InfluencedId.push_back(pElement->id);
+		//	}
+		//}
+	}
+
+	auto iter = Element.end();
+	for (auto pElement : DeleteLists)
+	{
+		if ((iter = std::find(Element.begin(), Element.end(), pElement)) != Element.end())
+			Element.erase(iter);
+	}
+
+	return InfluencedId;
+}
+
+//相关约束一并删掉，返回其id
 std::vector<int> TShape::DeleteElement(int index)
 {
 	//刷新构件及机架数量
@@ -127,7 +168,7 @@ std::vector<int> TShape::DeleteElement(int index)
 
 void TShape::ReleaseAll()
 {
-	for (auto pElement:Element)
+	for (auto pElement : Element)
 		delete pElement;
 	Element.clear();
 
@@ -171,9 +212,9 @@ void TShape::GetCoordinateByIndex(int index, double *x, double *y, double *theta
 
 void TShape::GetCoordinateByElement(TElement *element, double *x, double *y, double *theta)
 {
-		*x = element->dpt.x;
-		*y = element->dpt.y;
-		*theta = element->angle;
+	*x = element->dpt.x;
+	*y = element->dpt.y;
+	*theta = element->angle;
 }
 
 void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SQ, int &i)
@@ -200,7 +241,7 @@ void TShape::GetSijP(const TConstraintCoincide *pCoincide, DPOINT &SiP, DPOINT &
 
 bool TShape::ReadFromFile(TCHAR szFileName[])
 {
-	HANDLE hf= CreateFile(szFileName,
+	HANDLE hf = CreateFile(szFileName,
 		GENERIC_READ,
 		0,
 		(LPSECURITY_ATTRIBUTES)NULL,
@@ -366,12 +407,35 @@ bool TShape::SaveToFile(TCHAR szFileName[])
 	return true;
 }
 
-size_t TShape::GetPickedElementIndex(const POINT &ptPos, const TConfiguration *pConfig)
+TElement* TShape::GetPickedElement(const POINT &ptPos, const TConfiguration *pConfig)
 {
-	for (auto iter = Element.cbegin(); iter != Element.cend(); ++iter)
+	for (auto pElement : Element)
 	{
-		if ((*iter)->Picked(ptPos,pConfig))
-			return iter - Element.cbegin();
+		if (pElement->Picked(ptPos, pConfig))
+			return pElement;
 	}
-	return -1;
+	return nullptr;
+}
+
+//得到所有元素屏幕大小的包围盒及中心坐标
+bool TShape::GetBoundingBox(RECT &rect, POINT &center, const TConfiguration *pConfig)
+{
+	if (Element.size() == 0)
+		return false;
+	double x_min = DBL_MAX, x_max = -DBL_MAX, y_min = DBL_MAX, y_max = -DBL_MAX;
+	DPOINT dptTemp;
+	for (auto pElement : Element)
+	{
+		for (size_t index = 0; index < pElement->vecDpt.size(); ++index)
+		{
+			dptTemp = pElement->GetAbsolutePointByIndex(index);
+			x_min = min(x_min, dptTemp.x);
+			x_max = max(x_max, dptTemp.x);
+			y_min = min(y_min, dptTemp.y);
+			y_max = max(y_max, dptTemp.y);
+		}
+	}
+	TDraw::MakeRect(rect, x_min, x_max, y_min, y_max, pConfig);
+	TDraw::GetCenter(center, rect);
+	return true;
 }

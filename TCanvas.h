@@ -15,8 +15,12 @@ public:
 	void TCanvas::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam) override;
 	void DealMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void OnKeyDown(WPARAM wParam, LPARAM lParam) override;
+	void OnLButtonUp(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	void OnLButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	void OnRButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+	void OnRButtonUp(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)override;
+	void OnHotKey(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)override;
+
 	void OnMButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	void OnMButtonUp(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	void OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;

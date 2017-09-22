@@ -10,7 +10,7 @@ public:
 	int PointBeginIndexOfElement[2];//Pi点 Pj点 序号（vecDpt序号）
 	int PointEndIndexOfElement[2];//Qi点 Qj点 序号（vecDpt序号）
 
-	virtual const TCHAR * TConstraintColinear::GetElementTypeName(TCHAR name[]) override;//得到类型名称
+	virtual const String TConstraintColinear::GetElementTypeName() override;//得到类型名称
 	virtual void TConstraintColinear::Draw(HDC hdc, const TConfiguration* pConfig) override;
 	virtual void TConstraintColinear::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) override;
 	virtual void TConstraintColinear::NoticeListView(TListView *pListView) override;

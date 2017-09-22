@@ -19,9 +19,9 @@ TPolylineBar::~TPolylineBar()
 {
 }
 
-const TCHAR * TPolylineBar::GetElementTypeName(TCHAR name[])//得到类型名称
+const String TPolylineBar::GetElementTypeName()//得到类型名称
 {
-	return _tcscpy(name, TEXT("多段杆"));
+	return TEXT("多段杆");
 }
 
 void TPolylineBar::NoticeListView(TListView *pListView)
@@ -43,6 +43,7 @@ void TPolylineBar::NoticeListView(TListView *pListView)
 void TPolylineBar::Draw(HDC hdc, const TConfiguration* pConfig)
 {
 	TDraw::DrawPolylineBar(hdc, this, pConfig);
+	//if (bDrawSquare) DrawPickSquare(hdc, pConfig);
 }
 
 void TPolylineBar::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
@@ -55,4 +56,22 @@ void TPolylineBar::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
 bool TPolylineBar::Picked(const POINT &ptPos, const TConfiguration *pConfig)
 {
 	return TDraw::PointInPolylineBar(ptPos, this, pConfig);
+}
+
+bool TPolylineBar::InSelWindow(RECT rect, const TConfiguration *pConfig)
+{	
+	//相对坐标转为绝对坐标
+	std::vector<POINT> vecpt;
+	TDraw::GetAbsoluteScreen(vecpt, vecDpt,dpt, angle, pConfig);
+
+	return VecPointInRect(rect, vecpt);
+}
+
+bool TPolylineBar::InSelCross(RECT rect, const TConfiguration *pConfig)
+{	
+	//相对坐标转为绝对坐标
+	std::vector<POINT> vecpt;
+	TDraw::GetAbsoluteScreen(vecpt, vecDpt, dpt, angle, pConfig);
+
+	return VecPointCrossRect(rect, vecpt);
 }

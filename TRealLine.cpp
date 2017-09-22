@@ -20,9 +20,9 @@ TRealLine::~TRealLine()
 {
 }
 
-const TCHAR * TRealLine::GetElementTypeName(TCHAR name[])//得到类型名称
+const String TRealLine::GetElementTypeName()//得到类型名称
 {
-	return _tcscpy(name, TEXT("线"));
+	return TEXT("线");
 }
 
 void TRealLine::NoticeListView(TListView *pListView)
@@ -188,6 +188,7 @@ void TRealLine::SetPhi(double phi)
 void TRealLine::Draw(HDC hdc, const TConfiguration* pConfig)
 {
 	TDraw::DrawRealLine(hdc, ptBegin, ptEnd, logpenStyleShow, pConfig);
+	//if (bDrawSquare) DrawPickSquare(hdc, pConfig);
 }
 
 void TRealLine::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
@@ -206,4 +207,22 @@ void TRealLine::ChangePos(DPOINT dptDelta)
 bool TRealLine::Picked(const POINT &ptPos, const TConfiguration *pConfig)
 {
 	return TDraw::PointInRealLine(ptPos, this, pConfig);
+}
+
+bool TRealLine::InSelWindow(RECT rect, const TConfiguration *pConfig)
+{
+	RegularRect(rect);
+	if (PtInRect(&rect, pConfig->RealToScreen(ptBegin)) && PtInRect(&rect, pConfig->RealToScreen(ptEnd)))
+		return true;
+	else
+		return false;
+}
+
+bool TRealLine::InSelCross(RECT rect, const TConfiguration *pConfig)
+{
+	RegularRect(rect);
+	if (PtInRect(&rect, pConfig->RealToScreen(ptBegin)) || PtInRect(&rect, pConfig->RealToScreen(ptEnd)))
+		return true;
+	else
+		return false;
 }

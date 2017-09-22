@@ -27,22 +27,22 @@ TConstraintColinear::~TConstraintColinear()
 {
 }
 
-const TCHAR * TConstraintColinear::GetElementTypeName(TCHAR name[])//得到类型名称
+const String TConstraintColinear::GetElementTypeName()//得到类型名称
 {
-	return _tcscpy(name, TEXT("共线"));
+	return TEXT("共线");
 }
 
 void TConstraintColinear::NoticeListView(TListView *pListView)
 {
 	pListView->DeleteAllItems();
 
-	TCHAR buffer[32];
+	TCHAR buffer[64];
 
 	pListView->id = id;
 	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
 	pListView->AddAttributeItem(TEXT("名称"), CTRLTYPE_EDIT, &Name, Name);
-	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, GetElementTypeName(buffer));
-	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
+	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL, GetElementTypeName().c_str());
+	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle).c_str());
 	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
 	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
 
@@ -113,6 +113,7 @@ void TConstraintColinear::GetLinkDpt(int iLinkIndex, DPOINT &P, DPOINT &Q)const
 void TConstraintColinear::Draw(HDC hdc, const TConfiguration* pConfig)
 {
 	TDraw::DrawConstraintColinear(hdc, this, pConfig);
+	//if (bDrawSquare) DrawPickSquare(hdc, pConfig);
 }
 
 void TConstraintColinear::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)

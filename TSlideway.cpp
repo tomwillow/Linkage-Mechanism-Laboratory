@@ -17,9 +17,9 @@ TSlideway::TSlideway()
 	SlidewayStyle = 0;
 }
 
-const TCHAR * TSlideway::GetElementTypeName(TCHAR name[])//得到类型名称
+const String TSlideway::GetElementTypeName()//得到类型名称
 {
-	return _tcscpy(name, TEXT("滑道"));
+	return TEXT("滑道");
 }
 
 TSlideway::~TSlideway()
@@ -86,4 +86,5 @@ void TSlideway::NoticeListView(TListView *pListView)
 void TSlideway::Draw(HDC hdc, const TConfiguration* pConfig)
 {
 	TDraw::DrawSlideway(hdc, this, pConfig);
+	//if (bDrawSquare) DrawPickSquare(hdc, pConfig);
 }

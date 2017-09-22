@@ -23,9 +23,9 @@ TSlider::~TSlider()
 {
 }
 
-const TCHAR * TSlider::GetElementTypeName(TCHAR name[])//得到类型名称
+const String TSlider::GetElementTypeName()//得到类型名称
 {
-	return _tcscpy(name, TEXT("滑块"));
+	return TEXT("滑块");
 }
 
 void TSlider::NoticeListView(TListView *pListView)
@@ -107,6 +107,7 @@ DPOINT TSlider::GetAbsolutePointByIndex(int PointIndexOfElement) const
 void TSlider::Draw(HDC hdc, const TConfiguration* pConfig)
 {
 	TDraw::DrawSlider(hdc, this, pConfig);
+	//if (bDrawSquare) DrawPickSquare(hdc, pConfig);
 }
 
 void TSlider::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
@@ -119,4 +120,34 @@ void TSlider::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
 bool TSlider::Picked(const POINT &ptPos, const TConfiguration *pConfig)
 {
 	return TDraw::PointInSlider(ptPos, this, pConfig);
+}
+
+bool TSlider::InSelWindow(RECT rect, const TConfiguration *pConfig)
+{
+	POINT apt[4];
+	TDraw::CalcSliderRectCoor(apt, pConfig->RealToScreen(dpt), angle, pConfig);
+
+	std::vector<POINT> vecpt;
+	for (auto link : vecLine)
+	{
+		vecpt.push_back(pConfig->RealToScreen(this->GetAbsolutePointByIndex(link.index1)));
+		vecpt.push_back(pConfig->RealToScreen(this->GetAbsolutePointByIndex(link.index2)));
+	}
+
+	return APointInRect(rect, apt, 4) && VecPointInRect(rect,vecpt);
+}
+
+bool TSlider::InSelCross(RECT rect, const TConfiguration *pConfig)
+{
+	POINT apt[4];
+	TDraw::CalcSliderRectCoor(apt, pConfig->RealToScreen(dpt), angle, pConfig);
+
+	std::vector<POINT> vecpt;
+	for (auto link : vecLine)
+	{
+		vecpt.push_back(pConfig->RealToScreen(this->GetAbsolutePointByIndex(link.index1)));
+		vecpt.push_back(pConfig->RealToScreen(this->GetAbsolutePointByIndex(link.index2)));
+	}
+
+	return APointCrossRect(rect, apt, 4) || VecPointCrossRect(rect, vecpt);
 }

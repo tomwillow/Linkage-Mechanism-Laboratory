@@ -1,6 +1,7 @@
 #pragma once
 #include "DetectMemoryLeak.h"
 
+#include <algorithm>
 #include "TTreeViewContent.h"
 
 #include "TMainWindow.h"
@@ -40,15 +41,12 @@ void TTreeViewContent::DeleteAllItems()
 
 void TTreeViewContent::DeleteById(int id)
 {
-	for (auto i = Item.begin(); i != Item.end();i++)
+	SelectNull();
+	auto iter = std::find_if(Item.begin(), Item.end(), [id](decltype(Item.front())& item){return item.ObjectId == id; });
+	if (iter != Item.end())
 	{
-		if (i->ObjectId == id)
-		{
-			SelectNull();
-			TreeView_DeleteItem(m_hWnd, i->hTreeItem);
-			Item.erase(i);
-			break;
-		}
+		TreeView_DeleteItem(m_hWnd, iter->hTreeItem);
+		Item.erase(iter);
 	}
 }
 
@@ -78,11 +76,11 @@ void TTreeViewContent::AddDriver(int id,const TCHAR szMemo[])
 void TTreeViewContent::AddItem(TElement *Element, int id)
 {
 	HTREEITEM temp;
-	TCHAR buffer[64], szTypeName[16];
+	TCHAR buffer[64];
 	//ID:0 ÀàÐÍ Ãû³Æ
 	wsprintf(buffer, TEXT("ID:%d "), id);
-	Element->GetElementTypeName(szTypeName);
-	wsprintf(buffer, TEXT("%s %s %s"), buffer, szTypeName, Element->Name);
+	;
+	wsprintf(buffer, TEXT("%s %s %s"), buffer,Element->GetElementTypeName().c_str(), Element->Name);
 
 	TItem tempItem;
 	switch (Element->eType)

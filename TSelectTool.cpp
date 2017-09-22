@@ -1,9 +1,11 @@
 #pragma once
 #include "DetectMemoryLeak.h"
 
+#include <algorithm>
 #include "resource.h"
 
 #include "TSelectTool.h"
+#include "TAttach.h"
 
 #include "TSlider.h"
 #include "TCanvas.h"
@@ -18,20 +20,28 @@
 #include "TRealLine.h"
 #include "TConstraintCoincide.h"
 
+#include "TDrawTranslucent.h"
+
 #include "TSolver.h"
+
+using std::vector;
 
 TSelectTool::TSelectTool()
 {
 	eMode = SELECT_MOVE;
 	//bShowTips = false;
-	bDrag = false;
-	bMove = false;
-	iPickIndex = -1;
-	iPrevPickIndex = -1;
-	iHoverIndex = -1;
+
 	Cursor = IDC_ARROW;
 
 	bShowTips = true;
+	bShowSelRect = false;
+
+	bSelCross = false;
+
+	eState = NONE;
+	pAttach = new TAttach(pCanvas, pShape, pConfig);
+
+	RegisterHotKey(pCanvas->m_hWnd, 1, MOD_CONTROL, 'A');
 }
 
 //由TTool的虚析构函数重载
@@ -43,34 +53,11 @@ TSelectTool::~TSelectTool()
 
 void TSelectTool::SelectNull()
 {
+	CancelTreeViewAndListView();
 
-	if (iPickIndex != -1)
-	{
-		//恢复线型
-		RestorePickedLineStyle();
-		RestoreHoveredLineStyle();
-
-		CancelTreeViewAndListView();
-		iPickIndex = -1;
-	}
-}
-
-void TSelectTool::RestorePickedLineStyle()
-{
-	while (PickedLineId.size() > 0)
-	{
-		pShape->GetElementById(PickedLineId.top())->logpenStyleShow.lopnStyle = pShape->GetElementById(PickedLineId.top())->logpenStyle.lopnStyle;
-		PickedLineId.pop();
-	}
-}
-
-void TSelectTool::RestoreHoveredLineStyle()
-{
-	while (HoveredLineId.size() > 0)
-	{
-		pShape->GetElementById(HoveredLineId.top())->logpenStyleShow.lopnColor = pShape->GetElementById(HoveredLineId.top())->logpenStyle.lopnColor;
-		HoveredLineId.pop();
-	}
+	for (auto pElement : PickedElements)
+		pElement->SetStateNormal();
+	PickedElements.clear();
 }
 
 void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -78,34 +65,29 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	switch (wParam)
 	{
 	case VK_DELETE:
-		if (iPickIndex != -1)
-		{
-			//先恢复线型，否则删掉元素后index将失效
-			RestorePickedLineStyle();
-			RestoreHoveredLineStyle();
+	{
+		//清除属性栏
+		pListView->DeleteAllItems();
 
-			//得到受影响的元素id，并删掉
-			int id = pShape->Element[iPickIndex]->id;
-			std::vector<int> InfluenceId;// = pShape->GetInfluenceId(id);
+		//清理树状图
+		for (auto pElement : PickedElements)
+			pTreeViewContent->DeleteById(pElement->id);
 
-			pTreeViewContent->DeleteById(pShape->Element[iPickIndex]->id);
-			InfluenceId = pShape->DeleteElement(iPickIndex);
+		//删除选中元素
+		std::vector<int> InfluencedId;
+		InfluencedId=pShape->Delete(PickedElements.self());
 
-			for (auto i : InfluenceId)
-				pTreeViewContent->DeleteById(i);
+		for (auto i : InfluencedId)
+			pTreeViewContent->DeleteById(i);
 
-			iPickIndex = -1;
-			iHoverIndex = -1;
-			EndDrag();
-			EndMove();
+		//刷新方程
+		pSolver->RefreshEquations();
 
-			CancelTreeViewAndListView();
+		PickedElements.clear();
 
-			pSolver->RefreshEquations();
-
-			pCanvas->Invalidate();
-		}
-		return;
+		pCanvas->Invalidate();
+	}
+	return;
 	}
 }
 
@@ -119,190 +101,244 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	ptMouse = ptPos;
 
-	switch (eMode)
+	if ((nFlags & MK_LBUTTON) > 0)//按住左键
 	{
-	case SELECT_DRAG:
-		if (bDrag)
+		switch (eState)
+		{
+		case MOVE_SEL:
+		{
+			//pAttach->AttachAll(ptPos);
+			//ptMouse = pConfig->RealToScreen(pAttach->dptAttach);
+
+			DPOINT dptDelta = pConfig->ScreenToReal(ptPos) - pConfig->ScreenToReal(ptDrag);
+
+			for (auto pElement : PickedElements)
+				pElement->ChangePos(dptDelta);
+
+			ptDrag = ptPos;
+
+			sTips = TEXT("移动到新位置以放置元件");
+			Cursor = IDC_HAND;
+			break;
+		}
+		case DRAG_SEL:
 		{
 			pSolver->ClearOutput();
 			pSolver->ClearConstraint();
-			pSolver->AddMouseConstraint(iPickIndex, pConfig->ScreenToReal(ptPos));
+			pSolver->AddMouseConstraint(PickedElements.front(), pConfig->ScreenToReal(ptPos));
 			pSolver->Solve();
 
-			pCanvas->Invalidate();
-
-			if (pShape->Element[iPickIndex]->CanBeDragged)
-				sTips = TEXT("移动鼠标可预览拖动结果");
+			if (PickedElements.front()->CanBeDragged)
+				sTips = TEXT("可拖动");
 			else
 				sTips = TEXT("该构件不可拖动");
+			Cursor = IDC_HAND;
 
-			return;
+			break;
 		}
-		break;
-	case SELECT_MOVE:
-		if (bMove)
+		case NONE:
 		{
-			DPOINT dptDelta = pConfig->ScreenToReal(ptPos) - pConfig->ScreenToReal(ptMouseClick);
-
-			pShape->ChangePos(iPickIndex, dptDelta);
-
-			ptMouseClick = ptPos;
-
-			sTips = TEXT("点击以确定新位置");
-			return;
-		}
-		break;
-	}
-
-	RestoreHoveredLineStyle();
-
-	//遍历所有以显示浮动效果
-	iHoverIndex = pShape->GetPickedElementIndex(ptPos, pConfig);
-
-	if (iHoverIndex != -1)//悬停有东西
-	{
-		if (iPickIndex != iHoverIndex)//浮过的线未被选中
-		{
-			//暂存当前线型并更改
-			pShape->Element[iHoverIndex]->logpenStyleShow.lopnColor = RGB(200, 200, 200);
-			HoveredLineId.push(pShape->Element[iHoverIndex]->id);
-			sTips = TEXT("点击可选中");
-			return;
-		}
-		else
-		{
-			//若浮过的线已被选中则不变色
-			switch (eMode)
+			if (eMode == SELECT_MOVE)
 			{
-			case SELECT_MOVE:
-				sTips = TEXT("再次点击可进行移动");
-				return;
-			case SELECT_DRAG:
-				if (pShape->Element[iHoverIndex]->CanBeDragged)
-					sTips = TEXT("再次点击可进行拖动");
+				bShowSelRect = true;
+				rcSelect.right = ptPos.x;
+				rcSelect.bottom = ptPos.y;
+
+				for (auto pElement : pShape->Element)
+				{
+					if (pElement->InSelect(rcSelect, bSelCross, pConfig))
+					{
+						pElement->SetStateHover();//改变框选元素样式
+					}
+					else
+					{
+						pElement->SetStateUnHover();//设置未框选元素样式
+					}
+				}
+			}
+			Cursor = IDC_ARROW;
+			break;
+		}
+		}
+	}
+	else//没按住左键
+	{
+		TElement *pElementHover = nullptr;
+		bool bInSel = false;
+
+
+		for (auto pElement : pShape->Element)
+			if (pElement->Picked(ptMouse, pConfig))
+			{
+				pElementHover = pElement;
+				pElement->SetStateHover();//设置悬浮样式
+				if (pElement->bDrawSquare)
+					bInSel = true;//浮动到选择集上方
+			}
+			else
+				pElement->SetStateUnHover();
+
+
+		if (bInSel)
+			for (auto pElement : PickedElements)
+				pElement->SetStateHover();
+
+		if (pElementHover)
+		{
+			if (eMode == SELECT_MOVE)
+				sTips = TEXT("可拖动（无约束）");
+			else
+			{
+				if (pElementHover->CanBeDragged)
+					sTips = TEXT("可拖动（带约束）");
 				else
-					sTips = TEXT("该构件不可拖动");
-				return;
+					sTips = TEXT("不可拖动");
 			}
 		}
+		else
+			sTips.clear();
+
+		Cursor = IDC_ARROW;
+	}
+
+	pCanvas->Invalidate();
+}
+
+
+void TSelectTool::OnLButtonUp(HWND hWnd, UINT nFlags, POINT ptPos)
+{
+	bShowSelRect = false;
+
+	if (eState == NONE)
+	{
+		//清点框选内容，设置样式，进入选择集
+		PickedElements.clear();
+		for (auto pElement : pShape->Element)
+		{
+			if (pElement->InSelect(rcSelect, bSelCross, pConfig))
+			{
+				PickedElements.push_back(pElement);
+				pElement->SetStateChosen();
+			}
+			else
+			{
+				pElement->SetStateNormal();
+			}
+		}
+
+		//刷新悬浮
+		for (auto pElement : pShape->Element)
+			if (pElement->Picked(ptPos, pConfig))
+				pElement->SetStateHover();
+			else
+				pElement->SetStateUnHover();
+	}
+
+	if (PickedElements.size() == 1)
+	{
+		PickedElements.front()->NoticeListView(pListView);
 	}
 	else
-		sTips = TEXT("");
+	{
+		pListView->DeleteAllItems();
+	}
 
-}
-
-
-
-void TSelectTool::EndDrag()
-{
-	iPrevPickIndex = -1;
-	bDrag = false;
-	Cursor = IDC_ARROW;
-}
-
-void TSelectTool::EndMove()
-{
-	iPrevPickIndex = -1;
-	bMove = false;
-	Cursor = IDC_ARROW;
+	pCanvas->Invalidate();
 }
 
 void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	CancelTreeViewAndListView();
-	RestorePickedLineStyle();
+	//CancelTreeViewAndListView();
+	//RestorePickedLineStyle();
 
-	if (bDrag)
+	//设置选区框起始点
+	rcSelect.left = ptPos.x;
+	rcSelect.top = ptPos.y;
+
+	TElement *pElement = pShape->GetPickedElement(ptPos, pConfig);
+
+	if (pElement != nullptr)
 	{
-		EndDrag();
-	}
-
-	if (bMove)
-	{
-		EndMove();
-	}
-
-	//遍历所有
-	iPickIndex = pShape->GetPickedElementIndex(ptPos, pConfig);
-
-	if (iPickIndex != -1)//拾取到了
-	{
-		switch (eMode)
+		if (pElement->bDrawSquare)//点击了选择集中的元素
 		{
-		case SELECT_MOVE:
-			//非拾取状态再次点击同一对象进入拾取
-			if (bMove == false)
+			if (eMode == SELECT_MOVE)
 			{
-				if (iPrevPickIndex != -1 && iPrevPickIndex == iPickIndex)
-				{
-					bMove = true;
-					Cursor = IDC_CROSS;
-					ptMouseClick.x = ptPos.x;
-					ptMouseClick.y = ptPos.y;
-				}
-				iPrevPickIndex = iPickIndex;
+				eState = MOVE_SEL;
 			}
-			break;
-		case SELECT_DRAG:
-			if (bDrag == false)
-			{
-				if (iPrevPickIndex != -1 && iPrevPickIndex == iPickIndex)
-				{
-					//非拾取状态再次点击同一对象进入拾取
-					bDrag = true;
-					Cursor = IDC_HAND;
-					pSolver->RecordStartDragPos(iPickIndex, pConfig->ScreenToReal(ptPos));
-				}
-				iPrevPickIndex = iPickIndex;
-			}
-			break;
+			else
+				eState = DRAG_SEL;
 		}
+		else
+		{
+			if (eMode == SELECT_MOVE)
+			{
+				eState = MOVE_SEL;
+			}
+			else
+			{
+				eState = DRAG_SEL;
+				pSolver->RecordStartDragPos(pElement, pConfig->ScreenToReal(ptPos));
+			}
 
-		//暂存当前线型并更改
-		pShape->Element[iPickIndex]->logpenStyleShow.lopnStyle = PS_DOT;
-		PickedLineId.push(pShape->Element[iPickIndex]->id);
-
-		//通知TreeView选中
-		pTreeViewContent->SelectById(pShape->Element[iPickIndex]->id);
-
-		//通知ListView更新
-		pShape->Element[iPickIndex]->NoticeListView(pListView);
+			Select(pElement,true,true);
+		}
+		ptDrag = { rcSelect.left, rcSelect.top };
+		//pCanvas->Invalidate();
 		return;
 	}
 
-	//遍历结束
-	if (iPickIndex == -1)
-		iPrevPickIndex = -1;
+
+	eState = NONE;
+}
+
+void TSelectTool::Select(std::vector<TElement*> &vecSel)
+{
 
 }
 
-void TSelectTool::SelectByIndex(size_t index)
+void TSelectTool::Select(const TElement *pElement, bool ChooseTreeView, bool UpdateListView)
 {
-	RestorePickedLineStyle();
+	for (auto pEle : PickedElements)
+		pEle->SetStateNormal();
 
-			iPickIndex = index;
-			//暂存当前线型并更改
-			pShape->Element[iPickIndex]->logpenStyleShow.lopnStyle = PS_DOT;
-			PickedLineId.push(pShape->Element[iPickIndex]->id);
-
-			//通知ListView更新
-			pShape->Element[iPickIndex]->NoticeListView(pListView);
-
-			pCanvas->Invalidate();
-}
-
-void TSelectTool::SelectById(int id)
-{
-
-	for (size_t i = 0; i < pShape->Element.size(); i++)
-	{
-		if (pShape->Element[i]->id == id)
+	PickedElements.clear();
+	for (auto pEle : pShape->Element)
+		if (pEle == pElement)
 		{
-			SelectByIndex(i);
-			return;
+			pEle->SetStateChosen();
+			PickedElements.push_back(pEle);
+			break;
 		}
+
+	if (pElement == nullptr)
+	{
+		CancelTreeViewAndListView();
 	}
-	iPickIndex = -1;
+	else
+	{
+		if (UpdateListView)
+			const_cast<TElement*>(pElement)->NoticeListView(pListView);
+
+		if (ChooseTreeView)
+			pTreeViewContent->SelectById(pElement->id);
+	}
+
+	pCanvas->Invalidate();
+}
+
+void TSelectTool::SelectAll()
+{
+	for (auto pEle : pShape->Element)
+	{
+		pEle->SetStateChosen();
+		PickedElements.push_back(pEle);
+	}
+	pCanvas->Invalidate();
+}
+
+void TSelectTool::SelectById(int id, bool ChooseTreeView, bool UpdateListView)
+{
+	Select(pShape->GetElementById(id), ChooseTreeView, UpdateListView);
 }
 
 void TSelectTool::CancelTreeViewAndListView()
@@ -316,34 +352,69 @@ void TSelectTool::CancelTreeViewAndListView()
 
 void TSelectTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	iHoverIndex = pShape->GetPickedElementIndex(ptPos, pConfig);
-	if (iHoverIndex != -1)// && eMode == SELECT_MOVE
+	bShowSelRect = false;
+	ptMouse = ptPos;
+
+	TElement *pElement = pShape->GetPickedElement(ptPos, pConfig);
+
+	if (pElement != nullptr)
 	{
-		SelectByIndex(iHoverIndex);
+		if (!pElement->bDrawSquare)//不在选择集
+			Select(pElement, true, true);
+
+		pElement->NoticeListView(pListView);
+
+		sTips.clear();
+		pCanvas->Invalidate();
 
 		//弹出右键菜单，
 		HMENU hMenu = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_RIGHT));
 		hMenu = GetSubMenu(hMenu, 0);
 		ClientToScreen(hWnd, &ptPos);
-
+		
+		//此处句柄为Canvas句柄，消息上传至MainWindow，由MainWindow接收发送DELETE键至本级
 		TrackPopupMenu(hMenu, TPM_RIGHTBUTTON, ptPos.x, ptPos.y, 0, hWnd, NULL);
+		//}
 	}
 	else
 	{
-		EndDrag();
-		EndMove();
-		SelectNull();
+		CancelTreeViewAndListView();
+		Select(nullptr,true,true);
+	}
+}
+
+void TSelectTool::OnRButtonUp(HWND hWnd, UINT uMsg, POINT ptPos)
+{
+
+}
+
+void TSelectTool::OnHotKey(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	if (lParam == MAKELONG(MOD_CONTROL,'A'))
+	{
+		SelectAll();
 		pCanvas->Invalidate();
 	}
-
 }
 
 //由祖先插入WM_PAINT事件中进行绘制
 void TSelectTool::Draw(HDC hdc)
 {
-	if (iPickIndex != -1)
+	for (auto pElement : PickedElements)
+		pElement->DrawPickSquare(hdc, pConfig);
+
+	//画选择框
+	if (bShowSelRect)
 	{
-		pShape->Element[iPickIndex]->DrawPickSquare(hdc, pConfig);
+		TDraw::DrawRect(hdc, rcSelect, pConfig->logpenFront);
+
+		TDrawTranslucent Trans;
+		Trans.Start(hdc, 200, rcSelect, true);
+		Trans.Input(&rcSelect);
+		//OutputDebugPrintf(TEXT("DRAW:x%d y%d x%d y%d\n\n"), rcSelect.left, rcSelect.top, rcSelect.right, rcSelect.bottom);
+		TDraw::FillRect(hdc, &rcSelect, RGB(255, 255, 255));
+		Trans.End();
+
 	}
 
 	if (bShowTips)
@@ -351,11 +422,12 @@ void TSelectTool::Draw(HDC hdc)
 }
 
 //仅用于添加原动件时的判断
-bool TSelectTool::CanBeDriver()
+bool TSelectTool::CanBeDriver(TElement *&pElementFront)
 {
-	if (iPickIndex != -1)
+	if (PickedElements.size() == 1 && PickedElements.front()->CanBeDragged)
 	{
-		return pShape->Element[iPickIndex]->CanBeDragged;
+		pElementFront = PickedElements.front();
+		return true;
 	}
 	return false;
 }

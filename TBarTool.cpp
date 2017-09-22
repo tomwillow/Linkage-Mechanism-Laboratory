@@ -1,6 +1,7 @@
 #pragma once
 #include "TBarTool.h"
 
+#include "TTreeViewContent.h"
 #include "TShape.h"
 #include "TBar.h"
 #include "TConstraintCoincide.h"
@@ -25,6 +26,19 @@ TElement * TBarTool::AddIntoShape(TRealLine &RealLine)
 
 	RealLine.eType = myElementType;
 	return pShape->AddElement((TBar *)&RealLine);
+}
+
+void TBarTool::AddIntoTreeViewContent(TElement *Element, int id)
+{
+	if (Element->eType == ELEMENT_REALLINE)
+	{
+		Element->eType = myElementType;
+		TBar Bar;
+		Bar= *(TRealLine*)Element;
+		pTreeViewContent->AddItem(&Bar, pShape->iNextId);
+	}
+	else
+		TLineTool::AddIntoTreeViewContent(Element, id);
 }
 
 //void TBarTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig)

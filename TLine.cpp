@@ -15,6 +15,11 @@ TLine::~TLine()
 {
 }
 
+const String TLine::GetElementTypeName()//得到类型名称
+{
+	return TEXT("屏幕线");
+}
+
 TLine& TLine::operator=(const TLine &Line)
 {
 	TElement::operator=(Line);

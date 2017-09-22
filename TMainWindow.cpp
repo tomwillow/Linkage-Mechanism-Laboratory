@@ -103,7 +103,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	//创建真实切换按钮
 	m_CheckBoxShowReal.LoadCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_REAL);
 	m_CheckBoxShowReal.LoadUnCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_SIMPLE);
-	m_CheckBoxShowReal.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).top,20,20, IDR_STATUS_CHECKBOX_SHOW_REAL);
+	m_CheckBoxShowReal.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).top, 20, 20, IDR_STATUS_CHECKBOX_SHOW_REAL);
 	m_CheckBoxShowReal.SetCheckedAndBitmap(m_Configuration.bDrawReal);
 
 	//创建风格切换按钮
@@ -125,7 +125,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	//创建Trackbar
 	m_Trackbar.CreateTrackbar(m_Status.m_hWnd, this->m_hInst, m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0), IDR_TRACKBAR);
-	m_Trackbar.SetRangeAndValue({0.01,0.05,0.1, 0.125, 0.25, 0.5, 1, 2, 4, 8 ,16,32,64});
+	m_Trackbar.SetRangeAndValue({ 0.01, 0.05, 0.1, 0.125, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64 });
 	m_Trackbar.SetPosByValue(1.0, 1e-6);
 
 	//创建右窗口
@@ -180,7 +180,7 @@ void TMainWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		m_Configuration.SetDPU(m_Trackbar.GetNowValue());
 
 		m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("比例："));
-		
+
 		TCHAR temp[64];
 		TTransfer::double2TCHAR_AutoTrim0(m_Configuration.GetProportion() * 100, temp);
 		m_Status.SetText(IDR_STATUS_PROPORTION, TEXT("%s%%"), temp);
@@ -213,9 +213,10 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		RightWindow.TreeViewContent.DeleteAllItems();//删除tree
 		RightWindow.ListView.DeleteAllItems();//删除list
 
-		RightWindow.TreeViewContent.Initial();
-		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);
-		OnCommand(MAKELONG(ID_SELECT, 0), 0);
+		RightWindow.TreeViewContent.Initial();//树状图初始化
+		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);//设置原点
+		m_Trackbar.SetToMid();
+		OnCommand(MAKELONG(ID_SELECT, 0), 0);//设置选择工具
 
 		pSolver->RefreshEquations();
 		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
@@ -401,10 +402,10 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		srand(GetTickCount());
 		double b = rand();
 		double t = double(rand() % 10) / double(rand() % 100);
-		for (int x = 0; x <50 * (rand() % 19 + 1); ++x)
-		//for (int x = -99; x <=100; ++x)
+		for (int x = 0; x < 50 * (rand() % 19 + 1); ++x)
+			//for (int x = -99; x <=100; ++x)
 		{
-			dpt.x = b+x*t;
+			dpt.x = b + x*t;
 			//dpt.x = x;
 			dpt.y = sin(x / 10.0) * 50;
 			dptVector.push_back(dpt);
@@ -413,8 +414,8 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			dptVector2.push_back(dpt);
 		}
 
-		pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, true,TEXT("y=sin(x/50)"),TEXT("mm/s"));
-		pGraph->InputDptVector(dptVector2, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, true,TEXT("y=cos(x/50)"),TEXT("mm^2/s"));
+		pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, true, TEXT("y=sin(x/50)"), TEXT("mm/s"));
+		pGraph->InputDptVector(dptVector2, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, true, TEXT("y=cos(x/50)"), TEXT("mm^2/s"));
 
 		//pGraph->SetMargin(40);
 
@@ -428,15 +429,14 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	{
 		if (m_ManageTool.m_uiCurActiveTool == ID_SELECT || m_ManageTool.m_uiCurActiveTool == ID_DRAG)
 		{
-			if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->CanBeDriver())
+			TSelectTool *pSelect = (TSelectTool *)m_ManageTool.m_pCurrentTool;
+			TElement *pElement=nullptr;
+			if (pSelect->CanBeDriver(pElement))//选择工具 且 选中元素可驱动 则弹出原动件对话框
 			{
-				//选择工具 且 选中元素可驱动 则弹出原动件对话框
-				if (((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex != -1)
-				{
 					//预设
-					DialogAddDriver::iElementId = m_Shape.Element[((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex]->id;
-					DialogAddDriver::dElementValue = m_Shape.Element[((TSelectTool *)m_ManageTool.m_pCurrentTool)->iPickIndex]->angle;
-				}
+					DialogAddDriver::iElementId = pElement->id;
+					DialogAddDriver::dElementValue = pElement->angle;
+
 				if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DialogAddDriver::DlgAddDriverProc))
 				{
 					MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
@@ -512,10 +512,58 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	case ID_VIEW_SUITABLE:
-		//DPOINT center;
-		//double left, right, top, bottom;
+	{
+		RECT rcObj;
+		POINT ptObjCenter;
+		if (m_Shape.GetBoundingBox(rcObj, ptObjCenter, &m_Configuration) == false)
+			break;
 
-		break;
+		RECT rcWin = Canvas.ClientRect;
+		POINT ptWinCenter;
+		TDraw::GetCenter(ptWinCenter, rcWin);
+
+		double ProOrg = m_Configuration.GetProportion();
+
+		double lambda_x = double(rcWin.right) / (rcObj.right - rcObj.left);
+		double lambda_y = double(rcWin.bottom) / (rcObj.bottom - rcObj.top);
+
+		double lambda = min(lambda_x, lambda_y)*ProOrg;
+
+		//int StepCount = 20;
+		//int Time = 2000; //ms
+		//for (int i = 1; i <= StepCount; ++i)
+		//{
+		//	m_Configuration.SetOrg(ptOrg.x + double(dx)*i / StepCount, ptOrg.y + double(dy)*i / StepCount);
+		//	Canvas.Invalidate();
+		//	Sleep(Time/StepCount);
+		//}
+
+		if (lambda < ProOrg)//缩小
+		{
+			do
+			{
+				if (m_Trackbar.GetPos() > 0)
+					m_Trackbar.SetPos(m_Trackbar.GetPos() - 1);
+			} while (lambda < m_Trackbar.GetNowValue() );//
+		}
+		else
+		{
+			while (lambda > m_Trackbar.GetNowValue() && (lambda-m_Trackbar.GetNowValue())/m_Trackbar.GetNowValue()>1.0)
+			{
+				if (m_Trackbar.GetPos() < m_Trackbar.GetRange() - 1)
+					m_Trackbar.SetPos(m_Trackbar.GetPos() + 1);
+			}
+		}
+
+		m_Shape.GetBoundingBox(rcObj, ptObjCenter, &m_Configuration);
+		POINT ptOrg = m_Configuration.GetOrg();
+		LONG dx = ptWinCenter.x - ptObjCenter.x;
+		LONG dy = ptWinCenter.y - ptObjCenter.y;
+		m_Configuration.SetOrg(ptOrg.x + dx, ptOrg.y + dy);
+
+		Canvas.Invalidate();
+	}
+	break;
 	case IDR_LINEEDIT://not deal
 		break;
 	default:

@@ -5,6 +5,9 @@
 
 class TRealLine :public TLine
 {
+protected:
+	virtual bool TRealLine::InSelWindow(RECT rect, const TConfiguration *pConfig)override;
+	virtual bool TRealLine::InSelCross(RECT rect, const TConfiguration *pConfig)override;
 public:
 	DPOINT &ptBegin, ptEnd;
 	TRealLine();
@@ -17,7 +20,7 @@ public:
 
 	virtual void TRealLine::Draw(HDC hdc, const TConfiguration* pConfig) override;
 	virtual void TRealLine::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) override;
-	virtual const TCHAR * TRealLine::GetElementTypeName(TCHAR name[]) override;//得到类型名称
+	virtual const String TRealLine::GetElementTypeName() override;//得到类型名称
 	virtual void TRealLine::NoticeListView(TListView *pListView) override;
 	virtual bool TRealLine::WriteFile(HANDLE &hf, DWORD &now_pos)override;
 	virtual bool TRealLine::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)override;

@@ -15,11 +15,16 @@ protected:
 	virtual void OnCommand(WPARAM wParam, LPARAM lParam){	}
 	virtual void OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam){	}//重载此事件时不可使用m_hWnd作为窗口句柄
 	virtual void OnLButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
+	virtual void OnLButtonUp(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){ }
 	virtual void OnRButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
+	virtual void OnRButtonUp(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
+	virtual void OnHotKey(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
+
 	virtual void OnMButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
 	virtual void OnMButtonUp(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
 	virtual void OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
 	virtual void OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){	}
+
 	virtual void OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){ }
 	virtual bool OnClose(){ return true;}
 	virtual void OnSize(WPARAM wParam, LPARAM lParam){	}

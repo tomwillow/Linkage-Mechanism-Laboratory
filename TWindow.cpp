@@ -29,8 +29,17 @@ LRESULT TWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 		OnLButtonDown(hWnd, uMsg, wParam, lParam);
 		return 0;
+	case WM_LBUTTONUP:
+		OnLButtonUp(hWnd, uMsg, wParam, lParam);
+		return 0;
 	case WM_RBUTTONDOWN:
 		OnRButtonDown(hWnd, uMsg, wParam, lParam);
+		return 0;
+	case WM_RBUTTONUP:
+		OnRButtonUp(hWnd, uMsg, wParam, lParam);
+		return 0;
+	case WM_HOTKEY:
+		OnHotKey(hWnd, uMsg, wParam, lParam);
 		return 0;
 	case WM_MOUSEMOVE:
 		OnMouseMove(hWnd, uMsg, wParam, lParam);
@@ -227,12 +236,9 @@ WPARAM TWindow::MessageLoop(void)
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 #ifdef _DEBUG
-		TCHAR temp[MAX_PATH];// , name[MAX_PATH];
-
-		//GetWindowText(msg.hwnd, name, MAX_PATH);
-		//wsprintf(temp, TEXT("%s : Message(0x%x, 0x%x, 0x%x, 0x%x)\n"), name, msg.hwnd, msg.message, msg.wParam, msg.lParam);
+		TCHAR temp[MAX_PATH];//
 		wsprintf(temp, TEXT("Message(0x%x, 0x%x, 0x%x, 0x%x)\n"), msg.hwnd, msg.message, msg.wParam, msg.lParam);
-		OutputDebugString(temp);
+		//OutputDebugString(temp);
 #endif
 		if (!TranslateAccelerator(msg.hwnd, m_hAccelTable, &msg))
 		{

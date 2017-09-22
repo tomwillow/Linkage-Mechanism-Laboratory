@@ -75,6 +75,10 @@ public:
 		Org.x = x;
 		Org.y = y;
 	}
+	void TConfiguration::SetOrg(const POINT &pt)
+	{
+		Org = pt;
+	}
 	POINT TConfiguration::GetOrg() const
 	{
 		return Org;

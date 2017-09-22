@@ -1,6 +1,7 @@
 #pragma once
 #include "TSlidewayTool.h"
 
+#include "TTreeViewContent.h"
 #include "TShape.h"
 #include "TSlideway.h"
 
@@ -33,6 +34,19 @@ TElement * TSlidewayTool::AddIntoShape(TRealLine &RealLine)
 	TSlideway Slideway;
 	Slideway= RealLine;
 	return pShape->AddElement(&Slideway);
+}
+
+void TSlidewayTool::AddIntoTreeViewContent(TElement *Element, int id)
+{
+	if (Element->eType == ELEMENT_REALLINE)
+	{
+		Element->eType = myElementType;
+		TSlideway Slideway;
+		Slideway = *(TRealLine*)Element;
+		pTreeViewContent->AddItem(&Slideway, pShape->iNextId);
+	}
+	else
+		TLineTool::AddIntoTreeViewContent(Element, id);
 }
 
 //void TSlidewayTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig)//所有加入约束经过此处

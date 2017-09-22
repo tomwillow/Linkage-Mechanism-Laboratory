@@ -95,10 +95,10 @@ void TRightWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					win.m_ManageTool.SetCurActiveTool(ID_SELECT);
 
 				//送入选择工具
-				((TSelectTool *)win.m_ManageTool.m_pCurrentTool)->SelectById(id);
+				((TSelectTool *)win.m_ManageTool.m_pCurrentTool)->SelectById(id,false,true);
 
-				//刷新显示
-				win.Canvas.Invalidate();
+				////刷新显示
+				//win.Canvas.Invalidate();
 				
 				//弹出右键菜单
 				HMENU hMenu = LoadMenu(m_hInst, MAKEINTRESOURCE(IDR_MENU_RIGHT));
@@ -125,14 +125,14 @@ void TRightWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				win.m_ManageTool.SetCurActiveTool(ID_SELECT);
 
 			//送入选择工具
-			((TSelectTool *)win.m_ManageTool.m_pCurrentTool)->SelectById(id);
+			((TSelectTool *)win.m_ManageTool.m_pCurrentTool)->SelectById(id,false,true);
 
-			//刷新ListView
-			if (id != -1)
-				win.m_Shape.GetElementById(id)->NoticeListView(&ListView);
+			////刷新ListView
+			//if (id != -1)
+			//	win.m_Shape.GetElementById(id)->NoticeListView(&ListView);
 
-			//刷新显示
-			win.Canvas.Invalidate();
+			////刷新显示
+			//win.Canvas.Invalidate();
 
 			break;
 		}

@@ -6,7 +6,8 @@ class TBarTool:public TLineTool
 public:
 	TBarTool();
 	~TBarTool();
-	TElement * TBarTool::AddIntoShape(TRealLine &RealLine);
-	//virtual void TBarTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig) override;//所有加入约束经过此处
+	TElement * TBarTool::AddIntoShape(TRealLine &RealLine)override;
+
+	void TBarTool::AddIntoTreeViewContent(TElement *Element, int id)override;
 };
 

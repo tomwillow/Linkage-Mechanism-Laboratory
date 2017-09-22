@@ -116,7 +116,12 @@ void TSolver::ClearConstraint()
 
 void TSolver::RecordStartDragPos(int index, DPOINT dpt)
 {
-	DPOINT dptSPP = TDraw::GetRelative(dpt, pShape->Element[index]->dpt, pShape->Element[index]->angle);
+	RecordStartDragPos(pShape->Element[index], dpt);
+}
+
+void TSolver::RecordStartDragPos(TElement *pElement, DPOINT dpt)
+{
+	DPOINT dptSPP = TDraw::GetRelative(dpt, pElement->dpt, pElement->angle);
 
 	if (!IsZero(dptSPP.x, precision))
 		dRelativeAngle = atan(dptSPP.y / dptSPP.x);
@@ -127,19 +132,24 @@ void TSolver::RecordStartDragPos(int index, DPOINT dpt)
 //添加鼠标约束
 void TSolver::AddMouseConstraint(int index, DPOINT dptm)
 {
-	if (pShape->Element[index]->CanBeDragged)
+	AddMouseConstraint(pShape->Element[index],dptm);
+}
+
+//添加鼠标约束
+void TSolver::AddMouseConstraint(TElement *pElement, DPOINT dptm)
+{
+	if (pElement->CanBeDragged)
 	{
 		TCHAR temp[200];
-		TElement *element = pShape->Element[index];
 		double xm = dptm.x;
 		double ym = dptm.y;
-		int id = element->id;
+		int id = pElement->id;
 
 		_stprintf(temp, TEXT("(%f-x%d)*sin(phi%d+%f)-(%f-y%d)*cos(phi%d+%f)"),xm, id,  id, dRelativeAngle, ym,  id,id, dRelativeAngle);
 
 		TCHAR szVar[100], szValue[100];
 		_stprintf(szVar, TEXT("x%d y%d phi%d"), id, id, id);
-		_stprintf(szValue, TEXT("%f %f %f"), element->dpt.x, element->dpt.y, element->angle);
+		_stprintf(szValue, TEXT("%f %f %f"), pElement->dpt.x, pElement->dpt.y, pElement->angle);
 
 		Equations->DefineVariable(pOS, szVar, szValue);
 		Equations->AddEquation(pOS, temp, true);

@@ -333,7 +333,7 @@ namespace DialogAnimation
 						{
 							pManageTool->SetCurActiveTool(ID_SELECT);
 						}
-						((TSelectTool *)(pManageTool->m_pCurrentTool))->SelectById(id);
+						((TSelectTool *)(pManageTool->m_pCurrentTool))->SelectById(id,true,true);
 					}
 					break;
 				}
@@ -725,7 +725,6 @@ namespace DialogAnimation
 		vecItemsLeft.clear();
 		vecItemsRight.clear();
 
-		TCHAR temp[32];
 		String s, s_dpt;
 		for (auto pElement : pShape->Element)//遍历所有元素
 		{
@@ -733,7 +732,7 @@ namespace DialogAnimation
 			{
 				s.clear();
 				s << TEXT("ID:") << pElement->id;
-				s << TEXT(" ") << pElement->GetElementTypeName(temp);//“连杆”
+				s << TEXT(" ") << pElement->GetElementTypeName();//“连杆”
 				s << TEXT(" ") << pElement->Name;
 				for (size_t i = 0; i < pElement->vecDpt.size(); ++i)//遍历每个相对点
 				{

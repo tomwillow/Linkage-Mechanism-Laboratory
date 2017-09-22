@@ -14,7 +14,6 @@ class TTrackbar:public TControl
 {
 private:
 	std::vector<double> vecValue;
-	int TTrackbar::GetRange();
 public:
 	TTrackbar();
 	~TTrackbar();
@@ -22,6 +21,7 @@ public:
 	void TTrackbar::SetPos(int pos);
 	int TTrackbar::GetPos();
 	void TTrackbar::SetRange(int num);
+	int TTrackbar::GetRange();
 
 	//只支持升序排列
 	void TTrackbar::SetRangeAndValue(std::initializer_list<double> init_list)

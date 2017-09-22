@@ -28,9 +28,9 @@ TConstraintCoincide::~TConstraintCoincide()
 {
 }
 
-const TCHAR * TConstraintCoincide::GetElementTypeName(TCHAR name[])//得到类型名称
+const String TConstraintCoincide::GetElementTypeName()//得到类型名称
 {
-	return _tcscpy(name, TEXT("重合"));
+	return TEXT("重合");
 }
 
 void TConstraintCoincide::RestorePointStyle()
@@ -78,8 +78,8 @@ void TConstraintCoincide::NoticeListView(TListView *pListView)
 	pListView->id = id;
 	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
 	pListView->AddAttributeItem(TEXT("名称"), CTRLTYPE_EDIT, &Name, Name);
-	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL,GetElementTypeName(buffer));
-	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle, buffer));
+	pListView->AddAttributeItem(TEXT("类型"), CTRLTYPE_NULL, NULL,GetElementTypeName().c_str());
+	pListView->AddAttributeItem(TEXT("线型"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle).c_str());
 	pListView->AddAttributeItem(TEXT("线宽"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
 	pListView->AddAttributeItem(TEXT("颜色"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
 
@@ -140,6 +140,7 @@ bool TConstraintCoincide::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)
 void TConstraintCoincide::Draw(HDC hdc, const TConfiguration* pConfig)
 {
 	TDraw::DrawConstraintCoincide(hdc, this, pConfig);
+	//if (bDrawSquare) DrawPickSquare(hdc, pConfig);
 }
 
 void TConstraintCoincide::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)

@@ -127,7 +127,7 @@ void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 		sTips = TEXT("长度为0:请移动光标或输入数据");
 	else
 	{
-		sTips = TEXT("点击或输入数据以建立");
+		sTips = TEXT("点击以建立");
 		sTips << sType;
 		if (bShowDimLine)
 			sTips << TEXT("\r\n（输入格式: 长度 or 长度<角度 or x坐标,y坐标（相对当前点））");
@@ -177,11 +177,14 @@ TElement * TLineTool::AddIntoShape(TRealLine &RealLine)
 {
 	RealLine.vecDpt.push_back(RealLine.GetRelativePointByIndex(0));
 	RealLine.vecDpt.push_back(RealLine.GetRelativePointByIndex(1));
+
+	RealLine.eType = myElementType;
 	return pShape->AddElement(&RealLine);
 }
 
 void TLineTool::AddIntoTreeViewContent(TElement *Element, int id)
 {
+	//约束也要经过此处
 	if (Element->eType == ELEMENT_REALLINE)
 		Element->eType = myElementType;
 	pTreeViewContent->AddItem(Element, pShape->iNextId);

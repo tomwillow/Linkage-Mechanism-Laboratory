@@ -5,7 +5,7 @@
 #include "TDraw.h"
 #include "TBar.h"
 
-TBar::TBar() 
+TBar::TBar()
 {
 	TBar::dLength = 0;
 	_tcscpy(Name, TEXT(""));
@@ -18,9 +18,9 @@ TBar::~TBar()
 {
 }
 
-const TCHAR * TBar::GetElementTypeName(TCHAR name[])//得到类型名称
+const String TBar::GetElementTypeName()//得到类型名称
 {
-	return _tcscpy(name, TEXT("连杆"));
+	return TEXT("连杆");
 }
 
 //不通知listview，由realline通知
@@ -28,4 +28,11 @@ const TCHAR * TBar::GetElementTypeName(TCHAR name[])//得到类型名称
 void TBar::Draw(HDC hdc, const TConfiguration* pConfig)
 {
 	TDraw::DrawBar(hdc, this, pConfig);
+	//if (bDrawSquare) DrawPickSquare(hdc, pConfig);
+}
+
+TBar& TBar::operator=(const TRealLine &RealLine)
+{
+	TRealLine::operator=(RealLine);
+	return *this;
 }

@@ -26,6 +26,8 @@ class TElement
 {
 private:
 protected:
+	virtual bool TElement::InSelWindow(RECT rect, const TConfiguration *pConfig){ return false; }
+	virtual bool TElement::InSelCross(RECT rect, const TConfiguration *pConfig){ return false; }
 public:
 	int id;
 	bool available;//未启用
@@ -39,27 +41,32 @@ public:
 	DPOINT dpt;
 	double angle;
 
+	bool bDrawSquare;
 	unsigned char alpha;
 	bool CanBeDragged;
 	bool IsConstraint;
 
-	TElement();
+	TElement()=0;
 	virtual ~TElement();
-	virtual const TCHAR * TElement::GetElementTypeName(TCHAR name[]);//得到类型名称
 	virtual void TElement::BuildpDpt();
-	virtual bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos);
-	virtual bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape);
-	virtual void TElement::NoticeListView(TListView *pListView);
+	virtual const String TElement::GetElementTypeName()=0;//得到类型名称
+	virtual bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos)=0;
+	virtual bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)=0;
+	virtual void TElement::Draw(HDC hdc, const TConfiguration* pConfig) = 0;
+	virtual void TElement::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) = 0;
+	virtual void TElement::NoticeListView(TListView *pListView)=0;
 	virtual const DPOINT TElement::GetRelativePointByIndex(int PointIndexOfElement) const;
 	virtual DPOINT TElement::GetAbsolutePointByIndex(int PointIndexOfElement) const;
 	virtual void TElement::SetX(double x);
 	virtual void TElement::SetY(double y);
 	virtual void TElement::SetPhi(double phi);
-	virtual void TElement::Draw(HDC hdc, const TConfiguration* pConfig){}
-	virtual void TElement::DrawPickSquare(HDC hdc, const TConfiguration* pConfig){}
 	virtual void TElement::ChangePos(DPOINT dptDelta);
-	virtual bool TElement::Picked(const POINT &ptPos, const TConfiguration *pConfig);
-	
+	virtual bool TElement::Picked(const POINT &ptPos, const TConfiguration *pConfig){ return false; }
+	virtual bool TElement::InSelect(RECT rect, bool bSelCross, const TConfiguration *pConfig);
+	virtual void TElement::SetStateNormal();
+	virtual void TElement::SetStateHover();
+	virtual void TElement::SetStateUnHover();
+	virtual void TElement::SetStateChosen();
 
 	void TElement::SetStyle(const LOGPEN &logpen);//设置样式
 	void TElement::SetStyle(TConfiguration *pConfig);//设置样式
@@ -69,5 +76,13 @@ public:
 	TElement& TElement::operator=(const TElement &element);
 };
 
-TCHAR * GetLineStyleName(UINT linestyle, TCHAR name[]);//得到线型名称
-DPOINT GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);
+	const String GetLineStyleName(UINT linestyle);//得到线型名称
+	DPOINT GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);
+	void RegularRect(RECT &rect);
+	bool RectInRect(const RECT &rcBig, const RECT &rcSmall);
+	bool RectCrossRect(const RECT &rcBig, const RECT &rcSmall);
+	bool APointInRect(const RECT &rect, POINT *apt, int count);
+	bool APointCrossRect(const RECT &rect, POINT *apt, int count);
+	bool VecPointInRect(const RECT &rect, std::vector<POINT> &vecpt);
+	bool VecPointCrossRect(const RECT &rect, std::vector<POINT> &vecpt);
+	

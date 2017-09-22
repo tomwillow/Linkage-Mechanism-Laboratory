@@ -97,27 +97,9 @@ void TDraw::DrawBarSimple(HDC hdc, TBar *Bar, const TConfiguration *pConfig)
 	POINT ptBegin, ptEnd;
 	ptBegin = pConfig->RealToScreen(Bar->ptBegin);
 	ptEnd = pConfig->RealToScreen(Bar->ptEnd);
-	//DrawCircle(hdc, ptBegin, FRAMEPOINT_R);
-	//DrawCircle(hdc, ptEnd, FRAMEPOINT_R);
 
 	CalcBarLineEndpoint(ptBegin, ptEnd, Bar->vecIsJoint[0].size() > 0 ? pConfig->FRAMEPOINT_R : 0, Bar->vecIsJoint[1].size() > 0 ? pConfig->FRAMEPOINT_R : 0);
 	DrawLine(hdc, ptBegin, ptEnd);
-
-	////计算实际端点
-	//POINT p1, p2;
-	//double theta1 = GetAngleFromPointScreen(ptBegin, ptEnd);
-	//double theta2 = GetAngleFromPointScreen(ptEnd, ptBegin);
-
-	//if (Bar->vecIsJoint[0].size() > 0)
-	//	p1 = { LONG(ptBegin.x + pConfig->FRAMEPOINT_R*cos(theta1)), LONG(ptBegin.y - pConfig->FRAMEPOINT_R*sin(theta1)) };
-	//else
-	//	p1 = ptBegin;
-
-	//if (Bar->vecIsJoint[1].size() > 0)
-	//	p2 = { LONG(ptEnd.x + pConfig->FRAMEPOINT_R*cos(theta2)), LONG(ptEnd.y - pConfig->FRAMEPOINT_R*sin(theta2)) };
-	//else
-	//	p2 = ptEnd;
-	//DrawLine(hdc, p1, p2);
 
 	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
@@ -142,93 +124,6 @@ void TDraw::DrawRealLine(HDC hdc, DPOINT ptBegin, DPOINT ptEnd, LOGPEN logpen, c
 void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, const TConfiguration *pConfig)
 {
 	DrawBarTranslucent(hdc, pConfig->RealToScreen(pBar->ptBegin), pConfig->RealToScreen(pBar->ptEnd), pBar->angle, pBar->alpha, pBar->logpenStyleShow, pConfig);
-}
-
-//所有绘制x坐标均-left，y坐标-top
-//只要画的不是黑色 背景就是黑色 -> bNeedDrawBlack=false
-//标准开头（注销在EndTranslucent中完成，不需手动处理）
-//HDC hBitmapDC;
-//HBITMAP hBitmap;
-//VOID *pvBits;
-void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, bool bNeedDrawBlack)
-{
-	StartTranslucent(hBitmapDC, hBitmap, pvBits, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, bNeedDrawBlack);
-}
-
-//所有绘制x坐标均-left，y坐标-top
-//只要画的不是黑色 背景就是黑色 -> bNeedDrawBlack=false
-//标准开头（注销在EndTranslucent中完成，不需手动处理）
-//HDC hBitmapDC;
-//HBITMAP hBitmap;
-//VOID *pvBits;
-void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, bool bNeedDrawBlack)
-{
-	hBitmapDC = CreateCompatibleDC(NULL);
-
-	BITMAPINFO bmpInfo = { 0 };
-	bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmpInfo.bmiHeader.biWidth = width;
-	bmpInfo.bmiHeader.biHeight = height;//正数，说明数据从下到上，如未负数，则从上到下  
-	bmpInfo.bmiHeader.biPlanes = 1;
-	bmpInfo.bmiHeader.biBitCount = 32;
-	bmpInfo.bmiHeader.biCompression = BI_RGB;
-
-	hBitmap = CreateDIBSection(hBitmapDC, &bmpInfo, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
-	SelectObject(hBitmapDC, hBitmap);
-
-	//开始画
-	if (bNeedDrawBlack)//背景不是黑色就先涂白
-	{
-		HPEN hPen = (HPEN)::GetStockObject(NULL_PEN);
-		::SelectObject(hBitmapDC, hPen);
-
-		HBRUSH hBrush = CreateSolidBrush(0xffffff);//white
-
-		RECT rcTrans = { 0, 0, width, height };
-		::FillRect(hBitmapDC, &rcTrans, hBrush);
-
-		DeleteObject(hPen);
-		DeleteObject(hBrush);
-	}
-
-
-}
-
-void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, BYTE alpha, bool bNeedDrawBlack)
-{
-	EndTranslucent(hdc, hBitmapDC, hBitmap, pvBits, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, alpha, bNeedDrawBlack);
-}
-
-void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, BYTE alpha, bool bNeedDrawBlack)
-{
-
-	//将有内容区域设为不透明
-	UINT32 *data;
-	if (bNeedDrawBlack)
-		for (int i = 0; i < width*height; ++i)
-		{
-			data = ((UINT32 *)pvBits) + i;
-			if (*data != 0x00ffffff)//not white
-				*data |= 0xff000000;
-		}
-	else
-		for (int i = 0; i < width*height; ++i)//黑色背景
-		{
-			data = ((UINT32 *)pvBits) + i;
-			if (*data)//为黑色
-				*data |= 0xff000000;
-		}
-
-	BLENDFUNCTION bf;
-	bf.BlendOp = AC_SRC_OVER;
-	bf.AlphaFormat = AC_SRC_ALPHA;
-	bf.BlendFlags = 0;
-	bf.SourceConstantAlpha = alpha;
-
-	AlphaBlend(hdc, left, top, width, height, hBitmapDC, 0, 0, width, height, bf);
-
-	DeleteObject(hBitmap);
-	DeleteObject(hBitmapDC);
 }
 
 bool TDraw::CaptureWindowToFile(HWND hWnd, TCHAR szFileName[])
@@ -283,17 +178,101 @@ bool TDraw::CaptureWindowToFile(HWND hWnd, TCHAR szFileName[])
 	return true;
 }
 
+TDraw::HSB TDraw::RGB2HSB(int rgbR, int rgbG, int rgbB)
+{
+	int max = max(max(rgbR, rgbG), rgbB);
+	int min = min(min(rgbR, rgbG), rgbB);
+
+	float hsbB = max / 255.0f;
+	float hsbS = max == 0 ? 0 : (max - min) / (float)max;
+
+	float hsbH = 0;
+	if (max == rgbR && rgbG >= rgbB) {
+		hsbH = (rgbG - rgbB) * 60.0 / (max - min) + 0;
+	}
+	else if (max == rgbR && rgbG < rgbB) {
+		hsbH = (rgbG - rgbB) * 60.0 / (max - min) + 360;
+	}
+	else if (max == rgbG) {
+		hsbH = (rgbB - rgbR) * 60.0 / (max - min) + 120;
+	}
+	else if (max == rgbB) {
+		hsbH = (rgbR - rgbG) * 60.0 / (max - min) + 240;
+	}
+
+	return { hsbH, hsbS, hsbB };
+}
+
+COLORREF TDraw::HSB2RGB(float h, float s, float v)
+{
+	//assert Float.compare(h, 0.0f) >= 0 && Float.compare(h, 360.0f) <= 0;
+	//assert Float.compare(s, 0.0f) >= 0 && Float.compare(s, 1.0f) <= 0;
+	//assert Float.compare(v, 0.0f) >= 0 && Float.compare(v, 1.0f) <= 0;
+
+	float r = 0, g = 0, b = 0;
+	int i = ((int)(h / 60) % 6);
+	float f = (h / 60) - i;
+	float p = v * (1 - s);
+	float q = v * (1 - f * s);
+	float t = v * (1 - (1 - f) * s);
+	switch (i) {
+	case 0:
+		r = v;
+		g = t;
+		b = p;
+		break;
+	case 1:
+		r = q;
+		g = v;
+		b = p;
+		break;
+	case 2:
+		r = p;
+		g = v;
+		b = t;
+		break;
+	case 3:
+		r = p;
+		g = q;
+		b = v;
+		break;
+	case 4:
+		r = t;
+		g = p;
+		b = v;
+		break;
+	case 5:
+		r = v;
+		g = p;
+		b = q;
+		break;
+	default:
+		break;
+	}
+	return RGB(r * 255.0, g * 255.0,b * 255.0);
+}
+
 //根据ITU - R BT 601
 //亮度值Y = 0.299r + 0.587g + 0.114b
 COLORREF TDraw::GetBrighterColor(COLORREF cr)
 {
-	byte y = (byte)(0.299*GetRValue(cr) + 0.587*GetGValue(cr) + 0.114*GetBValue(cr));
-	if (y + 128 > 0xff)
-		y = 0xff;
+#define PLUS 0.2
+	HSB hsb = RGB2HSB(GetRValue(cr), GetGValue(cr), GetBValue(cr));
+	if (hsb.B + PLUS < 1.0)
+		hsb.B += PLUS;
 	else
-		y += 128;
+		hsb.B = 1.0;
 
-	return RGB(0.299 * 256 / y*GetRValue(cr), 0.587 * 256 / y*GetGValue(cr), 0.114 * 256 / y*GetBValue(cr));
+	return HSB2RGB(hsb.H, hsb.S, hsb.B);
+
+	//byte y = (byte)(0.299*GetRValue(cr) + 0.587*GetGValue(cr) + 0.114*GetBValue(cr));
+	//if (y + PLUS > 0xff)
+	//	y = 0xff;
+	//else
+	//	y += PLUS;
+
+	//return RGB(0.299 *  y / 256 * GetRValue(cr), 0.587 * y / 256 * GetGValue(cr), 0.114 * y / 256 * GetBValue(cr));
+#undef PLUS
 }
 
 void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double angle, unsigned char alpha, LOGPEN logpen, const TConfiguration *pConfig)
@@ -321,15 +300,9 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	int left = min(ptBegin.x, ptEnd.x) - pConfig->BAR_R, top = min(ptBegin.y, ptEnd.y) - pConfig->BAR_R;
 	int width = abs(ptBegin.x - ptEnd.x) + 2 * pConfig->BAR_R, height = abs(ptBegin.y - ptEnd.y) + 2 * pConfig->BAR_R;
 
-	//换到原点
-	ptBegin.x -= left;
-	ptBegin.y -= top;
-	ptEnd.x -= left;
-	ptEnd.y -= top;
-	MoveByDelta(pt, 4, -left, -top);
-
 	TDrawTranslucent Translucent;
 	Translucent.Start(hdc, alpha, left, top, width, height, logpen.lopnColor == 0);
+	Translucent.Input(&ptBegin).Input(&ptEnd).Input(pt, 4);
 
 	//开始画
 	hPen = (HPEN)::GetStockObject(NULL_PEN);
@@ -1362,6 +1335,20 @@ DPOINT TDraw::POINT2DPOINT(POINT &pt, double x_min, double x_max, double y_min, 
 	double x = x_min + (x_max - x_min)*(pt.x - rect.left) / (rect.right - rect.left);
 	double y = y_max - (y_max - y_min)*(pt.y - rect.top) / (rect.bottom - rect.top);
 	return{ x, y };
+}
+
+void TDraw::MakeRect(RECT &rcResult, double x_min, double x_max, double y_min, double y_max, const TConfiguration *pConfig)
+{
+	rcResult.top = pConfig->RealToScreenY(y_max);
+	rcResult.bottom = pConfig->RealToScreenY(y_min);
+	rcResult.left = pConfig->RealToScreenX(x_min);
+	rcResult.right = pConfig->RealToScreenX(x_max);
+}
+
+void TDraw::GetCenter(POINT &ptResult, const RECT &rect)
+{
+	ptResult.x = (rect.right + rect.left) / 2;
+	ptResult.y = (rect.top + rect.bottom) / 2;
 }
 
 void TDraw::DrawTextAdvance(HDC hdc, const TCHAR text[], RECT *rect, long FontSize, int FontWeight, unsigned long color, const TCHAR FontName[], UINT format, int cEscapement,int cOrientation)
