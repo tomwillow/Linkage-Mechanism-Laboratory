@@ -85,6 +85,7 @@
     <ClCompile Include="String.cpp" />
     <ClCompile Include="TButton.cpp" />
     <ClCompile Include="TCheckBox.cpp" />
+    <ClCompile Include="TConstraint.cpp" />
     <ClCompile Include="TConstraintCoincideTool.cpp" />
     <ClCompile Include="TConstraintColinear.cpp" />
     <ClCompile Include="TConstraintColinearTool.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="String.h" />
     <ClInclude Include="TButton.h" />
     <ClInclude Include="TCheckBox.h" />
+    <ClInclude Include="TConstraint.h" />
     <ClInclude Include="TConstraintCoincideTool.h" />
     <ClInclude Include="TConstraintColinear.h" />
     <ClInclude Include="TConstraintColinearTool.h" />

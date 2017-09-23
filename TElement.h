@@ -19,11 +19,20 @@ enum EnumElementType{
 	DRIVER
 };
 
+enum EnumElementClass{
+	ELEMENT_CLASS_FRAME,
+	ELEMENT_CLASS_NORMAL,
+	ELEMENT_CLASS_CONSTRAINT,
+	ELEMENT_CLASS_DRIVER,
+	ELEMENT_CLASS_NONE
+};
+
 class TConfiguration;
 class TShape;
 class TListView;
 class TElement
 {
+	friend void RefreshDOF(TElement *pElement, int &nb, int &iCoincideNum, int &iDriverNum, int &iFrameNum, bool isAdd);
 private:
 protected:
 	virtual bool TElement::InSelWindow(RECT rect, const TConfiguration *pConfig){ return false; }
@@ -32,6 +41,7 @@ public:
 	int id;
 	bool available;//未启用
 	EnumElementType eType;//类型
+	EnumElementClass eClass;
 	TCHAR Name[64];//名称
 	LOGPEN logpenStyleShow, logpenStyle;//显示样式，本身样式
 
@@ -43,12 +53,10 @@ public:
 
 	bool bDrawSquare;
 	unsigned char alpha;
-	bool CanBeDragged;
-	bool IsConstraint;
 
-	TElement()=0;
+	TElement();
 	virtual ~TElement();
-	virtual void TElement::BuildpDpt();
+	//virtual void TElement::BuildpDpt();
 	virtual const String TElement::GetElementTypeName()=0;//得到类型名称
 	virtual bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos)=0;
 	virtual bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)=0;
@@ -68,6 +76,9 @@ public:
 	virtual void TElement::SetStateUnHover();
 	virtual void TElement::SetStateChosen();
 
+	bool TElement::IsConstraint(){ return eClass == ELEMENT_CLASS_CONSTRAINT; }
+	bool TElement::CanBeDragged(){ return eClass == ELEMENT_CLASS_NORMAL; }
+
 	void TElement::SetStyle(const LOGPEN &logpen);//设置样式
 	void TElement::SetStyle(TConfiguration *pConfig);//设置样式
 	void TElement::SetColor(COLORREF cr);
@@ -85,4 +96,4 @@ public:
 	bool APointCrossRect(const RECT &rect, POINT *apt, int count);
 	bool VecPointInRect(const RECT &rect, std::vector<POINT> &vecpt);
 	bool VecPointCrossRect(const RECT &rect, std::vector<POINT> &vecpt);
-	
+	void RefreshDOF(TElement *pElement, int &nb,int &iCoincideNum,int &iDriverNum, int &iFrameNum,bool isAdd);

@@ -10,8 +10,8 @@ TBar::TBar()
 	TBar::dLength = 0;
 	_tcscpy(Name, TEXT(""));
 	eType = ELEMENT_BAR;
+	eClass = ELEMENT_CLASS_NORMAL;
 
-	CanBeDragged = true;
 }
 
 TBar::~TBar()

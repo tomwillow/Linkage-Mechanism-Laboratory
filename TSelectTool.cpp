@@ -128,7 +128,7 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			pSolver->AddMouseConstraint(PickedElements.front(), pConfig->ScreenToReal(ptPos));
 			pSolver->Solve();
 
-			if (PickedElements.front()->CanBeDragged)
+			if (PickedElements.front()->CanBeDragged())
 				sTips = TEXT("可拖动");
 			else
 				sTips = TEXT("该构件不可拖动");
@@ -189,7 +189,7 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 				sTips = TEXT("可拖动（无约束）");
 			else
 			{
-				if (pElementHover->CanBeDragged)
+				if (pElementHover->CanBeDragged())
 					sTips = TEXT("可拖动（带约束）");
 				else
 					sTips = TEXT("不可拖动");
@@ -424,7 +424,7 @@ void TSelectTool::Draw(HDC hdc)
 //仅用于添加原动件时的判断
 bool TSelectTool::CanBeDriver(TElement *&pElementFront)
 {
-	if (PickedElements.size() == 1 && PickedElements.front()->CanBeDragged)
+	if (PickedElements.size() == 1 && PickedElements.front()->CanBeDragged())
 	{
 		pElementFront = PickedElements.front();
 		return true;

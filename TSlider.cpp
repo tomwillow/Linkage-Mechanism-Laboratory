@@ -12,10 +12,10 @@ TSlider::TSlider()
 {
 	_tcscpy(Name, TEXT(""));
 	eType = ELEMENT_SLIDER;
+	eClass = ELEMENT_CLASS_NORMAL;
 	
 	dpt_1 = { 1, 0 };
 
-	CanBeDragged = true;
 }
 
 

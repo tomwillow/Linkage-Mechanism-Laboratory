@@ -728,7 +728,7 @@ namespace DialogAnimation
 		String s, s_dpt;
 		for (auto pElement : pShape->Element)//遍历所有元素
 		{
-			if (pElement->CanBeDragged)//非机架及RealLine,Driver,Constraint
+			if (pElement->CanBeDragged())//非机架及RealLine,Driver,Constraint
 			{
 				s.clear();
 				s << TEXT("ID:") << pElement->id;

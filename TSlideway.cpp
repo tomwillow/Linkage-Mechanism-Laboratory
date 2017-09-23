@@ -11,6 +11,7 @@ TSlideway::TSlideway()
 {
 	_tcscpy(Name, TEXT(""));
 	eType = ELEMENT_SLIDEWAY;
+	eClass = ELEMENT_CLASS_FRAME;
 
 	ShadowQuadrant = 4;
 	ShadowLength = 40;

@@ -9,7 +9,7 @@
 #include "TElement.h"
 
 #include "TListView.h"
-TElement::TElement() :available(true), CanBeDragged(false), IsConstraint(false) , bDrawSquare(false)
+TElement::TElement() :available(true), bDrawSquare(false), eClass(ELEMENT_CLASS_NONE)
 {
 	id = -1;
 	eType = ELEMENT_NULL;
@@ -27,10 +27,10 @@ TElement::~TElement()
 	
 }
 
-void TElement::BuildpDpt()
-{ 
-	assert(0); 
-}
+//void TElement::BuildpDpt()
+//{ 
+//	assert(0); 
+//}
 
 void TElement::SetStyle(const LOGPEN &logpen)//设置样式
 {
@@ -67,6 +67,7 @@ const String GetLineStyleName(UINT linestyle)
 		return TEXT("双点划线");
 	default:
 		assert(0);
+		return TEXT("Error");
 		break;
 	}
 }
@@ -352,4 +353,26 @@ bool VecPointCrossRect(const RECT &rect, std::vector<POINT> &vecpt)
 		if (PtInRect(&rect, pt))
 			return true;
 	return false;
+}
+
+void RefreshDOF(TElement *pElement, int &nb, int &iCoincideNum, int &iDriverNum, int &iFrameNum, bool isAdd)
+{
+	switch (pElement->eClass)
+	{
+	case ELEMENT_CLASS_CONSTRAINT:
+		isAdd?++iCoincideNum:--iCoincideNum;
+		break;
+	case ELEMENT_CLASS_DRIVER:
+		isAdd ? ++iDriverNum : --iDriverNum;
+		break;
+	case ELEMENT_CLASS_FRAME:
+		isAdd ? ++iFrameNum:--iFrameNum;
+		break;
+	case ELEMENT_CLASS_NORMAL:
+		isAdd ? ++nb : --nb;
+		break;
+	case ELEMENT_CLASS_NONE:
+			assert(0);
+			break;
+	}
 }

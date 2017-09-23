@@ -9,6 +9,7 @@ TLine::TLine() :dAngle(angle)
 {
 	TLine::dLength = 0;
 	_tcscpy(Name, TEXT("TLine"));
+	eClass = ELEMENT_CLASS_NONE;
 }
 
 TLine::~TLine()

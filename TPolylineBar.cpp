@@ -10,8 +10,8 @@ TPolylineBar::TPolylineBar()
 {
 	_tcscpy(Name, TEXT(""));
 	eType = ELEMENT_POLYLINEBAR;
+	eClass = ELEMENT_CLASS_NORMAL;
 
-	CanBeDragged = true;
 }
 
 

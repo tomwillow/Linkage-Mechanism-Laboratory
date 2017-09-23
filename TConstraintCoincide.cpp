@@ -11,16 +11,12 @@
 
 #include "TListView.h"
 
-TConstraintCoincide::TConstraintCoincide()
+TConstraintCoincide::TConstraintCoincide() 
 {
 	eType = CONSTRAINT_COINCIDE;
-	pElement[0] = NULL;
-	pElement[1] = NULL;
-	//pDpt[0] = NULL;
-	//pDpt[1] = NULL;
+	eClass = ELEMENT_CLASS_CONSTRAINT;
 	_tcscpy(Name, TEXT(""));
 
-	IsConstraint = true;
 }
 
 
@@ -91,13 +87,8 @@ void TConstraintCoincide::NoticeListView(TListView *pListView)
 //保存时pElement存入id
 bool TConstraintCoincide::WriteFile(HANDLE &hf, DWORD &now_pos)
 {
-	if (!TElement::WriteFile(hf, now_pos))
+	if (!TConstraint::WriteFile(hf, now_pos))
 		return false;
-
-	::WriteFile(hf, &(pElement[0]->id), sizeof(pElement[0]->id), &now_pos, NULL);
-	now_pos += sizeof(pElement[0]->id);
-	::WriteFile(hf, &(pElement[1]->id), sizeof(pElement[1]->id), &now_pos, NULL);
-	now_pos += sizeof(pElement[1]->id);
 
 	::WriteFile(hf, &(PointIndexOfElement[0]), sizeof(PointIndexOfElement[0]), &now_pos, NULL);
 	now_pos += sizeof(PointIndexOfElement[0]);
@@ -113,16 +104,8 @@ bool TConstraintCoincide::WriteFile(HANDLE &hf, DWORD &now_pos)
 //读出时根据pElement中保存的id重新指向对应的元素
 bool TConstraintCoincide::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)
 {
-	TElement::ReadFile(hf, now_pos, pShape);
-
-	int id0, id1;
-	::ReadFile(hf, &id0, sizeof(id0), &now_pos, NULL);
-	now_pos += sizeof(id0);
-	::ReadFile(hf, &id1, sizeof(id1), &now_pos, NULL);
-	now_pos += sizeof(id1);
-
-	pElement[0] = pShape->GetElementById(id0);
-	pElement[1] = pShape->GetElementById(id1);
+	if (!TConstraint::ReadFile(hf, now_pos, pShape))
+		return false;
 
 	::ReadFile(hf, &(PointIndexOfElement[0]), sizeof(PointIndexOfElement[0]), &now_pos, NULL);
 	now_pos += sizeof(PointIndexOfElement[0]);
@@ -162,3 +145,12 @@ bool TConstraintCoincide::Picked(const POINT &ptPos, const TConfiguration *pConf
 {
 	return TDraw::PickConstraintCoincide(ptPos,this, pConfig);
 }
+
+//TConstraintCoincide& TConstraintCoincide::operator=(const TConstraintCoincide &element)
+//{
+//	TElement::operator=(element);
+//
+//	BuildpDpt();
+//
+//	return *this;
+//}

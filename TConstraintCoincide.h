@@ -1,15 +1,15 @@
 #pragma once
-#include "TElement.h"
+#include "TConstraint.h"
 
 class TListView;
 class TConstraintCoincide :
-	public TElement
+	public TConstraint
 {
 private:
-	//const DPOINT *pDpt[2];
 public:
-	TElement *pElement[2];
 	int PointIndexOfElement[2];//
+	void TConstraintCoincide::BuildpDpt();
+	void TConstraintCoincide::BuildpDpt_inner(int i);
 	TConstraintCoincide();
 	~TConstraintCoincide();
 	virtual const String TConstraintCoincide::GetElementTypeName() override;//得到类型名称
@@ -21,9 +21,9 @@ public:
 	virtual void TConstraintCoincide::ChangePos(DPOINT dptDelta)override{}
 	virtual bool TConstraintCoincide::Picked(const POINT &ptPos, const TConfiguration *pConfig)override;
 
-	void TConstraintCoincide::BuildpDpt_inner(int i);
-	void TConstraintCoincide::BuildpDpt();
 	void TConstraintCoincide::RestorePointStyle();
 	DPOINT TConstraintCoincide::GetLinkDpt(int index);
+
+	//TConstraintCoincide& TConstraintCoincide::operator=(const TConstraintCoincide &element);
 };
 

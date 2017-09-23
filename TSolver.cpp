@@ -138,7 +138,7 @@ void TSolver::AddMouseConstraint(int index, DPOINT dptm)
 //Ìí¼ÓÊó±êÔ¼Êø
 void TSolver::AddMouseConstraint(TElement *pElement, DPOINT dptm)
 {
-	if (pElement->CanBeDragged)
+	if (pElement->CanBeDragged())
 	{
 		TCHAR temp[200];
 		double xm = dptm.x;

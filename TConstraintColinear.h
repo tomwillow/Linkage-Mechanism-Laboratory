@@ -1,12 +1,12 @@
 #pragma once
-#include "TElement.h"
+#include "TConstraint.h"
+
 class TConstraintColinear :
-	public TElement
+	public TConstraint
 {
 public:
 	TConstraintColinear();
 	~TConstraintColinear();
-	TElement *pElement[2];
 	int PointBeginIndexOfElement[2];//Piµ„ Pjµ„ –Ú∫≈£®vecDpt–Ú∫≈£©
 	int PointEndIndexOfElement[2];//Qiµ„ Qjµ„ –Ú∫≈£®vecDpt–Ú∫≈£©
 

@@ -11,15 +11,13 @@
 TConstraintColinear::TConstraintColinear()
 {
 	eType = CONSTRAINT_COLINEAR;
-	pElement[0] = NULL;
-	pElement[1] = NULL;
+	eClass = ELEMENT_CLASS_CONSTRAINT;
 	_tcscpy(Name, TEXT(""));
 	PointBeginIndexOfElement[0] = -1;
 	PointBeginIndexOfElement[1] = -1;
 	PointEndIndexOfElement[0] = -1;
 	PointEndIndexOfElement[1] = -1;
 
-	IsConstraint = true;
 }
 
 
@@ -54,12 +52,8 @@ void TConstraintColinear::NoticeListView(TListView *pListView)
 
 bool TConstraintColinear::WriteFile(HANDLE &hf, DWORD &now_pos)
 {
-	TElement::WriteFile(hf, now_pos);
-
-	::WriteFile(hf, &(pElement[0]->id), sizeof(pElement[0]->id), &now_pos, NULL);
-	now_pos += sizeof(pElement[0]->id);
-	::WriteFile(hf, &(pElement[1]->id), sizeof(pElement[1]->id), &now_pos, NULL);
-	now_pos += sizeof(pElement[1]->id);
+	if (!TConstraint::WriteFile(hf, now_pos))
+		return false;
 
 	::WriteFile(hf, &(PointBeginIndexOfElement[0]), sizeof(PointBeginIndexOfElement[0]), &now_pos, NULL);
 	now_pos += sizeof(PointBeginIndexOfElement[0]);
@@ -78,16 +72,8 @@ bool TConstraintColinear::WriteFile(HANDLE &hf, DWORD &now_pos)
 
 bool TConstraintColinear::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 {
-	TElement::ReadFile(hf, now_pos,pShape);
-
-	int id0, id1;
-	::ReadFile(hf, &id0, sizeof(id0), &now_pos, NULL);
-	now_pos += sizeof(id0);
-	::ReadFile(hf, &id1, sizeof(id1), &now_pos, NULL);
-	now_pos += sizeof(id1);
-
-	pElement[0] = pShape->GetElementById(id0);
-	pElement[1] = pShape->GetElementById(id1);
+	if (!TConstraint::ReadFile(hf, now_pos, pShape))
+		return false;
 
 	::ReadFile(hf, &(PointBeginIndexOfElement[0]), sizeof(PointBeginIndexOfElement[0]), &now_pos, NULL);
 	now_pos += sizeof(PointBeginIndexOfElement[0]);
