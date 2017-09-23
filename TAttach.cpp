@@ -172,6 +172,8 @@ bool TAttach::AttachLine_inner(DPOINT dptNowPos)
 
 	for (auto pElement:pShape->Element)
 	{
+		//if (pElement->Attach(dptNowPos))
+		//	return true;
 		switch (pElement->eType)
 		{
 		case ELEMENT_SLIDER:

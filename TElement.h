@@ -56,35 +56,38 @@ public:
 
 	TElement();
 	virtual ~TElement();
-	//virtual void TElement::BuildpDpt();
 	virtual const String TElement::GetElementTypeName()=0;//得到类型名称
 	virtual bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos)=0;
 	virtual bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)=0;
 	virtual void TElement::Draw(HDC hdc, const TConfiguration* pConfig) = 0;
 	virtual void TElement::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) = 0;
-	virtual void TElement::NoticeListView(TListView *pListView)=0;
-	virtual const DPOINT TElement::GetRelativePointByIndex(int PointIndexOfElement) const;
-	virtual DPOINT TElement::GetAbsolutePointByIndex(int PointIndexOfElement) const;
-	virtual void TElement::SetX(double x);
-	virtual void TElement::SetY(double y);
-	virtual void TElement::SetPhi(double phi);
-	virtual void TElement::ChangePos(DPOINT dptDelta);
+	virtual void TElement::NoticeListView(TListView *pListView) = 0;
+	virtual bool TElement::IsAttached(DPOINT dptNowPos){ return false; };
 	virtual bool TElement::Picked(const POINT &ptPos, const TConfiguration *pConfig){ return false; }
 	virtual bool TElement::InSelect(RECT rect, bool bSelCross, const TConfiguration *pConfig);
-	virtual void TElement::SetStateNormal();
-	virtual void TElement::SetStateHover();
-	virtual void TElement::SetStateUnHover();
-	virtual void TElement::SetStateChosen();
 
-	bool TElement::IsConstraint(){ return eClass == ELEMENT_CLASS_CONSTRAINT; }
-	bool TElement::CanBeDragged(){ return eClass == ELEMENT_CLASS_NORMAL; }
-
-	void TElement::SetStyle(const LOGPEN &logpen);//设置样式
-	void TElement::SetStyle(TConfiguration *pConfig);//设置样式
-	void TElement::SetColor(COLORREF cr);
-	void TElement::SetLineWidth(LONG width);
+	virtual const DPOINT TElement::GetRelativePointByIndex(int PointIndexOfElement) const;
+	virtual DPOINT TElement::GetAbsolutePointByIndex(int PointIndexOfElement) const;
+	virtual void TElement::ChangePos(DPOINT dptDelta);
+	virtual void TElement::SetPhi(double phi);
 
 	TElement& TElement::operator=(const TElement &element);
+
+	//Element独有函数
+	virtual void TElement::SetX(double x) final;
+	virtual void TElement::SetY(double y) final;
+	virtual void TElement::SetStateNormal() final;
+	virtual void TElement::SetStateHover() final;
+	virtual void TElement::SetStateUnHover() final;
+	virtual void TElement::SetStateChosen() final;
+
+	virtual bool TElement::IsConstraint()const final{ return eClass == ELEMENT_CLASS_CONSTRAINT; }
+	virtual bool TElement::CanBeDragged()const final{ return eClass == ELEMENT_CLASS_NORMAL; }
+
+	virtual void TElement::SetStyle(const LOGPEN &logpen) final;//设置样式
+	virtual void TElement::SetStyle(TConfiguration *pConfig) final;//设置样式
+	virtual void TElement::SetColor(COLORREF cr) final;
+	virtual void TElement::SetLineWidth(LONG width) final;
 };
 
 	const String GetLineStyleName(UINT linestyle);//得到线型名称
