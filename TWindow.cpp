@@ -220,7 +220,7 @@ void TWindow::GetWndClassEx(WNDCLASSEX & wc)
 	wc.hInstance = NULL;
 	wc.hIcon = m_hTitleIcon;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wc.hbrBackground = (HBRUSH)(COLOR_MENU  +1);//
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = NULL;
 	wc.hIconSm = NULL;

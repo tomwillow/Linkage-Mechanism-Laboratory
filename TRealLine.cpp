@@ -3,6 +3,7 @@
 #include "MyMath.h"
 #include "TRealLine.h"
 
+#include "TAttach.h"
 #include "TConfiguration.h"
 #include "TDraw.h"
 #include "TListView.h"
@@ -33,7 +34,7 @@ void TRealLine::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("P0"), CTRLTYPE_COOR_P1_EDIT, &ptBegin, TEXT("%.3f,%.3f"), ptBegin.x, ptBegin.y);
 	pListView->AddAttributeItem(TEXT("P1"), CTRLTYPE_COOR_P2_EDIT, &ptEnd, TEXT("%.3f,%.3f"), ptEnd.x, ptEnd.y);
 	pListView->AddAttributeItem(TEXT("长度"), CTRLTYPE_LEN_EDIT, NULL, TEXT("%f"), dLength);
-	pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_EDIT, NULL, TEXT("%f"), REG2DEG(dAngle));
+	pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_EDIT, NULL, TEXT("%f"), RAD2DEG(dAngle));
 }
 
 
@@ -73,7 +74,7 @@ void TRealLine::SetPointByDegAngle(DPOINT dptBegin, double dLength, double dDegA
 					if ((iAngle > 0 && iAngle % 270 == 0) || (iAngle < 0 && iAngle % 90 == 0))
 						iIvoryLine = 4;
 	}
-	SetPointByIvoryLine(iIvoryLine, dptBegin, dLength, DEG2REG(dDegAngle));
+	SetPointByIvoryLine(iIvoryLine, dptBegin, dLength, DEG2RAD(dDegAngle));
 }
 
 //若iIvory==0，则使用length和angle。否则按照象限数及length设置端点
@@ -226,4 +227,20 @@ bool TRealLine::InSelCross(RECT rect, const TConfiguration *pConfig)
 		return true;
 	else
 		return false;
+}
+
+bool TRealLine::IsAttached(DPOINT dptNowPos,TAttach *pAttach,const TConfiguration *pConfig)
+{
+	int PointIndex[2] = { 0, 1 };
+	return pAttach->AttachLine_Element_inner(dptNowPos, ptBegin, ptEnd, PointIndex, pConfig);
+};
+
+bool TRealLine::PointIsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)
+{
+	if (pAttach->AttachPointByElement(dptNowPos, ptBegin, 0, this, pConfig))
+		return true;
+	else
+		if (pAttach->AttachPointByElement(dptNowPos, ptEnd, 1, this, pConfig))
+			return true;
+	return false;
 }

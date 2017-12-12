@@ -177,7 +177,7 @@ void TPolylineBarTool::AddIntoShape()
 	//入库
 	AddTreeViewItem(pPolylineBar, pShape->iNextId);
 
-	TPolylineBar *pSavedPolylineBar = pShape->AddElement(pPolylineBar);
+	TPolylineBar *pSavedPolylineBar = dynamic_cast<TPolylineBar *>(pShape->AddElement(pPolylineBar));
 
 	//重合约束入库
 	while (!vecpCoincide.empty())

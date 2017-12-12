@@ -2,6 +2,7 @@
 #include "DetectMemoryLeak.h"
 
 #include "tchar_head.h"
+#include <stdio.h>//_vsnprintf_s
 #include "TControl.h"
 
 #include "TTransfer.h"
@@ -13,6 +14,8 @@ TControl::TControl()
 	m_hInst = NULL;
 
 	Text = NULL;
+
+	m_hFont = NULL;
 }
 
 
@@ -20,6 +23,9 @@ TControl::~TControl()
 {
 	if (Text != NULL)
 		free(Text);
+
+	if (m_hFont!=NULL)
+	::DeleteObject(m_hFont);
 }
 
 //仅使用x,y坐标，width,height使用原大小
@@ -103,7 +109,42 @@ void TControl::SetFont(HFONT hFont)
 		);
 }
 
-void CDECL TControl::SetText(TCHAR szFormat[], ...)
+void TControl::SetDefaultGuiFont()
+{
+	if (m_hFont != NULL)
+	{
+		DeleteObject(m_hFont);
+		m_hFont = NULL;
+	}
+
+	m_hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);//
+	SetFont(m_hFont);
+}
+
+void TControl::SetFont(TCHAR FontName[], int FontSize)
+{
+	if (m_hFont != NULL)
+	{
+		DeleteObject(m_hFont);
+		m_hFont = NULL;
+	}
+	
+	LOGFONT lf;
+	ZeroMemory(&lf, sizeof(lf));
+	_tcscpy_s(lf.lfFaceName,_tcslen(FontName)+1, FontName);
+	lf.lfHeight = -MulDiv(FontSize, GetDeviceCaps(GetDC(m_hWnd), LOGPIXELSY), 72);
+	//lf.lfWeight = 900;
+	
+	m_hFont = CreateFontIndirect(&lf);
+	SetFont(m_hFont);
+}
+
+void TControl::SetText(const String &s)
+{
+	::SetWindowText(m_hWnd, s.c_str());
+}
+
+void CDECL TControl::SetText(const TCHAR szFormat[], ...)
 {
 	TCHAR szBuffer[1024];
 	va_list pArgList;
@@ -113,6 +154,7 @@ void CDECL TControl::SetText(TCHAR szFormat[], ...)
 
 	::SetWindowText(m_hWnd, szBuffer);
 }
+
 
 void TControl::GetText(TCHAR text[])
 {

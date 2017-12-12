@@ -31,5 +31,8 @@ public:
 	virtual void TSlider::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) override;
 	DPOINT TSlider::GetAbsolutePointByIndex(int PointIndexOfElement) const override;
 	virtual bool TSlider::Picked(const POINT &ptPos, const TConfiguration *pConfig)override;
+
+	virtual bool TSlider::IsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)override;
+	virtual bool TSlider::PointIsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)override;
 };
 

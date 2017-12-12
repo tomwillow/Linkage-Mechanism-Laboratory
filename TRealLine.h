@@ -29,5 +29,8 @@ public:
 	virtual void TRealLine::SetPhi(double phi) override;
 	virtual void TRealLine::ChangePos(DPOINT dptDelta)override;
 	virtual bool TRealLine::Picked(const POINT &ptPos, const TConfiguration *pConfig)override;
+
+	virtual bool TRealLine::IsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)override;
+	virtual bool TRealLine::PointIsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)override;
 };
 

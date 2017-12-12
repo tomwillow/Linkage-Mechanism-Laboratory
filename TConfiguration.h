@@ -36,7 +36,7 @@ public:
 	int FRAMEPOINT_H = 20;//高-圆心到地线距离
 	int FRAMEPOINT_B = 30;//底边长
 	int FRAMEPOINT_SECTION_H = 10;//剖面线区域高度
-	int FRAMEPOINT_ANGLE = int(DEG2REG(60.0));//三角形弧度
+	int FRAMEPOINT_ANGLE = int(DEG2RAD(60.0));//三角形弧度
 	int SLIDER_B = 45;//滑块宽
 	int SLIDER_H = 30;//滑块高
 	int BAR_R = 7;//杆件圆角半径

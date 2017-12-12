@@ -2,6 +2,7 @@
 #include "DetectMemoryLeak.h"
 #include "TFramePoint.h"
 
+#include "TAttach.h"
 #include "TConfiguration.h"
 #include "TDraw.h"
 #include "TListView.h"
@@ -72,4 +73,10 @@ bool TFramePoint::InSelCross(RECT rect, const TConfiguration *pConfig)
 	RegularRect(rect);
 	RECT rcBox = GetFramePointBox(pConfig);
 	return RectCrossRect(rect, rcBox);
+}
+
+bool TFramePoint::PointIsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)
+{
+	//Îü¸½»ú¼Üµã
+	return pAttach->AttachPointByElement(dptNowPos, dpt, 0, this, pConfig);
 }

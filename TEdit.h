@@ -22,11 +22,9 @@ protected:
 public:
 	//bool bSendParentUserMsg=false;//如果置true,则接收到WM_KEYDOWN时向父窗口发送WM_USER消息
 	bool bMultiLine,bAutoHScrol,bAutoVScrol,bNoHideSel;
-	HFONT m_hFont;
 	TEdit();
 	~TEdit();
 	void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle = WS_EX_CLIENTEDGE);//创建Edit
-	void TEdit::SetDefaultGuiFont();
 	void TEdit::SetSelect(int iStart, int iEnd);//选择
 	void TEdit::SetSelectAll();//全选
 };

@@ -45,11 +45,11 @@ void SignificantDigit(double dNum, int iDigit, int &iResult, double &dResult,int
 		iPrecisionDigit = 0;
 		while (*(dot+1) != TEXT('\0'))
 		{
-			swap(*dot, *(dot+1));
+			std::swap(*dot, *(dot+1));
 			++dot;
 			++iPrecisionDigit;
 		}
-		swap(*dot, *(dot+1));
+		std::swap(*dot, *(dot + 1));
 	}
 	else
 	{
@@ -64,4 +64,9 @@ void SignificantDigit(double dNum, int iDigit, int &iResult, double &dResult,int
 		*(start + iDigit) = TEXT('\0');
 	}
 	iResult = TTransfer::TCHAR2int(sz);
+}
+
+double involute(double x)
+{
+	return tan(x) - x;
 }

@@ -15,8 +15,6 @@ using std::endl;
 using std::wstring;
 #define String wstring
 
-//#define String std::basic_string<TCHAR>
-
 using std::wostream;
 #define Ostream wostream
 
@@ -103,3 +101,6 @@ inline String & operator<<(String &s,const String &s2)
 	s += s2;
 	return s;
 }
+
+std::wstring stringToWstring(const std::string& str);
+std::string wstringToString(const std::wstring& wstr);

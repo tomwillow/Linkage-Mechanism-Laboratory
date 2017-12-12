@@ -6,5 +6,7 @@ class TButton :
 public:
 	TButton();
 	~TButton();
+
+	void TButton::CreateButton(HWND hParent, UINT uId, TCHAR text[], HINSTANCE hInst);
 };
 

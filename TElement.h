@@ -30,6 +30,7 @@ enum EnumElementClass{
 class TConfiguration;
 class TShape;
 class TListView;
+class TAttach;
 class TElement
 {
 	friend void RefreshDOF(TElement *pElement, int &nb, int &iCoincideNum, int &iDriverNum, int &iFrameNum, bool isAdd);
@@ -62,7 +63,9 @@ public:
 	virtual void TElement::Draw(HDC hdc, const TConfiguration* pConfig) = 0;
 	virtual void TElement::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) = 0;
 	virtual void TElement::NoticeListView(TListView *pListView) = 0;
-	virtual bool TElement::IsAttached(DPOINT dptNowPos){ return false; };
+	virtual bool TElement::IsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig){return false;}
+	virtual bool TElement::PointIsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig){ return false; }
+
 	virtual bool TElement::Picked(const POINT &ptPos, const TConfiguration *pConfig){ return false; }
 	virtual bool TElement::InSelect(RECT rect, bool bSelCross, const TConfiguration *pConfig);
 

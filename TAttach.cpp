@@ -117,12 +117,50 @@ void TAttach::AttachAll(POINT ptNowPos)
 			return;
 }
 
+bool TAttach::AttachLine_Element_inner(DPOINT dptNowPos, DPOINT dptAbsolute1, DPOINT dptAbsolute2, int PointIndex[2],
+	const TConfiguration *pConfig)
+{
+	int status = TDraw::PointInRealLineOrExtension(dptNowPos, dptAttach, dptAbsolute1,dptAbsolute2, pConfig);
+	if (status == -1)
+		return false;
+
+	//已捕捉
+	bAttachedEndpoint = false;
+	bShowAttachPoint = true;
+	bShowExtensionLine = true;
+
+	iAttachLinePointIndex[0] = PointIndex[0];
+	iAttachLinePointIndex[1] = PointIndex[1];
+
+	switch (status)
+	{
+	case 1://-1都不在 0在线段上 1在pt1一侧延长线 2在pt2一侧延长线
+		ExtensionLine->SetPoint(dptAbsolute1, dptAttach);
+		return true;
+	case 2:
+		ExtensionLine->SetPoint(dptAbsolute2, dptAttach);
+		return true;
+	case 0:
+		ExtensionLine->SetPoint({ 0, 0 }, { 0, 0 });
+		return true;
+	}
+	return false;
+}
+
+bool TAttach::AttachLineByRelativeVecPt(DPOINT dptNowPos, TElement *pElement, const std::vector<DPOINT> &vecdptRelative, const TConfiguration *pConfig)
+{
+	std::vector<DPOINT> vecdptAbsolute;
+	TDraw::GetAbsoluteReal(vecdptAbsolute, vecdptRelative, pElement->dpt, pElement->angle);
+
+	return AttachLineByAbsoluteVecPt(dptNowPos, pElement,vecdptAbsolute);
+}
+
 //以绝对坐标vecdptAbsolute顺序构成的线段，检测ptNowPos是否位于线上，并设置参数：
 //bAttachedEnepoint
 //bShowAttachPoint
 //bShowExtensionLine  ExtensionLine
 //iAttachLinePointIndex[0] iAttachLinePointIndex[1]
-bool TAttach::AttachLine_Element(DPOINT dptNowPos,const std::vector<DPOINT> vecdptAbsolute)
+bool TAttach::AttachLineByAbsoluteVecPt(DPOINT dptNowPos,TElement *pElement,const std::vector<DPOINT> &vecdptAbsolute)
 {
 	if (vecdptAbsolute.empty()) return false;
 
@@ -131,28 +169,10 @@ bool TAttach::AttachLine_Element(DPOINT dptNowPos,const std::vector<DPOINT> vecd
 
 	for (auto pt = vecdptAbsolute.begin(); pt != vecdptAbsolute.end() - 1; ++pt)
 	{
-		int status = TDraw::PointInRealLineOrExtension(dptNowPos,dptAttach, *pt, *(pt + 1), pConfig);
-		if (status == -1)
-			continue;
-
-		//已捕捉
-		bAttachedEndpoint = false;
-		bShowAttachPoint = true;
-		bShowExtensionLine = true;
-
-		iAttachLinePointIndex[0] = pt - vecdptAbsolute.begin();
-		iAttachLinePointIndex[1] = pt + 1 - vecdptAbsolute.begin();
-
-		switch (status)
+		int iPointIndex[2] = { pt - vecdptAbsolute.begin(), pt + 1 - vecdptAbsolute.begin() };
+		if (AttachLine_Element_inner(dptNowPos, *pt, *(pt + 1), iPointIndex, pConfig))
 		{
-		case 1://-1都不在 0在线段上 1在pt1一侧延长线 2在pt2一侧延长线
-			ExtensionLine->SetPoint(*pt, dptAttach);
-			return true;
-		case 2:
-			ExtensionLine->SetPoint(*(pt + 1), dptAttach);
-			return true;
-		case 0:
-			ExtensionLine->SetPoint({ 0, 0 }, { 0, 0 });
+			pAttachElement = pElement;
 			return true;
 		}
 	}
@@ -172,92 +192,15 @@ bool TAttach::AttachLine_inner(DPOINT dptNowPos)
 
 	for (auto pElement:pShape->Element)
 	{
-		//if (pElement->Attach(dptNowPos))
-		//	return true;
-		switch (pElement->eType)
-		{
-		case ELEMENT_SLIDER:
-		case ELEMENT_POLYLINEBAR:
-		{
-			std::vector<DPOINT> vecdptAbsolute;
-			TDraw::GetAbsoluteReal(vecdptAbsolute, pElement->vecDpt, pElement->dpt, pElement->angle);
-
-			if (AttachLine_Element(dptNowPos, vecdptAbsolute))
-			{
-				pAttachElement = pElement;
-				return true;
-			}
-
-			//吸附Slider
-			if (pElement->eType == ELEMENT_SLIDER)
-			{
-				std::vector<DPOINT> vecdptAbsoluteSlider;
-				vecdptAbsoluteSlider.push_back(pElement->GetAbsolutePointByIndex(-1));
-				vecdptAbsoluteSlider.push_back(pElement->GetAbsolutePointByIndex(0));
-
-				if (AttachLine_Element(dptNowPos, vecdptAbsoluteSlider))
-				{
-					iAttachLinePointIndex[0] = -1;
-					iAttachLinePointIndex[1] = 0;
-					pAttachElement = pElement;
-					return true;
-				}
-			}
-
-			break;
-		}
-		case ELEMENT_REALLINE:
-		case ELEMENT_BAR:
-		case ELEMENT_SLIDEWAY:
-		{
-			TRealLine *pRealLine = (TRealLine *)pElement;
-			int status = TDraw::PointInRealLineOrExtension(dptNowPos, dptAttach, pRealLine->ptBegin,pRealLine->ptEnd, pConfig);
-			if (status == -1)
-				break;
-
-				bAttachedEndpoint = false;
-				bShowAttachPoint = true;
-				bShowExtensionLine = true;
-				pAttachElement = pElement;
-
-				iAttachLinePointIndex[0] = 0;
-				iAttachLinePointIndex[1] = 1;
-
-			switch (status)
-			{
-			case 1://-1都不在 0在线段上 1在pt1一侧延长线 2在pt2一侧延长线
-				ExtensionLine->SetPoint(((TRealLine *)pElement)->ptBegin, dptAttach);
-				return true;
-			case 2:
-				ExtensionLine->SetPoint(((TRealLine *)pElement)->ptEnd, dptAttach);
-				return true;
-			case 0:
-				ExtensionLine->SetPoint({ 0, 0 }, { 0, 0 });
-				return true;
-			}
-		}
-		case ELEMENT_FRAMEPOINT:
-		case CONSTRAINT_COINCIDE:
-		case CONSTRAINT_COLINEAR:
-		case DRIVER:
-			break;
-		default:
-			assert(0);
-			break;
-		}
+		if (pElement->IsAttached(dptNowPos,this,pConfig))
+			return true;
 	}
 	return false;
 }
 
 bool TAttach::AttachLineSelf(DPOINT dptNowPos)
 {
-	if (AttachLine_Element(dptNowPos, vecdpt))
-	{
-		//pAttachElement = pElement;
-		return true;
-	}
-	else
-		return false;
+	return AttachLineByAbsoluteVecPt(dptNowPos, nullptr, vecdpt);
 }
 
 //检查NowPos是否靠近以CheckPos为原点的极轴，使用前应设置dptAttach为当前点
@@ -325,6 +268,20 @@ bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos)
 		return false;
 }
 
+bool TAttach::AttachPointByElement(DPOINT dptNowPos,DPOINT &dpt,int iPointIndex, TElement *pElement, const TConfiguration *pConfig)
+{
+	if (DPTisApproached(dptNowPos,dpt))
+	{
+		bAttachedEndpoint = true;
+		bShowAttachPoint = true;
+		pAttachElement = pElement;
+		iAttachElementPointIndex = iPointIndex;
+		dptAttach = dpt;
+		return true;
+	}
+	return false;
+}
+
 //读取pShape中的RealLine进行吸附，使用前应设置dptAttach为当前点
 bool TAttach::AttachPoint(DPOINT dptPos)
 {
@@ -333,80 +290,9 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 	pAttachElement = NULL;
 	for (auto pElement: pShape->Element)
 	{
-		eAttachElementType = pElement->eType;
-		switch (pElement->eType)
-		{
-		case ELEMENT_BAR:
-		case ELEMENT_REALLINE:
-		case ELEMENT_SLIDEWAY:
-		{
-			TRealLine *pRealLine = (TRealLine *)pElement;
-			//吸附起点
-			if (DPTisApproached(dptPos, pRealLine->ptBegin))
-			{
-				bAttachedEndpoint = true;
-				bShowAttachPoint = true;
-				pAttachElement = pRealLine;
-				iAttachElementPointIndex = 0;
-				dptAttach = pRealLine->ptBegin;
-				return true;
-			}
-
-			//吸附终点
-			if (DPTisApproached(dptPos, pRealLine->ptEnd))
-			{
-				bAttachedEndpoint = true;
-				bShowAttachPoint = true;
-				pAttachElement = pRealLine;
-				iAttachElementPointIndex = 1;
-				dptAttach = pRealLine->ptEnd;
-				return true;
-			}
-			break;
-		}
-		case ELEMENT_FRAMEPOINT:
-		{
-			TFramePoint *pFramePoint = (TFramePoint *)pElement;
-			//吸附机架点
-			if (DPTisApproached(dptPos, pFramePoint->dpt))
-			{
-				bAttachedEndpoint = true;
-				bShowAttachPoint = true;
-				pAttachElement = pFramePoint;
-				iAttachElementPointIndex = 0;
-				dptAttach = pFramePoint->dpt;
-				return true;
-			}
-			break;
-		}
-		case ELEMENT_POLYLINEBAR:
-		case ELEMENT_SLIDER:
-		{
-			for (auto iter = pElement->vecDpt.begin(); iter != pElement->vecDpt.end(); ++iter)
-			{
-				if (DPTisApproached(dptPos, TDraw::GetAbsolute(*iter, pElement->dpt, pElement->angle)))
-				{
-					bAttachedEndpoint = true;
-					bShowAttachPoint = true;
-					pAttachElement = pElement;
-					iAttachElementPointIndex = iter - pElement->vecDpt.begin();
-					dptAttach = TDraw::GetAbsolute(*iter, pElement->dpt, pElement->angle);
-					return true;
-				}
-			}
-			break;
-		}
-		//不吸附端点的元素
-		case CONSTRAINT_COLINEAR:
-		case CONSTRAINT_COINCIDE:
-		case DRIVER:
-			break;
-		default:
-			assert(0);
-			break;
-		}
+		if (pElement->PointIsAttached(dptPos, this, pConfig))
+			return true;
 	}
-
 
 	return false;
 }

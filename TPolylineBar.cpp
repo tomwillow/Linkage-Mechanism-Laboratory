@@ -2,6 +2,7 @@
 #include "MyMath.h"
 #include "TPolylineBar.h"
 
+#include "TAttach.h"
 #include "TConfiguration.h"
 #include "TDraw.h"
 #include "TListView.h"
@@ -31,7 +32,7 @@ void TPolylineBar::NoticeListView(TListView *pListView)
 	TCHAR buffer[16];
 
 	pListView->AddAttributeItem(TEXT("原点"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
-	pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), REG2DEG(angle));
+	pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), RAD2DEG(angle));
 
 	for (size_t i = 0; i < vecDpt.size(); ++i)
 	{
@@ -74,4 +75,19 @@ bool TPolylineBar::InSelCross(RECT rect, const TConfiguration *pConfig)
 	TDraw::GetAbsoluteScreen(vecpt, vecDpt, dpt, angle, pConfig);
 
 	return VecPointCrossRect(rect, vecpt);
+}
+
+bool TPolylineBar::IsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)
+{
+	return pAttach->AttachLineByRelativeVecPt(dptNowPos, this, vecDpt, pConfig);
+}
+
+bool TPolylineBar::PointIsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)
+{
+	for (auto iter = vecDpt.begin(); iter !=vecDpt.end(); ++iter)
+	{
+		if (pAttach->AttachPointByElement(dptNowPos, TDraw::GetAbsolute(*iter, dpt, angle), iter - vecDpt.begin(), this, pConfig))
+			return true;
+	}
+	return false;
 }

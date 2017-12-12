@@ -223,7 +223,7 @@ void TElement::NoticeListView(TListView *pListView)
 	pListView->AddAttributeItem(TEXT("Alpha"), CTRLTYPE_INT_EDIT, &alpha, TEXT("%d"), alpha);
 
 	//pListView->AddAttributeItem(TEXT("原点"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
-	//pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), REG2DEG(angle));
+	//pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), RAD2DEG(angle));
 }
 
 void TElement::SetLineWidth(LONG width)

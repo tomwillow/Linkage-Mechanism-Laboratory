@@ -1,9 +1,11 @@
 #pragma once
 #include <Windows.h>
+#include "String.h"
 
 class TControl
 {
 private:
+	HFONT m_hFont;
 	static LRESULT CALLBACK TControl::subControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 public:
 	//LONG m_iWidth, m_iHeight;
@@ -19,7 +21,10 @@ public:
 	//void TControl::SetPos(RECT &rect);
 	void TControl::Invalidate();
 	void TControl::SetFont(HFONT hFont);
-	void CDECL TControl::SetText(TCHAR szFormat[], ...);//设置内容
+	void TControl::SetDefaultGuiFont();
+	void TControl::SetFont(TCHAR FontName[], int FontSize);
+	void TControl::SetText(const String &s);
+	void CDECL TControl::SetText(const TCHAR szFormat[], ...);//设置内容
 	void TControl::GetText(TCHAR text[]);
 	TCHAR * TControl::GetText();
 	int TControl::GetLength();//获取字符串长度	

@@ -217,7 +217,7 @@ void TSliderTool::AddIntoShape()
 {
 	//滑块入库
 	AddTreeViewItem(pSlider, pShape->iNextId);
-	TSlider *pSavedSlider = pShape->AddElement(pSlider);
+	TSlider *pSavedSlider = dynamic_cast<TSlider *>(pShape->AddElement(pSlider));
 
 	//重合约束入库
 	while (!stackpCoincide.empty())

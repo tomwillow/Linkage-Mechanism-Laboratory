@@ -174,6 +174,35 @@ bool TShape::ReadFromFile(TCHAR szFileName[])
 	return success;
 }
 
+TElement* TShape::BuildElementByType(EnumElementType eType)const
+{
+	//按照类型读入元素
+	switch (eType)
+	{
+	case ELEMENT_BAR:
+		return new TBar;
+	case ELEMENT_REALLINE:
+		 return new TRealLine;
+	case ELEMENT_FRAMEPOINT:
+		 return new TFramePoint;
+	case ELEMENT_SLIDER:
+		 return new TSlider;
+	case ELEMENT_POLYLINEBAR:
+		 return new TPolylineBar;
+	case ELEMENT_SLIDEWAY:
+		 return new TSlideway;
+	case CONSTRAINT_COINCIDE:
+		 return new TConstraintCoincide;
+	case CONSTRAINT_COLINEAR:
+		 return new TConstraintColinear;
+	case DRIVER:
+		 return new TDriver;
+	default:
+		assert(0);
+		break;
+	}
+}
+
 bool TShape::ReadFromFile_inner(HANDLE hf)
 {
 	if (GetLastError() != 0)
@@ -197,93 +226,25 @@ bool TShape::ReadFromFile_inner(HANDLE hf)
 		now_pos += sizeof(EnumElementType);
 
 		//按照类型读入元素
-		switch (eType)
+		TElement *pElement = BuildElementByType(eType);
+		if (pElement->ReadFile(hf, now_pos, this))
 		{
-		case ELEMENT_BAR:
-		{
-			TBar temp;
-			if (temp.ReadFile(hf, now_pos, this))
-				AddElement(&temp);
+			//AddElement(pElement);
+
+			if (pElement->id == -1)
+				pElement->id = iNextId;
 			else
-				return false;
-			break;
+				iNextId = pElement->id;
+
+			RefreshDOF(pElement, nb, iCoincideNum, iDriverNum, iFrameNum, true);
+
+			Element.push_back(pElement);
+			iNextId++;
 		}
-		case ELEMENT_REALLINE:
+		else
 		{
-			TRealLine temp;
-			if (temp.ReadFile(hf, now_pos, this))
-				AddElement(&temp);
-			else
-				return false;
-			break;
-		}
-		case ELEMENT_FRAMEPOINT:
-		{
-			TFramePoint temp;
-			if (temp.ReadFile(hf, now_pos, this))
-				AddElement(&temp);
-			else
-				return false;
-			break;
-		}
-		case ELEMENT_SLIDER:
-		{
-			TSlider temp;
-			if (temp.ReadFile(hf, now_pos, this))
-				AddElement(&temp);
-			else
-				return false;
-			break;
-		}
-		case ELEMENT_POLYLINEBAR:
-		{
-			TPolylineBar temp;
-			if (temp.ReadFile(hf, now_pos, this))
-				AddElement(&temp);
-			else
-				return false;
-			break;
-		}
-		case ELEMENT_SLIDEWAY:
-		{
-			TSlideway temp;
-			if (temp.ReadFile(hf, now_pos, this))
-				AddElement(&temp);
-			else
-				return false;
-			break;
-		}
-		case CONSTRAINT_COINCIDE:
-		{
-			TConstraintCoincide temp;
-			if (temp.ReadFile(hf, now_pos, this))
-				AddElement(&temp);
-			else
-				return false;
-			break;
-		}
-		case CONSTRAINT_COLINEAR:
-		{
-			TConstraintColinear temp;
-			if (temp.ReadFile(hf, now_pos, this))
-				AddElement(&temp);
-			else
-				return false;
-			break;
-		}
-		case DRIVER:
-		{
-			TDriver temp;
-			if (temp.ReadFile(hf, now_pos, this))
-				AddElement(&temp);
-			else
-				return false;
-			break;
-		}
-		default:
+			delete pElement;
 			return false;
-			//assert(0);
-			break;
 		}
 	}
 	return true;

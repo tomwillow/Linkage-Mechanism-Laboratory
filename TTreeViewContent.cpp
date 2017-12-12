@@ -83,29 +83,24 @@ void TTreeViewContent::AddItem(TElement *Element, int id)
 	wsprintf(buffer, TEXT("%s %s %s"), buffer,Element->GetElementTypeName().c_str(), Element->Name);
 
 	TItem tempItem;
-	switch (Element->eType)
+	switch (Element->eClass)
 	{
-	case ELEMENT_REALLINE:
-	case ELEMENT_FRAMEPOINT:
-	case ELEMENT_BAR:
-	case ELEMENT_SLIDEWAY:
-	case ELEMENT_SLIDER:
-	case ELEMENT_POLYLINEBAR:
+	case ELEMENT_CLASS_FRAME:
+	case ELEMENT_CLASS_NORMAL:
 		temp = InsertTreeviewItem(buffer, hPrevObject);
 		TreeView_Expand(m_hWnd, hPrevObject, TVE_EXPAND);
 		tempItem.ObjectId = id;
 		tempItem.hTreeItem = temp;
 		Item.push_back(tempItem);
 		break;
-	case CONSTRAINT_COLINEAR:
-	case CONSTRAINT_COINCIDE:
+	case ELEMENT_CLASS_CONSTRAINT:
 		temp = InsertTreeviewItem(buffer, hPrevConstraint);
 		TreeView_Expand(m_hWnd, hPrevConstraint, TVE_EXPAND);
 		tempItem.ObjectId = id;
 		tempItem.hTreeItem = temp;
 		Item.push_back(tempItem);
 		break;
-	case DRIVER:
+	case ELEMENT_CLASS_DRIVER:
 		temp = InsertTreeviewItem(buffer, hPrevDriver);
 		TreeView_Expand(m_hWnd, hPrevDriver, TVE_EXPAND);
 		tempItem.ObjectId = id;

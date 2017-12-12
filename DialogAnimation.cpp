@@ -772,6 +772,8 @@ namespace DialogAnimation
 		case D:return TEXT("位移"); break;
 		case V:return TEXT("速度"); break;
 		case A:return TEXT("加速度"); break;
+		default:
+			return TEXT("error"); break;
 		}
 	}
 

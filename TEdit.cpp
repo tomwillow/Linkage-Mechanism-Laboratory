@@ -5,7 +5,6 @@
 #include <CommCtrl.h>
 TEdit::TEdit()
 {
-	m_hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 
 	bMultiLine = false;
 	bAutoHScrol = false;
@@ -15,7 +14,6 @@ TEdit::TEdit()
 
 TEdit::~TEdit()
 {
-	::DeleteObject(m_hFont);
 }
 
 LRESULT TEdit::WndProc(WNDPROC wndproc,HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -51,16 +49,12 @@ void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle)
 		(bMultiLine ? ES_MULTILINE : 0) |
 		(bAutoHScrol ? ES_AUTOHSCROLL|WS_HSCROLL : 0)|
 		(bAutoVScrol?ES_AUTOVSCROLL|WS_VSCROLL:0)|
-		(bNoHideSel?ES_NOHIDESEL:0),//|ES_RIGHT | WS_VISIBLE
+		(bNoHideSel?ES_NOHIDESEL:0)| WS_VISIBLE,//|ES_RIGHT 
 		0, 0, 0, 0, hParent,(HMENU)id, hInst,0);
 
 	RegisterProc();
 }
 
-void TEdit::SetDefaultGuiFont()
-{
-	SetFont(m_hFont);
-}
 
 
 void TEdit::SetSelect(int iStart, int iEnd)

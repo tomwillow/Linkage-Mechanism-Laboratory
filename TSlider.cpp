@@ -3,6 +3,7 @@
 
 #include "TSlider.h"
 
+#include "TAttach.h"
 #include "TConfiguration.h"
 #include "TDraw.h"
 #include "TListView.h"
@@ -35,7 +36,7 @@ void TSlider::NoticeListView(TListView *pListView)
 	TCHAR buffer[16];
 
 	pListView->AddAttributeItem(TEXT("原点"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
-	pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), REG2DEG(angle));
+	pListView->AddAttributeItem(TEXT("角度"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), RAD2DEG(angle));
 
 	for (size_t i = 0; i < vecDpt.size(); ++i)
 	{
@@ -150,4 +151,32 @@ bool TSlider::InSelCross(RECT rect, const TConfiguration *pConfig)
 	}
 
 	return APointCrossRect(rect, apt, 4) || VecPointCrossRect(rect, vecpt);
+}
+
+bool TSlider::IsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)
+{
+	if (pAttach->AttachLineByRelativeVecPt(dptNowPos, this, vecDpt, pConfig))
+		return true;
+
+	std::vector<DPOINT> vecdptAbsoluteSlider;
+	vecdptAbsoluteSlider.push_back(GetAbsolutePointByIndex(-1));
+	vecdptAbsoluteSlider.push_back(GetAbsolutePointByIndex(0));
+
+	if (pAttach->AttachLineByAbsoluteVecPt(dptNowPos,this, vecdptAbsoluteSlider))
+	{
+		pAttach->iAttachLinePointIndex[0] = -1;
+		pAttach->iAttachLinePointIndex[1] = 0;
+		return true;
+	}
+	return false;
+}
+
+bool TSlider::PointIsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)
+{
+	for (auto iter = vecDpt.begin(); iter != vecDpt.end(); ++iter)
+	{
+		if (pAttach->AttachPointByElement(dptNowPos, TDraw::GetAbsolute(*iter, dpt, angle), iter - vecDpt.begin(), this, pConfig))
+			return true;
+	}
+	return false;
 }

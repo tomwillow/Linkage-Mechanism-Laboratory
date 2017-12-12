@@ -169,6 +169,153 @@ void TCanvas::OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	Invalidate();
 }
 
+//逆时针
+void GetArcDPOINT(std::vector<DPOINT> &result,DPOINT dptO, double r, double angle1, double angle2, double all_step) 
+{
+	double dx = (angle2 - angle1) / all_step;
+	double t = angle1, x = 0, y = 0;
+	for (int i = 0; i <= all_step; ++i)
+	{
+		x = r*cos(t) + dptO.x;
+		y = r*sin(t) + dptO.y;
+		result.push_back({ x, y });
+		t += dx;
+	}
+}
+
+DPOINT pol2cart(double theta, double r)
+{
+	double x = r*cos(theta);
+	double y = r*sin(theta);
+	return{ x, y };
+}
+
+void DrawGear(HDC hdc,int m, int z, double x,double alphaDEG, DPOINT dpt,double ang,const LOGPEN &logpen,const TConfiguration *pConfig)
+{
+	using Vector = std::vector<double>;
+	bool error = false;
+
+	HPEN hPen = CreatePenIndirect(&logpen);
+	HBRUSH hBrush =(HBRUSH)::GetStockObject(NULL_BRUSH);
+	SelectObject(hdc, hPen);
+	SelectObject(hdc, hBrush);
+
+	double ha = 1, c = (m>=1)?0.25:0.35; //齿顶高系数; 顶隙系数; 变位系数
+	double alpha = DEG2RAD(alphaDEG); //压力角
+		
+	double	r = z*m / 2; //分度圆半径
+	double	ra = r + (ha + x)*m; //齿顶圆半径
+	double	rf = r - (ha + c - x)*m; //齿根圆半径
+	if (rf < 0) error = true;//变位系数过小（-x过大），导致齿根圆半径为负
+
+	double	rb = r*cos(alpha); //基圆半径
+
+	//TDraw::DrawCircle(hdc, pConfig->RealToScreen(dpt), pConfig->LengthToScreenX(ra));
+	//TDraw::DrawCircle(hdc, pConfig->RealToScreen(dpt), pConfig->LengthToScreenX(rb));
+	//TDraw::DrawCircle(hdc, pConfig->RealToScreen(dpt), pConfig->LengthToScreenX(rf));
+
+	double p = M_PI*m; //齿距
+	double s = p / 2 + 2 * x*m*tan(alpha); //齿厚
+
+	double beta1 = involute(acos(rb / r));
+	double beta2 = s / (2 * r);
+	double beta = beta1 + beta2;
+
+	double rr = abs(rb - rf) / 2;//粗取圆角半径
+	double mu = M_PI / z - beta;
+	double rr1 = rf*sin(mu) / (1 - sin(mu));//两圆角相交时的半径
+	double rr2 = abs(rb - rf);//基圆至齿根距离
+	if (rr > min(rr1, rr2)) rr = min(rr1, rr2);
+
+	std::vector<DPOINT> vecdpt;
+
+	//开始计算
+	//第-2段 圆角 = 圆角5镜像
+	double HE = rr, OH = rf + rr;
+	double gama = asin(HE / OH);
+	double epsilon = M_PI / 2 - gama - beta;
+	double Hx = OH*sin(epsilon);
+	double Hy = OH*cos(epsilon);
+	double angle1 = M_PI + gama + beta;
+	double angle2 = angle1 + (M_PI / 2 - gama);
+
+	int pt_count__2 = pConfig->LengthToScreenX(rr)/2;//圆角总点数
+	if (pt_count__2 < 2) pt_count__2 = 2;
+
+	std::vector<DPOINT> vecdpt5;
+	GetArcDPOINT(vecdpt5, { Hx, Hy }, rr, angle1, angle2, pt_count__2-1);
+	for (auto it = vecdpt5.begin(); it != vecdpt5.end(); ++it)
+	{
+		vecdpt.push_back({ it->x, -it->y });
+	}
+
+	//第-1段 直线
+
+	//第1段 渐开线
+	int step_count = pConfig->LengthToScreenX(ra - rb)/4; if (step_count < 2) step_count = 2;
+	double alphaK = 0, alphaK_end = acos(rb / ra),  dx = alphaK_end /step_count ;
+
+	if (alphaK_end > beta) error = true;//变位系数过大，齿顶渐开线相交
+
+	for (int step = 0; step <= step_count;++step)
+	{
+		double thetaK1 = involute(alphaK) - beta;
+		double rK1 = rb / cos(alphaK);
+		vecdpt.push_back(pol2cart(thetaK1, rK1));
+
+		alphaK += dx;
+	}
+
+	//第2段 齿顶圆
+	double thetaba = involute(acos(rb / ra));
+	double thetaa = beta - thetaba;
+
+	step_count = pConfig->LengthToScreenX(thetaa * 2 * ra);//半径*弧度=弧长
+	if (step_count < 2) step_count = 2;
+	GetArcDPOINT(vecdpt, { 0, 0 }, ra, -thetaa, thetaa, step_count);
+
+	//第3段 渐开线 = 渐开线1镜像
+	std::vector<DPOINT> vecdpt3(vecdpt.begin()+pt_count__2, vecdpt.end() - step_count);
+	for (auto &it = vecdpt3.rbegin(); it != vecdpt3.rend(); ++it)
+	{
+		it->y = -it->y;
+		vecdpt.push_back(*it);
+	}
+
+	//第4段 直线
+
+	//第5段 圆角
+	vecdpt.insert(vecdpt.end(), vecdpt5.rbegin(),vecdpt5.rend());
+
+	//第6段 齿根圆弧
+	double phi = 2 * M_PI / z - 2 * beta - 2 * gama;
+
+	step_count = pConfig->LengthToScreenX(ra*phi);//半径*弧度=弧长
+	GetArcDPOINT(vecdpt, { 0, 0 }, rf, beta+gama, beta+gama+phi, step_count);
+
+	//阵列
+	std::vector<DPOINT> vecdpt_all;// (vecdpt.begin(), vecdpt.end());
+	dx = 2 * M_PI / z;
+	double now_angle = 0;
+	for (int i = 0; i < z; ++i)
+	{
+		for (auto &dpt : vecdpt)
+		{
+			double x = dpt.x*cos(now_angle) - dpt.y*sin(now_angle);
+			double y = dpt.x*sin(now_angle) + dpt.y*cos(now_angle);
+			vecdpt_all.push_back({ x, y });
+		}
+		now_angle += dx;
+	}
+
+	//转为屏幕坐标
+	std::vector<POINT> vecpt;
+	TDraw::GetAbsoluteScreen(vecpt, vecdpt_all, dpt, ang, pConfig);//在这里旋转
+	Polygon(hdc, vecpt.data(), vecpt.size());
+
+	DeleteObject(hPen);
+	DeleteObject(hBrush);
+}
 
 void TCanvas::OnDraw(HDC hdc)
 {
@@ -194,4 +341,5 @@ void TCanvas::OnDraw(HDC hdc)
 	if (win.m_ManageTool.m_pCurrentTool != NULL)
 		win.m_ManageTool.m_pCurrentTool->Draw(hdc);//工具在使用中的图形绘制交由工具类执行
 
+	//DrawGear(hdc, 2, 42, 0, 20, { 0, 0 },0, pConfig->logpen, pConfig);
 }

@@ -22,11 +22,10 @@ private:
 
 
 	int iAttachPixel = 10;
-	bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2);
 	bool TAttach::AttachLine_inner(DPOINT dptNowPos);
 	bool TAttach::AttachPointSelf(DPOINT dptPos);
-	bool TAttach::AttachLine_Element(DPOINT dptNowPos, const std::vector<DPOINT> vecdptAbsolute);
-	bool TAttach::AttachLineSelf(DPOINT dptNowPos);
+
+	bool TAttach::AttachLineSelf(DPOINT dptNowPos);//与vecdpt配套
 	bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos);
 	bool TAttach::AttachPoint(DPOINT dptPos);
 public:
@@ -37,7 +36,7 @@ public:
 
 	bool bAttachedEndpoint;//吸附端点，为true则吸附上了确切存在的点
 	bool bAttachedEndpointSelf;//吸附上了vecdpt里的端点，用于PolylineBar绘制
-	EnumElementType eAttachElementType;
+	//EnumElementType eAttachElementType;
 
 	bool bShowAttachPoint;//会画叉
 	TElement *pAttachElement;
@@ -55,5 +54,13 @@ public:
 	{
 		return iIvoryLine;
 	}
+
+	bool TAttach::AttachPointByElement(DPOINT dptNowPos, DPOINT &dpt, int iPointIndex, TElement *pElement, const TConfiguration *pConfig);
+	bool TAttach::AttachLineByRelativeVecPt(DPOINT dptNowPos, TElement *pElement, const std::vector<DPOINT> &vecdptRelative, const TConfiguration *pConfig);
+	bool TAttach::AttachLineByAbsoluteVecPt(DPOINT dptNowPos, TElement *pElement, const std::vector<DPOINT> &vecdptAbsolute);
+	bool TAttach::AttachLine_Element_inner(DPOINT dptNowPos, DPOINT dptAbsolute1, DPOINT dptAbsolute2, int PointIndex[2],
+		const TConfiguration *pConfig);
+
+	bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2);
 };
 

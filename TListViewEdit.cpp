@@ -90,7 +90,7 @@ void TListViewEdit::ChangeSource()
 		this->GetText();
 
 		double DegAngle = TTransfer::TCHAR2double(Text);
-		*((double *)pContent) = DEG2REG(DegAngle);
+		*((double *)pContent) = DEG2RAD(DegAngle);
 		break;
 	}
 	case CTRLTYPE_COLOR_HEX:
@@ -113,7 +113,7 @@ void TListViewEdit::ChangeSource()
 
 		double len = TTransfer::TCHAR2double(Text);
 		TRealLine *pRealLine = (TRealLine *)pElement;
-		pRealLine->SetPointByDegAngle(pRealLine->ptBegin, len, REG2DEG(pRealLine->dAngle));
+		pRealLine->SetPointByDegAngle(pRealLine->ptBegin, len, RAD2DEG(pRealLine->dAngle));
 		break;
 	}
 	case CTRLTYPE_ANGLE_EDIT:
