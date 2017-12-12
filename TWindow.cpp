@@ -10,7 +10,6 @@
 #include "TWindow.h"
 
 
-// Default message handler for main program window, dispatch to OnKeyDown, OnDraw, etc.
 LRESULT TWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
@@ -98,19 +97,9 @@ LRESULT TWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 		return 0;
 
-	case WM_PALETTEISCHANGING: // should not happen
-		MessageBox(NULL, _T("Hello"), _T("Hi"), MB_OK);
-		return 0;
-
-	case WM_PALETTECHANGED:
-		return OnPaletteChanged(hWnd, wParam);
-
-	case WM_QUERYNEWPALETTE:
-		return OnQueryNewPalette();
-
 	case WM_DESTROY:
 		if (m_bMainWindow)
-			PostQuitMessage(0); // main window only
+			PostQuitMessage(0);
 		return 0;
 	case WM_CLOSE:
 		if (OnClose())
@@ -123,7 +112,6 @@ LRESULT TWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
-// Generic window procedure passed to WIN32 API, dispatches to TWindow::WndProc
 LRESULT CALLBACK TWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	TWindow * pWindow;
@@ -154,13 +142,10 @@ LRESULT CALLBACK TWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-
-// Register WNDCLASS for the window class. Registering only once
 bool TWindow::RegisterClass(LPCTSTR lpszClass, HINSTANCE hInst)
 {
 	WNDCLASSEX wc;
 
-	// Check if class is already registered
 	wc.cbSize = sizeof(wc);
 
 	if (!GetClassInfoEx(hInst, lpszClass, &wc))
@@ -178,7 +163,6 @@ bool TWindow::RegisterClass(LPCTSTR lpszClass, HINSTANCE hInst)
 }
 
 
-// Handles window creation
 bool TWindow::CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWORD dwStyle,
 	int x, int y, int nWidth, int nHeight, HWND hParent,
 	HMENU hMenu, HINSTANCE hInst)
@@ -186,7 +170,6 @@ bool TWindow::CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWO
 	if (!RegisterClass(lpszClass, hInst))
 		return false;
 
-	// Use MDICREATESTRUCT to support MDI child window
 	MDICREATESTRUCT mdic;
 	memset(&mdic, 0, sizeof(mdic));
 	mdic.lParam = (LPARAM) this;
@@ -207,7 +190,7 @@ void TWindow::LoadTitleIcon(HINSTANCE hInst, UINT id)
 	m_hTitleIcon = LoadIcon(hInst, MAKEINTRESOURCE(id));
 }
 
-// Fill WNDCLASSEX, virtual function
+
 void TWindow::GetWndClassEx(WNDCLASSEX & wc)
 {
 	memset(&wc, 0, sizeof(wc));
@@ -230,7 +213,6 @@ void TWindow::GetWndClassEx(WNDCLASSEX & wc)
 WPARAM TWindow::MessageLoop(void)
 {
 	MSG msg;
-
 	m_bMainWindow = true;
 
 	while (GetMessage(&msg, NULL, 0, 0))
@@ -248,81 +230,6 @@ WPARAM TWindow::MessageLoop(void)
 	}
 
 	return msg.wParam;
-}
-
-
-// Common message processing for MDI Child Window
-HRESULT TWindow::CommonMDIChildProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	HMENU hMenu, int nWindowMenu)
-{
-	switch (uMsg)
-	{
-	case WM_NCDESTROY:						   // should be the last message
-		SetWindowLong(hWnd, GWL_USERDATA, 0);  // make sure no more message through WindowProc
-		delete this;						   // MDI child are created using new operator, time to delete	
-		return 0;
-
-	case WM_MDIACTIVATE:
-		if (lParam == (LPARAM)hWnd)		   // if current window activate, switch menu
-			SendMessage(GetParent(hWnd), WM_MDISETMENU, (WPARAM)hMenu, (LPARAM)GetSubMenu(hMenu, nWindowMenu));
-
-		// send message to parent window to response to child window change
-		SendMessage(GetParent(GetParent(hWnd)), WM_USER, lParam != (LPARAM)hWnd, 0);
-		return 0;
-
-	default:
-		// generic MDI child window message handling provided by OS
-		return DefMDIChildProc(hWnd, uMsg, wParam, lParam);
-	}
-}
-
-
-LRESULT TWindow::OnQueryNewPalette(void)
-{
-	if (m_hPalette == NULL)
-		return FALSE;
-
-	HDC      hDC = GetDC(m_hWnd);
-	HPALETTE hOld = SelectPalette(hDC, m_hPalette, FALSE);
-
-	BOOL changed = RealizePalette(hDC) != 0;
-	SelectPalette(hDC, hOld, FALSE);
-	ReleaseDC(m_hWnd, hDC);
-
-	if (changed)
-	{
-		OutputDebugString(_T("InvalidateRect\n"));
-		InvalidateRect(m_hWnd, NULL, TRUE); // repaint
-	}
-
-	return changed;
-}
-
-
-LRESULT TWindow::OnPaletteChanged(HWND hWnd, WPARAM wParam)
-{
-	if ((hWnd != (HWND)wParam) && m_hPalette)
-	{
-		HDC hDC = GetDC(hWnd);
-		HPALETTE hOld = SelectPalette(hDC, m_hPalette, FALSE);
-
-		if (RealizePalette(hDC))
-			if (m_nUpdateCount >= 2)
-			{
-				InvalidateRect(hWnd, NULL, TRUE);
-				m_nUpdateCount = 0;
-			}
-			else
-			{
-				UpdateColors(hDC);
-				m_nUpdateCount++;
-			}
-
-		SelectPalette(hDC, hOld, FALSE);
-		ReleaseDC(hWnd, hDC);
-	}
-
-	return 0;
 }
 
 void TWindow::SetAccel(UINT id)

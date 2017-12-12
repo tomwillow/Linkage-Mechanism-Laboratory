@@ -4,6 +4,7 @@
 class TWindow
 {
 private:
+	bool m_bMainWindow;
 	HICON m_hTitleIcon;//图标
 	HACCEL m_hAccelTable;//快捷键
 	bool m_bDoubleBuffer;//双缓冲
@@ -38,18 +39,6 @@ protected:
 
 	virtual void GetWndClassEx(WNDCLASSEX & wc);
 
-   
-	HRESULT CommonMDIChildProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
-		HMENU hMenu, int nWindowMenu);
-
-	HPALETTE m_hPalette;
-	int		 m_nUpdateCount;
-
-	virtual LRESULT OnQueryNewPalette(void);
-	virtual LRESULT OnPaletteChanged(HWND hWnd, WPARAM wParam);
-
-	bool    m_bMainWindow;
-
 public:
 	TCHAR *szName;//名称
 	HWND m_hWnd;
@@ -59,11 +48,9 @@ public:
 	RECT WindowRect;
 	TWindow(void)
 	{
+		m_bMainWindow = false;
 		m_hParent = NULL;
-		m_hWnd		   = NULL;
-		m_hPalette	   = NULL;
-		m_nUpdateCount = 0;
-		m_bMainWindow  = false;
+		m_hWnd = NULL;
 		m_bDoubleBuffer = false;
 		m_hTitleIcon = NULL;
 		szName = NULL;
@@ -73,11 +60,6 @@ public:
 	{
 		if (szName != NULL)
 			delete[] szName;
-		if ( m_hPalette )
-		{
-			DeleteObject(m_hPalette);
-			m_hPalette = NULL;
-		}
 	}
 
 	void TWindow::LoadTitleIcon(HINSTANCE hInst, UINT id);//先于窗口载入图标

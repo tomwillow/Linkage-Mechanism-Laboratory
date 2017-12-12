@@ -117,9 +117,12 @@ void TAttach::AttachAll(POINT ptNowPos)
 			return;
 }
 
-bool TAttach::AttachLine_Element_inner(DPOINT dptNowPos, DPOINT dptAbsolute1, DPOINT dptAbsolute2, int PointIndex[2],
+
+bool TAttach::AttachLine_Element_inner(DPOINT dptNowPos, DPOINT dptAbsolute1, DPOINT dptAbsolute2, const TElement *pElement, int PointIndex[2],
 	const TConfiguration *pConfig)
 {
+
+	//计算dptNowPos在dpt1-dpt2线上的位置
 	int status = TDraw::PointInRealLineOrExtension(dptNowPos, dptAttach, dptAbsolute1,dptAbsolute2, pConfig);
 	if (status == -1)
 		return false;
@@ -128,6 +131,7 @@ bool TAttach::AttachLine_Element_inner(DPOINT dptNowPos, DPOINT dptAbsolute1, DP
 	bAttachedEndpoint = false;
 	bShowAttachPoint = true;
 	bShowExtensionLine = true;
+	pAttachElement = const_cast<TElement *>(pElement);
 
 	iAttachLinePointIndex[0] = PointIndex[0];
 	iAttachLinePointIndex[1] = PointIndex[1];
@@ -170,7 +174,7 @@ bool TAttach::AttachLineByAbsoluteVecPt(DPOINT dptNowPos,TElement *pElement,cons
 	for (auto pt = vecdptAbsolute.begin(); pt != vecdptAbsolute.end() - 1; ++pt)
 	{
 		int iPointIndex[2] = { pt - vecdptAbsolute.begin(), pt + 1 - vecdptAbsolute.begin() };
-		if (AttachLine_Element_inner(dptNowPos, *pt, *(pt + 1), iPointIndex, pConfig))
+		if (AttachLine_Element_inner(dptNowPos, *pt, *(pt + 1),pElement, iPointIndex, pConfig))
 		{
 			pAttachElement = pElement;
 			return true;
@@ -268,13 +272,13 @@ bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos)
 		return false;
 }
 
-bool TAttach::AttachPointByElement(DPOINT dptNowPos,DPOINT &dpt,int iPointIndex, TElement *pElement, const TConfiguration *pConfig)
+bool TAttach::AttachPointByElement(DPOINT dptNowPos,DPOINT &dpt,int iPointIndex,const TElement *pElement, const TConfiguration *pConfig)
 {
 	if (DPTisApproached(dptNowPos,dpt))
 	{
 		bAttachedEndpoint = true;
 		bShowAttachPoint = true;
-		pAttachElement = pElement;
+		pAttachElement =const_cast<TElement *>(pElement);
 		iAttachElementPointIndex = iPointIndex;
 		dptAttach = dpt;
 		return true;

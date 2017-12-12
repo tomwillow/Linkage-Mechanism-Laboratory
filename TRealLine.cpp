@@ -232,7 +232,7 @@ bool TRealLine::InSelCross(RECT rect, const TConfiguration *pConfig)
 bool TRealLine::IsAttached(DPOINT dptNowPos,TAttach *pAttach,const TConfiguration *pConfig)
 {
 	int PointIndex[2] = { 0, 1 };
-	return pAttach->AttachLine_Element_inner(dptNowPos, ptBegin, ptEnd, PointIndex, pConfig);
+	return pAttach->AttachLine_Element_inner(dptNowPos, ptBegin, ptEnd,this, PointIndex, pConfig);
 };
 
 bool TRealLine::PointIsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)

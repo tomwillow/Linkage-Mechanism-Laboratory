@@ -65,7 +65,7 @@ void TSliderTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			case ELEMENT_SLIDER:
 			case ELEMENT_POLYLINEBAR:
 			{
-				TElement *pElement = pAttach->pAttachElement;
+				const TElement *pElement = pAttach->pAttachElement;
 				int ptIndex0 = pAttach->iAttachLinePointIndex[0];
 				int ptIndex1 = pAttach->iAttachLinePointIndex[1];
 				DPOINT pt0 = pElement->GetAbsolutePointByIndex(ptIndex0);// TDraw::GetAbsolute(pElement->vecDpt[ptIndex0], pElement->dpt, pElement->angle);

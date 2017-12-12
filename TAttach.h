@@ -55,10 +55,10 @@ public:
 		return iIvoryLine;
 	}
 
-	bool TAttach::AttachPointByElement(DPOINT dptNowPos, DPOINT &dpt, int iPointIndex, TElement *pElement, const TConfiguration *pConfig);
+	bool TAttach::AttachPointByElement(DPOINT dptNowPos, DPOINT &dpt, int iPointIndex,const TElement *pElement, const TConfiguration *pConfig);
 	bool TAttach::AttachLineByRelativeVecPt(DPOINT dptNowPos, TElement *pElement, const std::vector<DPOINT> &vecdptRelative, const TConfiguration *pConfig);
 	bool TAttach::AttachLineByAbsoluteVecPt(DPOINT dptNowPos, TElement *pElement, const std::vector<DPOINT> &vecdptAbsolute);
-	bool TAttach::AttachLine_Element_inner(DPOINT dptNowPos, DPOINT dptAbsolute1, DPOINT dptAbsolute2, int PointIndex[2],
+	bool TAttach::AttachLine_Element_inner(DPOINT dptNowPos, DPOINT dptAbsolute1, DPOINT dptAbsolute2,const TElement *pElement, int PointIndex[2],
 		const TConfiguration *pConfig);
 
 	bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2);
