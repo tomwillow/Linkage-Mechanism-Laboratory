@@ -118,8 +118,7 @@ LRESULT CALLBACK TWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 	if (uMsg == WM_NCCREATE)
 	{
-		MDICREATESTRUCT * pMDIC = (MDICREATESTRUCT *)((LPCREATESTRUCT)lParam)->lpCreateParams;
-		pWindow = (TWindow *)(pMDIC->lParam);
+		pWindow = (TWindow *)((LPCREATESTRUCT)lParam)->lpCreateParams;
 		SetWindowLong(hWnd, GWL_USERDATA, (LONG)pWindow);
 	}
 	else
@@ -170,17 +169,14 @@ bool TWindow::CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWO
 	if (!RegisterClass(lpszClass, hInst))
 		return false;
 
-	MDICREATESTRUCT mdic;
-	memset(&mdic, 0, sizeof(mdic));
-	mdic.lParam = (LPARAM) this;
-
 	m_hInst = hInst;
 	m_hParent = hParent;
 	szName = new TCHAR[_tcslen(lpszName) + 1];
 	_tcscpy(szName, lpszName);
+
 	m_hWnd = CreateWindowEx(dwExStyle, lpszClass,
 		lpszName, dwStyle, x, y, nWidth, nHeight,
-		hParent, hMenu, hInst, &mdic);
+		hParent, hMenu, hInst, this);
 
 	return m_hWnd != NULL;
 }

@@ -89,6 +89,7 @@ private:
 
 	void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize, LONG &lRightSize,
 		const RECT &rcGraph, LONG &lPrevAllWidth, LONG lScaleLong, LONG lInterval);
+	void TGraph::AttachPoint();
 public:
 	bool bDraw = true;//如果为false，则OnDraw事件中不动作
 	bool bRealClose = true;//如果为true，则关闭时关闭窗口。否则只隐藏窗口
@@ -107,7 +108,6 @@ public:
 	void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOGPEN &logpen, bool visible, const TCHAR szLegend[] = TEXT(""),const TCHAR szUnitLabel[]=TEXT(""));
 	void TGraph::Clear();
 	void TGraph::Refresh();//刷新 等同于调用OnSize
-	void TGraph::AttachPoint();
 	void TGraph::SetMargin(int iMargin);
 	void TGraph::SetPointDataVisible(int index,bool visible);
 };
