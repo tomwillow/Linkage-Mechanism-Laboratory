@@ -1,17 +1,24 @@
 #pragma once
+
+
 #include <Windows.h>
 #include "tchar_head.h"
 #include <stdio.h>
 
-#pragma   comment(lib,"Msimg32.lib")//AlphaBlend使用
-
 #include "resource.h"
 #include "TConfiguration.h"
 #include "TMainWindow.h"
+
+//#pragma  comment(lib, "gdiplus.lib")
+//#include <comdef.h>
+//#include <gdiplus.h>
+
 #include "TCanvas.h"
 #include "TManageTool.h"
 #include "TLineTool.h"
 #include "TDraw.h"
+
+
 
 extern TMainWindow win;
 TCanvas::TCanvas()
@@ -317,6 +324,7 @@ void DrawGear(HDC hdc,int m, int z, double x,double alphaDEG, DPOINT dpt,double 
 	DeleteObject(hBrush);
 }
 
+
 void TCanvas::OnDraw(HDC hdc)
 {
 	SetBkMode(hdc, TRANSPARENT);
@@ -330,6 +338,8 @@ void TCanvas::OnDraw(HDC hdc)
 
 	if (pConfig->bDrawAxes)//画坐标原点
 		TDraw::DrawAxes(hdc, pConfig->GetOrg().x, pConfig->GetOrg().y, pConfig->crCoordinate);
+
+	//Draw.DrawLogo(m_hInst,IDB_PNG_SCHOOL,TEXT("PNG"),hdc,ClientRect);
 
 	//图形绘制
 	for (auto pElement : win.m_Shape.Element)

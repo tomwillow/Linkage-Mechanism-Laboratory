@@ -234,6 +234,7 @@
     <Image Include="Resource\file_icon.ico" />
     <Image Include="Resource\Icon.ico" />
     <Image Include="Resource\Icon_16.ico" />
+    <Image Include="Resource\PNG_SCHOOL.png" />
     <Image Include="Resource\toolbar_mechanism.bmp" />
   </ItemGroup>
   <ItemGroup>

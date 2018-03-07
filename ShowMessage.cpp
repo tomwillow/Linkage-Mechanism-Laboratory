@@ -3,6 +3,8 @@
 
 #include <stdio.h>//_vsntprintf
 
+#include <strsafe.h>//ShowErrorMsgBox
+
 void ShowMessage(TCHAR szFormat[], ...)
 {
 	TCHAR szBuffer[1024];
@@ -28,4 +30,38 @@ int MyMessageBox(HWND hWnd, const TCHAR * text, const TCHAR * caption, DWORD sty
 	param.lpszIcon = MAKEINTRESOURCE(iconid);
 
 	return MessageBoxIndirect(&param);
+}
+
+
+
+//
+void ShowErrorMsgBox(LPTSTR lpszFunction, DWORD dwErrorCode)
+{
+	// Retrieve the system error message for the last-error code
+
+	LPVOID lpMsgBuf;
+	LPVOID lpDisplayBuf;
+
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,
+		dwErrorCode,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&lpMsgBuf,
+		0, NULL);
+
+	// Display the error message and exit the process
+
+	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+		(lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR));
+	StringCchPrintf((LPTSTR)lpDisplayBuf,
+		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+		TEXT("%s ß∞‹°£¥ÌŒÛ¬Î %d: %s"),
+		lpszFunction, dwErrorCode, lpMsgBuf);
+	MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("¥ÌŒÛ"), MB_OK);
+
+	LocalFree(lpMsgBuf);
+	LocalFree(lpDisplayBuf);
 }

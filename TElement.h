@@ -33,7 +33,7 @@ class TListView;
 class TAttach;
 class TElement
 {
-	friend void RefreshDOF(TElement *pElement, int &nb, int &iCoincideNum, int &iDriverNum, int &iFrameNum, bool isAdd);
+	friend bool RefreshDOF(TElement *pElement, int &nb, int &iCoincideNum, int &iDriverNum, int &iFrameNum, bool isAdd);
 private:
 protected:
 	virtual bool TElement::InSelWindow(RECT rect, const TConfiguration *pConfig){ return false; }
@@ -102,4 +102,4 @@ public:
 	bool APointCrossRect(const RECT &rect, POINT *apt, int count);
 	bool VecPointInRect(const RECT &rect, std::vector<POINT> &vecpt);
 	bool VecPointCrossRect(const RECT &rect, std::vector<POINT> &vecpt);
-	void RefreshDOF(TElement *pElement, int &nb,int &iCoincideNum,int &iDriverNum, int &iFrameNum,bool isAdd);
+	bool RefreshDOF(TElement *pElement, int &nb,int &iCoincideNum,int &iDriverNum, int &iFrameNum,bool isAdd);

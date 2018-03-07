@@ -167,6 +167,7 @@ bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 	size_t tempSize;
 	DPOINT tempDpt;
 	::ReadFile(hf, &tempSize, sizeof(tempSize), &now_pos, NULL);
+	//int err_code = GetLastError();
 	now_pos += sizeof(tempSize);
 	vecDpt.clear();
 	for (size_t i = 0; i < tempSize;++i)
@@ -177,6 +178,14 @@ bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 	}
 
 	::ReadFile(hf, &tempSize, sizeof(tempSize), &now_pos, NULL);
+	if (tempSize > 0x10000)
+		return false;
+	//err_code = GetLastError();
+	//if ((err_code) != 0)
+	//{
+	//	ShowErrorMsgBox(TEXT("¶ÁÈ¡ÎÄ¼þ"), err_code);
+	//	return false;
+	//}
 	now_pos += sizeof(tempSize);
 	size_t JointNum;
 	int JointId;
@@ -355,24 +364,25 @@ bool VecPointCrossRect(const RECT &rect, std::vector<POINT> &vecpt)
 	return false;
 }
 
-void RefreshDOF(TElement *pElement, int &nb, int &iCoincideNum, int &iDriverNum, int &iFrameNum, bool isAdd)
+bool RefreshDOF(TElement *pElement, int &nb, int &iCoincideNum, int &iDriverNum, int &iFrameNum, bool isAdd)
 {
 	switch (pElement->eClass)
 	{
 	case ELEMENT_CLASS_CONSTRAINT:
 		isAdd?++iCoincideNum:--iCoincideNum;
-		break;
+		return true;
 	case ELEMENT_CLASS_DRIVER:
 		isAdd ? ++iDriverNum : --iDriverNum;
-		break;
+		return true;
 	case ELEMENT_CLASS_FRAME:
-		isAdd ? ++iFrameNum:--iFrameNum;
-		break;
+		isAdd ? ++iFrameNum : --iFrameNum;
+		return true;
 	case ELEMENT_CLASS_NORMAL:
 		isAdd ? ++nb : --nb;
-		break;
+		return true;
 	case ELEMENT_CLASS_NONE:
-			assert(0);
-			break;
+	default:
+		assert(0);
+		return false;
 	}
 }

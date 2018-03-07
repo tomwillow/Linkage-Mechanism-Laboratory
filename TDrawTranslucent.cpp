@@ -2,6 +2,8 @@
 #include "DetectMemoryLeak.h"
 #include "TDraw.h"
 
+#pragma comment(lib,"Msimg32.lib")//AlphaBlend π”√
+
 TDrawTranslucent::TDrawTranslucent()
 {
 }

@@ -1,5 +1,7 @@
 #pragma once
+
 #include <vector>
+
 #include <Windows.h>
 
 #include "DPOINT.h"
@@ -18,6 +20,7 @@ class TPolylineBar;
 class TDraw
 {
 private:
+	ULONG_PTR gdiplusStartupToken;
 	struct HSB
 	{
 		float H, S, B;
@@ -25,6 +28,8 @@ private:
 public:
 	TDraw();
 	~TDraw();
+	//void TDraw::DrawLogo(HINSTANCE hInst, UINT nID, LPCTSTR sType, HDC hdc, const RECT &ClientRect);
+	//BOOL TDraw::ImageFromIDResource(HINSTANCE hInst, UINT nID, LPCTSTR sType, Gdiplus::Image *&pImg);
 
 	static void TDraw::MoveByDelta(POINT apt[], int apt_num, long dx, long dy);
 	static void TDraw::MoveByDelta(std::vector<POINT> &vecpt, long dx, long dy);
@@ -132,13 +137,6 @@ public:
 	static int TDraw::PointInRealLineOrExtension(const DPOINT &dptPos, DPOINT &dptIntersection, const DPOINT dptBegin, const DPOINT dptEnd,const TConfiguration *pConfig);
 	static bool TDraw::PickConstraintColinear(POINT ptPos, TConstraintColinear *pColinear,const TConfiguration *pConfig);
 	static bool TDraw::PickConstraintCoincide(POINT ptPos, TElement *element,const TConfiguration *pConfig);
-
-	//Í¸Ã÷´¦Àí
-	//static void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, bool bNeedDrawBlack);
-	//static void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, bool bNeedDrawBlack);
-	//static void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, BYTE alpha, bool bNeedDrawBlack);
-	//static void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, BYTE alpha, bool bNeedDrawBlack);
-
 
 	static TDraw::HSB RGB2HSB(int rgbR, int rgbG, int rgbB);
 	static COLORREF TDraw::HSB2RGB(float h, float s, float v);

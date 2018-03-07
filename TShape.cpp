@@ -199,7 +199,7 @@ TElement* TShape::BuildElementByType(EnumElementType eType)const
 		 return new TDriver;
 	default:
 		assert(0);
-		break;
+		return 0;
 	}
 }
 
@@ -227,6 +227,8 @@ bool TShape::ReadFromFile_inner(HANDLE hf)
 
 		//按照类型读入元素
 		TElement *pElement = BuildElementByType(eType);
+		if (pElement == NULL)//类型号不正确
+			return false;
 		if (pElement->ReadFile(hf, now_pos, this))
 		{
 			//AddElement(pElement);
@@ -236,7 +238,11 @@ bool TShape::ReadFromFile_inner(HANDLE hf)
 			else
 				iNextId = pElement->id;
 
-			RefreshDOF(pElement, nb, iCoincideNum, iDriverNum, iFrameNum, true);
+			if (RefreshDOF(pElement, nb, iCoincideNum, iDriverNum, iFrameNum, true) == false)
+			{
+				delete pElement;
+				return false;
+			}
 
 			Element.push_back(pElement);
 			iNextId++;

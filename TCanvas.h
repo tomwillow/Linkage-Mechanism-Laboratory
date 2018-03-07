@@ -1,10 +1,12 @@
 #pragma once
 #include "TWindow.h"
+#include "TDraw.h"
 
 class TConfiguration;
 class TCanvas:public TWindow
 {
 private:
+	TDraw Draw;
 	TConfiguration *pConfig;
 	bool bMButtonPressing;
 	POINT uiMoveStart;
