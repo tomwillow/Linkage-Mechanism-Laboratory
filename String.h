@@ -33,6 +33,9 @@ using std::wostringstream;
 using std::wcout;
 #define COUT wcout
 
+using std::to_wstring;
+#define To_string to_wstring
+
 #else
 
 using std::string;
@@ -55,6 +58,9 @@ using std::ostringstream;
 
 using std::cout;
 #define COUT cout
+
+using std::to_string;
+#define To_string to_string
 
 #endif
 

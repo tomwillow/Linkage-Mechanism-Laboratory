@@ -121,12 +121,13 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			Cursor = IDC_HAND;
 			break;
 		}
-		case DRAG_SEL:
+		case DRAG_SEL://拖动求解
 		{
 			pSolver->ClearOutput();
 			pSolver->ClearConstraint();
 			pSolver->AddMouseConstraint(PickedElements.front(), pConfig->ScreenToReal(ptPos));
 			pSolver->Solve();
+			pShape->SimplifyPhiValue();
 
 			if (PickedElements.front()->CanBeDragged())
 				sTips = TEXT("可拖动");

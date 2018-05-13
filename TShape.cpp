@@ -1,11 +1,14 @@
 #pragma once
 #include "DetectMemoryLeak.h"
 
+#include <memory>
 #include <algorithm>
 #include "TSlider.h"
 
 #include "TShape.h"
 #include "TDraw.h"
+#include "FileFunction.h"
+#include "ShowMessage.h"
 
 #include "TConfiguration.h"
 
@@ -18,6 +21,10 @@
 #include "TConstraintColinear.h"
 #include "TDriver.h"
 
+extern std::String sStudentClass;
+extern std::String sStudentName;
+extern std::String sStudentNumber;
+extern std::String sStudentScore;
 TShape::TShape()
 {
 }
@@ -252,9 +259,18 @@ bool TShape::ReadFromFile_inner(HANDLE hf)
 			delete pElement;
 			return false;
 		}
-	}
+	}//for循环结束
+
+#if (defined _STUDENT) || (defined _TEACHER)
+	ReadFileString(hf, sStudentClass, now_pos);
+	ReadFileString(hf, sStudentName, now_pos);
+	ReadFileString(hf, sStudentNumber, now_pos);
+	ReadFileString(hf, sStudentScore, now_pos);
+#endif
+
 	return true;
 }
+
 
 bool TShape::SaveToFile(TCHAR szFileName[])
 {
@@ -265,19 +281,17 @@ bool TShape::SaveToFile(TCHAR szFileName[])
 		GENERIC_WRITE,
 		0,
 		(LPSECURITY_ATTRIBUTES)NULL,
-		CREATE_ALWAYS,
+		GetFileExists(szFileName)?OPEN_EXISTING:CREATE_ALWAYS,
 		FILE_ATTRIBUTE_NORMAL,
 		(HANDLE)NULL);
-	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
-		return false;
+	if (IsErrorShowMsgBox(TEXT("CreateFile"))) return false;
 	DWORD now_pos = 0;
 
 	//写入元素数量
 	int size = Element.size();
 	WriteFile(hf, &size, sizeof(size), &now_pos, NULL);
 	now_pos += sizeof(size);
-	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
-		return false;
+	if (IsErrorShowMsgBox(TEXT("写入元素数量"))) return false;
 
 	//逐条写入Element
 	for (auto pElement : Element)
@@ -285,6 +299,14 @@ bool TShape::SaveToFile(TCHAR szFileName[])
 		if (!pElement->WriteFile(hf, now_pos))
 			return false;
 	}
+
+#if (defined _STUDENT) || (defined _TEACHER)
+	if (WriteFileString(hf, sStudentClass, now_pos) == false) return false;
+	if (WriteFileString(hf, sStudentName, now_pos) == false) return false;
+	if (WriteFileString(hf, sStudentNumber, now_pos) == false) return false;
+	if (WriteFileString(hf, sStudentScore, now_pos) == false) return false;
+#endif
+
 	CloseHandle(hf);
 
 	return true;
@@ -321,4 +343,12 @@ bool TShape::GetBoundingBox(RECT &rect, POINT &center, const TConfiguration *pCo
 	TDraw::MakeRect(rect, x_min, x_max, y_min, y_max, pConfig);
 	TDraw::GetCenter(center, rect);
 	return true;
+}
+
+void TShape::SimplifyPhiValue()
+{
+	for (auto pElement : Element)
+	{
+		pElement->SetPhi(MakeIn2Pi(pElement->angle));
+	}
 }

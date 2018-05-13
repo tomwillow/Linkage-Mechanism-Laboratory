@@ -10,6 +10,7 @@ class TConfiguration;
 class TListView;
 class TTreeViewContent;
 class TSolver;
+class TStatus;
 class TElement;
 class TTool
 {
@@ -23,6 +24,7 @@ protected:
 	TConfiguration *pConfig;
 	TListView *pListView;
 	TTreeViewContent *pTreeViewContent;
+	TStatus *pStatus;
 	TSolver *pSolver;
 	RECT &ClientRect;
 	//void TTool::RefreshTreeViewContent();

@@ -20,7 +20,7 @@ TBar::~TBar()
 
 const String TBar::GetElementTypeName()//得到类型名称
 {
-	return TEXT("连杆");
+	return TEXT("杆");
 }
 
 //不通知listview，由realline通知

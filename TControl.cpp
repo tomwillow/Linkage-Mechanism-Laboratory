@@ -28,6 +28,12 @@ TControl::~TControl()
 	::DeleteObject(m_hFont);
 }
 
+
+void TControl::LinkControl(HWND hDlg, int id)
+{
+	LinkControl(GetDlgItem(hDlg, id));
+}
+
 //仅使用x,y坐标，width,height使用原大小
 void TControl::SetPositionOnlyOrigin(const RECT &rect)
 {

@@ -33,8 +33,20 @@ int MyMessageBox(HWND hWnd, const TCHAR * text, const TCHAR * caption, DWORD sty
 }
 
 
+bool IsErrorShowMsgBox(LPTSTR lpszFunction)
+{
+	DWORD dw = GetLastError();
+	if (dw != 0)
+	{
+		ShowErrorMsgBox(lpszFunction, dw);
+		return true;
+	}
+	else
+		return false;
+}
 
-//
+//根据错误码弹出错误信息框
+//lpszFunction为出错步骤名称
 void ShowErrorMsgBox(LPTSTR lpszFunction, DWORD dwErrorCode)
 {
 	// Retrieve the system error message for the last-error code

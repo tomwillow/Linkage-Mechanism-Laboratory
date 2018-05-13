@@ -36,6 +36,7 @@ class TElement
 	friend bool RefreshDOF(TElement *pElement, int &nb, int &iCoincideNum, int &iDriverNum, int &iFrameNum, bool isAdd);
 private:
 protected:
+	TElement();
 	virtual bool TElement::InSelWindow(RECT rect, const TConfiguration *pConfig){ return false; }
 	virtual bool TElement::InSelCross(RECT rect, const TConfiguration *pConfig){ return false; }
 public:
@@ -55,7 +56,6 @@ public:
 	bool bDrawSquare;
 	unsigned char alpha;
 
-	TElement();
 	virtual ~TElement();
 	virtual const String TElement::GetElementTypeName()=0;//得到类型名称
 	virtual bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos)=0;
@@ -102,4 +102,7 @@ public:
 	bool APointCrossRect(const RECT &rect, POINT *apt, int count);
 	bool VecPointInRect(const RECT &rect, std::vector<POINT> &vecpt);
 	bool VecPointCrossRect(const RECT &rect, std::vector<POINT> &vecpt);
-	bool RefreshDOF(TElement *pElement, int &nb,int &iCoincideNum,int &iDriverNum, int &iFrameNum,bool isAdd);
+	bool RefreshDOF(TElement *pElement, int &nb, int &iCoincideNum, int &iDriverNum, int &iFrameNum, bool isAdd);
+
+	bool WriteFileString(HANDLE hf, const std::String &s, DWORD &now_pos);
+	bool ReadFileString(HANDLE hf, std::String &s, DWORD &now_pos);

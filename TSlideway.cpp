@@ -20,7 +20,7 @@ TSlideway::TSlideway()
 
 const String TSlideway::GetElementTypeName()//得到类型名称
 {
-	return TEXT("滑道");
+	return TEXT("固定导轨");
 }
 
 TSlideway::~TSlideway()

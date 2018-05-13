@@ -1,47 +1,45 @@
 #pragma once
 
-
-#include <Windows.h>
 #include "tchar_head.h"
 #include <stdio.h>
 
+#include "String.h"
+
 #include "resource.h"
-#include "TConfiguration.h"
-#include "TMainWindow.h"
-
-//#pragma  comment(lib, "gdiplus.lib")
-//#include <comdef.h>
-//#include <gdiplus.h>
-
 #include "TCanvas.h"
+#include "TConfiguration.h"
 #include "TManageTool.h"
-#include "TLineTool.h"
+#include "TStatus.h"
+#include "TTrackbar.h"
+
+
+#include "TShape.h"
+
 #include "TDraw.h"
+#include "global.h"
 
-
-
-extern TMainWindow win;
-TCanvas::TCanvas()
+TCanvas::TCanvas(TConfiguration *pConfig, TManageTool *pManageTool, TStatus *pStatus, TTrackbar *pTrackbar, TShape *pShape) :ShowId(-1), ShowIndex(-1)
 {
-	pConfig = NULL;
 	bMButtonPressing = false;
+	TCanvas::pConfig = pConfig;
+	TCanvas::pManageTool = pManageTool;
+	TCanvas::pStatus = pStatus;
+	TCanvas::pTrackbar = pTrackbar;
+	TCanvas::pShape = pShape;
 }
 
 
 TCanvas::~TCanvas()
 {
-	pConfig = NULL;
 }
 
 void TCanvas::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	pConfig = &(win.m_Configuration);
 	m_hWnd = hWnd;
 }
 
 void TCanvas::DealMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	TManageTool *pManageTool = &(win.m_ManageTool);
 	if (pManageTool->m_pCurrentTool != NULL)
 	{
 		pManageTool->Message(hWnd, uMsg, wParam, lParam);
@@ -53,7 +51,8 @@ void TCanvas::DealMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void TCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	//热键返回给主窗口
-	win.OnCommand(wParam, lParam);
+	SendMessage(m_hParent, WM_COMMAND, wParam, lParam);
+	//win.OnCommand(wParam, lParam);
 }
 
 void TCanvas::OnKeyDown(WPARAM wParam, LPARAM lParam)
@@ -102,10 +101,10 @@ void TCanvas::OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (pConfig->uUnits)
 	{
 	case UNITS_MM:
-		win.m_Status.SetText(IDR_STATUS_COORDINATE, TEXT("(%.3f mm,%.3f mm)"), pConfig->ScreenToReal(ptPos).x, pConfig->ScreenToReal(ptPos).y);
+		pStatus->SetText(IDR_STATUS_COORDINATE, TEXT("(%.3f mm,%.3f mm)"), pConfig->ScreenToReal(ptPos).x, pConfig->ScreenToReal(ptPos).y);
 		break;
 	case UNITS_INCH:
-		win.m_Status.SetText(IDR_STATUS_COORDINATE, TEXT("(%.3f in,%.3f in)"), pConfig->ScreenToReal(ptPos).x, pConfig->ScreenToReal(ptPos).y);
+		pStatus->SetText(IDR_STATUS_COORDINATE, TEXT("(%.3f in,%.3f in)"), pConfig->ScreenToReal(ptPos).x, pConfig->ScreenToReal(ptPos).y);
 		break;
 	}
 
@@ -161,13 +160,13 @@ void TCanvas::OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	double ylen = pConfig->ScreenToLengthY(ptPos.y - pConfig->GetOrg().y);
 
 	if (zDelta > 0)
-		pConfig->SetDPU(win.m_Trackbar.GetNextValue());
+		pConfig->SetDPU(pTrackbar->GetNextValue());
 	else
-		pConfig->SetDPU(win.m_Trackbar.GetPrevValue());
+		pConfig->SetDPU(pTrackbar->GetPrevValue());
 
 	pConfig->SetOrg(ptPos.x - pConfig->LengthToScreenX(xlen), ptPos.y - pConfig->LengthToScreenY(ylen));
 
-	win.m_Trackbar.SetPosByValue(pConfig->GetProportion(), 1e-6);
+	pTrackbar->SetPosByValue(pConfig->GetProportion(), 1e-6);
 
 	//因为原来也是0，SetPos后也是0，SetPos不激发NOTIFY，所以手动发
 	PostMessage(m_hParent, WM_NOTIFY, MAKELONG(IDR_TRACKBAR, 0), 0);
@@ -336,20 +335,51 @@ void TCanvas::OnDraw(HDC hdc)
 	if (pConfig->bDrawGrid)
 		TDraw::DrawGrid(hdc, ClientRect, pConfig->GetOrg(), pConfig->crGridBig, pConfig->crGridSmall, pConfig);
 
+	//画校徽
+	Draw.DrawLogo(m_hInst,IDB_PNG_SCHOOL,TEXT("PNG"),hdc,ClientRect);
+
+#if (defined _STUDENT) || (defined _TEACHER)
+	//写学号信息
+	std::String s;
+	s << TEXT("班级：") + sStudentClass;
+	s << TEXT("\r\n\r\n姓名：") + sStudentName;
+	s << TEXT("\r\n\r\n学号：") + sStudentNumber;
+#endif
+#ifdef _TEACHER
+	s << TEXT("\r\n\r\n成绩：") + sStudentScore;
+#endif
+#if (defined _STUDENT) || (defined _TEACHER)
+	POINT pt = { ClientRect.left, ClientRect.bottom };
+	TDraw::DrawTips(hdc, pt, ClientRect,s.c_str(), pConfig);
+#endif
+
 	if (pConfig->bDrawAxes)//画坐标原点
 		TDraw::DrawAxes(hdc, pConfig->GetOrg().x, pConfig->GetOrg().y, pConfig->crCoordinate);
 
-	//Draw.DrawLogo(m_hInst,IDB_PNG_SCHOOL,TEXT("PNG"),hdc,ClientRect);
-
 	//图形绘制
-	for (auto pElement : win.m_Shape.Element)
+	for (auto pElement : pShape->Element)
 	{
 		pElement->Draw(hdc, pConfig);
+
+		if (pElement->id == ShowId)
+		{
+			String sId;
+			sId<<TEXT("id:")<<To_string(ShowId);
+			sId << TEXT(" pt") << To_string(ShowIndex);
+			
+			TDraw::DrawAdjustedText(hdc, pConfig->RealToScreen(pElement->GetAbsolutePointByIndex(ShowIndex)), ClientRect, sId.c_str(),10,false, pConfig);
+		}
 	}
 
 	//工具类绘制
-	if (win.m_ManageTool.m_pCurrentTool != NULL)
-		win.m_ManageTool.m_pCurrentTool->Draw(hdc);//工具在使用中的图形绘制交由工具类执行
+	if (pManageTool->m_pCurrentTool != NULL)
+		pManageTool->m_pCurrentTool->Draw(hdc);//工具在使用中的图形绘制交由工具类执行
 
 	//DrawGear(hdc, 2, 42, 0, 20, { 0, 0 },0, pConfig->logpen, pConfig);
+}
+
+void TCanvas::SetShowIdAndIndex(int id, int index)
+{
+	ShowId = id;
+	ShowIndex = index;
 }

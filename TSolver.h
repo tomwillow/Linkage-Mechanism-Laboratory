@@ -17,8 +17,8 @@ class TSolver:public TTool
 {
 private:
 	Ostream *pOS;
-	std::vector<String> vecStrDriver;//驱动方程
 	HWND hwndOutput;//输出窗口句柄
+	std::vector<String> vecStrDriver;//驱动方程
 	TEquations *Equations;//约束方程
 	String subsVar, subsValue;//机架点变量名及值
 	std::vector<int> idOrder;//

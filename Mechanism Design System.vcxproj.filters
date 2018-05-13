@@ -43,6 +43,9 @@
     <Filter Include="源文件\Solver">
       <UniqueIdentifier>{091bb2a2-18f7-4ef5-94ae-eb2d789c4b9f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Control">
+      <UniqueIdentifier>{85500cbc-c014-4734-9ec7-b1d191702bc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -252,18 +255,15 @@
     <ClCompile Include="TConstraint.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DialogStudent.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogScore.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TManageTool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TCanvas.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TMainWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TDraw.h">
@@ -275,55 +275,10 @@
     <ClInclude Include="TConfiguration.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TToolbar.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TStatus.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TTrackbar.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TEdit.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TLineEdit.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TAttach.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TWindow.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TRightWindow.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TListView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TTreeView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TTreeViewContent.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TControl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TConsole.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TConsoleEdit.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DetectMemoryLeak.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TGraph.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TListViewEdit.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TSelectTool.h">
@@ -425,14 +380,8 @@
     <ClInclude Include="TConstraintColinearTool.h">
       <Filter>头文件\Tool</Filter>
     </ClInclude>
-    <ClInclude Include="TToolTip.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TDriver.h">
       <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogAbout.h">
-      <Filter>头文件\Dialog</Filter>
     </ClInclude>
     <ClInclude Include="DialogAddDriver.h">
       <Filter>头文件\Dialog</Filter>
@@ -455,23 +404,92 @@
     <ClInclude Include="TEquations.h">
       <Filter>头文件\Solver</Filter>
     </ClInclude>
-    <ClInclude Include="TListBox.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TCheckBox.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TButton.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TCHAR_Function.h">
       <Filter>头文件\Common</Filter>
     </ClInclude>
-    <ClInclude Include="main.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TConstraint.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogAbout.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogStudent.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="global.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogScore.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="TButton.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TCanvas.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TCheckBox.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TConsole.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TConsoleEdit.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TControl.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TEdit.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TGraph.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TLineEdit.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TListBox.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TListView.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TListViewEdit.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TMainWindow.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TManageTool.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TRightWindow.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TStatus.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TToolbar.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TToolTip.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TTrackbar.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TTreeView.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TTreeViewContent.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="TWindow.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="tompng.h">
+      <Filter>头文件\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -519,8 +537,5 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
-    <None Include="svpng.inc">
-      <Filter>头文件\Common</Filter>
-    </None>
   </ItemGroup>
 </Project>

@@ -15,6 +15,7 @@ public:
 	TControl();
 	~TControl();
 	void TControl::LinkControl(HWND hwnd);
+	void TControl::LinkControl(HWND hDlg, int id);
 	RECT TControl::GetClientRect();
 	void TControl::SetRect(RECT &rect);
 	void TControl::SetRect(int x1, int y1, int x2, int y2); 

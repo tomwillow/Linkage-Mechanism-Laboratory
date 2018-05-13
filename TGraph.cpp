@@ -606,6 +606,10 @@ void TGraph::OnDraw(HDC hdc)
 			TDraw::DrawPolyline(hdc, PointData.ptArray, PointData.iPtCount, PointData.logpen);
 	}
 
+	//»­Í¼Àý
+	if (bShowLegend)
+		DrawLegend(hdc, pConfig->logpenBlack);
+
 	//ÏÔÊ¾²¶×½Êý¾Ý
 	if (bShowMouseLine && iPickPointDataIndex != -1 && vecPointData[iPickPointDataIndex].Show)
 	{
@@ -618,10 +622,6 @@ void TGraph::OnDraw(HDC hdc)
 		//»­·½¿é
 		TDraw::DrawPickSquare(hdc, vecPointData[iPickPointDataIndex].ptArray[iPick]);
 	}
-
-	//»­Í¼Àý
-	if (bShowLegend)
-		DrawLegend(hdc, pConfig->logpenBlack);
 
 }
 

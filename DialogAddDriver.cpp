@@ -190,10 +190,14 @@ namespace DialogAddDriver
 			CheckBoxA.LinkControl(GetDlgItem(hDlg, IDC_CHECK_A));
 			CheckBoxDisplacement.SetChecked(true);
 
-			//test
-			ComboBox_SetCurSel(hComboDriverType, 0);
-			ComboBox_SetCurSel(hComboExprType, 2);
-			EditExprRight.SetText(TEXT("sin(t)"));
+			//初始设置部分
+			//ComboBox_SetCurSel(hComboDriverType, 0);
+			//ComboBox_SetCurSel(hComboExprType, 2);
+			//EditExprRight.SetText(TEXT("sin(t)"));
+			ComboBox_SetCurSel(hComboDriverType, 1);
+			ComboBox_SetCurSel(hComboExprType, 0);
+			EditA.SetText(TEXT("1"));
+			//EditExprRight.SetText(TEXT("1"));
 
 			UpdateDlgAddDriver();
 

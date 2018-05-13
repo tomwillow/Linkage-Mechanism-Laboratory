@@ -244,7 +244,7 @@ namespace DialogAnimation
 		case WM_COMMAND:
 			switch (LOWORD(wParam))
 			{
-			case IDC_BUTTON_RUN:
+			case IDC_BUTTON_RUN://WM_COMMAND
 			{
 
 				if (isAnalyzing == false)//启动分析
@@ -267,7 +267,7 @@ namespace DialogAnimation
 
 				break;
 			}
-			case IDC_BUTTON_PLAY:
+			case IDC_BUTTON_PLAY://WM_COMMAND
 			{
 				if (isPlaying)
 				{
@@ -276,6 +276,8 @@ namespace DialogAnimation
 					isPlaying = false;
 
 					//播放线程将感知到
+					//禁用分析按钮
+					SetAnalyzeButtonEnable(true);
 
 					SetPlayerEnable(true);//按钮解禁
 					SetMesureControlEnable(true);
@@ -289,6 +291,9 @@ namespace DialogAnimation
 					//开始播放
 
 					//禁用全部按钮，除了暂停键
+
+					//禁用分析按钮
+					SetAnalyzeButtonEnable(false);
 					SetPlayerEnable(false);//禁用全部
 					ButtonPlay.SetEnable(true);
 					SetMesureControlEnable(false);
@@ -298,43 +303,50 @@ namespace DialogAnimation
 				}
 				break;
 			}
-			case IDC_BUTTON_FIRST_FRAME:
+			case IDC_BUTTON_FIRST_FRAME://WM_COMMAND
 				frame_now = frame_start;
 				TrackbarTime.SetPos(frame_now);
 				SendMessage(hDlg, WM_HSCROLL, 0, (LPARAM)TrackbarTime.m_hWnd);
 				break;
-			case IDC_BUTTON_LAST_FRAME:
+			case IDC_BUTTON_LAST_FRAME://WM_COMMAND
 				frame_now = frame_end;
 				TrackbarTime.SetPos(frame_now);
 				SendMessage(hDlg, WM_HSCROLL, 0, (LPARAM)TrackbarTime.m_hWnd);
 				break;
-			case IDC_BUTTON_NEXT_FRAME:
+			case IDC_BUTTON_NEXT_FRAME://WM_COMMAND
 				if (frame_now < frame_end) frame_now++;
 				TrackbarTime.SetPos(frame_now);
 				SendMessage(hDlg, WM_HSCROLL, 0, (LPARAM)TrackbarTime.m_hWnd);
 				break;
-			case IDC_BUTTON_PREV_FRAME:
+			case IDC_BUTTON_PREV_FRAME://WM_COMMAND
 				if (frame_now > 0) frame_now--;
 				TrackbarTime.SetPos(frame_now);
 				SendMessage(hDlg, WM_HSCROLL, 0, (LPARAM)TrackbarTime.m_hWnd);
 				break;
-			case IDC_LIST_LEFT:
+			case IDC_LIST_LEFT://WM_COMMAND
 				switch (HIWORD(wParam))
 				{
-				case LBN_SELCHANGE:
+				case LBN_SELCHANGE://左列表框内容变化
 				{
 					int ItemIndex = ListBoxLeft.GetCurSel();
 					if (ItemIndex != -1)
 					{
-						int id = vecItemsLeft[ItemIndex].id;
-						int IndexOfPoint = vecItemsLeft[ListBoxLeft.GetCurSel()].index_of_point;
+						int id = vecItemsLeft[ItemIndex].id;//取得当前id
+						int IndexOfPoint = vecItemsLeft[ListBoxLeft.GetCurSel()].index_of_point;//取得当前点号
 
 						if (pManageTool->m_uiCurActiveTool != ID_SELECT && pManageTool->m_uiCurActiveTool != ID_DRAG)
 						{
-							pManageTool->SetCurActiveTool(ID_SELECT);
+							pManageTool->SetCurActiveTool(ID_SELECT);//切换为选择工具
 						}
-						((TSelectTool *)(pManageTool->m_pCurrentTool))->SelectById(id,true,true);
+						((TSelectTool *)(pManageTool->m_pCurrentTool))->SelectById(id,true,true);//选中id
+
+						pCanvas->SetShowIdAndIndex(id, IndexOfPoint);
 					}
+					break;
+				}
+				case LBN_KILLFOCUS:
+				{
+					pCanvas->SetShowIdAndIndex(-1,-1);
 					break;
 				}
 				}
@@ -484,6 +496,14 @@ namespace DialogAnimation
 		ButtonMesureRemove.SetEnable(bEnable);
 	}
 
+	void SetAnalyzeButtonEnable(bool bEnable)
+	{
+		EditTimeStart.SetEnable(bEnable);
+		EditTimeEnd.SetEnable(bEnable);
+		EditFPS.SetEnable(bEnable);
+		ButtonRun.SetEnable(bEnable);
+	}
+
 	void SetPlayerButtonEnableWhenDragTrackbar()
 	{
 		if (frame_now == frame_start)
@@ -552,6 +572,8 @@ namespace DialogAnimation
 
 		std::vector<double> vecSingle;//本次位移数据
 
+		pSolver->RefreshEquations();
+
 		//准备记录坐标数据
 		vecSeries.clear();
 		pSolver->LinkpValue(vecpValue);
@@ -606,9 +628,9 @@ namespace DialogAnimation
 				if (hasSolved == false)
 				{
 					ShowMessage(TEXT("求解失败。\r\n\r\n可能的原因：到达极限位置；存在多余的约束或驱动。"));
+				}
 					time_now -= spf;
 					frame_now--;
-				}
 
 				//停止分析
 
@@ -667,6 +689,8 @@ namespace DialogAnimation
 		//回到第一帧
 		SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_FIRST_FRAME, 0), 0);
 
+		pShape->SimplifyPhiValue();
+
 		isAnalyzing = false;
 		ButtonRun.SetText(TEXT("开始分析"));
 		SetMesureControlEnable(true);//解禁
@@ -677,7 +701,10 @@ namespace DialogAnimation
 	VOID PlayProc(PVOID pvoud)
 	{
 		thread_is_running = true;
+
 		DWORD start = timeGetTime();//当前真实时间
+
+		if (frame_now == frame_end) frame_now = frame_start;
 		int frame_start_this_time = frame_now;//本轮播放的起始帧
 
 		DWORD now;
@@ -704,7 +731,7 @@ namespace DialogAnimation
 			frame_prev = frame_now;
 		}
 
-		if (CheckBoxLoop.GetChecked())
+		if (CheckBoxLoop.GetChecked())//循环按钮启用
 		{
 			isPlaying = false;
 			SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_FIRST_FRAME, 0), 0);
@@ -712,7 +739,7 @@ namespace DialogAnimation
 		}
 		else
 			//放完自动停止
-			SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_PLAY, 0), 0);
+			SendMessage(hDlg, WM_COMMAND, MAKELONG(IDC_BUTTON_PLAY, 0), 0);//再点一次播放按钮即停止
 
 		//_endthread();
 		//return 0;

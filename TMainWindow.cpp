@@ -1,4 +1,6 @@
 #pragma once
+//#define _STUDENT
+
 #include "DetectMemoryLeak.h"
 
 #include <process.h>
@@ -23,11 +25,19 @@
 #include "DialogAbout.h"
 #include "DialogAnimation.h"
 
+#include "global.h"
+#ifdef _STUDENT
+#include "DialogStudent.h"
+#endif
+#ifdef _TEACHER
+#include "DialogScore.h"
+#endif
+
 #include "TGraph.h"
 
 #include "FileFunction.h"
 
-TMainWindow::TMainWindow()
+TMainWindow::TMainWindow() :Canvas(&m_Configuration,&m_ManageTool,&m_Status,&m_Trackbar,&m_Shape)
 {
 	m_iRightWindowWidth = 200;
 	pConsole = NULL;
@@ -71,10 +81,11 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	m_Toolbar.AddButton(2, ID_REFRESH, true, TEXT("刷新"));
 	m_Toolbar.AddSeparator(0);
 	m_Toolbar.AddGroup(3, 0, ID_DRAW_FRAME, true, TEXT("机架"));
-	m_Toolbar.AddGroup(4, 0, ID_DRAW_BAR, true, TEXT("连杆"));
-	m_Toolbar.AddGroup(5, 0, ID_DRAW_POLYLINE_BAR, true, TEXT("多段杆"));
+	m_Toolbar.AddGroup(7, 0, ID_DRAW_SLIDEWAY, true, TEXT("固定导轨"));
+	m_Toolbar.AddSeparator(0);
+	m_Toolbar.AddGroup(4, 0, ID_DRAW_BAR, true, TEXT("杆"));
+	m_Toolbar.AddGroup(5, 0, ID_DRAW_POLYLINE_BAR, true, TEXT("多副构件"));
 	m_Toolbar.AddGroup(6, 0, ID_DRAW_LINE, true, TEXT("线"));
-	m_Toolbar.AddGroup(7, 0, ID_DRAW_SLIDEWAY, true, TEXT("滑道"));
 	m_Toolbar.AddGroup(8, 0, ID_DRAW_SLIDER, true, TEXT("滑块"));
 	m_Toolbar.AddSeparator(0);
 	m_Toolbar.AddGroup(9, 0, ID_DRAW_COINCIDE, true, TEXT("重合约束"));
@@ -157,7 +168,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	_tcscpy(szFileName, TEXT(""));
 
 	TCHAR szInputFileName[MAX_PATH];
-	if (GetCommandLineByIndex(1, szInputFileName))
+	if (GetCommandLineByIndex(1, szInputFileName))//如果输入了文件
 	{
 		//ShowMessage(szInputFileName);
 		_tcscpy(szFileName, szInputFileName);
@@ -165,8 +176,21 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 	else
 		//默认初始化
-		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);
+		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//不检查状态
 
+#ifdef _STUDENT
+	PostMessage(hWnd, WM_COMMAND,MAKELONG(ID_SHOW_STUDENT_DIALOG,0), 0);
+#endif
+
+#ifdef _TEACHER
+	//添加Menu
+	HMENU hMenu = GetMenu(hWnd);//取得菜单句柄
+	HMENU hMenuView = GetSubMenu(hMenu, 0);//“文件”菜单
+	InsertMenu(hMenuView, 5, MF_SEPARATOR | MF_BYPOSITION, 0, TEXT(""));
+	InsertMenu(hMenuView, 5, MF_ENABLED | MF_BYPOSITION, MAKELONG(ID_RECORD_SCORE, 0), TEXT("登记成绩"));
+
+	//AppendMenu(hMenuData, MF_ENABLED, ID_MENU_GRAPH_DATA_START, PointData.sLegend.c_str());
+#endif
 }
 
 
@@ -200,12 +224,22 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (wmId)
 	{
 	case ID_NEW:
-		if (wmEvent != ID_NEW_NOCHECK)
+		if (wmEvent != ID_NEW_NOCHECK)//检查状态
 			if (_tcslen(szFileName) > 0 || m_Shape.Element.size() > 0)
 			{
-				if (MessageBox(m_hWnd, TEXT("是否新建文件？"), TEXT(""), MB_YESNO) == IDNO)
+				if (MessageBox(m_hWnd, TEXT("是否新建文件？"), TEXT(""), MB_YESNO) == IDYES)
+				{
+		//清空Student
+#ifdef _STUDENT
+		PostMessage(m_hWnd, WM_COMMAND, MAKELONG(ID_SHOW_STUDENT_DIALOG, 0), 0);
+#endif
+
+				}
+				else
 					break;
 			}
+
+		//不检查状态
 		_tcscpy(szFileName, TEXT(""));
 		SetText(szName);
 		m_ManageTool.CloseCurTool();//关闭工具
@@ -219,6 +253,15 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		OnCommand(MAKELONG(ID_SELECT, 0), 0);//设置选择工具
 
 		pSolver->RefreshEquations();
+
+		//清空Student
+#if (defined _STUDENT) || (defined _TEACHER)
+		sStudentClass.clear();
+		sStudentName.clear();
+		sStudentNumber.clear();
+		sStudentScore.clear();
+#endif
+
 		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
 		break;
 	case ID_OPEN:
@@ -242,7 +285,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//无条件初始化
 		_tcscpy(szFileName, szFileNameBackup);
 
-		if (m_Shape.ReadFromFile(szFileName))
+		if (m_Shape.ReadFromFile(szFileName))//读取文件
 		{
 			RightWindow.TreeViewContent.AddAllItem();
 			SetText(TEXT("%s - %s"), szName, szFileName);
@@ -354,7 +397,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		pSolver->ClearOutput();
 		//pSolver->ClearEuqations();
-		pSolver->Demo();
+		pSolver->RefreshEquations();
 
 		break;
 	case ID_SHOW_CONSOLE:
@@ -492,6 +535,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case ID_REFRESH:
+		m_Shape.SimplifyPhiValue();
 		pSolver->RefreshEquations();
 		pSolver->ClearOutput();
 		pSolver->ClearConstraint();
@@ -564,6 +608,26 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		Canvas.Invalidate();
 	}
 	break;
+	case ID_SHOW_STUDENT_DIALOG:
+#ifdef _STUDENT
+		//打开学生窗口
+		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_STU), m_hWnd, DialogStudent::DlgStudentProc))
+		{
+			MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
+		}
+#endif
+		break;
+	case ID_RECORD_SCORE:
+#ifdef _TEACHER
+		//打开成绩登记窗口
+		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_SCORE), m_hWnd, DialogScore::DlgScoreProc))
+		{
+			MessageBox(NULL, TEXT("窗口打开失败。"), TEXT(""), MB_ICONERROR);
+		}
+		if (GetFileExists(szFileName))
+			this->OnCommand(MAKELONG(ID_SAVE, ID_SAVE_NOCHECK), 0);
+#endif
+		break;
 	case IDR_LINEEDIT://not deal
 		break;
 	default:
@@ -620,4 +684,5 @@ void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 	m_Configuration.SetOrg((LONG)(OrgProportion.x*Canvas.ClientRect.right), (LONG)(OrgProportion.y*Canvas.ClientRect.bottom));
 
 	Canvas.Invalidate();
+
 }

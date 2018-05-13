@@ -1,8 +1,10 @@
 #pragma once
-
 #include <vector>
-
 #include <Windows.h>
+
+#pragma  comment(lib, "gdiplus.lib")
+#include <comdef.h>
+#include <gdiplus.h>
 
 #include "DPOINT.h"
 
@@ -28,8 +30,8 @@ private:
 public:
 	TDraw();
 	~TDraw();
-	//void TDraw::DrawLogo(HINSTANCE hInst, UINT nID, LPCTSTR sType, HDC hdc, const RECT &ClientRect);
-	//BOOL TDraw::ImageFromIDResource(HINSTANCE hInst, UINT nID, LPCTSTR sType, Gdiplus::Image *&pImg);
+	void TDraw::DrawLogo(HINSTANCE hInst, UINT nID, LPCTSTR sType, HDC hdc, const RECT &ClientRect);
+	BOOL TDraw::ImageFromIDResource(HINSTANCE hInst, UINT nID, LPCTSTR sType, Gdiplus::Image *&pImg);
 
 	static void TDraw::MoveByDelta(POINT apt[], int apt_num, long dx, long dy);
 	static void TDraw::MoveByDelta(std::vector<POINT> &vecpt, long dx, long dy);
@@ -105,6 +107,7 @@ public:
 	static void TDraw::DrawGrid(HDC hdc, const RECT &rect, POINT ptOrg, COLORREF crGridBig, COLORREF crGridSmall, const TConfiguration *pConfig);
 
 	static void TDraw::DrawTips(HDC hdc, POINT &ptMouse,const RECT &rcLimited, const TCHAR text[], TConfiguration *pConfig);
+	static void TDraw::DrawAdjustedText(HDC hdc, POINT &ptMouse, const RECT &rcLimited, const TCHAR text[], LONG dist, bool DrawBorder, TConfiguration *pConfig);
 	static POINT TDraw::GetSystemFontSize(HDC hdc, const TCHAR text[]);
 	static void TDraw::DrawSystemFontText(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format);
 	static void TDraw::DrawSystemFontTextVertical(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format);

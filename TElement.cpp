@@ -2,6 +2,7 @@
 #include "DetectMemoryLeak.h"
 #include "MyMath.h"
 #include <stdio.h>
+#include <memory>
 
 #include "TDraw.h"
 #include "TConfiguration.h"
@@ -385,4 +386,43 @@ bool RefreshDOF(TElement *pElement, int &nb, int &iCoincideNum, int &iDriverNum,
 		assert(0);
 		return false;
 	}
+}
+
+bool WriteFileString(HANDLE hf, const std::String &s, DWORD &now_pos)
+{
+	size_t sSize = s.length() + 1;
+	::WriteFile(hf, &(sSize), sizeof(sSize), &now_pos, NULL);
+	now_pos += sizeof(sSize);
+	if (IsErrorShowMsgBox(TEXT("Ð´Èë×Ö·û´®³¤¶È")))
+		return false;
+
+	::WriteFile(hf, (s.c_str()), sSize*sizeof(TCHAR), &now_pos, NULL);
+	now_pos += sSize;
+	if (IsErrorShowMsgBox(TEXT("Ð´Èë×Ö·û´®")))
+		return false;
+
+	return true;
+}
+
+bool ReadFileString(HANDLE hf, std::String &s, DWORD &now_pos)
+{
+	//bool b;
+	int i;
+
+	size_t sSize=0;
+	::ReadFile(hf, &(sSize), sizeof(sSize), &now_pos, NULL);
+	if (now_pos == 0)return false;
+	if (GetLastError() != 0) return false;
+	now_pos += sizeof(sSize);
+
+	//TCHAR *temp=NULL;
+	//temp = new TCHAR[sSize];
+	std::unique_ptr<TCHAR> temp(new TCHAR[sSize]);
+	::ReadFile(hf, temp.get(), sSize*sizeof(TCHAR), &now_pos, NULL);
+	if (now_pos == 0)return false;
+	if (GetLastError() != 0) return false;
+	now_pos += sSize;
+	s = temp.get();
+	//delete[] temp;
+	return true;
 }

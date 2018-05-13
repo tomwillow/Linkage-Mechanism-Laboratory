@@ -6,7 +6,7 @@
 
 #include "resource.h"
 
-#include "main.h"
+#include "global.h"
 #include "FileFunction.h"
 #include "RegisterFunction.h"
 

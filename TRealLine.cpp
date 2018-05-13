@@ -13,7 +13,7 @@ TRealLine::TRealLine() :ptBegin(dpt)
 	TRealLine::dLength = 0;
 	_tcscpy(Name, TEXT(""));
 	eType = ELEMENT_REALLINE;
-	eClass = ELEMENT_CLASS_NONE;
+	eClass = ELEMENT_CLASS_NORMAL;
 
 	vecIsJoint.resize(2);
 }

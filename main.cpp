@@ -1,18 +1,17 @@
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
 
+
 #include <windows.h>
+#include "String.h"
 #include "tchar_head.h"
 #include <CommCtrl.h>
 
 #include "ControlStyle.h"
 #include "resource.h"
 
-#include "main.h"
-#include "TWindow.h"
+#include "global.h"
 #include "TMainWindow.h"
-#include "TCanvas.h"
-#include "TManageTool.h"
 
 #pragma comment(lib,"kernel32.lib")
 #pragma comment(lib,"user32.lib")
@@ -20,9 +19,23 @@
 #pragma comment(lib,"comctl32.lib")//样式使用
 #pragma comment(lib,"Comdlg32.lib")
 
-
 TMainWindow win;
 TMainWindow *pwin = &win;
+
+std::String sStudentClass;
+std::String sStudentName;
+std::String sStudentNumber;
+std::String sStudentScore;
+
+#ifdef _STUDENT
+	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory 学生版 v0.2");
+#else
+	#ifdef _TEACHER
+	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory 教师版 v0.2");
+	#else
+	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory v0.2");
+	#endif
+#endif
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow)
 {

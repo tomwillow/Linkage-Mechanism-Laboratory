@@ -29,6 +29,7 @@ namespace DialogAnimation
 	void SetMesureControlEnable(bool bEnable);
 	void SetPlayerEnable(bool bEnable);
 	void SetPlayerButtonEnableWhenDragTrackbar();
+	void SetAnalyzeButtonEnable(bool bEnable);
 	VOID AnalyzeProc(PVOID pvoid);
 	VOID PlayProc(PVOID pvoid);
 	VOID PrepareClose(PVOID pvoid);

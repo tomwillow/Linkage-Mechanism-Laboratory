@@ -3,16 +3,26 @@
 #include "TDraw.h"
 
 class TConfiguration;
+class TManageTool;
+class TStatus;
+class TTrackbar;
+class TShape;
 class TCanvas:public TWindow
 {
 private:
 	TDraw Draw;
-	TConfiguration *pConfig;
+	TConfiguration *pConfig; 
+	TManageTool *pManageTool;
+	TStatus *pStatus;
+	TTrackbar *pTrackbar;
+	TShape *pShape;
 	bool bMButtonPressing;
 	POINT uiMoveStart;
 	void TCanvas::OnCommand(WPARAM wParam, LPARAM lParam) override;
+
+	int ShowId, ShowIndex;
 public:
-	TCanvas();
+	TCanvas::TCanvas(TConfiguration *pConfig, TManageTool *pManageTool, TStatus *pStatus, TTrackbar *pTrackbar, TShape *pShape);
 	~TCanvas();
 	void TCanvas::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam) override;
 	void DealMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -29,4 +39,6 @@ public:
 	void OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	void OnSetCursor(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	void OnDraw(HDC hdc) override;
+
+	void TCanvas::SetShowIdAndIndex(int id, int index);
 };

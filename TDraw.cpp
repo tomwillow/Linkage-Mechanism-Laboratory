@@ -3,7 +3,7 @@
 #include "MyMath.h"
 #include "tchar_head.h"
 
-#include "svpng.inc"
+#include "tompng.h"
 
 
 #include "TDraw.h"
@@ -21,81 +21,81 @@
 
 TDraw::TDraw()
 {
-	//Gdiplus::GdiplusStartupInput gdiInput;
-	//Gdiplus::GdiplusStartup(&gdiplusStartupToken, &gdiInput, NULL);
+	Gdiplus::GdiplusStartupInput gdiInput;
+	Gdiplus::GdiplusStartup(&gdiplusStartupToken, &gdiInput, NULL);
 }
 
 
 TDraw::~TDraw()
 {
-	//Gdiplus::GdiplusShutdown(gdiplusStartupToken);
+	Gdiplus::GdiplusShutdown(gdiplusStartupToken);
 }
 
 //用法：
 //Image * pImage = NULL;
 //ImageFromIDResource(IDR_PNG_NO_PIC, L"png", pImage);
 //delete pImage;
-//BOOL TDraw::ImageFromIDResource(HINSTANCE hInst, UINT nID, LPCTSTR sType, Gdiplus::Image *&pImg)
-//{
-	//HRSRC hRsrc = ::FindResource(hInst, MAKEINTRESOURCE(nID), sType); // type  
-	//if (!hRsrc)
-	//	return FALSE;
-	//// load resource into memory  
-	//DWORD len = SizeofResource(hInst, hRsrc);
-	//BYTE* lpRsrc = (BYTE*)LoadResource(hInst, hRsrc);
-	//if (!lpRsrc)
-	//	return FALSE;
-	//// Allocate global memory on which to create stream  
-	//HGLOBAL m_hMem = GlobalAlloc(GMEM_FIXED, len);
-	//BYTE* pmem = (BYTE*)GlobalLock(m_hMem);
-	//memcpy(pmem, lpRsrc, len);
-	//IStream* pstm;
-	//CreateStreamOnHGlobal(m_hMem, FALSE, &pstm);
-	//// load from stream  
-	//pImg = Gdiplus::Image::FromStream(pstm);
-	//// free/release stuff  
-	//GlobalUnlock(m_hMem);
-	//pstm->Release();
-	//FreeResource(lpRsrc);
-	//return TRUE;
-//}
+BOOL TDraw::ImageFromIDResource(HINSTANCE hInst, UINT nID, LPCTSTR sType, Gdiplus::Image *&pImg)
+{
+	HRSRC hRsrc = ::FindResource(hInst, MAKEINTRESOURCE(nID), sType); // type  
+	if (!hRsrc)
+		return FALSE;
+	// load resource into memory  
+	DWORD len = SizeofResource(hInst, hRsrc);
+	BYTE* lpRsrc = (BYTE*)LoadResource(hInst, hRsrc);
+	if (!lpRsrc)
+		return FALSE;
+	// Allocate global memory on which to create stream  
+	HGLOBAL m_hMem = GlobalAlloc(GMEM_FIXED, len);
+	BYTE* pmem = (BYTE*)GlobalLock(m_hMem);
+	memcpy(pmem, lpRsrc, len);
+	IStream* pstm;
+	CreateStreamOnHGlobal(m_hMem, FALSE, &pstm);
+	// load from stream  
+	pImg = Gdiplus::Image::FromStream(pstm);
+	// free/release stuff  
+	GlobalUnlock(m_hMem);
+	pstm->Release();
+	FreeResource(lpRsrc);
+	return TRUE;
+}
 
-//void TDraw::DrawLogo(HINSTANCE hInst, UINT nID, LPCTSTR sType, HDC hdc, const RECT &ClientRect)
-//{
-	///********************************************
-	//* step 1.
-	//* Using Gdiplus to load the image
-	//********************************************/
+void TDraw::DrawLogo(HINSTANCE hInst, UINT nID, LPCTSTR sType, HDC hdc, const RECT &ClientRect)
+{
+	/********************************************
+	* step 1.
+	* Using Gdiplus to load the image
+	********************************************/
 
-	//Gdiplus::Image *image = NULL;
-	//if (ImageFromIDResource(hInst, nID, sType, image))
-	//{
-	//	UINT height = image->GetHeight();
-	//	UINT width = image->GetWidth();
+	Gdiplus::Image *image = NULL;
+	if (ImageFromIDResource(hInst, nID, sType, image))
+	{
+		UINT height = image->GetHeight();
+		UINT width = image->GetWidth();
 
-	//	HDC memDC = ::CreateCompatibleDC(hdc);
-	//	HBITMAP memBitmap = ::CreateCompatibleBitmap(hdc, width, height);
-	//	::SelectObject(memDC, memBitmap);
+		HDC memDC = ::CreateCompatibleDC(hdc);
+		HBITMAP memBitmap = ::CreateCompatibleBitmap(hdc, width, height);
+		::SelectObject(memDC, memBitmap);
 
-	//	Gdiplus::Graphics graphics(memDC);
-	//	graphics.DrawImage(image, 0, 0, width, height);
-	//	///*********************************************
-	//	//* step 3.
-	//	//* Use UpdateLayeredWindow to Draw the Window
-	//	//*
-	//	//*********************************************/
-	//	BLENDFUNCTION blendFunction;
-	//	blendFunction.AlphaFormat = AC_SRC_ALPHA;
-	//	blendFunction.BlendFlags = 0;
-	//	blendFunction.BlendOp = AC_SRC_OVER;
-	//	blendFunction.SourceConstantAlpha = 255;
-	//	AlphaBlend(hdc, ClientRect.right - width, 0, width, height, memDC, 0, 0, width, height, blendFunction);
-	//	::DeleteDC(memDC);
-	//	::DeleteObject(memBitmap);
+		Gdiplus::Graphics graphics(memDC);
+		graphics.DrawImage(image, 0, 0, width, height);
+		///*********************************************
+		//* step 3.
+		//* Use UpdateLayeredWindow to Draw the Window
+		//*
+		//*********************************************/
+		BLENDFUNCTION blendFunction;
+		blendFunction.AlphaFormat = AC_SRC_ALPHA;
+		blendFunction.BlendFlags = 0;
+		blendFunction.BlendOp = AC_SRC_OVER;
+		blendFunction.SourceConstantAlpha = 0x40;
+		AlphaBlend(hdc, ClientRect.right - width, 0, width, height, memDC, 0, 0, width, height, blendFunction);
+		::DeleteDC(memDC);
+		::DeleteObject(memBitmap);
 
-	//	delete image;
-	//}
-//}
+		delete image;
+	}
+}
 
 //画直线，不带样式
 void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos)
@@ -236,7 +236,7 @@ bool TDraw::CaptureWindowToFile(HWND hWnd, TCHAR szFileName[])
 			*p++ = data >> 8;
 			*p++ = data;
 		}
-	svpng(fp, width, height, rgb, 0);
+	tompng(fp, width, height, rgb, 0);
 	fclose(fp);
 	delete rgb;
 
@@ -1442,10 +1442,15 @@ void TDraw::DrawTextAdvance(HDC hdc, const TCHAR text[], RECT *rect, long FontSi
 
 void TDraw::DrawTips(HDC hdc, POINT &ptMouse, const RECT &rcLimited, const TCHAR text[], TConfiguration *pConfig)
 {
+	DrawAdjustedText(hdc, ptMouse, rcLimited, text, 22, true, pConfig);
+}
+
+
+void TDraw::DrawAdjustedText(HDC hdc, POINT &ptMouse, const RECT &rcLimited, const TCHAR text[], LONG dist, bool DrawBorder, TConfiguration *pConfig)
+{
 	if (_tcslen(text) == 0)
 		return;
 	RECT rc, rcBk;
-	LONG dist = 22;
 	rc.left = ptMouse.x + dist;
 	rc.top = ptMouse.y + dist;
 
@@ -1466,7 +1471,7 @@ void TDraw::DrawTips(HDC hdc, POINT &ptMouse, const RECT &rcLimited, const TCHAR
 		MoveRect(rcBk, 0, dist * 2 + height);
 	}
 
-	DrawRect(hdc, rcBk, pConfig->logpenFront, pConfig->crBackground);
+	if (DrawBorder) DrawRect(hdc, rcBk, pConfig->logpenFront, pConfig->crBackground);
 	DrawSystemFontText(hdc, text, rc, pConfig->logpenFront.lopnColor, DT_LEFT | DT_TOP);//DT_CALCRECT
 }
 

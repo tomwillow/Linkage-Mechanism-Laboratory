@@ -314,6 +314,7 @@ void TSolver::RefreshWindowText()
 	}
 }
 
+//将Shape的Element设置为VariableTable定义的数值
 void TSolver::SetElementDisplacement(const TVariableTable &VariableTable)
 {
 	for (size_t i = 0; i < VariableTable.VariableTable.size(); i++)
@@ -466,7 +467,7 @@ void TSolver::GetMesureResult(std::vector<DialogAnimation::TListBoxItem> &vecIte
 			using namespace DialogAnimation;
 		case D:
 		{
-			pVarTable = &(Equations->VariableTable); //指向VariableTable
+			pVarTable = &(Equations->VariableTableUnsolved); //指向VariableTable
 
 			DPOINT dptAb=vecItems[i].pElement->GetAbsolutePointByIndex(vecItems[i].index_of_point);
 			switch (vecItems[i].value_type)

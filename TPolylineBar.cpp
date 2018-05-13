@@ -22,7 +22,7 @@ TPolylineBar::~TPolylineBar()
 
 const String TPolylineBar::GetElementTypeName()//得到类型名称
 {
-	return TEXT("多段杆");
+	return TEXT("多副构件");
 }
 
 void TPolylineBar::NoticeListView(TListView *pListView)

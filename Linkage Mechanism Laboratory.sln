@@ -15,6 +15,12 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|Mixed Platforms = Release|Mixed Platforms
 		Release|Win32 = Release|Win32
+		STUDENT Release|Any CPU = STUDENT Release|Any CPU
+		STUDENT Release|Mixed Platforms = STUDENT Release|Mixed Platforms
+		STUDENT Release|Win32 = STUDENT Release|Win32
+		TEACHER Release|Any CPU = TEACHER Release|Any CPU
+		TEACHER Release|Mixed Platforms = TEACHER Release|Mixed Platforms
+		TEACHER Release|Win32 = TEACHER Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{265569DC-34A0-49B3-9BE3-5133199DB24D}.Debug|Any CPU.ActiveCfg = Debug|Win32
@@ -27,6 +33,16 @@ Global
 		{265569DC-34A0-49B3-9BE3-5133199DB24D}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{265569DC-34A0-49B3-9BE3-5133199DB24D}.Release|Win32.ActiveCfg = Release|Win32
 		{265569DC-34A0-49B3-9BE3-5133199DB24D}.Release|Win32.Build.0 = Release|Win32
+		{265569DC-34A0-49B3-9BE3-5133199DB24D}.STUDENT Release|Any CPU.ActiveCfg = STUDENT Release|Win32
+		{265569DC-34A0-49B3-9BE3-5133199DB24D}.STUDENT Release|Mixed Platforms.ActiveCfg = STUDENT Release|Win32
+		{265569DC-34A0-49B3-9BE3-5133199DB24D}.STUDENT Release|Mixed Platforms.Build.0 = STUDENT Release|Win32
+		{265569DC-34A0-49B3-9BE3-5133199DB24D}.STUDENT Release|Win32.ActiveCfg = STUDENT Release|Win32
+		{265569DC-34A0-49B3-9BE3-5133199DB24D}.STUDENT Release|Win32.Build.0 = STUDENT Release|Win32
+		{265569DC-34A0-49B3-9BE3-5133199DB24D}.TEACHER Release|Any CPU.ActiveCfg = TEACHER Release|Win32
+		{265569DC-34A0-49B3-9BE3-5133199DB24D}.TEACHER Release|Mixed Platforms.ActiveCfg = TEACHER Release|Win32
+		{265569DC-34A0-49B3-9BE3-5133199DB24D}.TEACHER Release|Mixed Platforms.Build.0 = TEACHER Release|Win32
+		{265569DC-34A0-49B3-9BE3-5133199DB24D}.TEACHER Release|Win32.ActiveCfg = TEACHER Release|Win32
+		{265569DC-34A0-49B3-9BE3-5133199DB24D}.TEACHER Release|Win32.Build.0 = TEACHER Release|Win32
 		{766594B9-B7B4-4827-9C6B-A11240060D1A}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{766594B9-B7B4-4827-9C6B-A11240060D1A}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{766594B9-B7B4-4827-9C6B-A11240060D1A}.Debug|Mixed Platforms.Build.0 = Debug|Win32
@@ -37,6 +53,16 @@ Global
 		{766594B9-B7B4-4827-9C6B-A11240060D1A}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{766594B9-B7B4-4827-9C6B-A11240060D1A}.Release|Win32.ActiveCfg = Release|Win32
 		{766594B9-B7B4-4827-9C6B-A11240060D1A}.Release|Win32.Build.0 = Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.STUDENT Release|Any CPU.ActiveCfg = STUDENT Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.STUDENT Release|Mixed Platforms.ActiveCfg = STUDENT Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.STUDENT Release|Mixed Platforms.Build.0 = STUDENT Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.STUDENT Release|Win32.ActiveCfg = STUDENT Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.STUDENT Release|Win32.Build.0 = STUDENT Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.TEACHER Release|Any CPU.ActiveCfg = TEACHER Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.TEACHER Release|Mixed Platforms.ActiveCfg = TEACHER Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.TEACHER Release|Mixed Platforms.Build.0 = TEACHER Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.TEACHER Release|Win32.ActiveCfg = TEACHER Release|Win32
+		{766594B9-B7B4-4827-9C6B-A11240060D1A}.TEACHER Release|Win32.Build.0 = TEACHER Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
