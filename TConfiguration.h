@@ -26,11 +26,12 @@ private:
 	COLORREF crPen, crDash, crDot;
 
 public:
+	bool bDrawSchoolLogo = true;
 	bool bDrawAxes = true;
 	bool bDrawReal=true;
 	bool bThemeDark = true;
 	bool bRandomColor = true;
-	bool bDrawGrid;
+	bool bDrawGrid = true;
 	int FRAMEPOINT_TRANS_R=5;//半透明状态节点圆半径
 	int FRAMEPOINT_R = 6;//节点圆半径
 	int FRAMEPOINT_H = 20;//高-圆心到地线距离

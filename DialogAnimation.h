@@ -30,6 +30,7 @@ namespace DialogAnimation
 	void SetPlayerEnable(bool bEnable);
 	void SetPlayerButtonEnableWhenDragTrackbar();
 	void SetAnalyzeButtonEnable(bool bEnable);
+	VOID SaveGifProc(PVOID pvoid);
 	VOID AnalyzeProc(PVOID pvoid);
 	VOID PlayProc(PVOID pvoid);
 	VOID PrepareClose(PVOID pvoid);

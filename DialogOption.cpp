@@ -9,6 +9,7 @@
 #include "global.h"
 #include "FileFunction.h"
 #include "RegisterFunction.h"
+#include "ShowMessage.h"
 
 #include "TCheckBox.h"
 
@@ -17,20 +18,28 @@ extern TMainWindow win;
 
 BOOL CALLBACK DlgOptionProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static HWND hCheckRegFile;
 	static TCheckBox CheckRegFile;
+	static TCheckBox CheckShowSchoolLogo;
+	static TCheckBox CheckShowGrid;
 	static bool bHasRegFile;
 	switch (message)
 	{
 	case WM_INITDIALOG:
 	{
-		hCheckRegFile=GetDlgItem(hDlg, IDC_CHECK_REG_FILE);
-		CheckRegFile.LinkControl(hCheckRegFile);
+		//Á´½Ó¿Ø¼þ
+		CheckRegFile.LinkControl(GetDlgItem(hDlg, IDC_CHECK_REG_FILE));
 
+		//¶ÁÈ¡×¢²á±í×´Ì¬
 		TCHAR szSelfFileName[MAX_PATH];
 		GetCommandLineByIndex(0, szSelfFileName);
 		bHasRegFile=CheckFileAssociation(TEXT("lml files"), szSelfFileName);
 		CheckRegFile.SetChecked(bHasRegFile);
+
+		CheckShowSchoolLogo.LinkControl(GetDlgItem(hDlg, IDC_CHECK_SHOW_SCHOOL_LOGO));
+		CheckShowSchoolLogo.SetChecked(win.m_Configuration.bDrawSchoolLogo);
+
+		CheckShowGrid.LinkControl(GetDlgItem(hDlg, IDC_CHECK_SHOW_GRID));
+		CheckShowGrid.SetChecked(win.m_Configuration.bDrawGrid);
 
 
 		return TRUE;
@@ -70,6 +79,11 @@ BOOL CALLBACK DlgOptionProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 					break;
 				}
 			}
+
+			win.m_Configuration.bDrawSchoolLogo = CheckShowSchoolLogo.GetChecked();
+			win.m_Configuration.bDrawGrid = CheckShowGrid.GetChecked();
+
+			win.Canvas.Invalidate();
 			
 			return TRUE;
 		}

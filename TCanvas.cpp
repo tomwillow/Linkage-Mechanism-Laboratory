@@ -336,7 +336,8 @@ void TCanvas::OnDraw(HDC hdc)
 		TDraw::DrawGrid(hdc, ClientRect, pConfig->GetOrg(), pConfig->crGridBig, pConfig->crGridSmall, pConfig);
 
 	//画校徽
-	Draw.DrawLogo(m_hInst,IDB_PNG_SCHOOL,TEXT("PNG"),hdc,ClientRect);
+	if (pConfig->bDrawSchoolLogo)
+		Draw.DrawLogo(m_hInst,IDB_PNG_SCHOOL,TEXT("PNG"),hdc,ClientRect);
 
 #if (defined _STUDENT) || (defined _TEACHER)
 	//写学号信息

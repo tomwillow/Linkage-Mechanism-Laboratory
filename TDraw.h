@@ -146,5 +146,11 @@ public:
 
 	//
 	static bool TDraw::CaptureWindowToFile(HWND hWnd, TCHAR szFileName[]);
+	static void TDraw::GetGifPaletteByHwnd(HWND hWnd, unsigned char *&palette, int &color_num, int &depth);
+	static unsigned char TDraw::GetIndexFromPalette(const UINT32 &data, const unsigned char *palette, const int &color_num);
+	static void TDraw::Create8TreePal(HWND hWnd, unsigned char *&palette, int &color_num, int &depth);
+
+	static unsigned char TDraw::GetIndexFromPalette(const UINT32 &data, const std::vector<unsigned int> &palette, const int &color_num);
+	static unsigned char TDraw::GetIndexFromPalette_Slow(const UINT32 &data, const std::vector<unsigned int> &palette, const int &color_num);
 };
 

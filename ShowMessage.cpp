@@ -5,7 +5,7 @@
 
 #include <strsafe.h>//ShowErrorMsgBox
 
-void ShowMessage(TCHAR szFormat[], ...)
+void ShowMessage(const TCHAR szFormat[], ...)
 {
 	TCHAR szBuffer[1024];
 	va_list pArgList;

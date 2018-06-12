@@ -1,5 +1,6 @@
 #pragma once
 #include "tchar_head.h"
+#include <string>
 
 namespace TTransfer
 {
@@ -12,4 +13,7 @@ namespace TTransfer
 	double TCHAR2double(TCHAR *start, TCHAR *end);
 
 	TCHAR * double2TCHAR_AutoTrim0(double d, TCHAR s[]);
+
+	std::wstring char2wstring(const char *s);
+	std::string unicode2string(const wchar_t *ws);
 }

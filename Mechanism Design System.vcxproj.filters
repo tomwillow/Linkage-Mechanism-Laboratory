@@ -261,6 +261,15 @@
     <ClCompile Include="DialogScore.cpp">
       <Filter>源文件\Dialog</Filter>
     </ClCompile>
+    <ClCompile Include="gifenc\gifenc.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TOctree.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -490,6 +499,15 @@
     </ClInclude>
     <ClInclude Include="tompng.h">
       <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="gifenc\gifenc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TImage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TOctree.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

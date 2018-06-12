@@ -67,3 +67,41 @@ TCHAR * TTransfer::double2TCHAR_AutoTrim0(double d, TCHAR s[])
 	_stprintf(s, TEXT("%.*f"), n, d);
 	return s;
 }
+
+std::wstring TTransfer::char2wstring(const char *s)
+{
+	DWORD dwNum = MultiByteToWideChar(CP_ACP, 0, s, -1, NULL, 0);
+	wchar_t *pwText;
+	pwText = new wchar_t[dwNum];
+	if (!pwText)
+	{
+		delete[]pwText;
+	}
+
+	MultiByteToWideChar(CP_ACP, 0, s, -1, pwText, dwNum);
+
+	std::wstring ws(pwText);
+
+	delete[]pwText;
+
+	return ws;
+}
+
+std::string TTransfer::unicode2string(const wchar_t *ws)
+{
+	DWORD dwNum = WideCharToMultiByte(CP_ACP, 0, ws, -1, NULL, 0, NULL, 0);
+	char *pText;
+	pText = new char[dwNum];
+	if (!pText)
+	{
+		delete[]pText;
+	}
+
+	WideCharToMultiByte(CP_ACP, 0, ws, -1, pText, dwNum, NULL, 0);
+
+	std::string s(pText);
+
+	delete[]pText;
+
+	return s;
+}

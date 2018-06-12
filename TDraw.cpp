@@ -3,10 +3,18 @@
 #include "MyMath.h"
 #include "tchar_head.h"
 
+#include <set>
+#include <map>
+#include <algorithm>
+
+#include <stdexcept>
+
 #include "tompng.h"
 
 
 #include "TDraw.h"
+
+#include "TImage.h"
 
 #include "TDrawTranslucent.h"
 #include "TConfiguration.h"
@@ -18,6 +26,8 @@
 #include "TConstraintCoincide.h"
 #include "TConstraintColinear.h"
 #include "TPolylineBar.h"
+
+#include "TOctree.h"
 
 TDraw::TDraw()
 {
@@ -196,54 +206,198 @@ void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, const TConfiguration *pConfi
 	DrawBarTranslucent(hdc, pConfig->RealToScreen(pBar->ptBegin), pConfig->RealToScreen(pBar->ptEnd), pBar->angle, pBar->alpha, pBar->logpenStyleShow, pConfig);
 }
 
+
+	//由真彩色图像建立最佳调色板
+/*直接传入指针，函数内将new出内容。delete由调用者负责。
+返回：位深
+e.g.
+unsigned char *palette;
+GetGifPaletteByHwnd(hWnd,palette);
+delete[] palette;
+*/
+void TDraw::Create8TreePal(HWND hWnd, unsigned char *&palette, int &color_num, int &depth)
+{   
+	using namespace TOctree;
+	int  i, j;
+	BYTE *pbBits;
+	BYTE r, g, b;
+	NODE *pTree;
+	UINT nLeafCount, nIndex;
+	NODE *pReducibleNodes[9];
+
+	TImage Image(hWnd);
+
+	// Initialize octree variables
+	pTree = NULL;                                       //八叉树置0（初始化）
+	nLeafCount = 0;
+	for (i = 0; i <= (int)depth; i++) pReducibleNodes[i] = NULL;
+
+	UINT32 data;
+	for (int y = 0; y < Image.height; y++)
+		for (int x = 0; x < Image.width; x++)
+		{
+			data = *((UINT32*)(Image.pvBits) + y*Image.width + x);
+			b = (BYTE)data;
+			g = (BYTE)(data >> 8);
+			r = (BYTE)(data >> 16);
+			AddColor(&pTree, r, g, b, depth, 0, &nLeafCount,
+				pReducibleNodes);                 //向八叉树中增加一种颜色
+			while (nLeafCount > color_num)              //若节点数超过调色板单元数
+				ReduceTree(depth, &nLeafCount, pReducibleNodes); //减少节点
+		}
+
+	palette = new unsigned char[color_num * 3];
+
+	nIndex = 0;
+	GetPaletteColors(pTree, palette, &nIndex);
+	DeleteTree(&pTree);
+}
+
+/*直接传入指针，函数内将new出内容。delete由调用者负责。
+返回：位深
+e.g. 
+unsigned char *palette;
+GetGifPaletteByHwnd(hWnd,palette);
+delete[] palette;
+*/
+void TDraw::GetGifPaletteByHwnd(HWND hWnd, unsigned char *&palette,int &color_num,int &depth) 
+{
+	TImage Image(hWnd);
+
+	typedef std::pair<UINT32, int> PAIR;
+
+	std::map<UINT32,int> palette_32;
+
+	UINT32 data;
+	for (int y = 0; y < Image.height; y++)
+		for (int x = 0; x < Image.width; x++)
+		{
+			data = *((UINT32*)(Image.pvBits) + y*Image.width + x);
+			palette_32[data]++;
+		}
+
+	//按照频率排序
+	std::vector<PAIR> palette_sorted(palette_32.begin(), palette_32.end());//复制到vector
+	std::sort(palette_sorted.begin(), palette_sorted.end(), [](const PAIR &lhs, const PAIR &rhs){return lhs.second > rhs.second; });
+	
+	//计算位深
+	color_num = 256;
+	depth = 8;
+	while (palette_sorted.size() < color_num && depth!=1)
+	{
+		color_num /= 2;
+		depth --;
+	}
+
+	//截掉多余颜色
+	if (palette_sorted.size() > color_num)
+		palette_sorted.erase(palette_sorted.begin() + color_num, palette_sorted.end());
+	else
+		color_num = palette_sorted.size();
+
+	//按照RGB值排序
+	std::sort(palette_sorted.begin(), palette_sorted.end(), [](const PAIR &lhs, const PAIR &rhs){return lhs.first < rhs.first; });
+
+	//写入调色盘
+		palette = new unsigned char[color_num*3];
+		for (int i = 0; i < color_num; ++i)
+		{
+			palette[i * 3] = palette_sorted[i].first>>16;//r
+			palette[i * 3+1] = palette_sorted[i].first>>8;//g
+			palette[i * 3+2] = palette_sorted[i].first;//b
+		}
+}
+
+//根据palette得到索引
+//对palette二分查找，找出和data最接近的
+unsigned char TDraw::GetIndexFromPalette(const UINT32 &data, const unsigned char *palette, const int &color_num)
+{
+	unsigned char low, high, mid(0);
+	low = 0;
+	high = color_num - 1;
+	mid = (low + high) / 2;
+	UINT32 palette_value;
+	while (low < high)
+	{
+		palette_value = palette[mid * 3 + 2] & 0x000000FF;
+		palette_value |= palette[mid * 3 + 1] << 8 & 0x0000FF00;
+		palette_value |= palette[mid * 3] << 16;
+		if (palette_value == data)
+			return mid;
+		if (data>palette_value)
+			low = mid + 1;
+		if (data<palette_value)
+			high = mid - 1;
+		mid = (low + high) / 2;
+	}
+	return mid;
+}
+//根据palette得到索引
+//对palette二分查找，找出和data最接近的
+unsigned char TDraw::GetIndexFromPalette(const UINT32 &data, const std::vector<unsigned int> &palette, const int &color_num)
+{
+	unsigned char low, high, mid(0);
+	low = 0;
+	high = color_num - 1;
+	mid = (low + high) / 2;
+	UINT32 palette_value;
+	while (low < high)
+	{
+		palette_value = palette[mid];
+		if (palette_value == data)
+			return mid;
+		if (data>palette_value)
+			low = mid + 1;
+		if (data<palette_value)
+			high = mid - 1;
+		mid = (low + high) / 2;
+	}
+	return mid;
+}
+
+
+//根据palette得到索引
+unsigned char TDraw::GetIndexFromPalette_Slow(const UINT32 &data, const std::vector<unsigned int> &palette, const int &color_num)
+{
+	unsigned char index=0;
+	long long value=_LLONG_MAX,dist;
+	int dist_r, dist_g, dist_b;
+	for (int i = 0; i < color_num; ++i)
+	{
+		dist_b=int(data & 0xff) - (palette[i] & 0xff);
+		dist_g= int(data >> 8 & 0xff) - (palette[i] >> 8 & 0xff);
+		dist_r= int(data >> 16 & 0xff) - (palette[i] >> 16 & 0xff);
+		dist = dist_r*dist_r + dist_g*dist_g + dist_b*dist_b;
+		if (dist<value)
+		{
+			value=dist;
+			index = i;
+		}
+	}
+	return index;
+}
+
 bool TDraw::CaptureWindowToFile(HWND hWnd, TCHAR szFileName[])
 {
-	RECT rc;
-	GetClientRect(hWnd, &rc);
-
-	HDC hdc = GetDC(hWnd);
-
-	LONG width = rc.right;
-	LONG height = rc.bottom;
-
-	HDC hBitmapDC = CreateCompatibleDC(NULL);
-
-	BITMAPINFO bmpInfo = { 0 };
-	bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmpInfo.bmiHeader.biWidth = width;
-	bmpInfo.bmiHeader.biHeight = height;//正数，说明数据从下到上，如未负数，则从上到下  
-	bmpInfo.bmiHeader.biPlanes = 1;
-	bmpInfo.bmiHeader.biBitCount = 32;
-	bmpInfo.bmiHeader.biCompression = BI_RGB;
-
-	VOID* pvBits;
-	HBITMAP hBitmap = CreateDIBSection(hBitmapDC, &bmpInfo, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
-	SelectObject(hBitmapDC, hBitmap);
-
-	BitBlt(hBitmapDC, 0, 0, width, height, hdc, 0, 0, SRCCOPY);
+	TImage Image(hWnd);
 
 	//将hBitmap中数据存出
-	unsigned char *rgb = new unsigned char[width*height * 3];
+	unsigned char *rgb = new unsigned char[Image.width*Image.height * 3];
 	unsigned char *p = rgb;
 	unsigned x, y;
 	FILE *fp = _wfopen(szFileName, TEXT("wb"));
 	UINT32 data;
-	for (y = 0; y < height; y++)
-		for (x = 0; x < width; x++)
+	for (y = 0; y < Image.height; y++)
+		for (x = 0; x < Image.width; x++)
 		{
-			data = *((UINT32*)(pvBits)+(height - 1 - y)*width + x);
-			*p++ = data >> 16;
-			*p++ = data >> 8;
-			*p++ = data;
+			data = *((UINT32*)(Image.pvBits) + y*Image.width + x);//(height - 1 - y)
+			*p++ = data >> 16;//R
+			*p++ = data >> 8;//G
+			*p++ = data;//B
 		}
-	tompng(fp, width, height, rgb, 0);
+	tompng(fp, Image.width, Image.height, rgb, 0);
 	fclose(fp);
 	delete rgb;
-
-	DeleteObject(hBitmap);
-	DeleteObject(hBitmapDC);
-
-	ReleaseDC(hWnd, hdc);
 
 	return true;
 }

@@ -10,6 +10,7 @@
 
 #include "String.h"
 #include "TTransfer.h"
+#include "ShowMessage.h"
 
 #include "TDraw.h"
 

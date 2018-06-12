@@ -37,7 +37,6 @@ void TConfiguration::SetTheme(bool bDark)
 		crDash = RGB(0, 200, 0);
 		crCoordinate = RGB(100, 100, 100);
 
-		bDrawGrid = true;
 		crGridBig = RGB(51, 57, 73);
 		crGridSmall = RGB(39, 45, 56);
 	}
@@ -51,7 +50,6 @@ void TConfiguration::SetTheme(bool bDark)
 		crDash = RGB(0, 200, 0);
 		crCoordinate = RGB(100, 100, 100);
 
-		bDrawGrid = true;
 		crGridBig = RGB(220, 220, 220);
 		crGridSmall = RGB(240, 240, 240);
 	}

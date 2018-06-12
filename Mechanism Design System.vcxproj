@@ -154,6 +154,7 @@
     <ClCompile Include="DialogAnimation.cpp" />
     <ClCompile Include="DialogOption.cpp" />
     <ClCompile Include="FileFunction.cpp" />
+    <ClCompile Include="gifenc\gifenc.c" />
     <ClCompile Include="RegisterFunction.cpp" />
     <ClCompile Include="ShowMessage.cpp" />
     <ClCompile Include="String.cpp" />
@@ -186,6 +187,7 @@
     <ClCompile Include="TFramePoint.cpp" />
     <ClCompile Include="TFramePointTool.cpp" />
     <ClCompile Include="TGraph.cpp" />
+    <ClCompile Include="TImage.cpp" />
     <ClCompile Include="TLineEdit.cpp" />
     <ClCompile Include="TLine.cpp" />
     <ClCompile Include="TLineTool.cpp" />
@@ -195,6 +197,7 @@
     <ClCompile Include="TMainWindow.cpp" />
     <ClCompile Include="TManageTool.cpp" />
     <ClCompile Include="TCHAR_Function.cpp" />
+    <ClCompile Include="TOctree.cpp" />
     <ClCompile Include="TPolylineBar.cpp" />
     <ClCompile Include="TPolylineBarTool.cpp" />
     <ClCompile Include="TRealLine.cpp" />
@@ -227,6 +230,7 @@
     <ClInclude Include="DialogAnimation.h" />
     <ClInclude Include="DialogOption.h" />
     <ClInclude Include="FileFunction.h" />
+    <ClInclude Include="gifenc\gifenc.h" />
     <ClInclude Include="RegisterFunction.h" />
     <ClInclude Include="ShowMessage.h" />
     <ClInclude Include="String.h" />
@@ -259,6 +263,7 @@
     <ClInclude Include="TFramePoint.h" />
     <ClInclude Include="TFramePointTool.h" />
     <ClInclude Include="TGraph.h" />
+    <ClInclude Include="TImage.h" />
     <ClInclude Include="TLineEdit.h" />
     <ClInclude Include="TLine.h" />
     <ClInclude Include="TLineTool.h" />
@@ -268,6 +273,7 @@
     <ClInclude Include="TMainWindow.h" />
     <ClInclude Include="TManageTool.h" />
     <ClInclude Include="TCHAR_Function.h" />
+    <ClInclude Include="TOctree.h" />
     <ClInclude Include="tompng.h" />
     <ClInclude Include="TPolylineBar.h" />
     <ClInclude Include="TPolylineBarTool.h" />
