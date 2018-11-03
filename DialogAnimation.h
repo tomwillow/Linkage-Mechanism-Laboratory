@@ -25,14 +25,5 @@ namespace DialogAnimation
 	};
 
 	BOOL CALLBACK DlgAnimationProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-	void SetEditTimeAndEditFrame();
-	void SetMesureControlEnable(bool bEnable);
-	void SetPlayerEnable(bool bEnable);
-	void SetPlayerButtonEnableWhenDragTrackbar();
-	void SetAnalyzeButtonEnable(bool bEnable);
-	VOID SaveGifProc(PVOID pvoid);
-	VOID AnalyzeProc(PVOID pvoid);
-	VOID PlayProc(PVOID pvoid);
-	VOID PrepareClose(PVOID pvoid);
-	void InitialListBoxLeft();
+
 }

@@ -40,9 +40,12 @@ namespace DialogAnimation
 	double time_start, time_end, time_now;
 	double fps;//帧率
 	int frame_start, frame_end, frame_now;
+
+	//多线程参数
 	bool isPlaying;
 	bool isAnalyzing;
 	bool thread_is_running;
+
 	bool player_enable;//和播放器启用状态同步
 
 	std::vector<TListBoxItem> vecItemsLeft, vecItemsRight;
@@ -81,6 +84,20 @@ namespace DialogAnimation
 	HINSTANCE hInst;
 
 	static HFONT hFont;
+
+	TCHAR filename[MAX_PATH];
+
+	void SetEditTimeAndEditFrame();
+	void SetMesureControlEnable(bool bEnable);
+	void SetPlayerEnable(bool bEnable);
+	void SetPlayerButtonEnableWhenDragTrackbar();
+	void SetAnalyzeButtonEnable(bool bEnable);
+	VOID SaveGifProc(PVOID pvoid);
+	VOID AnalyzeProc(PVOID pvoid);
+	VOID PlayProc(PVOID pvoid);
+	VOID PrepareClose(PVOID pvoid);
+	VOID SaveGifProc(PVOID pvoid);
+	void InitialListBoxLeft();
 
 	int CALLBACK EnumFontFamProc(LPENUMLOGFONT lpelf, LPNEWTEXTMETRIC lpntm, DWORD nFontType, long lParam)
 	{
@@ -454,82 +471,16 @@ namespace DialogAnimation
 			}
 			case ID_SAVE_AS_GIF:
 			{
-				uint8_t *palette = NULL;
 				try
 				{
 					if (player_enable==false)
 						throw TEXT("请先分析机构！");
-					TCHAR filename[MAX_PATH];
 
 					if (SaveFileDialog(hDlg, filename, TEXT("GIF\0*.gif\0\0"), TEXT("gif")))
 					{
-						DialogAnimation::SetAnalyzeButtonEnable(false);
-						DialogAnimation::SetMesureControlEnable(false);
-						DialogAnimation::SetPlayerEnable(false);
 
-						int w = pCanvas->ClientRect.right;
-						int h = pCanvas->ClientRect.bottom;
+						_beginthread(SaveGifProc, 0, (void *)filename);
 
-						int depth=8, color_num=256;
-
-#ifdef _DEBUG
-						::AllocConsole();
-						freopen("CONOUT$", "w+t", stdout);
-#endif
-
-						//TDraw::GetGifPaletteByHwnd(pCanvas->m_hWnd, palette, color_num, depth);
-						TDraw::Create8TreePal(pCanvas->m_hWnd, palette, color_num, depth);
-
-						std::vector<unsigned int> vecPalette;
-						unsigned int temp;
-						for (int i = 0; i < color_num; ++i)
-						{
-							temp = (palette[i * 3 + 2] << 16) | (palette[i * 3 + 1] << 8) | palette[i * 3];
-							vecPalette.push_back(temp);
-						}
-
-						std::sort(vecPalette.begin(), vecPalette.end());
-
-						for (int i = 0; i < color_num; ++i)
-						{
-							palette[i * 3+2] = (unsigned char)(vecPalette[i]>>16);
-							palette[i * 3+1] = (unsigned char)(vecPalette[i]>>8);
-							palette[i * 3] = (unsigned char)(vecPalette[i]);
-							std::cout << vecPalette[i] << std::endl;
-						}
-
-						ge_GIF *gif = ge_new_gif(
-							TTransfer::unicode2string(filename).c_str(),  /* file name */
-							w, h,           /* canvas size */
-							palette,
-							depth,              /* palette depth == log2(# of colors) */
-							0               /* infinite loop */
-							);
-
-						for (frame_now = frame_start; frame_now <= frame_end; ++frame_now)
-						{
-							//刷新渲染
-							TrackbarTime.SetPos(frame_now);
-							SendMessage(hDlg, WM_HSCROLL, 0, (LPARAM)TrackbarTime.m_hWnd);
-
-							//得到图像并遍历
-							TImage Image(pCanvas->m_hWnd);
-							for (int i = 0; i < Image.height*Image.width; ++i)
-							{
-								UINT32 *data = (UINT32 *)Image.pvBits + i;
-								*data &= 0x00FFFFFF;
-								//gif->frame[i] = TDraw::GetIndexFromPalette(*data, palette, color_num);
-								gif->frame[i] = TDraw::GetIndexFromPalette_Slow(*data,vecPalette, color_num);
-								std::cout << "%" << double(i) / (Image.height*Image.width) << std::endl;
-							}
-
-							//加入帧
-							ge_add_frame(gif, 100 / fps);
-						}
-
-
-						ge_close_gif(gif);
-						ShowMessage(TEXT("\"%s\" 保存完成。"),filename);
 					}
 				}
 				catch (TCHAR s[])
@@ -542,16 +493,6 @@ namespace DialogAnimation
 					ShowMessage(TEXT("保存出错。"));
 				}
 
-				DialogAnimation::SetAnalyzeButtonEnable(true);
-				DialogAnimation::SetMesureControlEnable(true);
-				DialogAnimation::SetPlayerEnable(true);
-
-						::FreeConsole();
-
-				if (palette != NULL)
-					delete[] palette;
-
-				//_beginthread(SaveGifProc, 0, NULL);
 				break;
 			}
 			}
@@ -581,17 +522,51 @@ namespace DialogAnimation
 
 	VOID SaveGifProc(PVOID pvoid)
 	{
+		thread_is_running = true;
+
+		DialogAnimation::SetAnalyzeButtonEnable(false);
+		DialogAnimation::SetMesureControlEnable(false);
+		DialogAnimation::SetPlayerEnable(false);
+
+		SetWindowText(hDlg, TEXT("保存中...请勿关闭程序"));
+
+		TCHAR *filename = (TCHAR *)pvoid;
+
+		uint8_t *palette = NULL;
 
 		int w = pCanvas->ClientRect.right;
 		int h = pCanvas->ClientRect.bottom;
 
-		uint8_t *palette = NULL;
+		int depth = 8, color_num = 256;
 
-		int depth, color_num;
-		TDraw::GetGifPaletteByHwnd(pCanvas->m_hWnd, palette, color_num, depth);
+#ifdef _DEBUG
+		::AllocConsole();
+		freopen("CONOUT$", "w+t", stdout);
+#endif
+
+		//TDraw::GetGifPaletteByHwnd(pCanvas->m_hWnd, palette, color_num, depth);
+		TDraw::Create8TreePal(pCanvas->m_hWnd, palette, color_num, depth);
+
+		std::vector<unsigned int> vecPalette;
+		unsigned int temp;
+		for (int i = 0; i < color_num; ++i)
+		{
+			temp = (palette[i * 3 + 2] << 16) | (palette[i * 3 + 1] << 8) | palette[i * 3];
+			vecPalette.push_back(temp);
+		}
+
+		std::sort(vecPalette.begin(), vecPalette.end());
+
+		for (int i = 0; i < color_num; ++i)
+		{
+			palette[i * 3 + 2] = (unsigned char)(vecPalette[i] >> 16);
+			palette[i * 3 + 1] = (unsigned char)(vecPalette[i] >> 8);
+			palette[i * 3] = (unsigned char)(vecPalette[i]);
+			std::cout << vecPalette[i] << std::endl;
+		}
 
 		ge_GIF *gif = ge_new_gif(
-			"example.gif",  /* file name */
+			TTransfer::unicode2string(filename).c_str(),  /* file name */
 			w, h,           /* canvas size */
 			palette,
 			depth,              /* palette depth == log2(# of colors) */
@@ -604,18 +579,37 @@ namespace DialogAnimation
 			TrackbarTime.SetPos(frame_now);
 			SendMessage(hDlg, WM_HSCROLL, 0, (LPARAM)TrackbarTime.m_hWnd);
 
+			//得到图像并遍历
 			TImage Image(pCanvas->m_hWnd);
 			for (int i = 0; i < Image.height*Image.width; ++i)
 			{
 				UINT32 *data = (UINT32 *)Image.pvBits + i;
-				gif->frame[i] = TDraw::GetIndexFromPalette(*data, palette, color_num);
+				*data &= 0x00FFFFFF;
+				gif->frame[i] = TDraw::GetIndexFromPalette_Slow(*data, vecPalette, color_num);
 			}
+
+			//加入帧
 			ge_add_frame(gif, 100 / fps);
 		}
 
 		ge_close_gif(gif);
 
-		delete[] palette;
+		if (palette != NULL)
+			delete[] palette;
+
+		ShowMessage(TEXT("\"%s\" 保存完成。"), filename);
+
+		DialogAnimation::SetAnalyzeButtonEnable(true);
+		DialogAnimation::SetMesureControlEnable(true);
+		DialogAnimation::SetPlayerEnable(true);
+
+		SetWindowText(hDlg, TEXT("动画与测量"));
+
+#ifdef _DEBUG
+		::FreeConsole();
+#endif
+
+		thread_is_running = false;
 	}
 
 	VOID PrepareClose(PVOID pvoid)

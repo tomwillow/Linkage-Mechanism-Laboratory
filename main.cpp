@@ -28,12 +28,12 @@ std::String sStudentNumber;
 std::String sStudentScore;
 
 #ifdef _STUDENT
-	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory 学生版 v0.2");
+	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory 学生版 v0.3");
 #else
 	#ifdef _TEACHER
-	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory 教师版 v0.2");
+	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory 教师版 v0.3");
 	#else
-	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory v0.2");
+	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory v0.3");
 	#endif
 #endif
 

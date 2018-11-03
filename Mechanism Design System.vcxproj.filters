@@ -46,18 +46,18 @@
     <Filter Include="头文件\Control">
       <UniqueIdentifier>{85500cbc-c014-4734-9ec7-b1d191702bc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\gif">
+      <UniqueIdentifier>{3b9ce7cc-7b8a-428b-a148-7929994879b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\gif">
+      <UniqueIdentifier>{c49d89c4-b0f8-4b40-814c-6ef2251b4036}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Control">
+      <UniqueIdentifier>{7015cd75-97e4-4505-85f2-0de281593eb3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TManageTool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TCanvas.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TMainWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TDraw.cpp">
@@ -69,52 +69,7 @@
     <ClCompile Include="TConfiguration.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TToolbar.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TStatus.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TTrackbar.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TEdit.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TLineEdit.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TAttach.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TWindow.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TRightWindow.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TListView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TTreeView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TTreeViewContent.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TControl.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TConsole.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TConsoleEdit.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TGraph.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TListViewEdit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TBar.cpp">
@@ -207,9 +162,6 @@
     <ClCompile Include="TConstraintColinearTool.cpp">
       <Filter>源文件\Tool</Filter>
     </ClCompile>
-    <ClCompile Include="TToolTip.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TDriver.cpp">
       <Filter>源文件\Element</Filter>
     </ClCompile>
@@ -240,20 +192,8 @@
     <ClCompile Include="TSolver.cpp">
       <Filter>源文件\Solver</Filter>
     </ClCompile>
-    <ClCompile Include="TListBox.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TCheckBox.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TButton.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TCHAR_Function.cpp">
       <Filter>源文件\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="TConstraint.cpp">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DialogStudent.cpp">
       <Filter>源文件\Dialog</Filter>
@@ -261,14 +201,83 @@
     <ClCompile Include="DialogScore.cpp">
       <Filter>源文件\Dialog</Filter>
     </ClCompile>
-    <ClCompile Include="gifenc\gifenc.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TImage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="gifenc\gifenc.c">
+      <Filter>源文件\gif</Filter>
+    </ClCompile>
     <ClCompile Include="TOctree.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\gif</Filter>
+    </ClCompile>
+    <ClCompile Include="TButton.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TCanvas.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TCheckBox.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TConsole.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TConsoleEdit.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TControl.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TEdit.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TGraph.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TLineEdit.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TListBox.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TListView.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TListViewEdit.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TMainWindow.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TManageTool.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TRightWindow.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TStatus.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TToolbar.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TToolTip.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TTrackbar.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TTreeView.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TTreeViewContent.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TWindow.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="TConstraint.cpp">
+      <Filter>源文件\Element</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -416,9 +425,6 @@
     <ClInclude Include="TCHAR_Function.h">
       <Filter>头文件\Common</Filter>
     </ClInclude>
-    <ClInclude Include="TConstraint.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DialogAbout.h">
       <Filter>头文件\Dialog</Filter>
     </ClInclude>
@@ -500,14 +506,17 @@
     <ClInclude Include="tompng.h">
       <Filter>头文件\Common</Filter>
     </ClInclude>
-    <ClInclude Include="gifenc\gifenc.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TImage.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="gifenc\gifenc.h">
+      <Filter>头文件\gif</Filter>
+    </ClInclude>
     <ClInclude Include="TOctree.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\gif</Filter>
+    </ClInclude>
+    <ClInclude Include="TConstraint.h">
+      <Filter>头文件\Element</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

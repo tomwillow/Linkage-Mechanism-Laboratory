@@ -360,7 +360,7 @@ unsigned char TDraw::GetIndexFromPalette(const UINT32 &data, const std::vector<u
 unsigned char TDraw::GetIndexFromPalette_Slow(const UINT32 &data, const std::vector<unsigned int> &palette, const int &color_num)
 {
 	unsigned char index=0;
-	long long value=_LLONG_MAX,dist;
+	int value=0x7fffffff,dist;
 	int dist_r, dist_g, dist_b;
 	for (int i = 0; i < color_num; ++i)
 	{
