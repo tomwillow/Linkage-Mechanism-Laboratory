@@ -1,7 +1,0 @@
-Linkage Mechanism Laboratory v0.2.exe 是普通版程序。
-
-Linkage Mechanism Laboratory学生版v0.2.exe 是学生版程序，打开时必须输入姓名等信息，且进入程序后无法更改。
-
-Linkage Mechanism Laboratory教师版v0.2.exe 是教师版程序，在“文件”菜单下多出“登记成绩”一项，可以更改学生信息、录入成绩。
-
-除以上说明外，学生版和教师版与普通版程序没有区别。

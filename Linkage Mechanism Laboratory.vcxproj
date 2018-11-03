@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{265569DC-34A0-49B3-9BE3-5133199DB24D}</ProjectGuid>
-    <RootNamespace>MechanismDesignSystem</RootNamespace>
+    <RootNamespace>LinkageMechanismLaboratory</RootNamespace>
     <ProjectName>Linkage Mechanism Laboratory</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -305,7 +305,7 @@
     <ClInclude Include="DialogScore.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Mechanism Design System.rc" />
+    <ResourceCompile Include="Linkage Mechanism Laboratory.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resource\BITMAP_AXES_HIDE.bmp" />
