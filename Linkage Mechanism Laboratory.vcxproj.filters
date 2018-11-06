@@ -60,301 +60,229 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TDraw.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TShape.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="TConfiguration.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TAttach.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TBar.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="TFramePoint.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="TLine.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="TSlideway.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="TElement.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="TBarTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="TDragTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="TLineTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="TSelectTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="TSlidewayTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="TTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="TConstraintCoincide.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="TRealLine.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="TFramePointTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="TSliderTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="TConstraintColinear.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="TSlider.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="DetectMemoryLeak.cpp">
-      <Filter>头文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TDialogBox.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TPolylineBar.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="TPolylineBarTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="DPOINT.cpp">
-      <Filter>源文件\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="FileFunction.cpp">
-      <Filter>源文件\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="RegisterFunction.cpp">
-      <Filter>源文件\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ShowMessage.cpp">
-      <Filter>源文件\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="String.cpp">
-      <Filter>源文件\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="TTransfer.cpp">
-      <Filter>源文件\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="TDrawTranslucent.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TConstraintCoincideTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="TConstraintColinearTool.cpp">
-      <Filter>源文件\Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="TDriver.cpp">
-      <Filter>源文件\Element</Filter>
-    </ClCompile>
-    <ClCompile Include="MyMath.cpp">
-      <Filter>源文件\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogAbout.cpp">
-      <Filter>源文件\Dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogAddDriver.cpp">
-      <Filter>源文件\Dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogAnimation.cpp">
-      <Filter>源文件\Dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogOption.cpp">
-      <Filter>源文件\Dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="TEquations.cpp">
-      <Filter>源文件\Solver</Filter>
-    </ClCompile>
-    <ClCompile Include="TExpressionTree.cpp">
-      <Filter>源文件\Solver</Filter>
-    </ClCompile>
-    <ClCompile Include="TVariableTable.cpp">
-      <Filter>源文件\Solver</Filter>
-    </ClCompile>
-    <ClCompile Include="TSolver.cpp">
-      <Filter>源文件\Solver</Filter>
-    </ClCompile>
-    <ClCompile Include="TCHAR_Function.cpp">
-      <Filter>源文件\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogStudent.cpp">
-      <Filter>源文件\Dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogScore.cpp">
-      <Filter>源文件\Dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="TImage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="gifenc\gifenc.c">
       <Filter>源文件\gif</Filter>
     </ClCompile>
-    <ClCompile Include="TOctree.cpp">
+    <ClCompile Include="Dialog\DialogAbout.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog\DialogAddDriver.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog\DialogAnimation.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog\DialogOption.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog\DialogScore.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog\DialogStudent.cpp">
+      <Filter>源文件\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TBarTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TDragTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TFramePointTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TManageTool.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TPolylineBarTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TSelectTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TSliderTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TSlidewayTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TLineTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TBar.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TConstraint.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TConstraintCoincide.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TConstraintColinear.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TElement.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TFramePoint.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TLine.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TPolylineBar.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TRealLine.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TSlider.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TSlideway.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TButton.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TCanvas.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TCheckBox.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TConsole.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TConsoleEdit.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TControl.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TEdit.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TGraph.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TLineEdit.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TListBox.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TListView.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TListViewEdit.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TMainWindow.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TRightWindow.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TStatus.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TToolbar.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TToolTip.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TTrackbar.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TTreeView.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TWindow.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Solver\TEquations.cpp">
+      <Filter>源文件\Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="Solver\TExpressionTree.cpp">
+      <Filter>源文件\Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="Solver\TSolver.cpp">
+      <Filter>源文件\Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="Solver\TVariableTable.cpp">
+      <Filter>源文件\Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\DetectMemoryLeak.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\FileFunction.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\MyMath.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\RegisterFunction.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\ShowMessage.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\String.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\TCHAR_Function.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\TTransfer.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TConstraintCoincideTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Tool\TConstraintColinearTool.cpp">
+      <Filter>源文件\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="Element\TDriver.cpp">
+      <Filter>源文件\Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TTreeViewContent.cpp">
+      <Filter>源文件\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\DPOINT.cpp">
+      <Filter>源文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw\TDraw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw\TDrawTranslucent.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw\TImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw\TOctree.cpp">
       <Filter>源文件\gif</Filter>
     </ClCompile>
-    <ClCompile Include="TButton.cpp">
-      <Filter>源文件\Control</Filter>
+    <ClCompile Include="Tool\TAttach.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TCanvas.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TCheckBox.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TConsole.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TConsoleEdit.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TControl.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TEdit.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TGraph.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TLineEdit.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TListBox.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TListView.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TListViewEdit.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TMainWindow.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TManageTool.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TRightWindow.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TStatus.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TToolbar.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TToolTip.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TTrackbar.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TTreeView.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TTreeViewContent.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TWindow.cpp">
-      <Filter>源文件\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="TConstraint.cpp">
-      <Filter>源文件\Element</Filter>
+    <ClCompile Include="Element\TShape.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TDraw.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TShape.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TConfiguration.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TAttach.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DetectMemoryLeak.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TSelectTool.h">
-      <Filter>头文件\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="TSlidewayTool.h">
-      <Filter>头文件\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="TTool.h">
-      <Filter>头文件\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="TLineTool.h">
-      <Filter>头文件\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="TFramePointTool.h">
-      <Filter>头文件\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="TDragTool.h">
-      <Filter>头文件\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="TBarTool.h">
-      <Filter>头文件\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="TElement.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="TLine.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="TRealLine.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="TSlideway.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="TFramePoint.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="TBar.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="TConstraintCoincide.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="TSliderTool.h">
-      <Filter>头文件\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="TConstraintColinear.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="TSlider.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="TDialogBox.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TPolylineBarTool.h">
-      <Filter>头文件\Tool</Filter>
     </ClInclude>
     <ClInclude Include="enumCtrlType.h">
       <Filter>头文件\Common</Filter>
@@ -362,161 +290,227 @@
     <ClInclude Include="enumError.h">
       <Filter>头文件\Common</Filter>
     </ClInclude>
-    <ClInclude Include="DPOINT.h">
-      <Filter>头文件\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="FileFunction.h">
-      <Filter>头文件\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="MyMath.h">
-      <Filter>头文件\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="RegisterFunction.h">
-      <Filter>头文件\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="ShowMessage.h">
-      <Filter>头文件\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="String.h">
-      <Filter>头文件\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="tchar_head.h">
-      <Filter>头文件\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="TTransfer.h">
-      <Filter>头文件\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="TDrawTranslucent.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TPolylineBar.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="TConstraintCoincideTool.h">
-      <Filter>头文件\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="TConstraintColinearTool.h">
-      <Filter>头文件\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="TDriver.h">
-      <Filter>头文件\Element</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogAddDriver.h">
-      <Filter>头文件\Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogOption.h">
-      <Filter>头文件\Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogAnimation.h">
-      <Filter>头文件\Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="TSolver.h">
-      <Filter>头文件\Solver</Filter>
-    </ClInclude>
-    <ClInclude Include="TVariableTable.h">
-      <Filter>头文件\Solver</Filter>
-    </ClInclude>
-    <ClInclude Include="TExpressionTree.h">
-      <Filter>头文件\Solver</Filter>
-    </ClInclude>
-    <ClInclude Include="TEquations.h">
-      <Filter>头文件\Solver</Filter>
-    </ClInclude>
-    <ClInclude Include="TCHAR_Function.h">
-      <Filter>头文件\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogAbout.h">
-      <Filter>头文件\Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogStudent.h">
-      <Filter>头文件\Dialog</Filter>
-    </ClInclude>
     <ClInclude Include="global.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogScore.h">
-      <Filter>头文件\Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="TButton.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TCanvas.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TCheckBox.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TConsole.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TConsoleEdit.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TControl.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TEdit.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TGraph.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TLineEdit.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TListBox.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TListView.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TListViewEdit.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TMainWindow.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TManageTool.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TRightWindow.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TStatus.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TToolbar.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TToolTip.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TTrackbar.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TTreeView.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TTreeViewContent.h">
-      <Filter>头文件\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="TWindow.h">
-      <Filter>头文件\Control</Filter>
     </ClInclude>
     <ClInclude Include="tompng.h">
       <Filter>头文件\Common</Filter>
     </ClInclude>
-    <ClInclude Include="TImage.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="gifenc\gifenc.h">
       <Filter>头文件\gif</Filter>
     </ClInclude>
-    <ClInclude Include="TOctree.h">
+    <ClInclude Include="Dialog\DialogAbout.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog\DialogAddDriver.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog\DialogAnimation.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog\DialogOption.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog\DialogScore.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog\DialogStudent.h">
+      <Filter>头文件\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TBarTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TDragTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TFramePointTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TManageTool.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TPolylineBarTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TSelectTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TSliderTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TSlidewayTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TLineTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TBar.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TConstraint.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TConstraintCoincide.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TConstraintColinear.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TElement.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TFramePoint.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TLine.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TPolylineBar.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TRealLine.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TSlider.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TSlideway.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TButton.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TCanvas.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TCheckBox.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TConsole.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TConsoleEdit.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TControl.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TEdit.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TGraph.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TLineEdit.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TListBox.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TListView.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TListViewEdit.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TMainWindow.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TRightWindow.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TStatus.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TToolbar.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TToolTip.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TTrackbar.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TTreeView.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TWindow.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Solver\TEquations.h">
+      <Filter>头文件\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="Solver\TExpressionTree.h">
+      <Filter>头文件\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="Solver\TSolver.h">
+      <Filter>头文件\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="Solver\TVariableTable.h">
+      <Filter>头文件\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\DetectMemoryLeak.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\FileFunction.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MyMath.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\RegisterFunction.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ShowMessage.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\String.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\TCHAR_Function.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\tchar_head.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\TTransfer.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TConstraintColinearTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool\TConstraintCoincideTool.h">
+      <Filter>头文件\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TDriver.h">
+      <Filter>头文件\Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TTreeViewContent.h">
+      <Filter>头文件\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\DPOINT.h">
+      <Filter>头文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\TDraw.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\TDrawTranslucent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\TImage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\TOctree.h">
       <Filter>头文件\gif</Filter>
     </ClInclude>
-    <ClInclude Include="TConstraint.h">
-      <Filter>头文件\Element</Filter>
+    <ClInclude Include="Tool\TAttach.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Element\TShape.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -561,8 +555,5 @@
     <Image Include="Resource\PNG_SCHOOL.png">
       <Filter>资源文件</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

@@ -3,15 +3,15 @@
 
 
 #include <windows.h>
-#include "String.h"
-#include "tchar_head.h"
+#include "Common\String.h"
+#include "Common\tchar_head.h"
 #include <CommCtrl.h>
 
-#include "ControlStyle.h"
+#include "Common\ControlStyle.h"
 #include "resource.h"
 
 #include "global.h"
-#include "TMainWindow.h"
+#include "Control\TMainWindow.h"
 
 #pragma comment(lib,"kernel32.lib")
 #pragma comment(lib,"user32.lib")

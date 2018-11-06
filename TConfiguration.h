@@ -1,9 +1,9 @@
 #pragma once
-#include "MyMath.h"
+#include "Common\MyMath.h"
 
 #include <vector>
 #include <Windows.h>
-#include "DPOINT.h"
+#include "Common\DPOINT.h"
 
 
 enum units { UNITS_PX, UNITS_MM, UNITS_INCH };

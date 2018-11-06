@@ -70,9 +70,21 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TEACHER Release|Win32'">
     <TargetName>$(ProjectName)教师版</TargetName>
+    <OutDir>..\$(Configuration)\</OutDir>
+    <IntDir>..\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STUDENT Release|Win32'">
     <TargetName>$(ProjectName)学生版</TargetName>
+    <OutDir>..\$(Configuration)\</OutDir>
+    <IntDir>..\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\$(Configuration)\</OutDir>
+    <IntDir>..\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\$(Configuration)\</OutDir>
+    <IntDir>..\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -148,161 +160,159 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DetectMemoryLeak.cpp" />
-    <ClCompile Include="DialogAbout.cpp" />
-    <ClCompile Include="DialogAddDriver.cpp" />
-    <ClCompile Include="DialogAnimation.cpp" />
-    <ClCompile Include="DialogOption.cpp" />
-    <ClCompile Include="FileFunction.cpp" />
+    <ClCompile Include="Common\DetectMemoryLeak.cpp" />
+    <ClCompile Include="Dialog\DialogAbout.cpp" />
+    <ClCompile Include="Dialog\DialogAddDriver.cpp" />
+    <ClCompile Include="Dialog\DialogAnimation.cpp" />
+    <ClCompile Include="Dialog\DialogOption.cpp" />
+    <ClCompile Include="Common\FileFunction.cpp" />
     <ClCompile Include="gifenc\gifenc.c" />
-    <ClCompile Include="RegisterFunction.cpp" />
-    <ClCompile Include="ShowMessage.cpp" />
-    <ClCompile Include="String.cpp" />
-    <ClCompile Include="TButton.cpp" />
-    <ClCompile Include="TCheckBox.cpp" />
-    <ClCompile Include="TConstraint.cpp" />
-    <ClCompile Include="TConstraintCoincideTool.cpp" />
-    <ClCompile Include="TConstraintColinear.cpp" />
-    <ClCompile Include="TConstraintColinearTool.cpp" />
-    <ClCompile Include="TDialogBox.cpp" />
-    <ClCompile Include="TDragTool.cpp" />
-    <ClCompile Include="TDrawTranslucent.cpp" />
-    <ClCompile Include="TDriver.cpp" />
-    <ClCompile Include="TEquations.cpp" />
+    <ClCompile Include="Common\RegisterFunction.cpp" />
+    <ClCompile Include="Common\ShowMessage.cpp" />
+    <ClCompile Include="Common\String.cpp" />
+    <ClCompile Include="Control\TButton.cpp" />
+    <ClCompile Include="Control\TCheckBox.cpp" />
+    <ClCompile Include="Element\TConstraint.cpp" />
+    <ClCompile Include="Tool\TConstraintCoincideTool.cpp" />
+    <ClCompile Include="Element\TConstraintColinear.cpp" />
+    <ClCompile Include="Tool\TConstraintColinearTool.cpp" />
+    <ClCompile Include="Tool\TDragTool.cpp" />
+    <ClCompile Include="Draw\TDrawTranslucent.cpp" />
+    <ClCompile Include="Element\TDriver.cpp" />
+    <ClCompile Include="Solver\TEquations.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="TAttach.cpp" />
-    <ClCompile Include="TBar.cpp" />
-    <ClCompile Include="TBarTool.cpp" />
-    <ClCompile Include="TCanvas.cpp" />
+    <ClCompile Include="Tool\TAttach.cpp" />
+    <ClCompile Include="Element\TBar.cpp" />
+    <ClCompile Include="Tool\TBarTool.cpp" />
+    <ClCompile Include="Control\TCanvas.cpp" />
     <ClCompile Include="TConfiguration.cpp" />
-    <ClCompile Include="DPOINT.cpp" />
-    <ClCompile Include="TConsole.cpp" />
-    <ClCompile Include="TConsoleEdit.cpp" />
-    <ClCompile Include="TConstraintCoincide.cpp" />
-    <ClCompile Include="TControl.cpp" />
-    <ClCompile Include="TDraw.cpp" />
-    <ClCompile Include="TEdit.cpp" />
-    <ClCompile Include="TElement.cpp" />
-    <ClCompile Include="TExpressionTree.cpp" />
-    <ClCompile Include="TFramePoint.cpp" />
-    <ClCompile Include="TFramePointTool.cpp" />
-    <ClCompile Include="TGraph.cpp" />
-    <ClCompile Include="TImage.cpp" />
-    <ClCompile Include="TLineEdit.cpp" />
-    <ClCompile Include="TLine.cpp" />
-    <ClCompile Include="TLineTool.cpp" />
-    <ClCompile Include="TListBox.cpp" />
-    <ClCompile Include="TListView.cpp" />
-    <ClCompile Include="TListViewEdit.cpp" />
-    <ClCompile Include="TMainWindow.cpp" />
-    <ClCompile Include="TManageTool.cpp" />
-    <ClCompile Include="TCHAR_Function.cpp" />
-    <ClCompile Include="TOctree.cpp" />
-    <ClCompile Include="TPolylineBar.cpp" />
-    <ClCompile Include="TPolylineBarTool.cpp" />
-    <ClCompile Include="TRealLine.cpp" />
-    <ClCompile Include="TRightWindow.cpp" />
-    <ClCompile Include="TSelectTool.cpp" />
-    <ClCompile Include="TShape.cpp" />
-    <ClCompile Include="TSlider.cpp" />
-    <ClCompile Include="TSliderTool.cpp" />
-    <ClCompile Include="TSlideway.cpp" />
-    <ClCompile Include="TSlidewayTool.cpp" />
-    <ClCompile Include="TSolver.cpp" />
-    <ClCompile Include="TStatus.cpp" />
-    <ClCompile Include="TTool.cpp" />
-    <ClCompile Include="TToolbar.cpp" />
-    <ClCompile Include="TToolTip.cpp" />
-    <ClCompile Include="TTreeView.cpp" />
-    <ClCompile Include="TTreeViewContent.cpp" />
-    <ClCompile Include="TVariableTable.cpp" />
-    <ClCompile Include="TWindow.cpp" />
-    <ClCompile Include="TTrackbar.cpp" />
-    <ClCompile Include="TTransfer.cpp" />
-    <ClCompile Include="MyMath.cpp" />
-    <ClCompile Include="DialogStudent.cpp" />
-    <ClCompile Include="DialogScore.cpp" />
+    <ClCompile Include="Common\DPOINT.cpp" />
+    <ClCompile Include="Control\TConsole.cpp" />
+    <ClCompile Include="Control\TConsoleEdit.cpp" />
+    <ClCompile Include="Element\TConstraintCoincide.cpp" />
+    <ClCompile Include="Control\TControl.cpp" />
+    <ClCompile Include="Draw\TDraw.cpp" />
+    <ClCompile Include="Control\TEdit.cpp" />
+    <ClCompile Include="Element\TElement.cpp" />
+    <ClCompile Include="Solver\TExpressionTree.cpp" />
+    <ClCompile Include="Element\TFramePoint.cpp" />
+    <ClCompile Include="Tool\TFramePointTool.cpp" />
+    <ClCompile Include="Control\TGraph.cpp" />
+    <ClCompile Include="Draw\TImage.cpp" />
+    <ClCompile Include="Control\TLineEdit.cpp" />
+    <ClCompile Include="Element\TLine.cpp" />
+    <ClCompile Include="Tool\TLineTool.cpp" />
+    <ClCompile Include="Control\TListBox.cpp" />
+    <ClCompile Include="Control\TListView.cpp" />
+    <ClCompile Include="Control\TListViewEdit.cpp" />
+    <ClCompile Include="Control\TMainWindow.cpp" />
+    <ClCompile Include="Tool\TManageTool.cpp" />
+    <ClCompile Include="Common\TCHAR_Function.cpp" />
+    <ClCompile Include="Draw\TOctree.cpp" />
+    <ClCompile Include="Element\TPolylineBar.cpp" />
+    <ClCompile Include="Tool\TPolylineBarTool.cpp" />
+    <ClCompile Include="Element\TRealLine.cpp" />
+    <ClCompile Include="Control\TRightWindow.cpp" />
+    <ClCompile Include="Tool\TSelectTool.cpp" />
+    <ClCompile Include="Element\TShape.cpp" />
+    <ClCompile Include="Element\TSlider.cpp" />
+    <ClCompile Include="Tool\TSliderTool.cpp" />
+    <ClCompile Include="Element\TSlideway.cpp" />
+    <ClCompile Include="Tool\TSlidewayTool.cpp" />
+    <ClCompile Include="Solver\TSolver.cpp" />
+    <ClCompile Include="Control\TStatus.cpp" />
+    <ClCompile Include="Tool\TTool.cpp" />
+    <ClCompile Include="Control\TToolbar.cpp" />
+    <ClCompile Include="Control\TToolTip.cpp" />
+    <ClCompile Include="Control\TTreeView.cpp" />
+    <ClCompile Include="Control\TTreeViewContent.cpp" />
+    <ClCompile Include="Solver\TVariableTable.cpp" />
+    <ClCompile Include="Control\TWindow.cpp" />
+    <ClCompile Include="Control\TTrackbar.cpp" />
+    <ClCompile Include="Common\TTransfer.cpp" />
+    <ClCompile Include="Common\MyMath.cpp" />
+    <ClCompile Include="Dialog\DialogStudent.cpp" />
+    <ClCompile Include="Dialog\DialogScore.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DetectMemoryLeak.h" />
-    <ClInclude Include="DialogAbout.h" />
-    <ClInclude Include="DialogAddDriver.h" />
-    <ClInclude Include="DialogAnimation.h" />
-    <ClInclude Include="DialogOption.h" />
-    <ClInclude Include="FileFunction.h" />
+    <ClInclude Include="Common\DetectMemoryLeak.h" />
+    <ClInclude Include="Dialog\DialogAbout.h" />
+    <ClInclude Include="Dialog\DialogAddDriver.h" />
+    <ClInclude Include="Dialog\DialogAnimation.h" />
+    <ClInclude Include="Dialog\DialogOption.h" />
+    <ClInclude Include="Common\FileFunction.h" />
     <ClInclude Include="gifenc\gifenc.h" />
-    <ClInclude Include="RegisterFunction.h" />
-    <ClInclude Include="ShowMessage.h" />
-    <ClInclude Include="String.h" />
-    <ClInclude Include="TButton.h" />
-    <ClInclude Include="TCheckBox.h" />
-    <ClInclude Include="TConstraint.h" />
-    <ClInclude Include="TConstraintCoincideTool.h" />
-    <ClInclude Include="TConstraintColinear.h" />
-    <ClInclude Include="TConstraintColinearTool.h" />
-    <ClInclude Include="TDialogBox.h" />
-    <ClInclude Include="TDragTool.h" />
-    <ClInclude Include="TDrawTranslucent.h" />
-    <ClInclude Include="TDriver.h" />
-    <ClInclude Include="TEquations.h" />
+    <ClInclude Include="Common\RegisterFunction.h" />
+    <ClInclude Include="Common\ShowMessage.h" />
+    <ClInclude Include="Common\String.h" />
+    <ClInclude Include="Control\TButton.h" />
+    <ClInclude Include="Control\TCheckBox.h" />
+    <ClInclude Include="Element\TConstraint.h" />
+    <ClInclude Include="Tool\TConstraintCoincideTool.h" />
+    <ClInclude Include="Element\TConstraintColinear.h" />
+    <ClInclude Include="Tool\TConstraintColinearTool.h" />
+    <ClInclude Include="Tool\TDragTool.h" />
+    <ClInclude Include="Draw\TDrawTranslucent.h" />
+    <ClInclude Include="Element\TDriver.h" />
+    <ClInclude Include="Solver\TEquations.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="TAttach.h" />
-    <ClInclude Include="TBar.h" />
-    <ClInclude Include="TBarTool.h" />
-    <ClInclude Include="TCanvas.h" />
+    <ClInclude Include="Tool\TAttach.h" />
+    <ClInclude Include="Element\TBar.h" />
+    <ClInclude Include="Tool\TBarTool.h" />
+    <ClInclude Include="Control\TCanvas.h" />
     <ClInclude Include="TConfiguration.h" />
-    <ClInclude Include="DPOINT.h" />
-    <ClInclude Include="TConsole.h" />
-    <ClInclude Include="TConsoleEdit.h" />
-    <ClInclude Include="TConstraintCoincide.h" />
-    <ClInclude Include="TControl.h" />
-    <ClInclude Include="TDraw.h" />
-    <ClInclude Include="TEdit.h" />
-    <ClInclude Include="TElement.h" />
-    <ClInclude Include="TExpressionTree.h" />
-    <ClInclude Include="TFramePoint.h" />
-    <ClInclude Include="TFramePointTool.h" />
-    <ClInclude Include="TGraph.h" />
-    <ClInclude Include="TImage.h" />
-    <ClInclude Include="TLineEdit.h" />
-    <ClInclude Include="TLine.h" />
-    <ClInclude Include="TLineTool.h" />
-    <ClInclude Include="TListBox.h" />
-    <ClInclude Include="TListView.h" />
-    <ClInclude Include="TListViewEdit.h" />
-    <ClInclude Include="TMainWindow.h" />
-    <ClInclude Include="TManageTool.h" />
-    <ClInclude Include="TCHAR_Function.h" />
-    <ClInclude Include="TOctree.h" />
+    <ClInclude Include="Common\DPOINT.h" />
+    <ClInclude Include="Control\TConsole.h" />
+    <ClInclude Include="Control\TConsoleEdit.h" />
+    <ClInclude Include="Element\TConstraintCoincide.h" />
+    <ClInclude Include="Control\TControl.h" />
+    <ClInclude Include="Draw\TDraw.h" />
+    <ClInclude Include="Control\TEdit.h" />
+    <ClInclude Include="Element\TElement.h" />
+    <ClInclude Include="Solver\TExpressionTree.h" />
+    <ClInclude Include="Element\TFramePoint.h" />
+    <ClInclude Include="Tool\TFramePointTool.h" />
+    <ClInclude Include="Control\TGraph.h" />
+    <ClInclude Include="Draw\TImage.h" />
+    <ClInclude Include="Control\TLineEdit.h" />
+    <ClInclude Include="Element\TLine.h" />
+    <ClInclude Include="Tool\TLineTool.h" />
+    <ClInclude Include="Control\TListBox.h" />
+    <ClInclude Include="Control\TListView.h" />
+    <ClInclude Include="Control\TListViewEdit.h" />
+    <ClInclude Include="Control\TMainWindow.h" />
+    <ClInclude Include="Tool\TManageTool.h" />
+    <ClInclude Include="Common\TCHAR_Function.h" />
+    <ClInclude Include="Draw\TOctree.h" />
     <ClInclude Include="tompng.h" />
-    <ClInclude Include="TPolylineBar.h" />
-    <ClInclude Include="TPolylineBarTool.h" />
-    <ClInclude Include="TRealLine.h" />
-    <ClInclude Include="TRightWindow.h" />
-    <ClInclude Include="TSelectTool.h" />
-    <ClInclude Include="TShape.h" />
-    <ClInclude Include="TSlider.h" />
-    <ClInclude Include="TSliderTool.h" />
-    <ClInclude Include="TSlideway.h" />
-    <ClInclude Include="TSlidewayTool.h" />
-    <ClInclude Include="TSolver.h" />
-    <ClInclude Include="TStatus.h" />
-    <ClInclude Include="TTool.h" />
-    <ClInclude Include="TToolbar.h" />
-    <ClInclude Include="TToolTip.h" />
-    <ClInclude Include="TTreeView.h" />
-    <ClInclude Include="TTreeViewContent.h" />
-    <ClInclude Include="TVariableTable.h" />
-    <ClInclude Include="TWindow.h" />
-    <ClInclude Include="TTrackbar.h" />
-    <ClInclude Include="TTransfer.h" />
+    <ClInclude Include="Element\TPolylineBar.h" />
+    <ClInclude Include="Tool\TPolylineBarTool.h" />
+    <ClInclude Include="Element\TRealLine.h" />
+    <ClInclude Include="Control\TRightWindow.h" />
+    <ClInclude Include="Tool\TSelectTool.h" />
+    <ClInclude Include="Element\TShape.h" />
+    <ClInclude Include="Element\TSlider.h" />
+    <ClInclude Include="Tool\TSliderTool.h" />
+    <ClInclude Include="Element\TSlideway.h" />
+    <ClInclude Include="Tool\TSlidewayTool.h" />
+    <ClInclude Include="Solver\TSolver.h" />
+    <ClInclude Include="Control\TStatus.h" />
+    <ClInclude Include="Tool\TTool.h" />
+    <ClInclude Include="Control\TToolbar.h" />
+    <ClInclude Include="Control\TToolTip.h" />
+    <ClInclude Include="Control\TTreeView.h" />
+    <ClInclude Include="Control\TTreeViewContent.h" />
+    <ClInclude Include="Solver\TVariableTable.h" />
+    <ClInclude Include="Control\TWindow.h" />
+    <ClInclude Include="Control\TTrackbar.h" />
+    <ClInclude Include="Common\TTransfer.h" />
     <ClInclude Include="enumError.h" />
     <ClInclude Include="enumCtrlType.h" />
-    <ClInclude Include="MyMath.h" />
-    <ClInclude Include="tchar_head.h" />
+    <ClInclude Include="Common\MyMath.h" />
+    <ClInclude Include="Common\tchar_head.h" />
     <ClInclude Include="global.h" />
-    <ClInclude Include="DialogStudent.h" />
-    <ClInclude Include="DialogScore.h" />
+    <ClInclude Include="Dialog\DialogStudent.h" />
+    <ClInclude Include="Dialog\DialogScore.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Linkage Mechanism Laboratory.rc" />
@@ -320,9 +330,6 @@
     <Image Include="Resource\Icon_16.ico" />
     <Image Include="Resource\PNG_SCHOOL.png" />
     <Image Include="Resource\toolbar_mechanism.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
