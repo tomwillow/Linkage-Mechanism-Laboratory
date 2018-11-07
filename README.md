@@ -34,5 +34,5 @@
 
 ## Thanks
 
-https://github.com/miloyip/svpng
+https://github.com/miloyip/svpng<br>
 https://github.com/lecram/gifenc
