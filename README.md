@@ -1,6 +1,10 @@
 # Linkage-Mechanism-Laboratory
 连杆机构实验室
 
+## Author
+By Tom Willow
+https://github.com/tomwillow/Linkage-Mechanism-Laboratory/
+
 ## 简介
 本程序用于进行平面连杆机构仿真。
 
