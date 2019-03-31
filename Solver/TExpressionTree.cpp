@@ -1,13 +1,17 @@
 #pragma once
+
+#pragma warning(disable:4703)
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_NON_CONFORMING_SWPRINTFS
 
 #include "..\Common\DetectMemoryLeak.h"
 
 #include "..\Solver\TExpressionTree.h"
-#include <Windows.h>
 #include "..\Common\TTransfer.h"
 #include "..\Common\TCHAR_Function.h"
+
+#include <string>
+#include <Windows.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -881,6 +885,7 @@ enumError TExpressionTree::ReadToInOrder(TCHAR *expression, std::queue<TNode *> 
 					tempTChar = new TCHAR[len + 1];
 					_tcsncpy(tempTChar, Data[i].start, len);
 					tempTChar[len] = TEXT('\0');
+
 
 					//
 					TCHAR *foundvar = NULL;
