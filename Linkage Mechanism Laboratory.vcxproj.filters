@@ -240,9 +240,6 @@
     <ClCompile Include="Common\TCHAR_Function.cpp">
       <Filter>源文件\Common</Filter>
     </ClCompile>
-    <ClCompile Include="Common\TTransfer.cpp">
-      <Filter>源文件\Common</Filter>
-    </ClCompile>
     <ClCompile Include="Tool\TConstraintCoincideTool.cpp">
       <Filter>源文件\Tool</Filter>
     </ClCompile>
@@ -274,6 +271,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Element\TShape.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="enumError.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\TTransfer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -510,6 +513,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Element\TShape.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ControlStyle.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

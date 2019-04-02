@@ -4,11 +4,16 @@
 
 #include "..\Common\DetectMemoryLeak.h"
 #include "..\Common\String.h"
-#include <iostream>
-#include <Windows.h>
 #include "..\Solver\TVariableTable.h"
 #include "..\Common\TCHAR_Function.h"
 #include "..\Common\TTransfer.h"
+
+#include <algorithm>
+#include <iostream>
+#include <Windows.h>
+#include <sstream>
+
+using namespace std;
 
 TVariableTable::TVariableTable()
 {
@@ -19,248 +24,127 @@ TVariableTable::TVariableTable()
 
 TVariableTable::~TVariableTable()
 {
-	if (bShared!=true)
-		ReleaseVariableTable(VariableTable);
 }
 
-void TVariableTable::ReleaseVariableTable(std::vector<TCHAR *> &input)
+double TVariableTable::GetValueFromVarPoint(const String VarStr)
 {
-	for (auto szStr: input)
+	auto it = FindVariableTable(VarStr);
+	if (it == VariableTable.end())
 	{
-		delete[] szStr;
+		eError = ERROR_UNDEFINED_VARIABLE;
+		throw TError{ eError, VarStr };
+		return 0.0;
 	}
-	input.clear();
+	return VariableValue[it - VariableTable.begin()];
 }
 
-double TVariableTable::GetValueFromVarPoint(TCHAR *pVar)
+void TVariableTable::SetValueFromVarStr(String VarStr, double value)
 {
-	for (size_t i = 0; i < VariableTable.size(); i++)
-		if (pVar == VariableTable[i])
-			return VariableValue[i];
-
-	eError = ERROR_UNDEFINED_VARIABLE;
-	throw eError;
+	auto it = FindVariableTable(VarStr);
+	if (it == VariableTable.end())
+	{
+		eError = ERROR_UNDEFINED_VARIABLE;
+		throw TError{ eError, VarStr };
+		return;
+	}
+	VariableValue[it - VariableTable.begin()] = value;
 }
 
-void TVariableTable::SetValueFromVarStr(TCHAR *VarStr,double value)
+std::vector<String>::iterator TVariableTable::FindVariableTable(const String varstr)//查找变量是否在变量表中，没有则返回false
 {
-	for (size_t i = 0; i < VariableTable.size(); i++)
-		if (_tcscmp(VarStr, VariableTable[i]) == 0)
-		{
-			VariableValue[i] = value;
-			return;
-		}
-
-	eError = ERROR_UNDEFINED_VARIABLE;
-	throw eError;
-}
-
-TCHAR * TVariableTable::FindVariableTable(const TCHAR *varstr)
-{
-	for (auto szVar:VariableTable)
-		if (_tcscmp(varstr, szVar) == 0)
-			return szVar;
-	return NULL;
+	return std::find(VariableTable.begin(), VariableTable.end(), varstr);
 }
 
 //连带value一起删
-void TVariableTable::DeleteByAddress(TCHAR *var)
+void TVariableTable::RemoveOne(Ostream *pStr, String var, bool bIgnoreUnExisted)
 {
-	for (size_t i = 0; i < VariableTable.size(); i++)
+	auto it = FindVariableTable(var);
+	if (it == VariableTable.end())//未定义
 	{
-		if (VariableTable[i] == var)
+		if (bIgnoreUnExisted)
+			return;
+		else
 		{
-			if (bShared==false) delete[] VariableTable[i];
-			std::vector<TCHAR *>::iterator iter = VariableTable.begin() + i;
-			VariableTable.erase(iter);
-
-			std::vector<double>::iterator iter2 = VariableValue.begin() + i;
-			VariableValue.erase(iter2);
-			break;
-		}
-	}
-}
-
-void TVariableTable::Remove(Ostream *pStr,const TCHAR input_str[])
-{
-	TCHAR *input = new TCHAR[_tcslen(input_str) + 1];
-	_tcscpy(input, input_str);
-
-	std::vector<TCHAR *> temp;
-	TCHAR_Function::Trim(input);
-	TCHAR_Function::ReplaceLoop(input, TEXT("  "), TEXT(" "));
-	TCHAR_Function::Split(input, temp, TEXT(" "));
-	for (auto szInputVar: temp)
-	{
-		if (TCHAR_Function::isVariableName(szInputVar) == false)
-		{
-			//出现不合法的变量名
-			*pStr<< TEXT("不合法的变量");
-			*pStr << szInputVar;
-			*pStr << TEXT("。");
-			eError = ERROR_INVALID_VARNAME;
-			ReleaseVariableTable(temp);
-			delete[] input;
+			eError = ERROR_UNDEFINED_VARIABLE;
+			throw TError{ eError, var };
 			return;
 		}
 	}
-
-	//找出存在的变量
-	TCHAR *var;
-	for (size_t i = 0; i < temp.size(); i++)
-		if (var=FindVariableTable(temp[i]))
-		{
-			DeleteByAddress(var);
-		}
-
-	ReleaseVariableTable(temp);
-	delete[] input;
-	// return Output();
+	int index = it - VariableTable.begin();
+	VariableTable.erase(it);
+	VariableValue.erase(VariableValue.begin() + index);
 }
 
-void TVariableTable::Define(Ostream *pStr,const TCHAR *input_str, double value)
+//void TVariableTable::Remove(Ostream *pStr, const String vars, bool bIgnoreUnExisted)
+//{
+//	std::vector<String> temp = StrSliceToVector(vars);
+//	for (auto &var : temp)
+//	{
+//		RemoveOne(pStr,var,bIgnoreUnExisted);
+//	}
+//}
+
+void TVariableTable::DefineOne(Ostream *pStr, String var, double value, bool bIgnoreReDef)
 {
-	//复制输入串
-	TCHAR *ptVar = new TCHAR[_tcslen(input_str) + 1];
-	_tcscpy(ptVar, input_str);
+	if (!isLegalName(var))
+	{
+		eError = ERROR_INVALID_VARNAME;
+		throw TError{ eError, var };
+		return;
+	}
 
-	//滤掉不合法输入
-		if (TCHAR_Function::isVariableName(ptVar) == false)
+	auto it = FindVariableTable(var);
+	if (it != VariableTable.end())//已定义
+	{
+		if (bIgnoreReDef)
 		{
-			//出现不合法的变量名
-			if (pStr != NULL)
-			{
-				*pStr << TEXT("不合法的变量");
-				*pStr << ptVar;
-				*pStr << TEXT("。");
-			}
-			eError = ERROR_INVALID_VARNAME;
-			delete[] ptVar;
+			VariableValue[it - VariableTable.begin()] = value;
 			return;
-		}
-
-	if (pStr != NULL)
-		*pStr << TEXT(">>Define: ");
-	//
-		if (FindVariableTable(ptVar))//已有的不再定义
-		{
-			delete[] ptVar;
 		}
 		else
-		{//未定义的进行定义
-			VariableTable.push_back(ptVar);
-			VariableValue.push_back(value);
-
-			if (pStr != NULL)
-			{
-				*pStr << VariableTable.back();
-				*pStr << TEXT("(");
-				*pStr << VariableValue.back();
-				*pStr << TEXT(") ");
-			}
+		{
+			eError = ERROR_VAR_HAS_BEEN_DEFINED;
+			throw TError{ eError, var };
+			return;
 		}
+	}
+	else
+	{
+		VariableTable.push_back(var);
+		VariableValue.push_back(value);
+	}
 
 	if (pStr != NULL)
+	{
+		*pStr << TEXT(">>Define: ");
+
+		*pStr << var << TEXT("(");
+		*pStr << value << TEXT(") ");
 		*pStr << TEXT("\r\n\r\n");
+	}
+
 }
 
 //新定义的若与旧的重名可过滤掉重定义
-void TVariableTable::Define(Ostream *pStr,const TCHAR *input_str,const TCHAR *input_num)
+void TVariableTable::Define(Ostream *pStr, String input_str, String input_num, bool bIgnoreReDef)
 {
-	//复制输入串
-	TCHAR *input = new TCHAR[_tcslen(input_str) + 1];
-	_tcscpy(input, input_str);
-
+	using namespace std;
 	//切分str，new出每个新变量
-	std::vector<TCHAR *> temp;
-	TCHAR_Function::Trim(input);
-	TCHAR_Function::ReplaceLoop(input, TEXT("  "), TEXT(" "));
-	TCHAR_Function::Split(input, temp, TEXT(" "));
-	delete[] input;
 
-	std::vector<double> vectorNums;
-	if (input_num != NULL)
+	std::vector<String> tempVar = StrSliceToVector(input_str);
+	std::vector<double> tempValue = StrSliceToDoubleVector(input_num);
+
+	if (tempVar.size() != tempValue.size())
 	{
-		TCHAR *str_num = new TCHAR[_tcslen(input_num) + 1];
-		_tcscpy(str_num, input_num);
-
-		//切分str，new出每个新变量
-		std::vector<TCHAR *> vectorStrNums;
-		TCHAR_Function::Trim(str_num);
-		TCHAR_Function::ReplaceLoop(str_num, TEXT("  "), TEXT(" "));
-		TCHAR_Function::Split(str_num, vectorStrNums, TEXT(" "));
-		delete[] str_num;
-
-		//变量名与初始值数量不对等
-		if (temp.size() != vectorStrNums.size())
-		{
-			if (pStr!=NULL) *pStr << TEXT("变量名与初始值数量不对等。");
-			eError = ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT;
-			ReleaseVariableTable(vectorStrNums);
-			ReleaseVariableTable(temp);
-			return;
-
-		}
-
-		for (size_t i = 0; i < vectorStrNums.size(); i++)
-		{
-			vectorNums.push_back(TTransfer::TCHAR2double(vectorStrNums[i]));//不合法数值被转化为0
-			delete[] vectorStrNums[i];
-		}
+		if (pStr != NULL) *pStr << TEXT("变量名与初始值数量不对等。");
+		eError = ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT;
+		throw TError{ eError, TEXT("VAR:") + input_str + TEXT(" VALUE:") + input_num };
+		return;
 	}
 
-	//滤掉不合法输入
-	for (size_t i = 0; i < temp.size(); i++)
-	{
-		if (TCHAR_Function::isVariableName(temp[i])==false)
-		{
-			//出现不合法的变量名
-			if (pStr != NULL)
-			{
-				*pStr << TEXT("不合法的变量");
-				*pStr << temp[i];
-				*pStr << TEXT("。");
-			}
-			eError = ERROR_INVALID_VARNAME;
-			ReleaseVariableTable(temp);
-			return;
-		}
-	}
+	for (int i = 0; i < tempVar.size(); ++i)
+		DefineOne(pStr, tempVar[i], tempValue[i], bIgnoreReDef);
 
-	if (pStr != NULL)
-		*pStr << TEXT(">>Define: ");
-	//
-	for (size_t i = 0; i < temp.size(); i++)
-		if (FindVariableTable(temp[i]))//已有的不再定义
-		{
-			delete[] temp[i];
-		}
-		else
-		{//未定义的进行定义
-			VariableTable.push_back(temp[i]);
-			if (input_num == NULL)
-				VariableValue.push_back(0.0);
-			else
-				VariableValue.push_back(vectorNums[i]);
-
-			if (pStr != NULL)
-			{
-				*pStr << VariableTable.back();
-				*pStr << TEXT("(");
-				*pStr << VariableValue.back();
-				*pStr << TEXT(") ");
-			}
-		}
-
-	if (pStr != NULL)
-		*pStr << TEXT("\r\n\r\n");
-	//if (bOutput)
-	//	return Output();//输出变量情况
-	//else
-	//{
-	//	str = TEXT("");
-	//	return str.c_str();
-	//}
 }
 
 void TVariableTable::Output(Ostream *pStr)
@@ -268,13 +152,10 @@ void TVariableTable::Output(Ostream *pStr)
 	if (pStr != NULL)
 	{
 		*pStr << TEXT("已定义变量(");
-
-		TCHAR tc[8];
-		TTransfer::int2TCHAR(VariableTable.size(), tc);
-		*pStr << tc;
-
+		*pStr << VariableTable.size();
 		*pStr << TEXT("个):");
-		for (auto Var : VariableTable)
+
+		for (auto &Var : VariableTable)
 		{
 			*pStr << TEXT(" ");
 			*pStr << Var;
@@ -284,11 +165,16 @@ void TVariableTable::Output(Ostream *pStr)
 	}
 }
 
+//不删掉原变量，仅仅加上VarTable的值
 void TVariableTable::SetValueByVarTable(TVariableTable &VarTable)
 {
-	for (size_t i = 0; i < VarTable.VariableTable.size(); i++)
+	for (int i = 0; i < VarTable.VariableTable.size(); ++i)
 	{
-			SetValueFromVarStr(VarTable.VariableTable[i], VarTable.VariableValue[i]);
+		auto it = FindVariableTable(VarTable.VariableTable[i]);
+		if (it != VariableTable.end())
+		{
+			VariableValue[it - VariableTable.begin()] = VarTable.VariableValue[i];
+		}
 	}
 }
 
@@ -296,9 +182,9 @@ void TVariableTable::OutputValue(Ostream *pStr)//输出 x=0 形式
 {
 	if (pStr != NULL)
 	{
-		for (size_t i = 0; i < VariableTable.size(); i++)
+		for (size_t i = 0; i < VariableTable.size(); ++i)
 		{
-			*pStr<< VariableTable[i];
+			*pStr << VariableTable[i];
 			*pStr << TEXT(" = ");
 			*pStr << VariableValue[i];
 			*pStr << TEXT("\r\n");
@@ -306,3 +192,21 @@ void TVariableTable::OutputValue(Ostream *pStr)//输出 x=0 形式
 		*pStr << TEXT("\r\n");
 	}
 }
+
+
+bool TVariableTable::isLegalName(String s)
+{
+	if (s.empty()) return false;
+	if (s[0] == '_' || (s[0] >= 'A' && s[0] <= 'z'))
+	{
+		for (auto c : s)
+			if (c == '_' || (c >= 'A'&& c <= 'z') || (c >= '0'&& c <= '9'))
+				;
+			else
+			{
+				return false;
+			}
+	}
+	return true;
+}
+

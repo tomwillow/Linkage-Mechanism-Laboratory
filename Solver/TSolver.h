@@ -20,7 +20,9 @@ private:
 	HWND hwndOutput;//输出窗口句柄
 	std::vector<String> vecStrDriver;//驱动方程
 	TEquations *Equations;//约束方程
-	String subsVar, subsValue;//机架点变量名及值
+	//String subsVar, subsValue;
+	std::vector<String> subsVar;//机架点变量名及值
+	std::vector<double> subsValue;
 	std::vector<int> idOrder;//
 	struct TCondition
 	{
@@ -31,7 +33,7 @@ private:
 
 	double dRelativeAngle;
 
-	int TSolver::GetIdFromVariableStr(TCHAR varname[]);
+	int TSolver::GetIdFromVariableStr(String varname);
 	void TSolver::Output(TCHAR szFormat[], ...);
 	void TSolver::Outputln(const TCHAR *szFormat, ...);
 	void TSolver::SetElementDisplacement(const TVariableTable &VariableTable);

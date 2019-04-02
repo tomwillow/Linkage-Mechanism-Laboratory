@@ -161,11 +161,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Common\DetectMemoryLeak.cpp" />
+    <ClCompile Include="Common\TTransfer.cpp" />
     <ClCompile Include="Dialog\DialogAbout.cpp" />
     <ClCompile Include="Dialog\DialogAddDriver.cpp" />
     <ClCompile Include="Dialog\DialogAnimation.cpp" />
     <ClCompile Include="Dialog\DialogOption.cpp" />
     <ClCompile Include="Common\FileFunction.cpp" />
+    <ClCompile Include="enumError.cpp" />
     <ClCompile Include="gifenc\gifenc.c" />
     <ClCompile Include="Common\RegisterFunction.cpp" />
     <ClCompile Include="Common\ShowMessage.cpp" />
@@ -229,12 +231,12 @@
     <ClCompile Include="Solver\TVariableTable.cpp" />
     <ClCompile Include="Control\TWindow.cpp" />
     <ClCompile Include="Control\TTrackbar.cpp" />
-    <ClCompile Include="Common\TTransfer.cpp" />
     <ClCompile Include="Common\MyMath.cpp" />
     <ClCompile Include="Dialog\DialogStudent.cpp" />
     <ClCompile Include="Dialog\DialogScore.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\ControlStyle.h" />
     <ClInclude Include="Common\DetectMemoryLeak.h" />
     <ClInclude Include="Dialog\DialogAbout.h" />
     <ClInclude Include="Dialog\DialogAddDriver.h" />

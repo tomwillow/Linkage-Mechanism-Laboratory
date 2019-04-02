@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include <string>
+#include <vector>
 
 using std::endl;
 
@@ -23,6 +24,9 @@ using std::wifstream;
 
 using std::wofstream;
 #define Ofstream wofstream
+
+using std::wstringstream;
+#define Stringstream wstringstream
 
 using std::wistringstream;
 #define Istringstream wistringstream
@@ -49,6 +53,9 @@ using std::ifstream;
 
 using std::ofstream;
 #define Ofstream ofstream
+
+using std::stringstream;
+#define Stringstream stringstream
 
 using std::istringstream;
 #define Istringstream istringstream
@@ -108,5 +115,26 @@ inline String & operator<<(String &s,const String &s2)
 	return s;
 }
 
+inline void Replace(String &src, const String sub,const String dest)
+{
+	auto it = String::npos;
+	size_t pos = 0;
+	size_t subn = sub.size();
+	size_t destn = dest.size();
+	while (1)
+	{
+		it = src.find(sub, pos);
+		if (it == String::npos)
+			break;
+
+		src.replace(it, subn, dest);
+		pos = it + destn;
+	}
+}
+
 std::wstring stringToWstring(const std::string& str);
 std::string wstringToString(const std::wstring& wstr);
+
+std::vector<String> StrSliceToVector(String s);
+
+std::vector<double> StrSliceToDoubleVector(String s);

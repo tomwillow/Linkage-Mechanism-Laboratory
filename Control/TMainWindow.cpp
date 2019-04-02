@@ -268,7 +268,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_OPEN:
 		if (m_Shape.Element.size() > 0 && _tcslen(szFileName) > 0)//有数据且已有当前文件名
 		{
-			if (MessageBox(m_hWnd, TEXT("文件未保存，仍然要打开文件？"), NULL, MB_YESNO) == IDNO)
+			if (MessageBox(m_hWnd, TEXT("文件未保存，仍然要打开文件？"), TEXT("询问"), MB_YESNO|MB_ICONQUESTION) == IDNO)
 				return;
 		}
 

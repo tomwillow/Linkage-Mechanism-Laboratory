@@ -1,4 +1,4 @@
-#include "..\Common\String.h"
+#include "String.h"
 
 std::wstring stringToWstring(const std::string& str)
 {
@@ -36,4 +36,32 @@ std::string wstringToString(const std::wstring& wstr)
 	pszDst = NULL;
 
 	return str;
+}
+
+std::vector<String> StrSliceToVector(String s)
+{
+	std::vector<String> ret;
+	Stringstream ss;
+	ss << s;
+	while (!ss.eof())
+	{
+		String word;
+		ss >> word;
+		ret.emplace_back(word);
+	}
+	return ret;
+}
+
+std::vector<double> StrSliceToDoubleVector(String s)
+{
+	std::vector<double> ret;
+	Stringstream ss;
+	ss << s;
+	while (!ss.eof())
+	{
+		String word;
+		ss >> word;
+		ret.emplace_back(std::stod(word));
+	}
+	return ret;
 }

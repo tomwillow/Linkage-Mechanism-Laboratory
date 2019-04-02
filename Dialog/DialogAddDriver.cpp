@@ -227,7 +227,8 @@ namespace DialogAddDriver
 					//SetTextColor(hdc, RGB(255, 0, 0));
 
 					TCHAR szErr[64];
-					GetErrorInfo(err, szErr);
+					String sErr;
+					sErr=GetErrorInfo(err);
 					hToolTipError=CreateToolTip(hDlg, EditExprRight.m_hWnd, (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE),szErr);
 
 					return (LRESULT)hBrush;
@@ -256,39 +257,37 @@ namespace DialogAddDriver
 				if (HIWORD(wParam) == EN_CHANGE)
 				{
 					pGraph->Clear();
-
-					TExpressionTree Expr,ExprV,ExprA;
-					TExpressionTree ExprTemp,ExprTempV,ExprTempA;
-					TVariableTable VariableTable;
-					VariableTable.Define(NULL, TEXT("t"));
-					TCHAR *sz_t = VariableTable.VariableTable[0];
-					Expr.LinkVariableTable(&VariableTable);
-					ExprV.LinkVariableTable(&VariableTable);
-					ExprA.LinkVariableTable(&VariableTable);
-					ExprTemp.LinkVariableTable(&VariableTable);
-					ExprTempV.LinkVariableTable(&VariableTable);
-					ExprTempA.LinkVariableTable(&VariableTable);
-
-					//读入Expr
-					String s = EditExprRight.GetText();
-					Expr.Read(s.c_str(), false);
-
-					enumError err;
-
-					double value,valueV,valueA;
-					if ((err = Expr.GetError()) == ERROR_NO)
+					try
 					{
-						std::vector<DPOINT> dptVector,dptVectorV,dptVectorA;
-						ExprV = Expr;
-						ExprV.Diff(sz_t, 1, false);
-						ExprV.Simplify(false);
 
-						ExprA = ExprV;
-						ExprA.Diff(sz_t, 1, false);
-						ExprA.Simplify(false);
-						for (double t = 0; t <= 10; t += 0.1)
-						{
-							try
+						TExpressionTree Expr, ExprV, ExprA;
+						TExpressionTree ExprTemp, ExprTempV, ExprTempA;
+						TVariableTable VariableTable;
+						VariableTable.Define(NULL, TEXT("t"));
+						String sz_t = VariableTable.VariableTable[0];
+						Expr.LinkVariableTable(&VariableTable);
+						ExprV.LinkVariableTable(&VariableTable);
+						ExprA.LinkVariableTable(&VariableTable);
+						ExprTemp.LinkVariableTable(&VariableTable);
+						ExprTempV.LinkVariableTable(&VariableTable);
+						ExprTempA.LinkVariableTable(&VariableTable);
+
+						//读入Expr
+						String s = EditExprRight.GetText();
+						Expr.Read(s.c_str(), false);
+
+
+						double value, valueV, valueA;
+
+							std::vector<DPOINT> dptVector, dptVectorV, dptVectorA;
+							ExprV = Expr;
+							ExprV.Diff(sz_t, 1, false);
+							ExprV.Simplify(false);
+
+							ExprA = ExprV;
+							ExprA.Diff(sz_t, 1, false);
+							ExprA.Simplify(false);
+							for (double t = 0; t <= 10; t += 0.1)
 							{
 								ExprTemp = Expr;
 								ExprTemp.Subs(sz_t, t, false);
@@ -301,31 +300,25 @@ namespace DialogAddDriver
 								ExprTempA = ExprA;
 								ExprTempA.Subs(sz_t, t, false);
 								valueA = ExprTempA.Value(true);
+								//if ((err = Expr.GetError()) != ERROR_NO)
+								//	break;
+								dptVector.push_back({ t, value });
+								dptVectorV.push_back({ t, valueV });
+								dptVectorA.push_back({ t, valueA });
 							}
-							catch (enumError eerr)
-							{
-								err = eerr;
-								break;
-							}
-							//if ((err = Expr.GetError()) != ERROR_NO)
-							//	break;
-							dptVector.push_back({ t, value });
-							dptVectorV.push_back({ t, valueV });
-							dptVectorA.push_back({ t, valueA });
-						}
 
-						//循环结束，送入数据
-						if (err == ERROR_NO)
-						{
-							pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, CheckBoxDisplacement.GetChecked(),TEXT("D"));
-							pGraph->InputDptVector(dptVectorV, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, CheckBoxV.GetChecked(),TEXT("V"));
-							pGraph->InputDptVector(dptVectorA, { PS_SOLID, { 1, 0 }, RGB(0, 255, 0) }, CheckBoxA.GetChecked(),TEXT("A"));
-						}
-					}//correct
-
-					//存入错误码
-					SetProp(EditExprRight.m_hWnd, TEXT("error"), (HANDLE)err);
-
+							//循环结束，送入数据
+								pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, CheckBoxDisplacement.GetChecked(), TEXT("D"));
+								pGraph->InputDptVector(dptVectorV, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, CheckBoxV.GetChecked(), TEXT("V"));
+								pGraph->InputDptVector(dptVectorA, { PS_SOLID, { 1, 0 }, RGB(0, 255, 0) }, CheckBoxA.GetChecked(), TEXT("A"));
+							
+						//correct
+					}
+					catch (TError &err)
+					{
+						//存入错误码
+						SetProp(EditExprRight.m_hWnd, TEXT("error"), (HANDLE)err.id);
+					}
 					//刷新
 					//pGraph->Invalidate();
 
@@ -366,14 +359,14 @@ namespace DialogAddDriver
 				//计算t=0时刻的值，不等于当前位置则加上当前位置
 				TExpressionTree Expr,ExprTemp;
 				TVariableTable VariableTable;
-				VariableTable.Define(NULL, TEXT("t"), 0.0);
+				VariableTable.DefineOne(NULL, TEXT("t"), 0.0);
 				Expr.LinkVariableTable(&VariableTable); 
 				Expr.Read(EditExprRight.GetText(), false);
 				Expr.OutputStr();
 
 				ExprTemp = Expr;
 
-				ExprTemp.Subs(VariableTable.FindVariableTable(TEXT("t")), 0.0, false);
+				ExprTemp.Subs(TEXT("t"), 0.0, false);
 
 				double value=0.0;
 				try
@@ -385,8 +378,6 @@ namespace DialogAddDriver
 					break;
 				}
 
-				if (Expr.GetError()==ERROR_NO && ExprTemp.GetError() == ERROR_NO)
-				{
 					if (!ISEQUAL(value,dElementValue,precision))
 					{
 						Expr.operator+(dElementValue);
@@ -394,7 +385,6 @@ namespace DialogAddDriver
 
 						EditExprRight.SetText(Expr.OutputStr());
 					}
-				}
 				break;
 			}
 			case IDOK:

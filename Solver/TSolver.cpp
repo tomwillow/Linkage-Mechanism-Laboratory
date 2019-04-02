@@ -87,25 +87,11 @@ void TSolver::Output(TCHAR *szFormat, ...)
 	*pOS << szBuffer;
 }
 
-int TSolver::GetIdFromVariableStr(TCHAR varname[])
+int TSolver::GetIdFromVariableStr(String varname)
 {
-	int i = -1;
-	TCHAR *temp = new TCHAR[10];
-	int len = _tcslen(varname);
-	TCHAR *end = varname + len;
-	while (*varname != TEXT('\0'))
-	{
-		if (*varname >= TEXT('0') && *varname <= TEXT('9'))
-		{
-			break;
-		}
-		varname++;
-	}
-	_tcsncpy(temp, varname, end - varname + 1);
-	i = TTransfer::TCHAR2int(temp);
-
-	delete[] temp;
-	return i;
+	int i = varname.find_first_of(TEXT("0123456789"));
+	String temp = varname.substr(i);
+	return std::stoi(temp);
 }
 
 void TSolver::ClearConstraint()
@@ -151,7 +137,7 @@ void TSolver::AddMouseConstraint(TElement *pElement, DPOINT dptm)
 		_stprintf(szVar, TEXT("x%d y%d phi%d"), id, id, id);
 		_stprintf(szValue, TEXT("%f %f %f"), pElement->dpt.x, pElement->dpt.y, pElement->angle);
 
-		Equations->DefineVariable(pOS, szVar, szValue);
+		Equations->DefineVariable(pOS, szVar, szValue,true);
 		Equations->AddEquation(pOS, temp, true);
 
 		return;
@@ -201,9 +187,15 @@ void TSolver::RefreshEquations()
 			pShape->GetCoordinateByElement(((TConstraintCoincide *)element)->pElement[1], &xj, &yj, &phij);
 
 			//定义变量及其初始值
-			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
-			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
-			Equations->DefineVariable(pOS, buffer1, buffer2);
+			//_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
+			//_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
+			//Equations->DefineVariable(pOS, buffer1, buffer2);
+			Equations->DefineOneVariable(pOS, TEXT("x") + To_string(i), xi,true);
+			Equations->DefineOneVariable(pOS, TEXT("y") + To_string(i), yi, true);
+			Equations->DefineOneVariable(pOS, TEXT("phi") + To_string(i), phii, true);
+			Equations->DefineOneVariable(pOS, TEXT("x") + To_string(j), xj, true);
+			Equations->DefineOneVariable(pOS, TEXT("y") + To_string(j), yj, true);
+			Equations->DefineOneVariable(pOS, TEXT("phi") + To_string(j), phij, true);
 
 			//读入方程
 			/* 推导结果：
@@ -232,9 +224,15 @@ void TSolver::RefreshEquations()
 			pShape->GetCoordinateByElement(pColinear->pElement[1], &xj, &yj, &phij);
 
 			//定义变量及其初始值
-			_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
-			_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
-			Equations->DefineVariable(pOS, buffer1, buffer2);
+			//_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
+			//_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
+			//Equations->DefineVariable(pOS, buffer1, buffer2, true);
+			Equations->DefineOneVariable(pOS, TEXT("x") + To_string(i), xi, true);
+			Equations->DefineOneVariable(pOS, TEXT("y") + To_string(i), yi, true);
+			Equations->DefineOneVariable(pOS, TEXT("phi") + To_string(i), phii, true);
+			Equations->DefineOneVariable(pOS, TEXT("x") + To_string(j), xj, true);
+			Equations->DefineOneVariable(pOS, TEXT("y") + To_string(j), yj, true);
+			Equations->DefineOneVariable(pOS, TEXT("phi") + To_string(j), phij, true);
 
 			//读入方程
 			//推导结果：
@@ -259,8 +257,12 @@ void TSolver::RefreshEquations()
 		{
 			int id = element->id;
 
-			subsVar << subsVar << TEXT(" x") << id << TEXT(" y") << id << TEXT(" phi") << id;
-			subsValue << subsValue << TEXT(" ") << element->dpt.x << TEXT(" ") << element->dpt.y << TEXT(" ") << element->angle;
+			subsVar.push_back(TEXT("x") + To_string(id));
+			subsVar.push_back(TEXT("y") + To_string(id));
+			subsVar.push_back(TEXT("phi") + To_string(id));
+			subsValue.push_back(element->dpt.x);
+			subsValue.push_back(element->dpt.y);
+			subsValue.push_back(element->angle);
 			//Solve时，建立Jacobian会替换掉
 			break;
 		}
@@ -319,7 +321,16 @@ void TSolver::SetElementDisplacement(const TVariableTable &VariableTable)
 {
 	for (size_t i = 0; i < VariableTable.VariableTable.size(); i++)
 	{
-		int id = GetIdFromVariableStr(VariableTable.VariableTable[i]);
+		int id = 0;
+		try
+		{
+			id = GetIdFromVariableStr(VariableTable.VariableTable[i]);
+		}
+		catch (std::exception &err)
+		{
+			//var is not a number
+			continue;
+		}
 		TElement *element = pShape->GetElementById(id);
 		const double &data = VariableTable.VariableValue[i];
 
@@ -402,7 +413,8 @@ void TSolver::Solve()
 
 void TSolver::SubsFramePoint()
 {
-	Equations->Subs(pOS, subsVar.c_str(), subsValue.c_str());
+	if (!subsVar.empty() && !subsValue.empty())
+		Equations->Subs(pOS, subsVar, subsValue);
 }
 
 //求解之前需要调用SubsFramePoint
@@ -417,13 +429,13 @@ bool TSolver::Solve(double t)
 
 	Equations->RemoveTempEquations();
 
-	Equations->DefineOneVariable(pOS, TEXT("t"), t);
+	Equations->DefineOneVariable(pOS, TEXT("t"), t,true);
 
 	SubsFramePoint();
 
 	//加入驱动方程
 	for (auto StrDriver : vecStrDriver)
-		Equations->AddEquation(pOS, StrDriver.c_str(), true);
+		Equations->AddEquation(pOS, StrDriver, true);
 
 	Equations->BuildEquationsV(pOS);//此时t还在变量组内
 	Equations->BuildEquationsA_Phitt(pOS);
@@ -496,29 +508,26 @@ void TSolver::GetMesureResult(std::vector<DialogAnimation::TListBoxItem> &vecIte
 //以未解出变量表为顺序依据，调用前必须SubsFramePoint
 void TSolver::LinkMesureResult(const std::vector<DialogAnimation::TListBoxItem> &vecItems, std::vector<int> &vecIndex)
 {
-	TCHAR temp[32];
+	String temp;
 	for (auto &Item : vecItems)
 	{
 		switch (Item.value_type)
 		{
 			using namespace DialogAnimation;
-		case X:_tcscpy(temp, TEXT("x")); break;
-		case Y:_tcscpy(temp, TEXT("y")); break;
-		case PHI:_tcscpy(temp, TEXT("phi")); break;
+		case X:temp=TEXT("x"); break;
+		case Y:temp = TEXT("y"); break;
+		case PHI:temp = TEXT("phi"); break;
 		}
-		_stprintf(temp, TEXT("%s%d"), temp, Item.id);
+		temp+=To_string(Item.id);
 		//至此得到变量名
 
 		//位移表和速度表项目顺序一致，得到变量索引
 		TVariableTable *pVarTable = &(Equations->VariableTableUnsolved);//以未解出变量表顺序为准
 
-		for (size_t i = 0; i < pVarTable->VariableTable.size(); ++i)
+		auto it = find(pVarTable->VariableTable.begin(), pVarTable->VariableTable.end(), temp);
+		if (it != pVarTable->VariableTable.end())
 		{
-			if (_tcscmp(pVarTable->VariableTable[i], temp) == 0)
-			{
-				vecIndex.push_back(i);
-				break;
-			}
+			vecIndex.push_back(it - pVarTable->VariableTable.begin());
 		}
 	}
 
@@ -550,7 +559,7 @@ void TSolver::Demo()
 
 	Equations->DefineOneVariable(pOS, TEXT("t"), 0.1);
 	Equations->AddEquation(pOS, TEXT("phi2-ln(t)"), true);
-	Equations->Subs(pOS, subsVar.c_str(), subsValue.c_str());
+	Equations->Subs(pOS, subsVar, subsValue);
 
 	Equations->BuildEquationsV(pOS);//此时t还在变量组内
 	Equations->BuildEquationsA_Phitt(pOS);//

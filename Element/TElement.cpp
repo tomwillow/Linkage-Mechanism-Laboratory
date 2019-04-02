@@ -407,7 +407,6 @@ bool WriteFileString(HANDLE hf, const std::String &s, DWORD &now_pos)
 bool ReadFileString(HANDLE hf, std::String &s, DWORD &now_pos)
 {
 	//bool b;
-	int i;
 
 	size_t sSize=0;
 	::ReadFile(hf, &(sSize), sizeof(sSize), &now_pos, NULL);

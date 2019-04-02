@@ -1,4 +1,5 @@
 #pragma once
+#include "Common\String.h"
 
 enum enumError{
 	ERROR_NO,
@@ -15,6 +16,7 @@ enum enumError{
 	ERROR_NOT_LINK_VARIABLETABLE,//未链接变量表
 	ERROR_OUTOF_DOMAIN,//计算超出定义域
 	ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT,//定义变量时变量数量与初始值不等
+	ERROR_VAR_HAS_BEEN_DEFINED,//变量重定义
 	ERROR_I,//出现虚数
 	ERROR_INDETERMINATE_EQUATION,//不定方程
 	ERROR_SINGULAR_MATRIX,//矩阵奇异
@@ -22,3 +24,12 @@ enum enumError{
 	ERROR_INFINITY_SOLUTIONS,//无穷多解
 	ERROR_OVER_DETERMINED_EQUATIONS//方程组过定义
 };
+
+struct TError :public std::exception
+{
+	enumError id;
+	String info;
+	TError::TError(const enumError inId, const String &inInfo) :id(inId), info(inInfo){}
+};
+
+String GetErrorInfo(enumError err);

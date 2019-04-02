@@ -11,7 +11,7 @@ private:
 	typedef std::vector<TExpressionTree *> TPEquations;
 	typedef std::vector<TPEquations> TJacobian;
 
-	enumError eError;
+	//enumError eError;
 	std::vector<bool> EquationIsTemp;
 
 	TJacobian Jacobian;
@@ -29,7 +29,7 @@ private:
 	void TEquations::Output(Ostream *pOS, TVector& v);
 	void TEquations::ReleaseTPEquations(TPEquations &Equations);
 	void TEquations::ReleaseJacobian(TJacobian &Jacobian);
-	void TEquations::SubsVar(Ostream *pOS, TPEquations &Equations, TVariableTable &LinkVariableTable, TCHAR *VarStr, double Value);
+	void TEquations::SubsVar(Ostream *pOS, TPEquations &Equations, TVariableTable &LinkVariableTable, String VarStr, double Value);
 	void TEquations::BuildJacobian_inner(TJacobian &JacobianResult,const TPEquations &Equations,TVariableTable &VariableTable);
 public:
 	TEquations();
@@ -57,19 +57,20 @@ public:
 	void TEquations::BuildVariableTableV(Ostream *pOS);
 	void TEquations::BuildVariableTableA(Ostream *pOS);
 	size_t TEquations::GetEquationsCount();
-	void TEquations::AddEquation(Ostream *pOS,const TCHAR *szInput, bool istemp);//添加方程
+	void TEquations::AddEquation(Ostream *pOS, String szInput, bool istemp);//添加方程
 	void TEquations::RemoveTempEquations();//移除临时方程
 	enumError TEquations::SolveLinear(TMatrix &A, TVector &x, TVector &b);//解线性方程组 系数A，未知数x
 	void TEquations::SolveEquations(Ostream *pOS);//求解方程组
 	void TEquations::SolveEquationsV(Ostream *pOS);//求解方程组V
 	void TEquations::SolveEquationsA(Ostream *pOS);//求解方程组A
 	void TEquations::SimplifyEquations(Ostream *pOS);//将方程组中的简单方程解出
-	void TEquations::DefineVariable(Ostream *pOS,const TCHAR *input_str,const TCHAR *input_num=NULL);
-	void TEquations::DefineOneVariable(Ostream *pOS, TCHAR *input_str, double value);
-	void TEquations::Subs(Ostream *pOS,const TCHAR *subsVar, double value);
-	void TEquations::Subs(Ostream *pOS,const TCHAR *subsVar,const TCHAR *subsValue);//代入
-	void TEquations::SubsV(Ostream *pOS, TCHAR *VarStr, double Value);
-	void TEquations::SubsA(Ostream *pOS, TCHAR *VarStr, double Value);
+	void TEquations::DefineVariable(Ostream *pOS, const String input_str, const String input_num = TEXT(""), bool bIgnoreReDef = false);
+	void TEquations::DefineOneVariable(Ostream *pOS, String var, double value,bool bIgnoreReDef = false);
+	void TEquations::Subs(Ostream *pOS, const String var, double value);
+	void TEquations::Subs(Ostream *pOS, const String subsVars, const String subsValues);//代入
+	void TEquations::Subs(Ostream *pOS,const std::vector<String> &subsVars,const std::vector<double> &subsValue);//代入
+	void TEquations::SubsV(Ostream *pOS, String VarStr, double Value);
+	void TEquations::SubsA(Ostream *pOS, String VarStr, double Value);
 	void TEquations::CalcJacobianMultiplyVector(TPEquations &EquationsResult, const TJacobian &Jacobian, const TVector &Vector);
 
 };
