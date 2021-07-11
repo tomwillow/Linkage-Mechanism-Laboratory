@@ -1,6 +1,5 @@
 #pragma once
 
-#include "..\Common\tchar_head.h"
 #include <queue>
 #include <stack>
 #include "..\Solver\TVariableTable.h"

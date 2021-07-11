@@ -5,8 +5,6 @@
 #include "..\Common\DetectMemoryLeak.h"
 #include "..\Common\String.h"
 #include "..\Solver\TVariableTable.h"
-#include "..\Common\TCHAR_Function.h"
-#include "..\Common\TTransfer.h"
 
 #include <algorithm>
 #include <iostream>
@@ -132,7 +130,11 @@ void TVariableTable::Define(Ostream *pStr, String input_str, String input_num, b
 	//切分str，new出每个新变量
 
 	std::vector<String> tempVar = StrSliceToVector(input_str);
-	std::vector<double> tempValue = StrSliceToDoubleVector(input_num);
+	std::vector<double> tempValue;
+	if (input_num.empty())
+		tempValue = std::vector<double>(tempVar.size());
+	else
+		tempValue = StrSliceToDoubleVector(input_num);
 
 	if (tempVar.size() != tempValue.size())
 	{

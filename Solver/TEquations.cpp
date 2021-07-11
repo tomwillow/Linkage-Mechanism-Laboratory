@@ -5,8 +5,6 @@
 #include "..\Common\String.h"
 #include "TEquations.h"
 
-#include "..\Common\TTransfer.h"
-
 TEquations::TEquations()
 {
 	VariableTableUnsolved.bShared = true;
@@ -991,4 +989,13 @@ void TEquations::SimplifyEquations(Ostream *pOS)//将方程组中的简单方程解出
 		VariableTableSolved.OutputValue(pOS);
 		*pOS << TEXT("\r\n");
 	}
+}
+
+double TEquations::GetValue(const String &var)
+{
+	auto it = VariableTable.FindVariableTable(var);
+	if (it == VariableTable.VariableTable.end())
+		throw TError{ ERROR_UNDEFINED_VARIABLE, var };
+
+	return VariableTable.VariableValue[it - VariableTable.VariableTable.begin()];
 }

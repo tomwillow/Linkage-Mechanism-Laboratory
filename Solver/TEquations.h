@@ -71,6 +71,7 @@ public:
 	void TEquations::Subs(Ostream *pOS,const std::vector<String> &subsVars,const std::vector<double> &subsValue);//´úÈë
 	void TEquations::SubsV(Ostream *pOS, String VarStr, double Value);
 	void TEquations::SubsA(Ostream *pOS, String VarStr, double Value);
+	double TEquations::GetValue(const String &var);
 	void TEquations::CalcJacobianMultiplyVector(TPEquations &EquationsResult, const TJacobian &Jacobian, const TVector &Vector);
 
 };

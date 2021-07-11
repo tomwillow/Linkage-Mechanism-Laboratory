@@ -61,6 +61,7 @@ std::vector<double> StrSliceToDoubleVector(String s)
 	{
 		String word;
 		ss >> word;
+		if (word.empty()) break;
 		ret.emplace_back(std::stod(word));
 	}
 	return ret;

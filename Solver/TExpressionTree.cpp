@@ -7,16 +7,13 @@
 #include "..\Common\DetectMemoryLeak.h"
 
 #include "..\Solver\TExpressionTree.h"
-#include "..\Common\TTransfer.h"
-#include "..\Common\TCHAR_Function.h"
-
 
 #include <string>
 #include <Windows.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-
+using namespace std;
 
 TExpressionTree::TExpressionTree()
 {
@@ -1478,6 +1475,7 @@ void TExpressionTree::Diff(TNode *now, String var)
 			}
 
 		case MATH_SIN:
+		{
 			TNode *multiply = new TNode;
 			ZeroMemory(multiply, sizeof(TNode));
 			multiply->eType = NODE_OPERATOR;
@@ -1535,6 +1533,13 @@ void TExpressionTree::Diff(TNode *now, String var)
 
 			Diff(u2, var);
 			return;
+		}
+		//case MATH_ARCTAN:
+		//{
+		//	TNode *multiply = new TNode()
+		//}
+		default:
+			throw TError(ERROR_WRONG_MATH_OPERATOR, String(TEXT("未完成的运算符")) + Function2Str(now->eOperator));
 		}
 	}
 	}

@@ -1,5 +1,4 @@
 #pragma once
-#include "..\Common\tchar_head.h"
 #include <vector>
 #include <map>
 

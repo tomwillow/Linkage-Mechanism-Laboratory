@@ -17,7 +17,7 @@ private:
 
 	POINT Org;
 	double dProportion = 1.0;
-	int iStyle = PS_SOLID;
+	UINT iStyle = PS_SOLID;
 	int iWidth = 1;
 	COLORREF PrevRandomColor;
 	std::vector<COLORREF> vecColorLib;
