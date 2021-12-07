@@ -365,8 +365,8 @@ void TCanvas::OnDraw(HDC hdc)
 		if (pElement->id == ShowId)
 		{
 			String sId;
-			sId<<TEXT("id:")<<To_string(ShowId);
-			sId << TEXT(" pt") << To_string(ShowIndex);
+			sId+=TEXT("id:")+To_string(ShowId);
+			sId+=TEXT(" pt") +To_string(ShowIndex);
 			
 			TDraw::DrawAdjustedText(hdc, pConfig->RealToScreen(pElement->GetAbsolutePointByIndex(ShowIndex)), ClientRect, sId.c_str(),10,false, pConfig);
 		}

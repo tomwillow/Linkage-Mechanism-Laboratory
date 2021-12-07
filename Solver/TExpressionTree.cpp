@@ -308,47 +308,47 @@ bool TExpressionTree::isBaseOperator(TCHAR c)
 
 TExpressionTree::enumMathOperator TExpressionTree::Str2Function(String s)
 {
-	if (s==TEXT("sin"))
+	if (s == TEXT("sin"))
 	{
 		return MATH_SIN;
 	}
-	if (s==TEXT("cos"))
+	if (s == TEXT("cos"))
 	{
 		return MATH_COS;
 	}
-	if (s==TEXT("tan"))
+	if (s == TEXT("tan"))
 	{
 		return MATH_TAN;
 	}
-	if (s==TEXT("arcsin"))
+	if (s == TEXT("arcsin"))
 	{
 		return MATH_ARCSIN;
 	}
-	if (s==TEXT("arccos"))
+	if (s == TEXT("arccos"))
 	{
 		return MATH_ARCCOS;
 	}
-	if (s==TEXT("arctan"))
+	if (s == TEXT("arctan"))
 	{
 		return MATH_ARCTAN;
 	}
-	if (s==TEXT("sqrt"))
+	if (s == TEXT("sqrt"))
 	{
 		return MATH_SQRT;
 	}
-	if (s==TEXT("ln"))
+	if (s == TEXT("ln"))
 	{
 		return MATH_LN;
 	}
-	if (s==TEXT("log10"))
+	if (s == TEXT("log10"))
 	{
 		return MATH_LOG10;
 	}
-	if (s==TEXT("exp"))
+	if (s == TEXT("exp"))
 	{
 		return MATH_EXP;
 	}
-	return MATH_NOT_AVAILIALBE;
+	return MATH_NULL;
 }
 
 String TExpressionTree::Function2Str(TExpressionTree::enumMathOperator eOperator)
@@ -406,7 +406,7 @@ TExpressionTree::enumMathOperator TExpressionTree::BaseOperatorCharToEnum(TCHAR 
 	case TEXT('%'):
 		return MATH_MOD;
 	default:
-		return MATH_NOT_AVAILIALBE;
+		return MATH_NULL;
 	}
 }
 /*  */
@@ -448,7 +448,7 @@ bool TExpressionTree::isLegal(TCHAR c)
 {
 	if (isDoubleChar(c)) return true;
 	if (isBaseOperator(c)) return true;
-	if (IsCharAlpha(c) || c== TEXT('_')) return true;
+	if (IsCharAlpha(c) || c == TEXT('_')) return true;
 	return false;
 }
 
@@ -599,7 +599,7 @@ void TExpressionTree::TraverseInOrder(TNode *now, String &output)
 	{
 		if (now->eType == NODE_FUNCTION)
 		{
-			output+=Node2Str(*now)+TEXT("(");
+			output += Node2Str(*now) + TEXT("(");
 			has_parenthesis = 1;
 		}
 		else
@@ -612,34 +612,34 @@ void TExpressionTree::TraverseInOrder(TNode *now, String &output)
 	if (GetOperateNum(now->eOperator) != 1)//非一元运算符才输出，即一元运算符的输出顺序已改变
 	{
 		if (now->eType == NODE_OPERATOR)//本级为运算符
-			if (now->parent!=NULL)
-			if (
-				(GetOperateNum(now->parent->eOperator) == 2 &&//父运算符存在，为二元，
-					(
-						Rank(now->parent->eOperator) > Rank(now->eOperator)//父级优先级高于本级->加括号
-						||
-						(//两级优先级相等
-							Rank(now->parent->eOperator) == Rank(now->eOperator) && 
+			if (now->parent != NULL)
+				if (
+					(GetOperateNum(now->parent->eOperator) == 2 &&//父运算符存在，为二元，
+						(
+							Rank(now->parent->eOperator) > Rank(now->eOperator)//父级优先级高于本级->加括号
+							||
+							(//两级优先级相等
+								Rank(now->parent->eOperator) == Rank(now->eOperator) &&
 								(
 									//本级为父级的右子树 且父级不满足结合律->加括号
-									(inAssociativeLaws(now->parent->eOperator)==false && now==now->parent->right)
+									(inAssociativeLaws(now->parent->eOperator) == false && now == now->parent->right)
 									||
 									////两级都是右结合
 									(isLeft2Right(now->parent->eOperator) == false && isLeft2Right(now->eOperator) == false)
+									)
 								)
+							)
 						)
+
+					//||
+
+					////父运算符存在，为除号，且本级为分子，则添加括号
+					//(now->parent->eOperator == MATH_DIVIDE && now == now->parent->right)
 					)
-				)
-
-				//||
-
-				////父运算符存在，为除号，且本级为分子，则添加括号
-				//(now->parent->eOperator == MATH_DIVIDE && now == now->parent->right)
-				)
-			{
-				output += TEXT("(");
-				has_parenthesis = 1;
-			}
+				{
+					output += TEXT("(");
+					has_parenthesis = 1;
+				}
 	}
 
 	if (now->left != NULL)//左遍历
@@ -649,7 +649,7 @@ void TExpressionTree::TraverseInOrder(TNode *now, String &output)
 
 	if (GetOperateNum(now->eOperator) != 1)//非一元运算符才输出，即一元运算符的输出顺序已改变
 	{
-		output+=Node2Str(*now);
+		output += Node2Str(*now);
 	}
 
 
@@ -690,9 +690,9 @@ String  TExpressionTree::OutputStr()
 {
 	String temp;
 
-		if (head != NULL)
-			TraverseInOrder(head, temp);
-		return temp;
+	if (head != NULL)
+		TraverseInOrder(head, temp);
+	return temp;
 }
 
 void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOrder)
@@ -716,7 +716,7 @@ void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOr
 	for (auto c : expression)
 		if (!isLegal(c))
 		{
-			throw TError{ ERROR_ILLEGALCHAR, String(TEXT("WRONG CHAR:")) +To_string(c) };
+			throw TError{ ERROR_ILLEGALCHAR, String(TEXT("WRONG CHAR:")) + To_string(c) };
 		}
 
 	//粗切分：利用operator切分
@@ -724,8 +724,8 @@ void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOr
 	{
 		bool bBaseOperator;
 		String s;
-		TStrPiece(bool bIn, String sIn) :bBaseOperator(bIn), s(sIn){}
-	} ;
+		TStrPiece(bool bIn, String sIn) :bBaseOperator(bIn), s(sIn) {}
+	};
 	std::vector<TStrPiece> Data;
 
 	String temp;
@@ -739,7 +739,7 @@ void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOr
 		{
 			if (!temp.empty())
 			{
-				Data.emplace_back( false, temp );
+				Data.emplace_back(false, temp);
 				temp.clear();
 			}
 			Data.emplace_back(true, String{ c });
@@ -750,7 +750,7 @@ void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOr
 		Data.emplace_back(false, temp);
 		temp.clear();
 	}
-	
+
 
 	//二次切分：切分出4类元素
 	//并送入Pre In order
@@ -762,11 +762,10 @@ void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOr
 	{
 		if (Data[i].bBaseOperator)//识别出基本运算符（括号也在其中）
 		{
-				tempNode = new TNode;
-				ZeroMemory(tempNode, sizeof(TNode));
-				tempNode->eType = NODE_OPERATOR;
-				tempNode->eOperator = BaseOperatorCharToEnum(Data[i].s[0]);
-				PreInOrder.push_back(tempNode);
+			tempNode = new TNode;
+			tempNode->eType = NODE_OPERATOR;
+			tempNode->eOperator = BaseOperatorCharToEnum(Data[i].s[0]);
+			PreInOrder.push_back(tempNode);
 		}
 		else//
 		{
@@ -782,17 +781,15 @@ void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOr
 			if (isDouble)//数字
 			{
 				tempNode = new TNode;
-				ZeroMemory(tempNode, sizeof(TNode));
 				tempNode->eType = NODE_NUMBER;
 				tempNode->value = std::stod(Data[i].s);
 				PreInOrder.push_back(tempNode);
 			}
 			else
 			{
-				if ((tempeOperator = Str2Function(Data[i].s)) != MATH_NOT_AVAILIALBE)//识别出函数
+				if ((tempeOperator = Str2Function(Data[i].s)) != MATH_NULL)//识别出函数
 				{
 					tempNode = new TNode;
-					ZeroMemory(tempNode, sizeof(TNode));
 					tempNode->eType = NODE_FUNCTION;
 					tempNode->eOperator = tempeOperator;
 					PreInOrder.push_back(tempNode);
@@ -807,10 +804,10 @@ void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOr
 						throw TError{ ERROR_NOT_LINK_VARIABLETABLE, TEXT("") };
 						return;
 					}
-					if (!IsCharAlpha(Data[i].s[0]) && Data[i].s[0]!=TEXT('_'))//变量名首字符需为下划线或字母
+					if (!IsCharAlpha(Data[i].s[0]) && Data[i].s[0] != TEXT('_'))//变量名首字符需为下划线或字母
 					{
 						ReleaseVectorTNode(PreInOrder);
-						throw TError{ERROR_INVALID_VARNAME, Data[i].s};
+						throw TError{ ERROR_INVALID_VARNAME, Data[i].s };
 						return;
 					}
 
@@ -824,7 +821,6 @@ void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOr
 					}
 
 					tempNode = new TNode;
-					ZeroMemory(tempNode, sizeof(TNode));
 					tempNode->eType = NODE_VARIABLE;
 					tempNode->varname = Data[i].s;
 					PreInOrder.push_back(tempNode);
@@ -926,7 +922,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 	case MATH_TAN:
 	{
 		//x!=k*pi+pi/2 -> 2*x/pi != 2*k+1(odd)
-		double value = value1*2.0 / M_PI;
+		double value = value1 * 2.0 / M_PI;
 		if (abs(value - (int)value) < MIN_DOUBLE && (int)value % 2 != 1)
 		{
 			//恢复修改并抛出异常
@@ -1010,7 +1006,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		if (value1 < 0 && IsIntAndEven(1ll / value2))
 		{
 			Operator->eType = NODE_OPERATOR;
-			throw TError{ ERROR_I, String(TEXT("pow(")) + To_string(value1) + TEXT(",") + To_string(value2) + TEXT(")")};
+			throw TError{ ERROR_I, String(TEXT("pow(")) + To_string(value1) + TEXT(",") + To_string(value2) + TEXT(")") };
 		}
 		Operator->value = pow(value1, value2);
 		break;
@@ -1034,14 +1030,13 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		Operator->value = value1 - value2;
 		break;
 	}
-	Operator->eOperator = MATH_NOT_AVAILIALBE;
+	Operator->eOperator = MATH_NULL;
 }
 
 //复制节点树，返回新节点树头节点
-TExpressionTree::TNode * TExpressionTree::CopyNodeTree(TNode *oldNode)
+TExpressionTree::TNode *TExpressionTree::CopyNodeTree(TNode *oldNode)
 {
 	TNode *newNode = new TNode;
-	ZeroMemory(newNode, sizeof(TNode));
 	newNode->eType = oldNode->eType;
 	newNode->eOperator = oldNode->eOperator;
 	newNode->value = oldNode->value;
@@ -1061,10 +1056,9 @@ TExpressionTree::TNode * TExpressionTree::CopyNodeTree(TNode *oldNode)
 	return newNode;
 }
 
-TExpressionTree::TNode * TExpressionTree::NewNode(enumNodeType eType, enumMathOperator eOperator)
+TExpressionTree::TNode *TExpressionTree::NewNode(enumNodeType eType, enumMathOperator eOperator)
 {
 	TNode *newNode = new TNode;
-	ZeroMemory(newNode, sizeof(TNode));
 	newNode->eType = eType;
 	newNode->eOperator = eOperator;
 	return newNode;
@@ -1107,13 +1101,11 @@ void TExpressionTree::Diff(TNode *now, String var)
 					Diff(now->right, var);
 				else
 					Diff(now->left, var);
-				return;
 			}
 			else
 			{
 				TNode *plus;
 				plus = new TNode;
-				ZeroMemory(plus, sizeof(TNode));
 				plus->eType = NODE_OPERATOR;
 				plus->eOperator = MATH_ADD;
 				if (now != head)
@@ -1141,13 +1133,12 @@ void TExpressionTree::Diff(TNode *now, String var)
 
 				Diff(plus->left->left, var);
 				Diff(plus->right->right, var);
-				return;
 			}
+			return;
 		case MATH_DIVIDE:
 			if (now->right->eType == NODE_NUMBER)// f(x)/number = f'(x)/number
 			{
 				Diff(now->left, var);
-				return;
 			}
 			else
 			{
@@ -1212,8 +1203,8 @@ void TExpressionTree::Diff(TNode *now, String var)
 				Diff(u1, var);
 				Diff(v2, var);
 
-				return;
 			}
+			return;
 		case MATH_POWER:
 		{
 			bool LChildIsNumber = now->left->eType == NODE_NUMBER;
@@ -1225,7 +1216,7 @@ void TExpressionTree::Diff(TNode *now, String var)
 				now->left = NULL;
 				now->right = NULL;
 				now->eType = NODE_NUMBER;
-				now->eOperator = MATH_NOT_AVAILIALBE;
+				now->eOperator = MATH_NULL;
 				now->value = 0.0;
 				return;
 			}
@@ -1286,6 +1277,7 @@ void TExpressionTree::Diff(TNode *now, String var)
 			return;
 		}
 		}
+		break;
 	case NODE_FUNCTION:
 	{
 		//不考虑定义域
@@ -1293,10 +1285,11 @@ void TExpressionTree::Diff(TNode *now, String var)
 		if (now->left->eType == NODE_NUMBER)
 		{
 			now->eType = NODE_NUMBER;
-			now->eOperator = MATH_NOT_AVAILIALBE;
+			now->eOperator = MATH_NULL;
 			now->value = 0;
 			DeleteNode(now->left);
 			now->left = NULL;
+			return;
 		}
 
 		TNode *function = now;
@@ -1410,8 +1403,8 @@ void TExpressionTree::Diff(TNode *now, String var)
 			if (u->eType != NODE_VARIABLE)
 				Diff(u2, var);
 
-			return;
 		}
+		return;
 		case MATH_EXP:
 		{
 			if (function->left->eType == NODE_VARIABLE)//e^x=e^x
@@ -1444,13 +1437,11 @@ void TExpressionTree::Diff(TNode *now, String var)
 			u2->parent = multiply;
 
 			Diff(u2, var);
-			return;
 		}
+		return;
 		case MATH_COS:
-
-			TNode *negative;
-			negative = new TNode;
-			ZeroMemory(negative, sizeof(TNode));
+		{
+			TNode *negative = new TNode;
 			negative->eType = NODE_OPERATOR;
 			negative->eOperator = MATH_NEGATIVE;
 
@@ -1474,57 +1465,20 @@ void TExpressionTree::Diff(TNode *now, String var)
 				negative->parent = NULL;
 			}
 
-		case MATH_SIN:
-		{
 			TNode *multiply = new TNode;
-			ZeroMemory(multiply, sizeof(TNode));
 			multiply->eType = NODE_OPERATOR;
 			multiply->eOperator = MATH_MULTIPLY;
 
-			switch (function->eOperator)
-			{
-			case MATH_SIN:
-				//连接上一级和乘号
-				if (function != head)
-				{
-					if (function->parent->left == function)
-					{
-						function->parent->left = multiply;
-						multiply->parent = function->parent;
-					}
-					if (function->parent->right == function)
-					{
-						function->parent->right = multiply;
-						multiply->parent = function->parent;
-					}
-				}
-				else
-				{
-					head = multiply;
-					multiply->parent = NULL;
-				}
-				break;
-			case MATH_COS:
-				//连接负号和乘号
-				negative->left = multiply;
-				multiply->parent = negative;
-				break;
-			}
+			//连接负号和乘号
+			negative->left = multiply;
+			multiply->parent = negative;
 
 			//连接乘号和function
 			multiply->left = function;
 			function->parent = multiply;
 
 			//变更function
-			switch (function->eOperator)
-			{
-			case MATH_SIN:
-				function->eOperator = MATH_COS;
-				break;
-			case MATH_COS:
-				function->eOperator = MATH_SIN;
-				break;
-			}
+			function->eOperator = MATH_SIN;
 
 			//复制u2并连接乘号
 			TNode *u2 = CopyNodeTree(function->left);
@@ -1532,12 +1486,53 @@ void TExpressionTree::Diff(TNode *now, String var)
 			u2->parent = multiply;
 
 			Diff(u2, var);
-			return;
+		}
+		return;
+		case MATH_SIN:
+		{
+			TNode *multiply = new TNode;
+			multiply->eType = NODE_OPERATOR;
+			multiply->eOperator = MATH_MULTIPLY;
+
+			//连接上一级和乘号
+			if (function != head)
+			{
+				if (function->parent->left == function)
+				{
+					function->parent->left = multiply;
+					multiply->parent = function->parent;
+				}
+				if (function->parent->right == function)
+				{
+					function->parent->right = multiply;
+					multiply->parent = function->parent;
+				}
+			}
+			else
+			{
+				head = multiply;
+				multiply->parent = NULL;
+			}
+
+			//连接乘号和function
+			multiply->left = function;
+			function->parent = multiply;
+
+			//变更function
+			function->eOperator = MATH_COS;
+
+			//复制u2并连接乘号
+			TNode *u2 = CopyNodeTree(function->left);
+			multiply->right = u2;
+			u2->parent = multiply;
+
+			Diff(u2, var);
 		}
 		//case MATH_ARCTAN:
 		//{
 		//	TNode *multiply = new TNode()
 		//}
+		return;
 		default:
 			throw TError(ERROR_WRONG_MATH_OPERATOR, String(TEXT("未完成的运算符")) + Function2Str(now->eOperator));
 		}
@@ -1550,11 +1545,11 @@ String  TExpressionTree::Diff(String var, int n, bool bOutput)
 	if (pVariableTable->FindVariableTable(var) == pVariableTable->VariableTable.end())
 		throw TError{ ERROR_UNDEFINED_VARIABLE, var };
 
-		for (int i = 0; i < n; i++)
-		{
-			Diff(head, var);
-		}
-		return OutputStr();
+	for (int i = 0; i < n; i++)
+	{
+		Diff(head, var);
+	}
+	return OutputStr();
 }
 
 void TExpressionTree::LinkParent(TNode *child, TNode *ignore)
@@ -1639,12 +1634,12 @@ void TExpressionTree::Simplify(TNode *now)
 		{
 			//try
 			//{
-				CalcNode(now, now->left, now->right);
-				delete now->left;
-				delete now->right;
-				now->eOperator = MATH_NOT_AVAILIALBE;
-				now->left = NULL;
-				now->right = NULL;
+			CalcNode(now, now->left, now->right);
+			delete now->left;
+			delete now->right;
+			now->eOperator = MATH_NULL;
+			now->left = NULL;
+			now->right = NULL;
 			//}
 			//catch (enumError err)
 			//{
@@ -1659,7 +1654,6 @@ void TExpressionTree::Simplify(TNode *now)
 			//新建一个1节点
 			TNode *temp;
 			temp = new TNode;
-			ZeroMemory(temp, sizeof(TNode));
 			temp->eType = NODE_NUMBER;
 			temp->value = 1;
 
@@ -1692,7 +1686,6 @@ void TExpressionTree::Simplify(TNode *now)
 			//新建一个0节点
 			TNode *temp;
 			temp = new TNode;
-			ZeroMemory(temp, sizeof(TNode));
 			temp->eType = NODE_NUMBER;
 			temp->value = 0;
 
@@ -1826,47 +1819,47 @@ void TExpressionTree::CopyVariableTable(std::vector<String > &Dest, const std::v
 //替换 VarsVector变量 NumsVector数字
 void  TExpressionTree::Subs(std::vector<String > VarsVector, std::vector<double> NumsVector, bool output)
 {
-		if (VarsVector.size() == NumsVector.size())//替换与被替换元素数目相等
+	if (VarsVector.size() == NumsVector.size())//替换与被替换元素数目相等
+	{
+		for (size_t i = 0; i < VarsVector.size(); i++)//遍历被替换变量
 		{
-			for (size_t i = 0; i < VarsVector.size(); i++)//遍历被替换变量
+			//查表识别被替换变量
+			auto it = pVariableTable->FindVariableTable(VarsVector[i]);
+			if (it != pVariableTable->VariableTable.end())//已识别出
 			{
-				//查表识别被替换变量
-				auto it = pVariableTable->FindVariableTable(VarsVector[i]);
-				if (it!=pVariableTable->VariableTable.end())//已识别出
+				String var = *it;
+				//构建替换节点树
+				TExpressionTree Expr;
+				Expr.LinkVariableTable(pVariableTable);
+				Expr.Read(NumsVector[i], false);
+
+				//得到所有被替换变量的位置
+				std::vector<TNode *> VarsPos;
+				GetVariablePos(var, VarsPos);
+				for (size_t j = 0; j < VarsPos.size(); j++)
 				{
-					String var = *it;
-					//构建替换节点树
-					TExpressionTree Expr;
-					Expr.LinkVariableTable(pVariableTable);
-					Expr.Read(NumsVector[i], false);
+					TNode *newNode = CopyNodeTree(Expr.head);
 
-						//得到所有被替换变量的位置
-						std::vector<TNode *> VarsPos;
-						GetVariablePos(var, VarsPos);
-						for (size_t j = 0; j < VarsPos.size(); j++)
-						{
-							TNode *newNode = CopyNodeTree(Expr.head);
-
-							//连接到新节点
-							if (VarsPos[j] != head)
-							{
-								if (VarsPos[j]->parent->left != NULL && VarsPos[j]->parent->left == VarsPos[j])
-									VarsPos[j]->parent->left = newNode;
-								if (VarsPos[j]->parent->right != NULL && VarsPos[j]->parent->right == VarsPos[j])
-									VarsPos[j]->parent->right = newNode;
-								newNode->parent = VarsPos[j]->parent;
-							}
-							else
-								head = newNode;
-
-							//删掉旧节点
-							delete VarsPos[j];
-						}
+					//连接到新节点
+					if (VarsPos[j] != head)
+					{
+						if (VarsPos[j]->parent->left != NULL && VarsPos[j]->parent->left == VarsPos[j])
+							VarsPos[j]->parent->left = newNode;
+						if (VarsPos[j]->parent->right != NULL && VarsPos[j]->parent->right == VarsPos[j])
+							VarsPos[j]->parent->right = newNode;
+						newNode->parent = VarsPos[j]->parent;
 					}
+					else
+						head = newNode;
+
+					//删掉旧节点
+					delete VarsPos[j];
 				}
 			}
-		else
-			throw TError{ ERROR_SUBS_NOT_EQUAL, TEXT("") };
+		}
+	}
+	else
+		throw TError{ ERROR_SUBS_NOT_EQUAL, TEXT("") };
 }
 
 void TExpressionTree::Subs_inner(TNode *node, String ptVar, double value)
@@ -1903,47 +1896,47 @@ void  TExpressionTree::Subs(const String vars, const String nums, bool output)
 	std::vector<String> VarsVector = StrSliceToVector(vars);
 	std::vector<String> NumsVector = StrSliceToVector(nums);
 
-		if (VarsVector.size() == NumsVector.size())//替换与被替换元素数目相等
+	if (VarsVector.size() == NumsVector.size())//替换与被替换元素数目相等
+	{
+		for (size_t i = 0; i < VarsVector.size(); i++)//遍历被替换变量
 		{
-			for (size_t i = 0; i < VarsVector.size(); i++)//遍历被替换变量
+			//查表识别被替换变量
+			auto it = pVariableTable->FindVariableTable(VarsVector[i]);
+			if (it != pVariableTable->VariableTable.end())//已识别出
 			{
-				//查表识别被替换变量
-				auto it = pVariableTable->FindVariableTable(VarsVector[i]);
-				if (it!=pVariableTable->VariableTable.end())//已识别出
+				String var = *it;
+				//构建替换节点树
+				TExpressionTree Expr;
+				Expr.LinkVariableTable(pVariableTable);
+				Expr.Read(NumsVector[i], false);
+
+				//得到所有被替换变量的位置
+				std::vector<TNode *> VarsPos;
+				GetVariablePos(var, VarsPos);
+				for (size_t j = 0; j < VarsPos.size(); j++)
 				{
-					String var = *it;
-					//构建替换节点树
-					TExpressionTree Expr;
-					Expr.LinkVariableTable(pVariableTable);
-					Expr.Read(NumsVector[i], false);
+					TNode *newNode = CopyNodeTree(Expr.head);
 
-						//得到所有被替换变量的位置
-						std::vector<TNode *> VarsPos;
-						GetVariablePos(var, VarsPos);
-						for (size_t j = 0; j < VarsPos.size(); j++)
-						{
-							TNode *newNode = CopyNodeTree(Expr.head);
+					//连接到新节点
+					if (VarsPos[j] != head)
+					{
+						if (VarsPos[j]->parent->left != NULL && VarsPos[j]->parent->left == VarsPos[j])
+							VarsPos[j]->parent->left = newNode;
+						if (VarsPos[j]->parent->right != NULL && VarsPos[j]->parent->right == VarsPos[j])
+							VarsPos[j]->parent->right = newNode;
+						newNode->parent = VarsPos[j]->parent;
+					}
+					else
+						head = newNode;
 
-							//连接到新节点
-							if (VarsPos[j] != head)
-							{
-								if (VarsPos[j]->parent->left != NULL && VarsPos[j]->parent->left == VarsPos[j])
-									VarsPos[j]->parent->left = newNode;
-								if (VarsPos[j]->parent->right != NULL && VarsPos[j]->parent->right == VarsPos[j])
-									VarsPos[j]->parent->right = newNode;
-								newNode->parent = VarsPos[j]->parent;
-							}
-							else
-								head = newNode;
-
-							//删掉旧节点
-							delete VarsPos[j];
-						}
+					//删掉旧节点
+					delete VarsPos[j];
 				}
 			}
 		}
-		else
-			throw TError{ ERROR_SUBS_NOT_EQUAL, TEXT("") };
+	}
+	else
+		throw TError{ ERROR_SUBS_NOT_EQUAL, TEXT("") };
 
 }
 
@@ -1986,7 +1979,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 			write_pos->right->parent = write_pos;
 
 			write_pos->left = new TNode;
-			ZeroMemory(write_pos->left, sizeof(TNode));
 
 			write_pos->left->parent = write_pos;
 			Solve(parent, write_pos->left);
@@ -1999,7 +1991,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 			write_pos->right->parent = write_pos;
 
 			write_pos->left = new TNode;
-			ZeroMemory(write_pos->left, sizeof(TNode));
 
 			write_pos->left->parent = write_pos;
 			Solve(parent, write_pos->left);
@@ -2014,7 +2005,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 				write_pos->right->parent = write_pos;
 
 				write_pos->left = new TNode;
-				ZeroMemory(write_pos->left, sizeof(TNode));
 
 				write_pos->left->parent = write_pos;
 				Solve(parent, write_pos->left);
@@ -2028,7 +2018,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 				write_pos->left->parent = write_pos;
 
 				write_pos->right = new TNode;
-				ZeroMemory(write_pos->right, sizeof(TNode));
 
 				write_pos->right->parent = write_pos;
 				Solve(parent, write_pos->right);
@@ -2044,7 +2033,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 				write_pos->right->parent = write_pos;
 
 				write_pos->left = new TNode;
-				ZeroMemory(write_pos->left, sizeof(TNode));
 
 				write_pos->left->parent = write_pos;
 				Solve(parent, write_pos->left);
@@ -2058,7 +2046,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 				write_pos->left->parent = write_pos;
 
 				write_pos->right = new TNode;
-				ZeroMemory(write_pos->right, sizeof(TNode));
 
 				write_pos->right->parent = write_pos;
 				Solve(parent, write_pos->right);
@@ -2069,7 +2056,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 			write_pos->eOperator = MATH_POSITIVE;
 
 			write_pos->left = new TNode;
-			ZeroMemory(write_pos->left, sizeof(TNode));
 
 			write_pos->left->parent = write_pos;
 			Solve(parent, write_pos->left);
@@ -2079,7 +2065,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 			write_pos->eOperator = MATH_NEGATIVE;
 
 			write_pos->left = new TNode;
-			ZeroMemory(write_pos->left, sizeof(TNode));
 
 			write_pos->left->parent = write_pos;
 			Solve(parent, write_pos->left);
@@ -2089,7 +2074,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 			write_pos->eOperator = MATH_ARCSIN;
 
 			write_pos->left = new TNode;
-			ZeroMemory(write_pos->left, sizeof(TNode));
 
 			write_pos->left->parent = write_pos;
 			Solve(parent, write_pos->left);
@@ -2099,7 +2083,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 			write_pos->eOperator = MATH_ARCCOS;
 
 			write_pos->left = new TNode;
-			ZeroMemory(write_pos->left, sizeof(TNode));
 
 			write_pos->left->parent = write_pos;
 			Solve(parent, write_pos->left);
@@ -2109,7 +2092,6 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 			write_pos->eOperator = MATH_ARCTAN;
 
 			write_pos->left = new TNode;
-			ZeroMemory(write_pos->left, sizeof(TNode));
 
 			write_pos->left->parent = write_pos;
 			Solve(parent, write_pos->left);
@@ -2134,7 +2116,6 @@ String  TExpressionTree::Solve(String &var, double &value)
 	TExpressionTree Result;
 
 	TNode *ResultNow = new TNode;
-	ZeroMemory(ResultNow, sizeof(TNode));
 
 	var = LastVarNode->varname;
 
@@ -2156,7 +2137,7 @@ void  TExpressionTree::Read(String expression, bool bOutput)
 
 	ReadToInOrder(expression, InOrder);
 	InQueue2PostQueue(InOrder, PostOrder);
-			BuildExpressionTree(PostOrder);
+	BuildExpressionTree(PostOrder);
 }
 
 bool TExpressionTree::CanCalc(TNode *now)
@@ -2220,53 +2201,53 @@ void TExpressionTree::Calc(TNode *now)
 //计算表达式值 operateHeadNode决定是否操作本身的节点
 double TExpressionTree::Value(bool operateHeadNode)
 {
-		TNode *pNode = NULL;
-		if (operateHeadNode)
-			pNode = head;
-		else
-			pNode = CopyNodeTree(head);
+	TNode *pNode = NULL;
+	if (operateHeadNode)
+		pNode = head;
+	else
+		pNode = CopyNodeTree(head);
 
-		try
-		{
-			Calc(pNode);
-		}
-		catch (enumError &err)
-		{
-			//删掉节点树并提交给上级
-			if (operateHeadNode == false)
-				DeleteNode(pNode);
-			throw err;
-		}
-
-		//得到最终结果
-		double num = pNode->value;
-		//释放复制的树
+	try
+	{
+		Calc(pNode);
+	}
+	catch (enumError &err)
+	{
+		//删掉节点树并提交给上级
 		if (operateHeadNode == false)
-			delete pNode;
-		return num;
+			DeleteNode(pNode);
+		throw err;
+	}
+
+	//得到最终结果
+	double num = pNode->value;
+	//释放复制的树
+	if (operateHeadNode == false)
+		delete pNode;
+	return num;
 }
 
 //复制出一棵临时树计算值
 String  TExpressionTree::Calc(double *result)
 {
-		if (CanCalc())
-		{
-			TNode *Duplicate = CopyNodeTree(head);
-			Calc(Duplicate);
+	if (CanCalc())
+	{
+		TNode *Duplicate = CopyNodeTree(head);
+		Calc(Duplicate);
 
-			if (result != NULL)
-				*result = Duplicate->value;
+		if (result != NULL)
+			*result = Duplicate->value;
 
-			String temp=Node2Str(*Duplicate);
-			delete Duplicate;
+		String temp = Node2Str(*Duplicate);
+		delete Duplicate;
 
-			return temp;
-		}
-		else
-			return OutputStr();
+		return temp;
+	}
+	else
+		return OutputStr();
 }
 
-TExpressionTree& TExpressionTree::operator=(const TExpressionTree &expr)
+TExpressionTree &TExpressionTree::operator=(const TExpressionTree &expr)
 {
 	Release();
 	Reset();
@@ -2298,7 +2279,7 @@ void TExpressionTree::Vpa_inner(TNode *now)
 //仅将变量表内置数值代入，不进行计算
 void  TExpressionTree::Vpa(bool bOutput)
 {
-		Vpa_inner(head);
+	Vpa_inner(head);
 }
 
 bool TExpressionTree::IsSingleVar()//检查是否为一元
@@ -2334,7 +2315,7 @@ bool TExpressionTree::HasOnlyOneVar()//只有一个变量
 	return iVarAppearedCount == 1;
 }
 
-TExpressionTree & TExpressionTree::operator*(double value)
+TExpressionTree &TExpressionTree::operator*(double value)
 {
 	if (head == NULL)
 	{
@@ -2357,7 +2338,7 @@ TExpressionTree & TExpressionTree::operator*(double value)
 	return *this;
 }
 
-TExpressionTree & TExpressionTree::operator+(double value)
+TExpressionTree &TExpressionTree::operator+(double value)
 {
 	if (head == NULL)
 	{
@@ -2380,7 +2361,7 @@ TExpressionTree & TExpressionTree::operator+(double value)
 	return *this;
 }
 
-TExpressionTree & TExpressionTree::operator-(double value)
+TExpressionTree &TExpressionTree::operator-(double value)
 {
 	if (head == NULL)
 	{
@@ -2403,7 +2384,7 @@ TExpressionTree & TExpressionTree::operator-(double value)
 	return *this;
 }
 
-TExpressionTree& TExpressionTree::operator+(const TExpressionTree &expr)
+TExpressionTree &TExpressionTree::operator+(const TExpressionTree &expr)
 {
 	if (head == NULL)
 		head = CopyNodeTree(expr.head);

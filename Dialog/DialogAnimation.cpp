@@ -908,9 +908,9 @@ namespace DialogAnimation
 			if (pElement->CanBeDragged())//非机架及RealLine,Driver,Constraint
 			{
 				s.clear();
-				s << TEXT("ID:") << pElement->id;
-				s << TEXT(" ") << pElement->GetElementTypeName();//“连杆”
-				s << TEXT(" ") << pElement->Name;
+				s+= TEXT("ID:") + To_string(pElement->id);
+				s += TEXT(" ") + pElement->GetElementTypeName();//“连杆”
+				s += TEXT(" ") + String(pElement->Name);
 				for (size_t i = 0; i < pElement->vecDpt.size(); ++i)//遍历每个相对点
 				{
 					for (auto ValueType : { X, Y, PHI })//x,y,phi各加一个
@@ -920,12 +920,12 @@ namespace DialogAnimation
 						TListBoxItem tempItem;
 
 						s_dpt.clear();
-						s_dpt << TEXT("pt") << i;
+						s_dpt +=TEXT("pt") + i;
 						switch (ValueType)
 						{
-						case X:s_dpt << TEXT(" x");  break;
-						case Y:s_dpt << TEXT(" y");  break;
-						case PHI:s_dpt << TEXT(" phi");  break;
+						case X:s_dpt +=TEXT(" x");  break;
+						case Y:s_dpt +=TEXT(" y");  break;
+						case PHI:s_dpt +=TEXT(" phi");  break;
 						}
 						ListBoxLeft.AddString((s + s_dpt).c_str());
 
@@ -957,19 +957,19 @@ namespace DialogAnimation
 	String GetUnitName(enumListBoxItemType type, enumListBoxItemValueType value_type)
 	{
 		String s = GetTypeName(type);
-		s << TEXT(" (");
+		s += TEXT(" (");
 		switch (value_type)
 		{
-		case X:s << TEXT("mm"); break;
-		case Y:s << TEXT("mm"); break;
-		case PHI:s << TEXT("rad"); break;
+		case X:s += TEXT("mm"); break;
+		case Y:s += TEXT("mm"); break;
+		case PHI:s += TEXT("rad"); break;
 		}
 
 		switch (type)
 		{
-		case D:s << TEXT(")"); break;
-		case V:s << TEXT("/s)"); break;
-		case A:s << TEXT("/s^2)"); break;
+		case D:s += TEXT(")"); break;
+		case V:s += TEXT("/s)"); break;
+		case A:s += TEXT("/s^2)"); break;
 		}
 		return s;
 	}

@@ -128,11 +128,11 @@ void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	else
 	{
 		sTips = TEXT("点击以建立");
-		sTips << sType;
+		sTips += sType;
 		if (bShowDimLine)
-			sTips << TEXT("\r\n（输入格式: 长度 or 长度<角度 or x坐标,y坐标（相对当前点））");
+			sTips += TEXT("\r\n（输入格式: 长度 or 长度<角度 or x坐标,y坐标（相对当前点））");
 		if (Attach->bAttachedEndpoint && bCanBuildCoincide)
-			sTips << TEXT("\r\n已吸附端点:自动建立重合约束");
+			sTips += TEXT("\r\n已吸附端点:自动建立重合约束");
 	}
 
 	//由Canvas刷新

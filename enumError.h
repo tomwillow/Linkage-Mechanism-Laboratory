@@ -29,7 +29,7 @@ struct TError :public std::exception
 {
 	enumError id;
 	String info;
-	TError::TError(const enumError inId, const String &inInfo) :id(inId), info(inInfo){}
+	TError(const enumError inId, const String &inInfo) :id(inId), info(inInfo){}
 };
 
 String GetErrorInfo(enumError err);

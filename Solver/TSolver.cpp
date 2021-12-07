@@ -26,6 +26,9 @@
 
 #include "..\Dialog\DialogAnimation.h"
 
+#include <iomanip>
+#include <locale>
+
 TSolver::TSolver()
 {
 	hwndOutput = NULL;
@@ -46,7 +49,10 @@ void TSolver::SetHwnd(HWND hwnd)
 {
 	hwndOutput = hwnd;
 	if (hwnd != NULL)
+	{
 		pOS = new Ostringstream;
+		pOS->imbue(std::locale(""));
+	}
 	else
 	{
 		if (pOS != NULL)
@@ -270,7 +276,7 @@ void TSolver::RefreshEquations()
 		{
 			TDriver *pDriver = (TDriver *)element;
 			String s;
-			s << pDriver->sExprLeft << TEXT("-(") << pDriver->sExprRight<<TEXT(")");
+			s += pDriver->sExprLeft + TEXT("-(") + pDriver->sExprRight+TEXT(")");
 			vecStrDriver.push_back(s);
 			break;
 		}
@@ -296,6 +302,7 @@ void TSolver::ClearOutput()
 	{
 		delete pOS;
 		pOS = new Ostringstream;
+		pOS->imbue(std::locale(""));
 	}
 }
 
@@ -304,9 +311,7 @@ void TSolver::RefreshWindowText()
 {
 	if (hwndOutput != NULL)
 	{
-		Ostringstream *pOss;
-		pOss = (Ostringstream *)pOS;
-		SetWindowText(hwndOutput, (*pOss).str().c_str());
+		SetWindowText(hwndOutput, ((Ostringstream*)pOS)->str().c_str());
 
 		//SetFocus(Edit.m_hWnd);
 
