@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Linkage Mechanism Laboratory", "Linkage Mechanism Laboratory.vcxproj", "{265569DC-34A0-49B3-9BE3-5133199DB24D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test_TExpressionTree", "Test_TExpressionTree\Test_TExpressionTree.vcxproj", "{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,36 +49,6 @@ Global
 		{265569DC-34A0-49B3-9BE3-5133199DB24D}.TEACHER Release|Win32.ActiveCfg = TEACHER Release|Win32
 		{265569DC-34A0-49B3-9BE3-5133199DB24D}.TEACHER Release|Win32.Build.0 = TEACHER Release|Win32
 		{265569DC-34A0-49B3-9BE3-5133199DB24D}.TEACHER Release|x64.ActiveCfg = TEACHER Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Debug|Win32.Build.0 = Debug|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Debug|x64.ActiveCfg = Debug|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Debug|x64.Build.0 = Debug|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Release|Any CPU.ActiveCfg = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Release|Win32.ActiveCfg = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Release|Win32.Build.0 = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Release|x64.ActiveCfg = Release|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.Release|x64.Build.0 = Release|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.STUDENT Release|Any CPU.ActiveCfg = Release|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.STUDENT Release|Any CPU.Build.0 = Release|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.STUDENT Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.STUDENT Release|Mixed Platforms.Build.0 = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.STUDENT Release|Win32.ActiveCfg = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.STUDENT Release|Win32.Build.0 = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.STUDENT Release|x64.ActiveCfg = Release|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.STUDENT Release|x64.Build.0 = Release|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.TEACHER Release|Any CPU.ActiveCfg = Release|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.TEACHER Release|Any CPU.Build.0 = Release|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.TEACHER Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.TEACHER Release|Mixed Platforms.Build.0 = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.TEACHER Release|Win32.ActiveCfg = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.TEACHER Release|Win32.Build.0 = Release|Win32
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.TEACHER Release|x64.ActiveCfg = Release|x64
-		{D3AE7C6E-A730-40F7-B70F-BAF4B4493FBF}.TEACHER Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

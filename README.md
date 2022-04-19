@@ -1,6 +1,10 @@
 # Linkage-Mechanism-Laboratory
 连杆机构实验室
 
+## 视频
+
+Bilibili: [C++无任何类库编写的平面连杆机构仿真软件](https://www.bilibili.com/video/BV1oE411y7Wr/)
+
 ## Author
 By Tom Willow
 https://github.com/tomwillow/Linkage-Mechanism-Laboratory/
