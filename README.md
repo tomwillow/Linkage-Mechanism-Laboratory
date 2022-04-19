@@ -40,6 +40,10 @@ https://github.com/tomwillow/Linkage-Mechanism-Laboratory/
 
 ![](https://github.com/tomwillow/Linkage-Mechanism-Laboratory/blob/master/Snap/%E7%A8%8B%E5%BA%8F%E6%80%BB%E4%BD%93%E7%BB%93%E6%9E%841.3_%E7%BB%93%E6%9E%84%E5%AE%8C%E6%95%B4%E7%89%88.png)
 
+## 论文
+
+柳冬玉. 平面连杆机构仿真程序研究与开发【D】.西南交通大学,2018.
+
 ## Thanks
 
 https://github.com/miloyip/svpng<br>
