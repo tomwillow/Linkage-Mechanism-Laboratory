@@ -37,7 +37,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{265569DC-34A0-49B3-9BE3-5133199DB24D}</ProjectGuid>
     <RootNamespace>LinkageMechanismLaboratory</RootNamespace>
-    <ProjectName>Linkage Mechanism Laboratory</ProjectName>
+    <ProjectName>LinkageMechanismLaboratory</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -148,6 +148,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\$(Configuration)\</OutDir>
     <IntDir>..\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)../$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -454,7 +458,7 @@
     <ClInclude Include="Dialog\DialogScore.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Linkage Mechanism Laboratory.rc" />
+    <ResourceCompile Include="LinkageMechanismLaboratory.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resource\BITMAP_AXES_HIDE.bmp" />

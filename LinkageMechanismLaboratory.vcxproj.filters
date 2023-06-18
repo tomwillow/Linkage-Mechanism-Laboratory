@@ -520,7 +520,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Linkage Mechanism Laboratory.rc">
+    <ResourceCompile Include="LinkageMechanismLaboratory.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>
