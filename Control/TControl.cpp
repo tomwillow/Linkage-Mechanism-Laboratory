@@ -71,7 +71,11 @@ void TControl::SetPosition(RECT rect)
 LRESULT CALLBACK TControl::subControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	TControl * pControl;
+#ifdef _WIN64
+	pControl = (TControl *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+#else
 	pControl = (TControl *)GetWindowLong(hWnd, GWL_USERDATA);
+#endif
 
 	WNDPROC oldProc;
 	oldProc = (WNDPROC)GetProp(hWnd, TEXT("oldProc"));
@@ -89,7 +93,11 @@ void TControl::LinkControl(HWND hwndControl)//链接到已有控件（用于对话框中）
 
 void TControl::RegisterProc()//创建窗口后注册
 {
+#ifdef _WIN64
+	SetWindowLongPtr(m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
+#else
 	SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
+#endif
 
 	WNDPROC oldProc= (WNDPROC)::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)subControlProc);
 

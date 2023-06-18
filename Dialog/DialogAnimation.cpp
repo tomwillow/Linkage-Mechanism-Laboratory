@@ -107,13 +107,17 @@ namespace DialogAnimation
 		//return 0;
 	}
 
-	BOOL CALLBACK DlgAnimationProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+	INT_PTR CALLBACK DlgAnimationProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		switch (message)
 		{
 		case WM_INITDIALOG:
 		{
+#ifdef _WIN64
+			hInst = (HINSTANCE)GetWindowLong(hDlg, GWLP_HINSTANCE);
+#else
 			hInst = (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE);
+#endif
 			pSolver = (win.pSolver);
 			pCanvas = &(win.Canvas);
 			pShape = &(win.m_Shape);
@@ -129,7 +133,13 @@ namespace DialogAnimation
 				CW_USEDEFAULT,
 				CW_USEDEFAULT,
 				CW_USEDEFAULT,
-				win.m_hWnd, (HMENU)LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_GRAPH)), (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE));
+				win.m_hWnd, (HMENU)LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_GRAPH)),
+#ifdef _WIN64
+				(HINSTANCE)GetWindowLong(hDlg, GWLP_HINSTANCE)
+#else
+				(HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE)
+#endif
+			);
 			pGraph->SetDoubleBuffer(true);
 			pGraph->ShowWindow(SW_HIDE);
 			pGraph->UpdateWindow();

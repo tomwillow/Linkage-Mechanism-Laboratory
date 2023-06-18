@@ -24,6 +24,6 @@ namespace DialogAnimation
 		TElement *pElement;
 	};
 
-	BOOL CALLBACK DlgAnimationProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+	INT_PTR CALLBACK DlgAnimationProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 }

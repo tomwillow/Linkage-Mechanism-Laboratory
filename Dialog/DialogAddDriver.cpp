@@ -123,7 +123,7 @@ namespace DialogAddDriver
 		EditExprLeft.SetText(TEXT("phi%d"), iElementId);
 	}
 
-	BOOL CALLBACK DlgAddDriverProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+	INT_PTR CALLBACK DlgAddDriverProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 
 		switch (message)
@@ -152,7 +152,13 @@ namespace DialogAddDriver
 				50,
 				300,
 				200,
-				hDlg, (HMENU)0, (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE));
+				hDlg, (HMENU)0,
+#ifdef _WIN64
+				(HINSTANCE)GetWindowLong(hDlg, GWLP_HINSTANCE)
+#else
+				(HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE)
+#endif
+			);
 			pGraph->SetDoubleBuffer(true);
 			pGraph->ShowWindow(SW_SHOWNORMAL);
 			pGraph->SetWindowRect(rcGraph);
@@ -229,7 +235,13 @@ namespace DialogAddDriver
 					TCHAR szErr[64];
 					String sErr;
 					sErr=GetErrorInfo(err);
-					hToolTipError=CreateToolTip(hDlg, EditExprRight.m_hWnd, (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE),szErr);
+					hToolTipError=CreateToolTip(hDlg, EditExprRight.m_hWnd,
+#ifdef _WIN64
+						(HINSTANCE)GetWindowLong(hDlg, GWLP_HINSTANCE)
+#else
+						(HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE)
+#endif
+						,szErr);
 
 					return (LRESULT)hBrush;
 				}

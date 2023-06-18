@@ -119,10 +119,20 @@ LRESULT CALLBACK TWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	if (uMsg == WM_NCCREATE)
 	{
 		pWindow = (TWindow *)((LPCREATESTRUCT)lParam)->lpCreateParams;
+#ifdef _WIN64
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pWindow);
+#else
 		SetWindowLong(hWnd, GWL_USERDATA, (LONG)pWindow);
+#endif
 	}
 	else
+	{
+#ifdef _WIN64
+		pWindow = (TWindow *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+#else
 		pWindow = (TWindow *)GetWindowLong(hWnd, GWL_USERDATA);
+#endif
+	}
 
 
 	if (pWindow)

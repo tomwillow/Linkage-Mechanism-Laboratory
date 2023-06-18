@@ -16,7 +16,7 @@
 #include "..\Control\TMainWindow.h"
 extern TMainWindow win;
 
-BOOL CALLBACK DlgOptionProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgOptionProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static TCheckBox CheckRegFile;
 	static TCheckBox CheckShowSchoolLogo;
