@@ -14,7 +14,7 @@ public:
 	TFramePoint();
 	~TFramePoint();
 	void TFramePoint::NoticeListView(TListView *pListView) override;
-	virtual const String TFramePoint::GetElementTypeName() override;//得到类型名称
+	virtual const String TFramePoint::GetElementTypeName() override;//寰楀埌绫诲瀷鍚嶇О
 	virtual void TFramePoint::Draw(HDC hdc, const TConfiguration* pConfig) override;
 	virtual void TFramePoint::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) override;
 	virtual bool TFramePoint::Picked(const POINT &ptPos, const TConfiguration *pConfig)override;

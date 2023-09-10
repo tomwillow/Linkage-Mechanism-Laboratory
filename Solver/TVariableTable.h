@@ -10,19 +10,19 @@ class TVariableTable
 private:
 	bool isLegalName(String s);
 public:
-	bool bShared;//Èç¹ûÊÇ¹²Ïí±äÁ¿±íÔò²»deleteÔªËØ
+	bool bShared;//å¦‚æœæ˜¯å…±äº«å˜é‡è¡¨åˆ™ä¸deleteå…ƒç´ 
 	enumError eError;
 	std::vector<String> VariableTable;
 	std::vector<double> VariableValue;
 	TVariableTable();
 	~TVariableTable();
-	std::vector<String>::iterator FindVariableTable(const String varstr);//²éÕÒ±äÁ¿ÊÇ·ñÔÚ±äÁ¿±íÖĞ£¬Ã»ÓĞÔò·µ»Øfalse
+	std::vector<String>::iterator FindVariableTable(const String varstr);//æŸ¥æ‰¾å˜é‡æ˜¯å¦åœ¨å˜é‡è¡¨ä¸­ï¼Œæ²¡æœ‰åˆ™è¿”å›false
 	void Define(Ostream *pStr, String vars, String input_num = TEXT(""),bool bIgnoreReDef = false);
-	void DefineOne(Ostream *pStr,String var, double value,bool bIgnoreReDef=false);//¶¨Òåµ¥±äÁ¿
+	void DefineOne(Ostream *pStr,String var, double value,bool bIgnoreReDef=false);//å®šä¹‰å•å˜é‡
 	void Output(Ostream *pStr);
-	void OutputValue(Ostream *pStr);//Êä³ö x=0 ĞÎÊ½
+	void OutputValue(Ostream *pStr);//è¾“å‡º x=0 å½¢å¼
 	//void Remove(Ostream *pStr, const String vars, bool bIgnoreUnExisted = false);
-	void RemoveOne(Ostream *pStr, String var, bool bIgnoreUnExisted = false);//Í¬Ê±Çå³ı±äÁ¿ºÍÊı¾İ
+	void RemoveOne(Ostream *pStr, String var, bool bIgnoreUnExisted = false);//åŒæ—¶æ¸…é™¤å˜é‡å’Œæ•°æ®
 	double GetValueFromVarPoint(const String pVar);
 	void SetValueFromVarStr(String VarStr, double value);
 	void SetValueByVarTable(TVariableTable &VarTable);

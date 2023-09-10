@@ -16,7 +16,7 @@ public:
 	TLine();
 	~TLine();
 	TLine& TLine::operator=(const TLine &Line);
-	virtual const String TLine::GetElementTypeName()override;//得到类型名称
+	virtual const String TLine::GetElementTypeName()override;//寰楀埌绫诲瀷鍚嶇О
 	virtual bool TLine::WriteFile(HANDLE &hf, DWORD &now_pos)override{ return true; };
 	virtual bool TLine::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)override{ return true; };
 	virtual void TLine::NoticeListView(TListView *pListView)override{};

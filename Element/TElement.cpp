@@ -33,7 +33,7 @@ TElement::~TElement()
 //	assert(0); 
 //}
 
-void TElement::SetStyle(const LOGPEN &logpen)//ÉèÖÃÑùÊ½
+void TElement::SetStyle(const LOGPEN &logpen)//è®¾ç½®æ ·å¼
 {
 	logpenStyleShow = logpenStyle = logpen;
 }
@@ -49,7 +49,7 @@ void TElement::SetStyle(TConfiguration *pConfig)
 const String TElement::GetElementTypeName()
 {
 	assert(0);
-	return TEXT("Î´¶¨Òå");
+	return TEXT("æœªå®šä¹‰");
 }
 
 const String GetLineStyleName(UINT linestyle)
@@ -57,15 +57,15 @@ const String GetLineStyleName(UINT linestyle)
 	switch (linestyle)
 	{
 	case PS_SOLID:
-		return TEXT("ÊµÏß");
+		return TEXT("å®žçº¿");
 	case PS_DASH:
-		return TEXT("Ïß¶Î");
+		return TEXT("çº¿æ®µ");
 	case PS_DOT:
-		return TEXT("ÐéÏß");
+		return TEXT("è™šçº¿");
 	case PS_DASHDOT:
-		return TEXT("µã»®Ïß");
+		return TEXT("ç‚¹åˆ’çº¿");
 	case PS_DASHDOTDOT:
-		return TEXT("Ë«µã»®Ïß");
+		return TEXT("åŒç‚¹åˆ’çº¿");
 	default:
 		assert(0);
 		return TEXT("Error");
@@ -95,11 +95,11 @@ TElement& TElement::operator=(const TElement &element)
 
 bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos)
 {
-	//Ð´ÈëÀàÐÍ±ê¼Ç
+	//å†™å…¥ç±»åž‹æ ‡è®°
 	::WriteFile(hf, &eType, sizeof(EnumElementType), &now_pos, NULL);
 	now_pos += sizeof(EnumElementType);
 
-	//Ð´ÈëÊý¾Ý	
+	//å†™å…¥æ•°æ®	
 	::WriteFile(hf, &id, sizeof(id), &now_pos, NULL);
 	now_pos += sizeof(id);
 	::WriteFile(hf, &available, sizeof(available), &now_pos, NULL);
@@ -152,7 +152,7 @@ bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos)
 
 bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 {
-	//¶ÁÈëÊý¾Ý£¬³ýÁËeType	
+	//è¯»å…¥æ•°æ®ï¼Œé™¤äº†eType	
 	::ReadFile(hf, &id, sizeof(id), &now_pos, NULL);
 	now_pos += sizeof(id);
 	::ReadFile(hf, &available, sizeof(available), &now_pos, NULL);
@@ -184,7 +184,7 @@ bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 	//err_code = GetLastError();
 	//if ((err_code) != 0)
 	//{
-	//	ShowErrorMsgBox(TEXT("¶ÁÈ¡ÎÄ¼þ"), err_code);
+	//	ShowErrorMsgBox(TEXT("è¯»å–æ–‡ä»¶"), err_code);
 	//	return false;
 	//}
 	now_pos += sizeof(tempSize);
@@ -225,15 +225,15 @@ void TElement::NoticeListView(TListView *pListView)
 
 	pListView->id = id;
 	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
-	pListView->AddAttributeItem(TEXT("Ãû³Æ"), CTRLTYPE_EDIT, &Name, Name);
-	pListView->AddAttributeItem(TEXT("ÀàÐÍ"), CTRLTYPE_NULL, NULL, GetElementTypeName().c_str());
-	pListView->AddAttributeItem(TEXT("ÏßÐÍ"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle).c_str());
-	pListView->AddAttributeItem(TEXT("Ïß¿í"), CTRLTYPE_LINE_WIDTH, this, TEXT("%d"), this->logpenStyle.lopnWidth);
-	pListView->AddAttributeItem(TEXT("ÑÕÉ«"), CTRLTYPE_COLOR_HEX, this, TEXT("0x%X"), this->logpenStyle.lopnColor);
+	pListView->AddAttributeItem(TEXT("åç§°"), CTRLTYPE_EDIT, &Name, Name);
+	pListView->AddAttributeItem(TEXT("ç±»åž‹"), CTRLTYPE_NULL, NULL, GetElementTypeName().c_str());
+	pListView->AddAttributeItem(TEXT("çº¿åž‹"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle).c_str());
+	pListView->AddAttributeItem(TEXT("çº¿å®½"), CTRLTYPE_LINE_WIDTH, this, TEXT("%d"), this->logpenStyle.lopnWidth);
+	pListView->AddAttributeItem(TEXT("é¢œè‰²"), CTRLTYPE_COLOR_HEX, this, TEXT("0x%X"), this->logpenStyle.lopnColor);
 	pListView->AddAttributeItem(TEXT("Alpha"), CTRLTYPE_INT_EDIT, &alpha, TEXT("%d"), alpha);
 
-	//pListView->AddAttributeItem(TEXT("Ô­µã"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
-	//pListView->AddAttributeItem(TEXT("½Ç¶È"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), RAD2DEG(angle));
+	//pListView->AddAttributeItem(TEXT("åŽŸç‚¹"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
+	//pListView->AddAttributeItem(TEXT("è§’åº¦"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), RAD2DEG(angle));
 }
 
 void TElement::SetLineWidth(LONG width)
@@ -393,12 +393,12 @@ bool WriteFileString(HANDLE hf, const std::String &s, DWORD &now_pos)
 	size_t sSize = s.length() + 1;
 	::WriteFile(hf, &(sSize), sizeof(sSize), &now_pos, NULL);
 	now_pos += sizeof(sSize);
-	if (IsErrorShowMsgBox(TEXT("Ð´Èë×Ö·û´®³¤¶È")))
+	if (IsErrorShowMsgBox(TEXT("å†™å…¥å­—ç¬¦ä¸²é•¿åº¦")))
 		return false;
 
 	::WriteFile(hf, (s.c_str()), sSize*sizeof(TCHAR), &now_pos, NULL);
 	now_pos += sSize;
-	if (IsErrorShowMsgBox(TEXT("Ð´Èë×Ö·û´®")))
+	if (IsErrorShowMsgBox(TEXT("å†™å…¥å­—ç¬¦ä¸²")))
 		return false;
 
 	return true;

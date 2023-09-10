@@ -7,10 +7,10 @@ class TConstraintColinear :
 public:
 	TConstraintColinear();
 	~TConstraintColinear();
-	int PointBeginIndexOfElement[2];//Piµã Pjµã ĞòºÅ£¨vecDptĞòºÅ£©
-	int PointEndIndexOfElement[2];//Qiµã Qjµã ĞòºÅ£¨vecDptĞòºÅ£©
+	int PointBeginIndexOfElement[2];//Piç‚¹ Pjç‚¹ åºå·ï¼ˆvecDptåºå·ï¼‰
+	int PointEndIndexOfElement[2];//Qiç‚¹ Qjç‚¹ åºå·ï¼ˆvecDptåºå·ï¼‰
 
-	virtual const String TConstraintColinear::GetElementTypeName() override;//µÃµ½ÀàĞÍÃû³Æ
+	virtual const String TConstraintColinear::GetElementTypeName() override;//å¾—åˆ°ç±»å‹åç§°
 	virtual void TConstraintColinear::Draw(HDC hdc, const TConfiguration* pConfig) override;
 	virtual void TConstraintColinear::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) override;
 	virtual void TConstraintColinear::NoticeListView(TListView *pListView) override;

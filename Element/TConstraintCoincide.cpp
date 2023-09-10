@@ -24,9 +24,9 @@ TConstraintCoincide::~TConstraintCoincide()
 {
 }
 
-const String TConstraintCoincide::GetElementTypeName()//µÃµ½ÀàĞÍÃû³Æ
+const String TConstraintCoincide::GetElementTypeName()//å¾—åˆ°ç±»å‹åç§°
 {
-	return TEXT("ÖØºÏ");
+	return TEXT("é‡åˆ");
 }
 
 void TConstraintCoincide::RestorePointStyle()
@@ -51,7 +51,7 @@ void TConstraintCoincide::BuildpDpt_inner(int i)
 	pElement[i]->vecIsJoint[PointIndexOfElement[i]].push_back(id);
 }
 
-//¸ù¾İpElementºÍPointIndexOfElementµÃµ½pDpt£¬²¢ÉèÖÃvecIsJoint
+//æ ¹æ®pElementå’ŒPointIndexOfElementå¾—åˆ°pDptï¼Œå¹¶è®¾ç½®vecIsJoint
 void TConstraintCoincide::BuildpDpt()
 {
 	for (int i = 0; i < 2; i++)//0-1
@@ -73,18 +73,18 @@ void TConstraintCoincide::NoticeListView(TListView *pListView)
 
 	pListView->id = id;
 	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
-	pListView->AddAttributeItem(TEXT("Ãû³Æ"), CTRLTYPE_EDIT, &Name, Name);
-	pListView->AddAttributeItem(TEXT("ÀàĞÍ"), CTRLTYPE_NULL, NULL,GetElementTypeName().c_str());
-	pListView->AddAttributeItem(TEXT("ÏßĞÍ"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle).c_str());
-	pListView->AddAttributeItem(TEXT("Ïß¿í"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
-	pListView->AddAttributeItem(TEXT("ÑÕÉ«"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
+	pListView->AddAttributeItem(TEXT("åç§°"), CTRLTYPE_EDIT, &Name, Name);
+	pListView->AddAttributeItem(TEXT("ç±»å‹"), CTRLTYPE_NULL, NULL,GetElementTypeName().c_str());
+	pListView->AddAttributeItem(TEXT("çº¿å‹"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle).c_str());
+	pListView->AddAttributeItem(TEXT("çº¿å®½"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
+	pListView->AddAttributeItem(TEXT("é¢œè‰²"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
 
 	wsprintf(buffer, TEXT("ID:%d.P%d = ID:%d.P%d"), pElement[0]->id, PointIndexOfElement[0], pElement[1]->id, PointIndexOfElement[1]);
 
 	pListView->AddAttributeItem(TEXT("Value"), CTRLTYPE_NULL, NULL, buffer);
 }
 
-//±£´æÊ±pElement´æÈëid
+//ä¿å­˜æ—¶pElementå­˜å…¥id
 bool TConstraintCoincide::WriteFile(HANDLE &hf, DWORD &now_pos)
 {
 	if (!TConstraint::WriteFile(hf, now_pos))
@@ -101,7 +101,7 @@ bool TConstraintCoincide::WriteFile(HANDLE &hf, DWORD &now_pos)
 		return true;
 }
 
-//¶Á³öÊ±¸ù¾İpElementÖĞ±£´æµÄidÖØĞÂÖ¸Ïò¶ÔÓ¦µÄÔªËØ
+//è¯»å‡ºæ—¶æ ¹æ®pElementä¸­ä¿å­˜çš„idé‡æ–°æŒ‡å‘å¯¹åº”çš„å…ƒç´ 
 bool TConstraintCoincide::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)
 {
 	if (!TConstraint::ReadFile(hf, now_pos, pShape))
@@ -130,13 +130,13 @@ void TConstraintCoincide::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
 {
 	if (TDraw::ShowConstraintCoincideDotLine(this, pConfig))
 	{
-		//»­Ê°È¡·½¸ñ
+		//ç”»æ‹¾å–æ–¹æ ¼
 		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(GetLinkDpt(0)));
 		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(GetLinkDpt(1)));
 	}
 	else
 	{
-		//»­ÖØºÏµã
+		//ç”»é‡åˆç‚¹
 		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(GetLinkDpt(0)));
 	}
 }

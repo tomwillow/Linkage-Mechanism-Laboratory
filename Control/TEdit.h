@@ -8,23 +8,23 @@ class TEdit :public TControl
 {
 private:
 protected:
-	//ĞéÄâÏûÏ¢´¦Àíº¯Êı£¬¿ÉÖØÔØ
+	//è™šæ‹Ÿæ¶ˆæ¯å¤„ç†å‡½æ•°ï¼Œå¯é‡è½½
 	virtual LRESULT TEdit::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-	//½ÓÊÕVK_RETURN,VK_ESCAPEµÈ£¬·µ»ØÊÇÔòµ÷ÓÃÄ¬ÈÏÏûÏ¢´¦Àí
+	//æ¥æ”¶VK_RETURN,VK_ESCAPEç­‰ï¼Œè¿”å›æ˜¯åˆ™è°ƒç”¨é»˜è®¤æ¶ˆæ¯å¤„ç†
 	virtual bool TEdit::OnKeyDown(WPARAM wParam, LPARAM lParam){ return true; }
 
-	//½ÓÊÕ×Ö·û°´¼ü£¬·µ»ØÊÇÔòµ÷ÓÃÄ¬ÈÏÏûÏ¢´¦Àí
+	//æ¥æ”¶å­—ç¬¦æŒ‰é”®ï¼Œè¿”å›æ˜¯åˆ™è°ƒç”¨é»˜è®¤æ¶ˆæ¯å¤„ç†
 	virtual bool TEdit::OnChar(WPARAM wParam, LPARAM lParam){ return true; }
 
-	//½ÓÊÕÊ§È¥½¹µãÏûÏ¢£¬·µ»ØÊÇÔòµ÷ÓÃÄ¬ÈÏÏûÏ¢´¦Àí
+	//æ¥æ”¶å¤±å»ç„¦ç‚¹æ¶ˆæ¯ï¼Œè¿”å›æ˜¯åˆ™è°ƒç”¨é»˜è®¤æ¶ˆæ¯å¤„ç†
 	virtual bool TEdit::OnKillFocus(WPARAM wParam, LPARAM lParam){ return true; }
 public:
-	//bool bSendParentUserMsg=false;//Èç¹ûÖÃtrue,Ôò½ÓÊÕµ½WM_KEYDOWNÊ±Ïò¸¸´°¿Ú·¢ËÍWM_USERÏûÏ¢
+	//bool bSendParentUserMsg=false;//å¦‚æœç½®true,åˆ™æ¥æ”¶åˆ°WM_KEYDOWNæ—¶å‘çˆ¶çª—å£å‘é€WM_USERæ¶ˆæ¯
 	bool bMultiLine,bAutoHScrol,bAutoVScrol,bNoHideSel;
 	TEdit();
 	~TEdit();
-	void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle = WS_EX_CLIENTEDGE);//´´½¨Edit
-	void TEdit::SetSelect(int iStart, int iEnd);//Ñ¡Ôñ
-	void TEdit::SetSelectAll();//È«Ñ¡
+	void TEdit::CreateEditEx(HWND hParent, UINT id, HINSTANCE hInst, DWORD dwStyle = WS_EX_CLIENTEDGE);//åˆ›å»ºEdit
+	void TEdit::SetSelect(int iStart, int iEnd);//é€‰æ‹©
+	void TEdit::SetSelectAll();//å…¨é€‰
 };

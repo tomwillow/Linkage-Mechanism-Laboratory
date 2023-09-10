@@ -52,11 +52,11 @@ Above is Milo Yip's origin statement.
 
 #define TOMPNG_PUT(u) fputc(u,fp)
 
-//²»´øCRCµÄÊä³ö
+//ä¸å¸¦CRCçš„è¾“å‡º
 #define TOMPNG_U8A(ua,l) for(i=0;i<l;++i) TOMPNG_PUT((ua)[i]);
 #define TOMPNG_U32(u) TOMPNG_PUT((u)>>24); TOMPNG_PUT(((u)>>16)&0xFF);TOMPNG_PUT(((u)>>8)&0xFF);TOMPNG_PUT((u)&0xFF);
 
-//´øCRCµÄÊä³ö
+//å¸¦CRCçš„è¾“å‡º
 #define TOMPNG_U8C(u) do { TOMPNG_PUT(u); c ^= (u); c = (c >> 4) ^ t[c & 15]; c = (c >> 4) ^ t[c & 15]; } while(0)
 #define TOMPNG_U8AC(ua,l) do {for(i=0;i<l;++i) TOMPNG_U8C((ua)[i]);}while(0)
 #define TOMPNG_U16LC(u) do{TOMPNG_U8C((u)&0xFF);TOMPNG_U8C(((u)>>8)&0xFF);}while(0)

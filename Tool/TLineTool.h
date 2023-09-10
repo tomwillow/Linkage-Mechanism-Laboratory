@@ -20,7 +20,7 @@ private:
 	//int iPrevLineId;
 	TElement *pPrevLine;
 	TAttach *Attach;
-	std::vector<DPOINT> dptHit;//Ã¿´ÎµÄµã»÷Î»ÖÃ
+	std::vector<DPOINT> dptHit;//æ¯æ¬¡çš„ç‚¹å‡»ä½ç½®
 	bool bShowDimLine;
 	POINT pt1, pt2;
 	TLine *Line1, *Line2, *LineDim;
@@ -42,11 +42,11 @@ protected:
 	bool bCanBuildCoincide;
 	String sType;
 
-	TRealLine *MoveLine;//ÏÔÊ¾µãµÄÎ»ÖÃ
+	TRealLine *MoveLine;//æ˜¾ç¤ºç‚¹çš„ä½ç½®
 	EnumElementType myElementType;
 	virtual TElement * TLineTool::AddIntoShape(TRealLine &RealLine);
 	virtual void TLineTool::AddIntoTreeViewContent(TElement *Element, int id);
-	virtual void TLineTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig);//ËùÓĞ¼ÓÈëÔ¼Êø¾­¹ı´Ë´¦
+	virtual void TLineTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig);//æ‰€æœ‰åŠ å…¥çº¦æŸç»è¿‡æ­¤å¤„
 public:
 	TLineTool();
 	~TLineTool();

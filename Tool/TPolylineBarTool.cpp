@@ -29,18 +29,18 @@ TPolylineBarTool::~TPolylineBarTool()
 
 void TPolylineBarTool::Reset()
 {
-	//ÖØÉèÁÙÊ±¿é
+	//é‡è®¾ä¸´æ—¶å—
 	if (pPolylineBar != NULL)
 		delete pPolylineBar;
 
 	pPolylineBar = new TPolylineBar;
 	pPolylineBar->SetStyle(pConfig);
 
-	//ÖØÉè×´Ì¬
+	//é‡è®¾çŠ¶æ€
 	dptHit.clear();
 
 	bShowTips = true;
-	sTips = TEXT("µã»÷ÒÔ½¨Á¢¶à¶Î¸Ë");
+	sTips = TEXT("ç‚¹å‡»ä»¥å»ºç«‹å¤šæ®µæ†");
 
 	if (pAttach != NULL)
 		delete pAttach;
@@ -79,22 +79,22 @@ void TPolylineBarTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	switch (dptHit.size())
 	{
 	case 0:
-	sTips = TEXT("µã»÷ÒÔ½¨Á¢¶à¶Î¸Ë");
+	sTips = TEXT("ç‚¹å‡»ä»¥å»ºç«‹å¤šæ®µæ†");
 	break;
 	case 1:
 		pPolylineBar->vecDpt.back() = TDraw::GetRelative(pAttach->dptAttach, dptHit[0], pPolylineBar->angle);
-		sTips = TEXT("ÓÒ¼ü/Esc¿ÉÈ¡Ïû»æÖÆ");
+		sTips = TEXT("å³é”®/Escå¯å–æ¶ˆç»˜åˆ¶");
 		break;
 	default:
 		pPolylineBar->vecDpt.back() = TDraw::GetRelative(pAttach->dptAttach, dptHit[0], pPolylineBar->angle);
 
-		sTips = TEXT("ÓÒ¼ü/Enter/¿Õ¸ñ¿ÉÍê³É»æÖÆ\r\nEsc¿ÉÈ¡Ïû»æÖÆ");
+		sTips = TEXT("å³é”®/Enter/ç©ºæ ¼å¯å®Œæˆç»˜åˆ¶\r\nEscå¯å–æ¶ˆç»˜åˆ¶");
 		break;
 	}
 
-	if (pAttach->bAttachedEndpoint)//²¶×½µ½¶Ëµã
+	if (pAttach->bAttachedEndpoint)//æ•æ‰åˆ°ç«¯ç‚¹
 	{
-		sTips += TEXT("\r\nÒÑÎü¸½¶Ëµã£º½¨Á¢ÖØºÏÔ¼Êø");
+		sTips += TEXT("\r\nå·²å¸é™„ç«¯ç‚¹ï¼šå»ºç«‹é‡åˆçº¦æŸ");
 	}
 }
 
@@ -114,9 +114,9 @@ void TPolylineBarTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		pPolylineBar->vecDpt.push_back(dptRelative);
 		break;
 	}
-	pPolylineBar->vecIsJoint.resize(pPolylineBar->vecDpt.size());//ÉèÖÃJointÈÝÆ÷´óÐ¡
+	pPolylineBar->vecIsJoint.resize(pPolylineBar->vecDpt.size());//è®¾ç½®Jointå®¹å™¨å¤§å°
 
-	pAttach->vecdpt.push_back(pAttach->dptAttach);//Í¬²½¼ÓÈëAttachÖÐÓÃÒÔÎü¸½
+	pAttach->vecdpt.push_back(pAttach->dptAttach);//åŒæ­¥åŠ å…¥Attachä¸­ç”¨ä»¥å¸é™„
 
 
 	if (pAttach->bAttachedEndpoint)
@@ -156,13 +156,13 @@ void TPolylineBarTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	switch (dptHit.size())
 	{
-	case 0://ÇÐ»»¹¤¾ß
+	case 0://åˆ‡æ¢å·¥å…·
 		ResetTool();
 	case 1:
 		Reset();
 		break;
 	default:
-		pPolylineBar->vecDpt.erase(pPolylineBar->vecDpt.end() - 1);//È¥µô×îºóÒ»¸ö
+		pPolylineBar->vecDpt.erase(pPolylineBar->vecDpt.end() - 1);//åŽ»æŽ‰æœ€åŽä¸€ä¸ª
 		pPolylineBar->vecIsJoint.resize(pPolylineBar->vecDpt.size());
 
 		AddIntoShape();
@@ -174,15 +174,15 @@ void TPolylineBarTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 void TPolylineBarTool::AddIntoShape()
 {
 
-	//Èë¿â
+	//å…¥åº“
 	AddTreeViewItem(pPolylineBar, pShape->iNextId);
 
 	TPolylineBar *pSavedPolylineBar = dynamic_cast<TPolylineBar *>(pShape->AddElement(pPolylineBar));
 
-	//ÖØºÏÔ¼ÊøÈë¿â
+	//é‡åˆçº¦æŸå…¥åº“
 	while (!vecpCoincide.empty())
 	{
-		vecpCoincide.back()->pElement[1] = pSavedPolylineBar;//¸üÐÂÖØºÏÔ¼ÊøÁ´½Óµ½¸Õ±£´æµÄÔªËØ
+		vecpCoincide.back()->pElement[1] = pSavedPolylineBar;//æ›´æ–°é‡åˆçº¦æŸé“¾æŽ¥åˆ°åˆšä¿å­˜çš„å…ƒç´ 
 
 		AddTreeViewItem(vecpCoincide.back(), pShape->iNextId);
 		pShape->AddElement(vecpCoincide.back());
@@ -191,7 +191,7 @@ void TPolylineBarTool::AddIntoShape()
 		vecpCoincide.pop_back();
 	}
 
-	//¹²ÏßÔ¼ÊøÈë¿â
+	//å…±çº¿çº¦æŸå…¥åº“
 	while (!stackpColinear.empty())
 	{
 		stackpColinear.top()->pElement[1] = pSavedPolylineBar;
@@ -203,7 +203,7 @@ void TPolylineBarTool::AddIntoShape()
 		stackpColinear.pop();
 	}
 
-	//Ë¢ÐÂ·½³Ì×é
+	//åˆ·æ–°æ–¹ç¨‹ç»„
 	RefreshEquations();
 }
 

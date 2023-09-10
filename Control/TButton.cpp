@@ -14,7 +14,7 @@ void TButton::CreateButton(HWND hParent,UINT uId,TCHAR text[],HINSTANCE hInst)
 {
 	m_hInst = hInst;
 	m_hWnd = CreateWindow(
-		TEXT("button"),//ÀàÃû£¬¸ü¸Äºó°´Å¥²»ÏÔÊ¾
+		TEXT("button"),//ç±»åï¼Œæ›´æ”¹åæŒ‰é’®ä¸æ˜¾ç¤º
 		text,
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
 		0,

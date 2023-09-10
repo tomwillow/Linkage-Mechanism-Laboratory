@@ -20,7 +20,7 @@ void TCHAR_Function::Split(TCHAR *src, std::vector<TCHAR *> &result, TCHAR *sub)
 	int sublen = _tcslen(sub);
 	TCHAR *end = src + srclen;
 
-	//µÃµ½ËùÓĞÎ»ÖÃ
+	//å¾—åˆ°æ‰€æœ‰ä½ç½®
 	TCHAR *tempstr = NULL;
 	TCHAR *prev = src;
 	TCHAR *now = NULL;
@@ -77,9 +77,9 @@ int TCHAR_Function::Replace(TCHAR *src, TCHAR *sub, TCHAR *dest)
 	int sublen = _tcslen(sub);
 	if (sublen == 0) return 0;
 	int destlen = _tcslen(dest);
-	std::vector<TCHAR *> pos;//±£´æÑ°ÕÒµ½µÄÎ»ÖÃ
+	std::vector<TCHAR *> pos;//ä¿å­˜å¯»æ‰¾åˆ°çš„ä½ç½®
 
-	//µÃµ½ËùÓĞÎ»ÖÃ
+	//å¾—åˆ°æ‰€æœ‰ä½ç½®
 	TCHAR *temp = src;
 	TCHAR *now = NULL;
 	while ((now = _tcsstr(temp, sub)) != NULL)
@@ -89,7 +89,7 @@ int TCHAR_Function::Replace(TCHAR *src, TCHAR *sub, TCHAR *dest)
 	}
 
 	if (pos.size() == 0) return 0;
-	int newsize = srclen + pos.size()*(destlen - sublen) + 1;//ĞÂ´®µÄ´óĞ¡£¬¼ÓÉÏÄ©Î²µÄ\0
+	int newsize = srclen + pos.size()*(destlen - sublen) + 1;//æ–°ä¸²çš„å¤§å°ï¼ŒåŠ ä¸Šæœ«å°¾çš„\0
 	TCHAR *newsrc = (TCHAR *)malloc(newsize*sizeof(TCHAR));
 	newsrc[0] = TEXT('\0');
 	TCHAR *prevpos = src;
@@ -100,14 +100,14 @@ int TCHAR_Function::Replace(TCHAR *src, TCHAR *sub, TCHAR *dest)
 		prevpos = pos[i] + sublen;
 	}
 	_tcsncat(newsrc, prevpos, srclen - (prevpos - src));
-	//´Ë´¦newsrcÒÑÈ«²¿¿½Íê
+	//æ­¤å¤„newsrcå·²å…¨éƒ¨æ‹·å®Œ
 
 	_tcscpy(src, newsrc);
 	free(newsrc);
 	return pos.size();
 }
 
-/* ×Ö·ûÊÇa-zA-z»ò_ */
+/* å­—ç¬¦æ˜¯a-zA-zæˆ–_ */
 bool TCHAR_Function::isAlphaCharOrUnderline(TCHAR c)
 {
 	if ((c >= TEXT('a') && c <= TEXT('z')) || (c >= TEXT('A') && c <= TEXT('Z'))

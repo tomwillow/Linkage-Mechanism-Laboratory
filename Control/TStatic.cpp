@@ -14,7 +14,7 @@ void TStatic::CreateStatic(HWND hParent, UINT uId, TCHAR text[], HINSTANCE hInst
 {
 	m_hInst = hInst;
 	m_hWnd = CreateWindow(
-		TEXT("static"),//ÀàÃû£¬¸ü¸Äºó°´Å¥²»ÏÔÊ¾
+		TEXT("static"),//ç±»åï¼Œæ›´æ”¹åæŒ‰é’®ä¸æ˜¾ç¤º
 		text,
 		WS_CHILD | WS_VISIBLE|SS_CENTERIMAGE,
 		0,

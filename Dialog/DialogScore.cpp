@@ -42,26 +42,26 @@ namespace DialogScore
 				//sStudentClass = editScoreClass.GetText();
 				//if (sStudentClass.length() == 0)
 				//{
-				//	ShowMessage(TEXT("°à¼¶²»ÄÜÎª¿Õ£¡"));
+				//	ShowMessage(TEXT("ç­çº§ä¸èƒ½ä¸ºç©ºï¼"));
 				//	return TRUE;
 				//}
 				//sStudentName = editScoreName.GetText();
 				//if (sStudentName.length() == 0)
 				//{
-				//	ShowMessage(TEXT("ĞÕÃû²»ÄÜÎª¿Õ£¡"));
+				//	ShowMessage(TEXT("å§“åä¸èƒ½ä¸ºç©ºï¼"));
 				//	return TRUE;
 				//}
 				//sStudentNumber = editScoreNumber.GetText();
 				//if (sStudentNumber.length() == 0)
 				//{
-				//	ShowMessage(TEXT("Ñ§ºÅ²»ÄÜÎª¿Õ£¡"));
+				//	ShowMessage(TEXT("å­¦å·ä¸èƒ½ä¸ºç©ºï¼"));
 				//	return TRUE;
 				//}
 
 				sStudentScore = editScore.GetText();
 				if (sStudentScore.length() != 0)
 				{
-					ShowMessage(TEXT("Â¼Èë³É¹¦£¡"));
+					ShowMessage(TEXT("å½•å…¥æˆåŠŸï¼"));
 				}
 
 				EndDialog(hDlg, 0);

@@ -22,9 +22,9 @@ TRealLine::~TRealLine()
 {
 }
 
-const String TRealLine::GetElementTypeName()//µÃµ½ÀàÐÍÃû³Æ
+const String TRealLine::GetElementTypeName()//å¾—åˆ°ç±»åž‹åç§°
 {
-	return TEXT("Ïß");
+	return TEXT("çº¿");
 }
 
 void TRealLine::NoticeListView(TListView *pListView)
@@ -33,8 +33,8 @@ void TRealLine::NoticeListView(TListView *pListView)
 
 	pListView->AddAttributeItem(TEXT("P0"), CTRLTYPE_COOR_P1_EDIT, &ptBegin, TEXT("%.3f,%.3f"), ptBegin.x, ptBegin.y);
 	pListView->AddAttributeItem(TEXT("P1"), CTRLTYPE_COOR_P2_EDIT, &ptEnd, TEXT("%.3f,%.3f"), ptEnd.x, ptEnd.y);
-	pListView->AddAttributeItem(TEXT("³¤¶È"), CTRLTYPE_LEN_EDIT, NULL, TEXT("%f"), dLength);
-	pListView->AddAttributeItem(TEXT("½Ç¶È"), CTRLTYPE_ANGLE_EDIT, NULL, TEXT("%f"), RAD2DEG(dAngle));
+	pListView->AddAttributeItem(TEXT("é•¿åº¦"), CTRLTYPE_LEN_EDIT, NULL, TEXT("%f"), dLength);
+	pListView->AddAttributeItem(TEXT("è§’åº¦"), CTRLTYPE_ANGLE_EDIT, NULL, TEXT("%f"), RAD2DEG(dAngle));
 }
 
 
@@ -55,12 +55,12 @@ void TRealLine::SetPoint(DPOINT dptBegin, double dLength, double dAngle)
 	this->dAngle = dAngle;
 }
 
-//×Ô¶¯Ê¶±ð90¶ÈµÈ½Ç¶È
+//è‡ªåŠ¨è¯†åˆ«90åº¦ç­‰è§’åº¦
 void TRealLine::SetPointByDegAngle(DPOINT dptBegin, double dLength, double dDegAngle)
 {
 	int iIvoryLine = 0;
 	int iAngle = (int)dDegAngle;
-	if (dDegAngle - iAngle < 1e-6)//ÕûÊý
+	if (dDegAngle - iAngle < 1e-6)//æ•´æ•°
 	{
 		if (iAngle == 0)
 			iIvoryLine = 1;
@@ -77,31 +77,31 @@ void TRealLine::SetPointByDegAngle(DPOINT dptBegin, double dLength, double dDegA
 	SetPointByIvoryLine(iIvoryLine, dptBegin, dLength, DEG2RAD(dDegAngle));
 }
 
-//ÈôiIvory==0£¬ÔòÊ¹ÓÃlengthºÍangle¡£·ñÔò°´ÕÕÏóÏÞÊý¼°lengthÉèÖÃ¶Ëµã
+//è‹¥iIvory==0ï¼Œåˆ™ä½¿ç”¨lengthå’Œangleã€‚å¦åˆ™æŒ‰ç…§è±¡é™æ•°åŠlengthè®¾ç½®ç«¯ç‚¹
 void TRealLine::SetPointByIvoryLine(int iIvoryLine, DPOINT dptBegin, double length, double RegAngle)
 {
 	ptBegin = dptBegin;
 	switch (iIvoryLine)
 	{
-	case 0://Ã»ÔÚxyÖáÉÏ
+	case 0://æ²¡åœ¨xyè½´ä¸Š
 		SetPoint(ptBegin, length, RegAngle);
 		break;
-	case 1://¡ú
+	case 1://â†’
 		ptEnd = { ptBegin.x + length, ptBegin.y };
 		dLength = length;
 		dAngle = 0;
 		break;
-	case 3://¡û
+	case 3://â†
 		ptEnd = { ptBegin.x - length, ptBegin.y };
 		dLength = length;
 		dAngle = M_PI;
 		break;
-	case 2://¡ü
+	case 2://â†‘
 		ptEnd = { ptBegin.x, ptBegin.y + length };
 		dLength = length;
 		dAngle = M_PI / 2;
 		break;
-	case 4://¡ý
+	case 4://â†“
 		ptEnd = { ptBegin.x, ptBegin.y - length };
 		dLength = length;
 		dAngle = 1.5*M_PI;
@@ -195,7 +195,7 @@ void TRealLine::Draw(HDC hdc, const TConfiguration* pConfig)
 
 void TRealLine::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
 {
-	//»­Ê°È¡·½¸ñ
+	//ç”»æ‹¾å–æ–¹æ ¼
 	TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(ptBegin));
 	TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(ptEnd));
 }

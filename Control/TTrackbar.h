@@ -23,7 +23,7 @@ public:
 	void TTrackbar::SetRange(int num);
 	int TTrackbar::GetRange();
 
-	//Ö»Ö§³ÖÉıĞòÅÅÁĞ
+	//åªæ”¯æŒå‡åºæ’åˆ—
 	void TTrackbar::SetRangeAndValue(std::initializer_list<double> init_list)
 	{
 		for (auto value : init_list)

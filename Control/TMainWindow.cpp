@@ -66,81 +66,81 @@ TMainWindow::~TMainWindow()
 
 void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	//´ËÊ±m_hWndÉĞÎ´¸üĞÂ£¬²»¿ÉÊ¹ÓÃ¡£Ö»ÄÜÓÃhWnd¡£
+	//æ­¤æ—¶m_hWndå°šæœªæ›´æ–°ï¼Œä¸å¯ä½¿ç”¨ã€‚åªèƒ½ç”¨hWndã€‚
 
-	//ÅäÖÃ³õÊ¼»¯
+	//é…ç½®åˆå§‹åŒ–
 	this->m_Configuration.Initial(hWnd);
 
-	//´´½¨¹¤¾ßÀ¸
+	//åˆ›å»ºå·¥å…·æ 
 	m_Toolbar.bAutoWrap = true;
 	m_Toolbar.bIsFlat = true;
 	//m_Toolbar.bTextOnRight = true;
 	m_Toolbar.CreateToolbar(hWnd, m_hInst);
 	m_Toolbar.LoadImageList(32, 32, IDR_TOOLBAR_MAIN, RGB(255, 255, 255));
-	m_Toolbar.AddGroup(0, 0, ID_SELECT, true, TEXT("Ñ¡Ôñ"));
-	m_Toolbar.AddGroup(1, 0, ID_DRAG, true, TEXT("ÍÏ¶¯"));
-	m_Toolbar.AddButton(2, ID_REFRESH, true, TEXT("Ë¢ĞÂ"));
+	m_Toolbar.AddGroup(0, 0, ID_SELECT, true, TEXT("é€‰æ‹©"));
+	m_Toolbar.AddGroup(1, 0, ID_DRAG, true, TEXT("æ‹–åŠ¨"));
+	m_Toolbar.AddButton(2, ID_REFRESH, true, TEXT("åˆ·æ–°"));
 	m_Toolbar.AddSeparator(0);
-	m_Toolbar.AddGroup(3, 0, ID_DRAW_FRAME, true, TEXT("»ú¼Ü"));
-	m_Toolbar.AddGroup(7, 0, ID_DRAW_SLIDEWAY, true, TEXT("¹Ì¶¨µ¼¹ì"));
+	m_Toolbar.AddGroup(3, 0, ID_DRAW_FRAME, true, TEXT("æœºæ¶"));
+	m_Toolbar.AddGroup(7, 0, ID_DRAW_SLIDEWAY, true, TEXT("å›ºå®šå¯¼è½¨"));
 	m_Toolbar.AddSeparator(0);
-	m_Toolbar.AddGroup(4, 0, ID_DRAW_BAR, true, TEXT("¸Ë"));
-	m_Toolbar.AddGroup(5, 0, ID_DRAW_POLYLINE_BAR, true, TEXT("¶à¸±¹¹¼ş"));
-	m_Toolbar.AddGroup(6, 0, ID_DRAW_LINE, true, TEXT("Ïß"));
-	m_Toolbar.AddGroup(8, 0, ID_DRAW_SLIDER, true, TEXT("»¬¿é"));
+	m_Toolbar.AddGroup(4, 0, ID_DRAW_BAR, true, TEXT("æ†"));
+	m_Toolbar.AddGroup(5, 0, ID_DRAW_POLYLINE_BAR, true, TEXT("å¤šå‰¯æ„ä»¶"));
+	m_Toolbar.AddGroup(6, 0, ID_DRAW_LINE, true, TEXT("çº¿"));
+	m_Toolbar.AddGroup(8, 0, ID_DRAW_SLIDER, true, TEXT("æ»‘å—"));
 	m_Toolbar.AddSeparator(0);
-	m_Toolbar.AddGroup(9, 0, ID_DRAW_COINCIDE, true, TEXT("ÖØºÏÔ¼Êø"));
-	m_Toolbar.AddGroup(10, 0, ID_DRAW_COLINEAR, true, TEXT("¹²ÏßÔ¼Êø"));
+	m_Toolbar.AddGroup(9, 0, ID_DRAW_COINCIDE, true, TEXT("é‡åˆçº¦æŸ"));
+	m_Toolbar.AddGroup(10, 0, ID_DRAW_COLINEAR, true, TEXT("å…±çº¿çº¦æŸ"));
 	m_Toolbar.AddSeparator(0);
-	m_Toolbar.AddButton(11, ID_SET_DRIVER, true, TEXT("ÉèÎªÔ­¶¯¼ş"));
-	m_Toolbar.AddButton(12, ID_ANIMATION, true, TEXT("¶¯»­Óë²âÁ¿"));
+	m_Toolbar.AddButton(11, ID_SET_DRIVER, true, TEXT("è®¾ä¸ºåŸåŠ¨ä»¶"));
+	m_Toolbar.AddButton(12, ID_ANIMATION, true, TEXT("åŠ¨ç”»ä¸æµ‹é‡"));
 	m_Toolbar.ShowToolbar();
 
-	//´´½¨×´Ì¬À¸
+	//åˆ›å»ºçŠ¶æ€æ 
 	m_Status.Create(hWnd, IDR_STATUS, m_hInst, 24);
-	m_Status.AddPart(IDR_STATUS_COORDINATE, 160, PT_FIXED);//×ø±ê
+	m_Status.AddPart(IDR_STATUS_COORDINATE, 160, PT_FIXED);//åæ ‡
 	m_Status.AddPart(0, 0, PT_NONE);
 	m_Status.AddPart(IDR_STATUS_CHECKBOX_AXES, 22, PT_FIXED);//
-	m_Status.AddPart(IDR_STATUS_CHECKBOX_SHOW_REAL, 22, PT_FIXED);//Á¬¸Ë»æÖÆ/ÕæÊµ»æÖÆ
+	m_Status.AddPart(IDR_STATUS_CHECKBOX_SHOW_REAL, 22, PT_FIXED);//è¿æ†ç»˜åˆ¶/çœŸå®ç»˜åˆ¶
 	m_Status.AddPart(IDR_STATUS_CHECKBOX_THEME, 22, PT_FIXED);//
-	m_Status.AddPart(IDR_STATUS_PROPORTIONNAME, 40, PT_FIXED);//±ÈÀı£º
+	m_Status.AddPart(IDR_STATUS_PROPORTIONNAME, 40, PT_FIXED);//æ¯”ä¾‹ï¼š
 	m_Status.AddPart(IDR_STATUS_TRACKBAR, 120, PT_FIXED);//
-	m_Status.AddPart(IDR_STATUS_PROPORTION, 60, PT_FIXED);//±ÈÀıÊı×Ö
-	m_Status.AddPart(0, 6, PT_FIXED);//Áô¸øÍÏ¶¯Èı½ÇµÄ
+	m_Status.AddPart(IDR_STATUS_PROPORTION, 60, PT_FIXED);//æ¯”ä¾‹æ•°å­—
+	m_Status.AddPart(0, 6, PT_FIXED);//ç•™ç»™æ‹–åŠ¨ä¸‰è§’çš„
 	m_Status.FreshSize();
 
-	m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("±ÈÀı£º"), m_Configuration.GetProportion() * 100);
+	m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("æ¯”ä¾‹ï¼š"), m_Configuration.GetProportion() * 100);
 	m_Status.SetText(IDR_STATUS_PROPORTION, TEXT("%.0f%%"), m_Configuration.GetProportion() * 100);
 
-	//´´½¨ÕæÊµÇĞ»»°´Å¥
+	//åˆ›å»ºçœŸå®åˆ‡æ¢æŒ‰é’®
 	m_CheckBoxShowReal.LoadCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_REAL);
 	m_CheckBoxShowReal.LoadUnCheckedBitmap(m_hInst, IDR_BITMAP_SHOW_SIMPLE);
 	m_CheckBoxShowReal.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 0).top, 20, 20, IDR_STATUS_CHECKBOX_SHOW_REAL);
 	m_CheckBoxShowReal.SetCheckedAndBitmap(m_Configuration.bDrawReal);
 
-	//´´½¨·ç¸ñÇĞ»»°´Å¥
+	//åˆ›å»ºé£æ ¼åˆ‡æ¢æŒ‰é’®
 	m_CheckBoxTheme.LoadCheckedBitmap(m_hInst, IDB_BITMAP_THEME_DARK);
 	m_CheckBoxTheme.LoadUnCheckedBitmap(m_hInst, IDB_BITMAP_THEME_BRIGHT);
 	m_CheckBoxTheme.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 0).top, 20, 20, IDR_STATUS_CHECKBOX_THEME);
 	m_CheckBoxTheme.SetCheckedAndBitmap(m_Configuration.bThemeDark);
 
-	//´´½¨×ø±êÖáÇĞ»»°´Å¥
+	//åˆ›å»ºåæ ‡è½´åˆ‡æ¢æŒ‰é’®
 	m_CheckBoxAxes.LoadCheckedBitmap(m_hInst, IDB_BITMAP_AXES_SHOW);
 	m_CheckBoxAxes.LoadUnCheckedBitmap(m_hInst, IDB_BITMAP_AXES_HIDE);
 	m_CheckBoxAxes.CreateBitmapCheckBox(m_hInst, m_Status.m_hWnd, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_AXES, 1).left, m_Status.GetPartRect(IDR_STATUS_CHECKBOX_AXES, 0).top, 20, 20, IDR_STATUS_CHECKBOX_AXES);
 	m_CheckBoxAxes.SetCheckedAndBitmap(m_Configuration.bDrawAxes);
 
-	//´´½¨tooltip
-	CreateToolTip(m_Status.m_hWnd, m_CheckBoxShowReal.m_hWnd, m_hInst, TEXT("µã»÷ÒÔÇĞ»» ÕæÊµ/¼òÍ¼ ÏÔÊ¾"));
-	CreateToolTip(m_Status.m_hWnd, m_CheckBoxTheme.m_hWnd, m_hInst, TEXT("µã»÷ÒÔÇĞ»» ÉîÉ«/Ç³É« ±³¾°"));
-	CreateToolTip(m_Status.m_hWnd, m_CheckBoxAxes.m_hWnd, m_hInst, TEXT("µã»÷ÒÔÇĞ»»ÏÔÊ¾×ø±êÖá"));
+	//åˆ›å»ºtooltip
+	CreateToolTip(m_Status.m_hWnd, m_CheckBoxShowReal.m_hWnd, m_hInst, TEXT("ç‚¹å‡»ä»¥åˆ‡æ¢ çœŸå®/ç®€å›¾ æ˜¾ç¤º"));
+	CreateToolTip(m_Status.m_hWnd, m_CheckBoxTheme.m_hWnd, m_hInst, TEXT("ç‚¹å‡»ä»¥åˆ‡æ¢ æ·±è‰²/æµ…è‰² èƒŒæ™¯"));
+	CreateToolTip(m_Status.m_hWnd, m_CheckBoxAxes.m_hWnd, m_hInst, TEXT("ç‚¹å‡»ä»¥åˆ‡æ¢æ˜¾ç¤ºåæ ‡è½´"));
 
-	//´´½¨Trackbar
+	//åˆ›å»ºTrackbar
 	m_Trackbar.CreateTrackbar(m_Status.m_hWnd, this->m_hInst, m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0), IDR_TRACKBAR);
 	m_Trackbar.SetRangeAndValue({ 0.01, 0.05, 0.1, 0.125, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64 });
 	m_Trackbar.SetPosByValue(1.0, 1e-6);
 
-	//´´½¨ÓÒ´°¿Ú
+	//åˆ›å»ºå³çª—å£
 	RightWindow.CreateEx(0, TEXT("RightWindow"), TEXT("RightWindow"),
 		WS_CHILD,
 		0, 0, 0, 0,
@@ -151,7 +151,7 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	RightWindow.ShowWindow(TRUE);
 	RightWindow.UpdateWindow();
 
-	//´´½¨»­²¼
+	//åˆ›å»ºç”»å¸ƒ
 	Canvas.CreateEx(0, TEXT("canvas"), TEXT("canvas"),
 		WS_CHILD,
 		0,
@@ -169,26 +169,26 @@ void TMainWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	_tcscpy(szFileName, TEXT(""));
 
 	TCHAR szInputFileName[MAX_PATH];
-	if (GetCommandLineByIndex(1, szInputFileName))//Èç¹ûÊäÈëÁËÎÄ¼ş
+	if (GetCommandLineByIndex(1, szInputFileName))//å¦‚æœè¾“å…¥äº†æ–‡ä»¶
 	{
 		//ShowMessage(szInputFileName);
 		_tcscpy(szFileName, szInputFileName);
-		::PostMessage(hWnd, WM_COMMAND, MAKELONG(ID_OPEN, ID_OPEN_NOCHECK), 0);//ÎŞµ¯´°´ò¿ª
+		::PostMessage(hWnd, WM_COMMAND, MAKELONG(ID_OPEN, ID_OPEN_NOCHECK), 0);//æ— å¼¹çª—æ‰“å¼€
 	}
 	else
-		//Ä¬ÈÏ³õÊ¼»¯
-		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//²»¼ì²é×´Ì¬
+		//é»˜è®¤åˆå§‹åŒ–
+		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//ä¸æ£€æŸ¥çŠ¶æ€
 
 #ifdef _STUDENT
 	PostMessage(hWnd, WM_COMMAND,MAKELONG(ID_SHOW_STUDENT_DIALOG,0), 0);
 #endif
 
 #ifdef _TEACHER
-	//Ìí¼ÓMenu
-	HMENU hMenu = GetMenu(hWnd);//È¡µÃ²Ëµ¥¾ä±ú
-	HMENU hMenuView = GetSubMenu(hMenu, 0);//¡°ÎÄ¼ş¡±²Ëµ¥
+	//æ·»åŠ Menu
+	HMENU hMenu = GetMenu(hWnd);//å–å¾—èœå•å¥æŸ„
+	HMENU hMenuView = GetSubMenu(hMenu, 0);//â€œæ–‡ä»¶â€èœå•
 	InsertMenu(hMenuView, 5, MF_SEPARATOR | MF_BYPOSITION, 0, TEXT(""));
-	InsertMenu(hMenuView, 5, MF_ENABLED | MF_BYPOSITION, MAKELONG(ID_RECORD_SCORE, 0), TEXT("µÇ¼Ç³É¼¨"));
+	InsertMenu(hMenuView, 5, MF_ENABLED | MF_BYPOSITION, MAKELONG(ID_RECORD_SCORE, 0), TEXT("ç™»è®°æˆç»©"));
 
 	//AppendMenu(hMenuData, MF_ENABLED, ID_MENU_GRAPH_DATA_START, PointData.sLegend.c_str());
 #endif
@@ -201,10 +201,10 @@ void TMainWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	int wmEvent = HIWORD(wParam);
 	if (wmId == IDR_TRACKBAR)
 	{
-		//ÍÏ¶¯ÁËTrackbar
+		//æ‹–åŠ¨äº†Trackbar
 		m_Configuration.SetDPU(m_Trackbar.GetNowValue());
 
-		m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("±ÈÀı£º"));
+		m_Status.SetText(IDR_STATUS_PROPORTIONNAME, TEXT("æ¯”ä¾‹ï¼š"));
 
 		TCHAR temp[64];
 		TTransfer::double2TCHAR_AutoTrim0(m_Configuration.GetProportion() * 100, temp);
@@ -217,7 +217,7 @@ void TMainWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	static TCHAR lpstrFilterLML[] = TEXT("»ú¹¹Éè¼ÆÎÄ¼ş(*.lml)\0*.lml\0\0");
+	static TCHAR lpstrFilterLML[] = TEXT("æœºæ„è®¾è®¡æ–‡ä»¶(*.lml)\0*.lml\0\0");
 
 	int wmId = LOWORD(wParam);
 	int wmEvent = HIWORD(wParam);
@@ -225,12 +225,12 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (wmId)
 	{
 	case ID_NEW:
-		if (wmEvent != ID_NEW_NOCHECK)//¼ì²é×´Ì¬
+		if (wmEvent != ID_NEW_NOCHECK)//æ£€æŸ¥çŠ¶æ€
 			if (_tcslen(szFileName) > 0 || m_Shape.Element.size() > 0)
 			{
-				if (MessageBox(m_hWnd, TEXT("ÊÇ·ñĞÂ½¨ÎÄ¼ş£¿"), TEXT(""), MB_YESNO) == IDYES)
+				if (MessageBox(m_hWnd, TEXT("æ˜¯å¦æ–°å»ºæ–‡ä»¶ï¼Ÿ"), TEXT(""), MB_YESNO) == IDYES)
 				{
-		//Çå¿ÕStudent
+		//æ¸…ç©ºStudent
 #ifdef _STUDENT
 		PostMessage(m_hWnd, WM_COMMAND, MAKELONG(ID_SHOW_STUDENT_DIALOG, 0), 0);
 #endif
@@ -240,22 +240,22 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 					break;
 			}
 
-		//²»¼ì²é×´Ì¬
+		//ä¸æ£€æŸ¥çŠ¶æ€
 		_tcscpy(szFileName, TEXT(""));
 		SetText(szName);
-		m_ManageTool.CloseCurTool();//¹Ø±Õ¹¤¾ß
-		m_Shape.ReleaseAll();//ÊÍ·ÅÔªËØ
-		RightWindow.TreeViewContent.DeleteAllItems();//É¾³ıtree
-		RightWindow.ListView.DeleteAllItems();//É¾³ılist
+		m_ManageTool.CloseCurTool();//å…³é—­å·¥å…·
+		m_Shape.ReleaseAll();//é‡Šæ”¾å…ƒç´ 
+		RightWindow.TreeViewContent.DeleteAllItems();//åˆ é™¤tree
+		RightWindow.ListView.DeleteAllItems();//åˆ é™¤list
 
-		RightWindow.TreeViewContent.Initial();//Ê÷×´Í¼³õÊ¼»¯
-		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);//ÉèÖÃÔ­µã
+		RightWindow.TreeViewContent.Initial();//æ ‘çŠ¶å›¾åˆå§‹åŒ–
+		this->m_Configuration.SetOrg(this->Canvas.ClientRect.right / 2, this->Canvas.ClientRect.bottom / 2);//è®¾ç½®åŸç‚¹
 		m_Trackbar.SetToMid();
-		OnCommand(MAKELONG(ID_SELECT, 0), 0);//ÉèÖÃÑ¡Ôñ¹¤¾ß
+		OnCommand(MAKELONG(ID_SELECT, 0), 0);//è®¾ç½®é€‰æ‹©å·¥å…·
 
 		pSolver->RefreshEquations();
 
-		//Çå¿ÕStudent
+		//æ¸…ç©ºStudent
 #if (defined _STUDENT) || (defined _TEACHER)
 		sStudentClass.clear();
 		sStudentName.clear();
@@ -266,36 +266,36 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		::InvalidateRect(Canvas.m_hWnd, &(Canvas.ClientRect), FALSE);
 		break;
 	case ID_OPEN:
-		if (m_Shape.Element.size() > 0 && _tcslen(szFileName) > 0)//ÓĞÊı¾İÇÒÒÑÓĞµ±Ç°ÎÄ¼şÃû
+		if (m_Shape.Element.size() > 0 && _tcslen(szFileName) > 0)//æœ‰æ•°æ®ä¸”å·²æœ‰å½“å‰æ–‡ä»¶å
 		{
-			if (MessageBox(m_hWnd, TEXT("ÎÄ¼şÎ´±£´æ£¬ÈÔÈ»Òª´ò¿ªÎÄ¼ş£¿"), TEXT("Ñ¯ÎÊ"), MB_YESNO|MB_ICONQUESTION) == IDNO)
+			if (MessageBox(m_hWnd, TEXT("æ–‡ä»¶æœªä¿å­˜ï¼Œä»ç„¶è¦æ‰“å¼€æ–‡ä»¶ï¼Ÿ"), TEXT("è¯¢é—®"), MB_YESNO|MB_ICONQUESTION) == IDNO)
 				return;
 		}
 
 		if (wmEvent != ID_OPEN_NOCHECK)
 		{
-			//×¼±¸´ò¿ª¶Ô»°¿ò
+			//å‡†å¤‡æ‰“å¼€å¯¹è¯æ¡†
 			if (OpenFileDialog(m_hWnd, szFileName, lpstrFilterLML) == FALSE)
 				break;
 		}
 
 
-		//ÒòÎªNew»á¸Ä±äszFileName£¬ËùÒÔÏÈ±£´æÔÙ»Ö¸´
+		//å› ä¸ºNewä¼šæ”¹å˜szFileNameï¼Œæ‰€ä»¥å…ˆä¿å­˜å†æ¢å¤
 		TCHAR szFileNameBackup[MAX_PATH];
 		_tcscpy(szFileNameBackup, szFileName);
-		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//ÎŞÌõ¼ş³õÊ¼»¯
+		this->OnCommand(MAKELONG(ID_NEW, ID_NEW_NOCHECK), 0);//æ— æ¡ä»¶åˆå§‹åŒ–
 		_tcscpy(szFileName, szFileNameBackup);
 
-		if (m_Shape.ReadFromFile(szFileName))//¶ÁÈ¡ÎÄ¼ş
+		if (m_Shape.ReadFromFile(szFileName))//è¯»å–æ–‡ä»¶
 		{
 			RightWindow.TreeViewContent.AddAllItem();
 			SetText(TEXT("%s - %s"), szName, szFileName);
 			pSolver->RefreshEquations();
 		}
 		else
-		{//¶ÁÈ¡Ê§°Ü
+		{//è¯»å–å¤±è´¥
 			if (GetLastError() == ERROR_NO)//
-				MessageBox(NULL, TEXT("ÎÄ¼ş¸ñÊ½²»ÕıÈ·£¬¶ÁÈ¡ÖĞÖ¹¡£"), TEXT(""), MB_OK);
+				MessageBox(NULL, TEXT("æ–‡ä»¶æ ¼å¼ä¸æ­£ç¡®ï¼Œè¯»å–ä¸­æ­¢ã€‚"), TEXT(""), MB_OK);
 			else
 				ShowMessage(TEXT("Error:%d"), GetLastError());
 
@@ -305,10 +305,10 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		break;
 	case ID_SAVE:
 	{
-		if (wmEvent != ID_SAVE_NOCHECK)//ÎŞÌõ¼ş±£´æ²»µ¯¶Ô»°¿ò£¬ÂÔ¹ı´Ëif
-			if (_tcslen(szFileName) == 0 || GetFileExists(szFileName) == false)//Ã»ÓĞµ±Ç°ÎÄ¼ş»òÕßµ±Ç°ÎÄ¼şÒÑÊ§Ğ§
+		if (wmEvent != ID_SAVE_NOCHECK)//æ— æ¡ä»¶ä¿å­˜ä¸å¼¹å¯¹è¯æ¡†ï¼Œç•¥è¿‡æ­¤if
+			if (_tcslen(szFileName) == 0 || GetFileExists(szFileName) == false)//æ²¡æœ‰å½“å‰æ–‡ä»¶æˆ–è€…å½“å‰æ–‡ä»¶å·²å¤±æ•ˆ
 			{
-				//µ¯³ö¶Ô»°¿ò
+				//å¼¹å‡ºå¯¹è¯æ¡†
 				if (SaveFileDialog(m_hWnd, szFileName, lpstrFilterLML, TEXT("lml")) == FALSE)
 					return;
 			}
@@ -317,7 +317,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			ShowMessage(TEXT("Error:%d"), GetLastError());
 		else
 		{
-			ShowMessage(TEXT("±£´æ%s³É¹¦¡£"), szFileName);
+			ShowMessage(TEXT("ä¿å­˜%sæˆåŠŸã€‚"), szFileName);
 			SetText(TEXT("%s - %s"), szName, szFileName);
 		}
 	}
@@ -344,7 +344,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_DRAW_SLIDER:
 	case ID_DRAW_COINCIDE:
 	case ID_DRAW_COLINEAR:
-		SendMessage(m_Toolbar.m_hWnd, WM_USER, wmId, 0);//Ë¢ĞÂToolbarÀïµÄradio×´Ì¬
+		SendMessage(m_Toolbar.m_hWnd, WM_USER, wmId, 0);//åˆ·æ–°Toolbaré‡Œçš„radioçŠ¶æ€
 		p_Managetool->SetCurActiveTool(wmId);
 		break;
 	case ID_DELETE_ELEMENT:
@@ -391,7 +391,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		}
 		Canvas.Invalidate();
 		break;
-	case ID_ANALYZE_MECHANISM://·ÖÎö»ú¹¹
+	case ID_ANALYZE_MECHANISM://åˆ†ææœºæ„
 		if (pConsole == NULL)
 			OnCommand(ID_SHOW_CONSOLE, 0);
 		//pSolver->RefreshEquations(true);
@@ -427,7 +427,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	{
 		TGraph *pGraph = new TGraph(&m_Configuration);
 		pGraph->bShowMouseLine = true;
-		pGraph->CreateEx(0, TEXT("Í¼±í"), TEXT("Í¼±í"),
+		pGraph->CreateEx(0, TEXT("å›¾è¡¨"), TEXT("å›¾è¡¨"),
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
@@ -475,29 +475,29 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		{
 			TSelectTool *pSelect = (TSelectTool *)m_ManageTool.m_pCurrentTool;
 			TElement *pElement=nullptr;
-			if (pSelect->CanBeDriver(pElement))//Ñ¡Ôñ¹¤¾ß ÇÒ Ñ¡ÖĞÔªËØ¿ÉÇı¶¯ Ôòµ¯³öÔ­¶¯¼ş¶Ô»°¿ò
+			if (pSelect->CanBeDriver(pElement))//é€‰æ‹©å·¥å…· ä¸” é€‰ä¸­å…ƒç´ å¯é©±åŠ¨ åˆ™å¼¹å‡ºåŸåŠ¨ä»¶å¯¹è¯æ¡†
 			{
-					//Ô¤Éè
+					//é¢„è®¾
 					DialogAddDriver::iElementId = pElement->id;
 					DialogAddDriver::dElementValue = pElement->angle;
 
 				if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ADD_DRIVER), m_hWnd, DialogAddDriver::DlgAddDriverProc))
 				{
-					MessageBox(NULL, TEXT("´°¿Ú´ò¿ªÊ§°Ü¡£"), TEXT(""), MB_ICONERROR);
+					MessageBox(NULL, TEXT("çª—å£æ‰“å¼€å¤±è´¥ã€‚"), TEXT(""), MB_ICONERROR);
 				}
 			}
 			else
-				MessageBox(m_hWnd, TEXT("ÇëÏÈÊ¹ÓÃÑ¡Ôñ¹¤¾ßÑ¡ÔñÒ»¸öÔªËØ£¬ÔÙÉèÎªÔ­¶¯¼ş¡£"), TEXT(""), MB_ICONINFORMATION);
+				MessageBox(m_hWnd, TEXT("è¯·å…ˆä½¿ç”¨é€‰æ‹©å·¥å…·é€‰æ‹©ä¸€ä¸ªå…ƒç´ ï¼Œå†è®¾ä¸ºåŸåŠ¨ä»¶ã€‚"), TEXT(""), MB_ICONINFORMATION);
 		}
 		else
-			MessageBox(m_hWnd, TEXT("ÇëÏÈÊ¹ÓÃÑ¡Ôñ¹¤¾ßÑ¡ÔñÒ»¸öÔªËØ£¬ÔÙÉèÎªÔ­¶¯¼ş¡£"), TEXT(""), MB_ICONINFORMATION);
+			MessageBox(m_hWnd, TEXT("è¯·å…ˆä½¿ç”¨é€‰æ‹©å·¥å…·é€‰æ‹©ä¸€ä¸ªå…ƒç´ ï¼Œå†è®¾ä¸ºåŸåŠ¨ä»¶ã€‚"), TEXT(""), MB_ICONINFORMATION);
 		break;
 	}
 	case ID_ANIMATION:
 	{
 		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ANIMATION), m_hWnd, DialogAnimation::DlgAnimationProc))
 		{
-			MessageBox(NULL, TEXT("´°¿Ú´ò¿ªÊ§°Ü¡£"), TEXT(""), MB_ICONERROR);
+			MessageBox(NULL, TEXT("çª—å£æ‰“å¼€å¤±è´¥ã€‚"), TEXT(""), MB_ICONERROR);
 		}
 		break;
 	}
@@ -505,7 +505,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	{
 		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_OPTION), m_hWnd, DlgOptionProc))
 		{
-			MessageBox(NULL, TEXT("´°¿Ú´ò¿ªÊ§°Ü¡£"), TEXT(""), MB_ICONERROR);
+			MessageBox(NULL, TEXT("çª—å£æ‰“å¼€å¤±è´¥ã€‚"), TEXT(""), MB_ICONERROR);
 		}
 		break;
 	}
@@ -513,7 +513,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	{
 		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_ABOUT), m_hWnd, DlgAboutProc))
 		{
-			MessageBox(NULL, TEXT("´°¿Ú´ò¿ªÊ§°Ü¡£"), TEXT(""), MB_ICONERROR);
+			MessageBox(NULL, TEXT("çª—å£æ‰“å¼€å¤±è´¥ã€‚"), TEXT(""), MB_ICONERROR);
 		}
 		break;
 	}
@@ -550,9 +550,9 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (SaveFileDialog(m_hWnd, szFileNamePNG, TEXT("PNG File\0*.png\0\0"), TEXT("png")))
 		{
 			if (TDraw::CaptureWindowToFile(Canvas.m_hWnd, szFileNamePNG))
-				MessageBox(NULL, TEXT("±£´æ³É¹¦¡£"), TEXT(""), 0);
+				MessageBox(NULL, TEXT("ä¿å­˜æˆåŠŸã€‚"), TEXT(""), 0);
 			else
-				MessageBox(NULL, TEXT("±£´æÊ§°Ü¡£"), TEXT(""), MB_ICONERROR);
+				MessageBox(NULL, TEXT("ä¿å­˜å¤±è´¥ã€‚"), TEXT(""), MB_ICONERROR);
 		}
 		break;
 	}
@@ -583,7 +583,7 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		//	Sleep(Time/StepCount);
 		//}
 
-		if (lambda < ProOrg)//ËõĞ¡
+		if (lambda < ProOrg)//ç¼©å°
 		{
 			do
 			{
@@ -611,19 +611,19 @@ void TMainWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	break;
 	case ID_SHOW_STUDENT_DIALOG:
 #ifdef _STUDENT
-		//´ò¿ªÑ§Éú´°¿Ú
+		//æ‰“å¼€å­¦ç”Ÿçª—å£
 		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_STU), m_hWnd, DialogStudent::DlgStudentProc))
 		{
-			MessageBox(NULL, TEXT("´°¿Ú´ò¿ªÊ§°Ü¡£"), TEXT(""), MB_ICONERROR);
+			MessageBox(NULL, TEXT("çª—å£æ‰“å¼€å¤±è´¥ã€‚"), TEXT(""), MB_ICONERROR);
 		}
 #endif
 		break;
 	case ID_RECORD_SCORE:
 #ifdef _TEACHER
-		//´ò¿ª³É¼¨µÇ¼Ç´°¿Ú
+		//æ‰“å¼€æˆç»©ç™»è®°çª—å£
 		if (-1 == DialogBox(m_hInst, MAKEINTRESOURCE(IDD_DIALOG_SCORE), m_hWnd, DialogScore::DlgScoreProc))
 		{
-			MessageBox(NULL, TEXT("´°¿Ú´ò¿ªÊ§°Ü¡£"), TEXT(""), MB_ICONERROR);
+			MessageBox(NULL, TEXT("çª—å£æ‰“å¼€å¤±è´¥ã€‚"), TEXT(""), MB_ICONERROR);
 		}
 		if (GetFileExists(szFileName))
 			this->OnCommand(MAKELONG(ID_SAVE, ID_SAVE_NOCHECK), 0);
@@ -655,14 +655,14 @@ void TMainWindow::SetRightWindowPos()
 		ClientRect.bottom - m_Toolbar.GetClientRect().bottom - m_Status.GetClientRect().bottom, true);
 }
 
-//Ö»ÓĞ´Ë´¦»á±ä¸ü²¼¾Ö´óĞ¡
+//åªæœ‰æ­¤å¤„ä¼šå˜æ›´å¸ƒå±€å¤§å°
 void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 {
 	if (wParam == SIZE_MINIMIZED)
 		return;
 	m_Toolbar.FreshSize();
 	m_Status.FreshSize();
-	m_Trackbar.SetRect(m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0));//TrackbarÇ¶ÈëStatus
+	m_Trackbar.SetRect(m_Status.GetPartRect(IDR_STATUS_TRACKBAR, 0));//TrackbaråµŒå…¥Status
 	m_CheckBoxShowReal.SetPositionOnlyOrigin(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_SHOW_REAL, 1));
 	m_CheckBoxTheme.SetPositionOnlyOrigin(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_THEME, 1));
 	m_CheckBoxAxes.SetPositionOnlyOrigin(m_Status.GetPartRect(IDR_STATUS_CHECKBOX_AXES, 1));
@@ -670,7 +670,7 @@ void TMainWindow::OnSize(WPARAM wParam, LPARAM lParam)
 	SetRightWindowPos();
 
 
-	//¼ÇÂ¼ÏÂ×ø±êÔ­µãÏà¶Ô±ÈÀı£¬Canvas±ä¶¯ºóÔÙ°´±ÈÀı»Ö¸´×ø±êÎ»ÖÃ
+	//è®°å½•ä¸‹åæ ‡åŸç‚¹ç›¸å¯¹æ¯”ä¾‹ï¼ŒCanvaså˜åŠ¨åå†æŒ‰æ¯”ä¾‹æ¢å¤åæ ‡ä½ç½®
 	DPOINT OrgProportion;
 	if (Canvas.ClientRect.right != 0 && Canvas.ClientRect.bottom != 0)
 	{

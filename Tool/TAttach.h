@@ -15,8 +15,8 @@ private:
 	TShape *pShape;
 	TConfiguration *pConfig;
 	int iIvoryLine;
-	TRealLine *XAssistLine, *YAssistLine;//X,YÖá¸¨ÖúÏß
-	bool bShowXAssist, bShowYAssist;//ÏÔÊ¾X,YÖá¸¨ÖúÏß
+	TRealLine *XAssistLine, *YAssistLine;//X,Yè½´è¾…åŠ©çº¿
+	bool bShowXAssist, bShowYAssist;//æ˜¾ç¤ºX,Yè½´è¾…åŠ©çº¿
 
 	TRealLine *ExtensionLine;
 
@@ -25,20 +25,20 @@ private:
 	bool TAttach::AttachLine_inner(DPOINT dptNowPos);
 	bool TAttach::AttachPointSelf(DPOINT dptPos);
 
-	bool TAttach::AttachLineSelf(DPOINT dptNowPos);//ÓëvecdptÅäÌ×
+	bool TAttach::AttachLineSelf(DPOINT dptNowPos);//ä¸vecdpté…å¥—
 	bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos);
 	bool TAttach::AttachPoint(DPOINT dptPos);
 public:
-	std::vector<DPOINT> vecdpt;//Ôİ´æµã£¬±£´æPolylineBarÖ®Ç°»­¹ıµÄµã£¬Îª¾ø¶Ô×ø±ê
+	std::vector<DPOINT> vecdpt;//æš‚å­˜ç‚¹ï¼Œä¿å­˜PolylineBarä¹‹å‰ç”»è¿‡çš„ç‚¹ï¼Œä¸ºç»å¯¹åæ ‡
 
-	int iAttachLinePointIndex[2];//Îü¸½Ïß¶ÎÊ±£¬±»Îü¸½ÏßµÄP QµãÔÚvecDptÖĞµÄĞòºÅ
-	bool bShowExtensionLine;//»áÏÔÊ¾ÑÓ³¤Ïß£¬»æÖÆExtensionLine£¬×÷ÎªÅĞ¶ÏÊÇ·ñÎü¸½Ö±ÏßµÄÒÀ¾İ
+	int iAttachLinePointIndex[2];//å¸é™„çº¿æ®µæ—¶ï¼Œè¢«å¸é™„çº¿çš„P Qç‚¹åœ¨vecDptä¸­çš„åºå·
+	bool bShowExtensionLine;//ä¼šæ˜¾ç¤ºå»¶é•¿çº¿ï¼Œç»˜åˆ¶ExtensionLineï¼Œä½œä¸ºåˆ¤æ–­æ˜¯å¦å¸é™„ç›´çº¿çš„ä¾æ®
 
-	bool bAttachedEndpoint;//Îü¸½¶Ëµã£¬ÎªtrueÔòÎü¸½ÉÏÁËÈ·ÇĞ´æÔÚµÄµã
-	bool bAttachedEndpointSelf;//Îü¸½ÉÏÁËvecdptÀïµÄ¶Ëµã£¬ÓÃÓÚPolylineBar»æÖÆ
+	bool bAttachedEndpoint;//å¸é™„ç«¯ç‚¹ï¼Œä¸ºtrueåˆ™å¸é™„ä¸Šäº†ç¡®åˆ‡å­˜åœ¨çš„ç‚¹
+	bool bAttachedEndpointSelf;//å¸é™„ä¸Šäº†vecdpté‡Œçš„ç«¯ç‚¹ï¼Œç”¨äºPolylineBarç»˜åˆ¶
 	//EnumElementType eAttachElementType;
 
-	bool bShowAttachPoint;//»á»­²æ
+	bool bShowAttachPoint;//ä¼šç”»å‰
 	TElement *pAttachElement;
 	int iAttachElementPointIndex;
 	DPOINT dptAttach;

@@ -62,26 +62,26 @@ void TConstraintCoincideTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	switch (dptHit.size())
 	{
 	case 0:
-		if (pAttach->bAttachedEndpoint)//ÒÑÊ°È¡
+		if (pAttach->bAttachedEndpoint)//å·²æ‹¾å–
 		{
-			sTips = TEXT("ÒÑÎü¸½¶Ëµã£ºµã»÷ÒÔÈ·¶¨µÚÒ»µã");
+			sTips = TEXT("å·²å¸é™„ç«¯ç‚¹ï¼šç‚¹å‡»ä»¥ç¡®å®šç¬¬ä¸€ç‚¹");
 		}
 		else
-		sTips = TEXT("ÇëÑ¡ÔñÒª½¨Á¢Ô¼ÊøµÄµÚÒ»µã");
+		sTips = TEXT("è¯·é€‰æ‹©è¦å»ºç«‹çº¦æŸçš„ç¬¬ä¸€ç‚¹");
 
 		break;
 	case 1:
-		if (pAttach->bAttachedEndpoint)//ÒÑÊ°È¡
+		if (pAttach->bAttachedEndpoint)//å·²æ‹¾å–
 		{
-			sTips = TEXT("ÒÑÎü¸½¶Ëµã£ºµã»÷ÒÔÈ·¶¨µÚ¶þµã");
+			sTips = TEXT("å·²å¸é™„ç«¯ç‚¹ï¼šç‚¹å‡»ä»¥ç¡®å®šç¬¬äºŒç‚¹");
 		}
 		else
-			sTips = TEXT("ÇëÑ¡ÔñÒª½¨Á¢Ô¼ÊøµÄµÚ¶þµã");
+			sTips = TEXT("è¯·é€‰æ‹©è¦å»ºç«‹çº¦æŸçš„ç¬¬äºŒç‚¹");
 
-		if (pAttach->pAttachElement == pCoincide->pElement[0])//Ê°È¡×ÔÉí
-			sTips = TEXT("²»ÄÜÔÚÍ¬Ò»¸ö¹¹¼þÉÏ½¨Á¢Ô¼Êø");
+		if (pAttach->pAttachElement == pCoincide->pElement[0])//æ‹¾å–è‡ªèº«
+			sTips = TEXT("ä¸èƒ½åœ¨åŒä¸€ä¸ªæž„ä»¶ä¸Šå»ºç«‹çº¦æŸ");
 
-		sTips += TEXT("\r\nÓÒ¼ü/Esc ¿ÉÈ¡Ïû");
+		sTips += TEXT("\r\nå³é”®/Esc å¯å–æ¶ˆ");
 		break;
 	}
 
@@ -89,12 +89,12 @@ void TConstraintCoincideTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 
 void TConstraintCoincideTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	if (pAttach->bAttachedEndpoint)//ÒÑÊ°È¡
+	if (pAttach->bAttachedEndpoint)//å·²æ‹¾å–
 	{
 		dptHit.push_back(ptPos);
 		switch (dptHit.size())
 		{
-		case 1://°´ÏÂµÚÒ»µã
+		case 1://æŒ‰ä¸‹ç¬¬ä¸€ç‚¹
 			pCoincide = new TConstraintCoincide;
 			pCoincide->SetStyle(pConfig->logpen);
 
@@ -105,9 +105,9 @@ void TConstraintCoincideTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 			break;
 		case 2:
-			if (pAttach->pAttachElement == pCoincide->pElement[0])//Ê°È¡×ÔÉí
+			if (pAttach->pAttachElement == pCoincide->pElement[0])//æ‹¾å–è‡ªèº«
 			{
-				sTips = TEXT("²»ÄÜÔÚÍ¬Ò»¸ö¹¹¼þÉÏ½¨Á¢Ô¼Êø");
+				sTips = TEXT("ä¸èƒ½åœ¨åŒä¸€ä¸ªæž„ä»¶ä¸Šå»ºç«‹çº¦æŸ");
 				break;
 			}
 
@@ -116,21 +116,21 @@ void TConstraintCoincideTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 			AddIntoShape();
 			Reset();
-			sTips = TEXT("½¨Á¢Íê³É");
+			sTips = TEXT("å»ºç«‹å®Œæˆ");
 			break;
 		}
 	}
-	else//ÎÞÐ§µã»÷
-		sTips = TEXT("Ñ¡ÔñÎÞÐ§£ºÇëµã»÷ÒÑ´æÔÚ¹¹¼þÉÏµÄµã");
+	else//æ— æ•ˆç‚¹å‡»
+		sTips = TEXT("é€‰æ‹©æ— æ•ˆï¼šè¯·ç‚¹å‡»å·²å­˜åœ¨æž„ä»¶ä¸Šçš„ç‚¹");
 }
 
 void TConstraintCoincideTool::AddIntoShape()
 {
-	//Èë¿â
+	//å…¥åº“
 	AddTreeViewItem(pCoincide, pShape->iNextId);
 	pShape->AddElement(pCoincide);
 
-	//Ë¢ÐÂ·½³Ì×é
+	//åˆ·æ–°æ–¹ç¨‹ç»„
 	RefreshEquations();
 }
 

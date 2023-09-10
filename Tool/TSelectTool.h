@@ -21,11 +21,11 @@ private:
 	TAttach *pAttach;
 	TCHAR *Cursor;
 
-	bool bSelCross;//½»Ñ¡
-	bool bShowSelRect;//ÏÔÊ¾Ñ¡Ôñ¿ò
+	bool bSelCross;//äº¤é€‰
+	bool bShowSelRect;//æ˜¾ç¤ºé€‰æ‹©æ¡†
 	//std::vector<POINT> vecptHit;
 	RECT rcSelect;
-	POINT ptDrag;//ÍÏ¶¯Æğµã£¬ÖĞÍ¾±ä¸üÎªÉÏÒ»´ÎÍÏ¶¯µã
+	POINT ptDrag;//æ‹–åŠ¨èµ·ç‚¹ï¼Œä¸­é€”å˜æ›´ä¸ºä¸Šä¸€æ¬¡æ‹–åŠ¨ç‚¹
 
 	class TPickedData
 	{

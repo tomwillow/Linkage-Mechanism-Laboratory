@@ -20,9 +20,9 @@ TPolylineBar::~TPolylineBar()
 {
 }
 
-const String TPolylineBar::GetElementTypeName()//µÃµ½ÀàĞÍÃû³Æ
+const String TPolylineBar::GetElementTypeName()//å¾—åˆ°ç±»å‹åç§°
 {
-	return TEXT("¶à¸±¹¹¼ş");
+	return TEXT("å¤šå‰¯æ„ä»¶");
 }
 
 void TPolylineBar::NoticeListView(TListView *pListView)
@@ -31,8 +31,8 @@ void TPolylineBar::NoticeListView(TListView *pListView)
 
 	TCHAR buffer[16];
 
-	pListView->AddAttributeItem(TEXT("Ô­µã"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
-	pListView->AddAttributeItem(TEXT("½Ç¶È"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), RAD2DEG(angle));
+	pListView->AddAttributeItem(TEXT("åŸç‚¹"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
+	pListView->AddAttributeItem(TEXT("è§’åº¦"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), RAD2DEG(angle));
 
 	for (size_t i = 0; i < vecDpt.size(); ++i)
 	{
@@ -50,7 +50,7 @@ void TPolylineBar::Draw(HDC hdc, const TConfiguration* pConfig)
 void TPolylineBar::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
 {
 	for (auto &Dpt: vecDpt)
-		//»­Ê°È¡·½¸ñ
+		//ç”»æ‹¾å–æ–¹æ ¼
 		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(TDraw::GetAbsolute(Dpt,dpt, angle)));
 }
 
@@ -61,7 +61,7 @@ bool TPolylineBar::Picked(const POINT &ptPos, const TConfiguration *pConfig)
 
 bool TPolylineBar::InSelWindow(RECT rect, const TConfiguration *pConfig)
 {	
-	//Ïà¶Ô×ø±ê×ªÎª¾ø¶Ô×ø±ê
+	//ç›¸å¯¹åæ ‡è½¬ä¸ºç»å¯¹åæ ‡
 	std::vector<POINT> vecpt;
 	TDraw::GetAbsoluteScreen(vecpt, vecDpt,dpt, angle, pConfig);
 
@@ -70,7 +70,7 @@ bool TPolylineBar::InSelWindow(RECT rect, const TConfiguration *pConfig)
 
 bool TPolylineBar::InSelCross(RECT rect, const TConfiguration *pConfig)
 {	
-	//Ïà¶Ô×ø±ê×ªÎª¾ø¶Ô×ø±ê
+	//ç›¸å¯¹åæ ‡è½¬ä¸ºç»å¯¹åæ ‡
 	std::vector<POINT> vecpt;
 	TDraw::GetAbsoluteScreen(vecpt, vecDpt, dpt, angle, pConfig);
 

@@ -17,7 +17,7 @@ TAttach::TAttach(TCanvas *pCanvas, TShape *pShape, TConfiguration *pConfig)
 
 	iIvoryLine = 0;
 
-	//ÉèÖÃ¼«ÖáÏß
+	//è®¾ç½®æžè½´çº¿
 	bShowXAssist = false;
 	bShowYAssist = false;
 
@@ -26,12 +26,12 @@ TAttach::TAttach(TCanvas *pCanvas, TShape *pShape, TConfiguration *pConfig)
 	XAssistLine->SetStyle(pConfig->logpenAssistLine);
 	YAssistLine->SetStyle(pConfig->logpenAssistLine);
 
-	//ÉèÖÃÑÓ³¤Ïß
+	//è®¾ç½®å»¶é•¿çº¿
 	bShowExtensionLine = false;
 	ExtensionLine = new TRealLine;
 	ExtensionLine->SetStyle(pConfig->logpenAssistLine);
 
-	//ÉèÖÃ²¶×½µã
+	//è®¾ç½®æ•æ‰ç‚¹
 	bAttachedEndpoint = true;
 	bShowAttachPoint = false;
 	pAttachElement = NULL;
@@ -64,14 +64,14 @@ void TAttach::Draw(HDC hdc)
 	{
 		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), pConfig->CROSS_SIZE, pConfig->logpenFront);
 	}
-	//»­X¸¨ÖúÏß
+	//ç”»Xè¾…åŠ©çº¿
 	if (bShowXAssist)
 	{
 		TDraw::DrawRealLine(hdc, *XAssistLine, pConfig);//
 		TDraw::DrawCross(hdc, pConfig->RealToScreen(dptAttach), pConfig->CROSS_SIZE, pConfig->logpenFront);
 	}
 
-	//»­Y¸¨ÖúÏß
+	//ç”»Yè¾…åŠ©çº¿
 	if (bShowYAssist)
 	{
 		TDraw::DrawRealLine(hdc, *YAssistLine, pConfig);//
@@ -89,12 +89,12 @@ void TAttach::AttachAll(POINT ptNowPos, DPOINT dptCheckPos)
 {
 	dptAttach = pConfig->ScreenToReal(ptNowPos);
 
-	AttachAxis(dptAttach, pConfig->ScreenToReal(pConfig->GetOrg()));//Îü¸½Ô­µã×ø±êÖá
+	AttachAxis(dptAttach, pConfig->ScreenToReal(pConfig->GetOrg()));//å¸é™„åŽŸç‚¹åæ ‡è½´
 	AttachAxis(dptAttach, dptCheckPos);
 
-//ºóÎü¸½Ïß¶ËµãÒòÎªÏß¶Ëµã¸üÖØÒª£¨¸²¸Çµô¸¨ÖúÏßµãÐ§¹û£©
+//åŽå¸é™„çº¿ç«¯ç‚¹å› ä¸ºçº¿ç«¯ç‚¹æ›´é‡è¦ï¼ˆè¦†ç›–æŽ‰è¾…åŠ©çº¿ç‚¹æ•ˆæžœï¼‰
 
-	//Ô½¿¿ÉÏÔ½ÓÅÏÈ
+	//è¶Šé ä¸Šè¶Šä¼˜å…ˆ
 	if (!AttachPointSelf(dptAttach))
 		if (!AttachPoint(dptAttach))
 			if (!AttachLine_inner(dptAttach))
@@ -105,11 +105,11 @@ void TAttach::AttachAll(POINT ptNowPos, DPOINT dptCheckPos)
 void TAttach::AttachAll(POINT ptNowPos)
 {
 	dptAttach = pConfig->ScreenToReal(ptNowPos);
-	AttachAxis(dptAttach, pConfig->ScreenToReal(pConfig->GetOrg()));//Îü¸½Ô­µã×ø±êÖá
+	AttachAxis(dptAttach, pConfig->ScreenToReal(pConfig->GetOrg()));//å¸é™„åŽŸç‚¹åæ ‡è½´
 
-//ºóÎü¸½Ïß¶ËµãÒòÎªÏß¶Ëµã¸üÖØÒª£¨¸²¸Çµô¸¨ÖúÏßµãÐ§¹û£©
+//åŽå¸é™„çº¿ç«¯ç‚¹å› ä¸ºçº¿ç«¯ç‚¹æ›´é‡è¦ï¼ˆè¦†ç›–æŽ‰è¾…åŠ©çº¿ç‚¹æ•ˆæžœï¼‰
 
-	//Ô½¿¿ÉÏÔ½ÓÅÏÈ
+	//è¶Šé ä¸Šè¶Šä¼˜å…ˆ
 	if (!AttachPointSelf(dptAttach))
 		if (!AttachPoint(dptAttach))
 			if (!AttachLine_inner(dptAttach))
@@ -122,12 +122,12 @@ bool TAttach::AttachLine_Element_inner(DPOINT dptNowPos, DPOINT dptAbsolute1, DP
 	const TConfiguration *pConfig)
 {
 
-	//¼ÆËãdptNowPosÔÚdpt1-dpt2ÏßÉÏµÄÎ»ÖÃ
+	//è®¡ç®—dptNowPosåœ¨dpt1-dpt2çº¿ä¸Šçš„ä½ç½®
 	int status = TDraw::PointInRealLineOrExtension(dptNowPos, dptAttach, dptAbsolute1,dptAbsolute2, pConfig);
 	if (status == -1)
 		return false;
 
-	//ÒÑ²¶×½
+	//å·²æ•æ‰
 	bAttachedEndpoint = false;
 	bShowAttachPoint = true;
 	bShowExtensionLine = true;
@@ -138,7 +138,7 @@ bool TAttach::AttachLine_Element_inner(DPOINT dptNowPos, DPOINT dptAbsolute1, DP
 
 	switch (status)
 	{
-	case 1://-1¶¼²»ÔÚ 0ÔÚÏß¶ÎÉÏ 1ÔÚpt1Ò»²àÑÓ³¤Ïß 2ÔÚpt2Ò»²àÑÓ³¤Ïß
+	case 1://-1éƒ½ä¸åœ¨ 0åœ¨çº¿æ®µä¸Š 1åœ¨pt1ä¸€ä¾§å»¶é•¿çº¿ 2åœ¨pt2ä¸€ä¾§å»¶é•¿çº¿
 		ExtensionLine->SetPoint(dptAbsolute1, dptAttach);
 		return true;
 	case 2:
@@ -159,7 +159,7 @@ bool TAttach::AttachLineByRelativeVecPt(DPOINT dptNowPos, TElement *pElement, co
 	return AttachLineByAbsoluteVecPt(dptNowPos, pElement,vecdptAbsolute);
 }
 
-//ÒÔ¾ø¶Ô×ø±êvecdptAbsoluteË³Ðò¹¹³ÉµÄÏß¶Î£¬¼ì²âptNowPosÊÇ·ñÎ»ÓÚÏßÉÏ£¬²¢ÉèÖÃ²ÎÊý£º
+//ä»¥ç»å¯¹åæ ‡vecdptAbsoluteé¡ºåºæž„æˆçš„çº¿æ®µï¼Œæ£€æµ‹ptNowPosæ˜¯å¦ä½äºŽçº¿ä¸Šï¼Œå¹¶è®¾ç½®å‚æ•°ï¼š
 //bAttachedEnepoint
 //bShowAttachPoint
 //bShowExtensionLine  ExtensionLine
@@ -207,21 +207,21 @@ bool TAttach::AttachLineSelf(DPOINT dptNowPos)
 	return AttachLineByAbsoluteVecPt(dptNowPos, nullptr, vecdpt);
 }
 
-//¼ì²éNowPosÊÇ·ñ¿¿½üÒÔCheckPosÎªÔ­µãµÄ¼«Öá£¬Ê¹ÓÃÇ°Ó¦ÉèÖÃdptAttachÎªµ±Ç°µã
+//æ£€æŸ¥NowPosæ˜¯å¦é è¿‘ä»¥CheckPosä¸ºåŽŸç‚¹çš„æžè½´ï¼Œä½¿ç”¨å‰åº”è®¾ç½®dptAttachä¸ºå½“å‰ç‚¹
 bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos)
 {
 
 	iIvoryLine = 0;
 	RECT CanvasClientRect;
 	::GetClientRect(pCanvas->m_hWnd, &CanvasClientRect);
-	//¼ì²âXÖá¸¨ÖúÏß
+	//æ£€æµ‹Xè½´è¾…åŠ©çº¿
 	XAssistLine->ptBegin = dptCheckPos;
-	if (abs(pConfig->LengthToScreenY(dptNowPos.y - dptCheckPos.y)) < 10)//µ±Ç°µãºÍÆðÊ¼µãyÖáÆ«²î10ÏñËØ
+	if (abs(pConfig->LengthToScreenY(dptNowPos.y - dptCheckPos.y)) < 10)//å½“å‰ç‚¹å’Œèµ·å§‹ç‚¹yè½´åå·®10åƒç´ 
 	{
 		bShowXAssist = true;
 
-		//ÉèÖÃ¸¨ÖúÏßx,y×ø±ê
-		if (dptNowPos.x - XAssistLine->ptBegin.x > 0)//µ±Ç°Î»ÖÃÎ»ÓÚ¸¨ÖúÏßÆðÊ¼µãÓÒ±ß
+		//è®¾ç½®è¾…åŠ©çº¿x,yåæ ‡
+		if (dptNowPos.x - XAssistLine->ptBegin.x > 0)//å½“å‰ä½ç½®ä½äºŽè¾…åŠ©çº¿èµ·å§‹ç‚¹å³è¾¹
 		{
 			XAssistLine->ptEnd.x = pConfig->ScreenToRealX(CanvasClientRect.right);
 			iIvoryLine = 1;
@@ -234,19 +234,19 @@ bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos)
 		XAssistLine->ptEnd.y = XAssistLine->ptBegin.y;
 
 		//dptAttach.x = dptNowPos.x;
-		dptAttach.y = XAssistLine->ptEnd.y;//½«µ±Ç°µãÎü¸½µ½×ø±êÖá
+		dptAttach.y = XAssistLine->ptEnd.y;//å°†å½“å‰ç‚¹å¸é™„åˆ°åæ ‡è½´
 	}
 	else
 	{
 		bShowXAssist = false;
 	}
 
-	//¼ì²âYÖá¸¨ÖúÏß
+	//æ£€æµ‹Yè½´è¾…åŠ©çº¿
 	YAssistLine->ptBegin = dptCheckPos;
 	if (abs(pConfig->LengthToScreenX(dptNowPos.x - dptCheckPos.x)) < 10)
 	{
 		bShowYAssist = true;
-		if (dptNowPos.y - YAssistLine->ptBegin.y > 0)//µ±Ç°Î»ÖÃÎ»ÓÚ¸¨ÖúÏßÆðÊ¼µãÉÏ±ß
+		if (dptNowPos.y - YAssistLine->ptBegin.y > 0)//å½“å‰ä½ç½®ä½äºŽè¾…åŠ©çº¿èµ·å§‹ç‚¹ä¸Šè¾¹
 		{
 			YAssistLine->ptEnd.y = pConfig->ScreenToRealY(CanvasClientRect.top);
 			iIvoryLine = 2;
@@ -259,7 +259,7 @@ bool TAttach::AttachAxis(DPOINT dptNowPos, DPOINT dptCheckPos)
 		YAssistLine->ptEnd.x = YAssistLine->ptBegin.x;
 
 		//dptAttach.y = dptNowPos.y;
-		dptAttach.x = YAssistLine->ptEnd.x;//Îü¸½
+		dptAttach.x = YAssistLine->ptEnd.x;//å¸é™„
 	}
 	else
 	{
@@ -286,7 +286,7 @@ bool TAttach::AttachPointByElement(DPOINT dptNowPos,DPOINT &dpt,int iPointIndex,
 	return false;
 }
 
-//¶ÁÈ¡pShapeÖÐµÄRealLine½øÐÐÎü¸½£¬Ê¹ÓÃÇ°Ó¦ÉèÖÃdptAttachÎªµ±Ç°µã
+//è¯»å–pShapeä¸­çš„RealLineè¿›è¡Œå¸é™„ï¼Œä½¿ç”¨å‰åº”è®¾ç½®dptAttachä¸ºå½“å‰ç‚¹
 bool TAttach::AttachPoint(DPOINT dptPos)
 {
 	bAttachedEndpoint = false;
@@ -301,7 +301,7 @@ bool TAttach::AttachPoint(DPOINT dptPos)
 	return false;
 }
 
-//Îü¸½vecdpt£¬Ê¹ÓÃÇ°Ó¦ÉèÖÃdptAttachÎªµ±Ç°µã
+//å¸é™„vecdptï¼Œä½¿ç”¨å‰åº”è®¾ç½®dptAttachä¸ºå½“å‰ç‚¹
 bool TAttach::AttachPointSelf(DPOINT dptPos)
 {
 	bAttachedEndpointSelf = false;
@@ -319,7 +319,7 @@ bool TAttach::AttachPointSelf(DPOINT dptPos)
 	return false;
 }
 
-//Á½µãÆÁÄ»¾àÀëÐ¡ÓÚdistance
+//ä¸¤ç‚¹å±å¹•è·ç¦»å°äºŽdistance
 bool TAttach::DPTisApproached(DPOINT dpt1, DPOINT dpt2)
 {
 	if (abs(pConfig->LengthToScreenX(dpt1.x - dpt2.x)) < iAttachPixel &&

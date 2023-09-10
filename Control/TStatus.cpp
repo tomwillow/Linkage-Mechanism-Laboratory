@@ -57,7 +57,7 @@ void TStatus::FreshSize()
 	int now_x = 0;
 	for (UINT i = 0; i < m_iPartsNum; i++)
 	{
-		//½«¿ÕÓà¿í¶È¾ù·Ö¸ø·Ç¹Ì¶¨¿é
+		//å°†ç©ºä½™å®½åº¦å‡åˆ†ç»™éžå›ºå®šå—
 		if (m_pePartsType[i] == PT_NONE)
 		{
 			m_piPartsWidth[i] = remaid_width / flex_num;
@@ -97,7 +97,7 @@ void CDECL TStatus::SetText(int id, TCHAR szFormat[], ...)
 	}
 }
 
-//µÃµ½Ä³¿éµÄRect£¬±£´æµÄÊÇ×ø±ê
+//å¾—åˆ°æŸå—çš„Rectï¼Œä¿å­˜çš„æ˜¯åæ ‡
 RECT TStatus::GetPartRect(int id, int margin)
 {
 	for (UINT i = 0; i < m_iPartsNum; i++)

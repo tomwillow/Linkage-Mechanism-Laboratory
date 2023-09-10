@@ -44,7 +44,7 @@ TSelectTool::TSelectTool()
 	RegisterHotKey(pCanvas->m_hWnd, 1, MOD_CONTROL, 'A');
 }
 
-//ÓÉTToolµÄÐéÎö¹¹º¯ÊýÖØÔØ
+//ç”±TToolçš„è™šæžæž„å‡½æ•°é‡è½½
 TSelectTool::~TSelectTool()
 {
 	SelectNull();
@@ -66,21 +66,21 @@ void TSelectTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	{
 	case VK_DELETE:
 	{
-		//Çå³ýÊôÐÔÀ¸
+		//æ¸…é™¤å±žæ€§æ 
 		pListView->DeleteAllItems();
 
-		//ÇåÀíÊ÷×´Í¼
+		//æ¸…ç†æ ‘çŠ¶å›¾
 		for (auto pElement : PickedElements)
 			pTreeViewContent->DeleteById(pElement->id);
 
-		//É¾³ýÑ¡ÖÐÔªËØ
+		//åˆ é™¤é€‰ä¸­å…ƒç´ 
 		std::vector<int> InfluencedId;
 		InfluencedId=pShape->Delete(PickedElements.self());
 
 		for (auto i : InfluencedId)
 			pTreeViewContent->DeleteById(i);
 
-		//Ë¢ÐÂ·½³Ì
+		//åˆ·æ–°æ–¹ç¨‹
 		pSolver->RefreshEquations();
 
 		PickedElements.clear();
@@ -101,7 +101,7 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	ptMouse = ptPos;
 
-	if ((nFlags & MK_LBUTTON) > 0)//°´×¡×ó¼ü
+	if ((nFlags & MK_LBUTTON) > 0)//æŒ‰ä½å·¦é”®
 	{
 		switch (eState)
 		{
@@ -117,11 +117,11 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 
 			ptDrag = ptPos;
 
-			sTips = TEXT("ÒÆ¶¯µ½ÐÂÎ»ÖÃÒÔ·ÅÖÃÔª¼þ");
+			sTips = TEXT("ç§»åŠ¨åˆ°æ–°ä½ç½®ä»¥æ”¾ç½®å…ƒä»¶");
 			Cursor = IDC_HAND;
 			break;
 		}
-		case DRAG_SEL://ÍÏ¶¯Çó½â
+		case DRAG_SEL://æ‹–åŠ¨æ±‚è§£
 		{
 			pSolver->ClearOutput();
 			pSolver->ClearConstraint();
@@ -130,9 +130,9 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			pShape->SimplifyPhiValue();
 
 			if (PickedElements.front()->CanBeDragged())
-				sTips = TEXT("¿ÉÍÏ¶¯");
+				sTips = TEXT("å¯æ‹–åŠ¨");
 			else
-				sTips = TEXT("¸Ã¹¹¼þ²»¿ÉÍÏ¶¯");
+				sTips = TEXT("è¯¥æž„ä»¶ä¸å¯æ‹–åŠ¨");
 			Cursor = IDC_HAND;
 
 			break;
@@ -149,11 +149,11 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 				{
 					if (pElement->InSelect(rcSelect, bSelCross, pConfig))
 					{
-						pElement->SetStateHover();//¸Ä±ä¿òÑ¡ÔªËØÑùÊ½
+						pElement->SetStateHover();//æ”¹å˜æ¡†é€‰å…ƒç´ æ ·å¼
 					}
 					else
 					{
-						pElement->SetStateUnHover();//ÉèÖÃÎ´¿òÑ¡ÔªËØÑùÊ½
+						pElement->SetStateUnHover();//è®¾ç½®æœªæ¡†é€‰å…ƒç´ æ ·å¼
 					}
 				}
 			}
@@ -162,7 +162,7 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 		}
 		}
 	}
-	else//Ã»°´×¡×ó¼ü
+	else//æ²¡æŒ‰ä½å·¦é”®
 	{
 		TElement *pElementHover = nullptr;
 		bool bInSel = false;
@@ -172,9 +172,9 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 			if (pElement->Picked(ptMouse, pConfig))
 			{
 				pElementHover = pElement;
-				pElement->SetStateHover();//ÉèÖÃÐü¸¡ÑùÊ½
+				pElement->SetStateHover();//è®¾ç½®æ‚¬æµ®æ ·å¼
 				if (pElement->bDrawSquare)
-					bInSel = true;//¸¡¶¯µ½Ñ¡Ôñ¼¯ÉÏ·½
+					bInSel = true;//æµ®åŠ¨åˆ°é€‰æ‹©é›†ä¸Šæ–¹
 			}
 			else
 				pElement->SetStateUnHover();
@@ -187,13 +187,13 @@ void TSelectTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 		if (pElementHover)
 		{
 			if (eMode == SELECT_MOVE)
-				sTips = TEXT("¿ÉÍÏ¶¯£¨ÎÞÔ¼Êø£©");
+				sTips = TEXT("å¯æ‹–åŠ¨ï¼ˆæ— çº¦æŸï¼‰");
 			else
 			{
 				if (pElementHover->CanBeDragged())
-					sTips = TEXT("¿ÉÍÏ¶¯£¨´øÔ¼Êø£©");
+					sTips = TEXT("å¯æ‹–åŠ¨ï¼ˆå¸¦çº¦æŸï¼‰");
 				else
-					sTips = TEXT("²»¿ÉÍÏ¶¯");
+					sTips = TEXT("ä¸å¯æ‹–åŠ¨");
 			}
 		}
 		else
@@ -212,7 +212,7 @@ void TSelectTool::OnLButtonUp(HWND hWnd, UINT nFlags, POINT ptPos)
 
 	if (eState == NONE)
 	{
-		//Çåµã¿òÑ¡ÄÚÈÝ£¬ÉèÖÃÑùÊ½£¬½øÈëÑ¡Ôñ¼¯
+		//æ¸…ç‚¹æ¡†é€‰å†…å®¹ï¼Œè®¾ç½®æ ·å¼ï¼Œè¿›å…¥é€‰æ‹©é›†
 		PickedElements.clear();
 		for (auto pElement : pShape->Element)
 		{
@@ -227,7 +227,7 @@ void TSelectTool::OnLButtonUp(HWND hWnd, UINT nFlags, POINT ptPos)
 			}
 		}
 
-		//Ë¢ÐÂÐü¸¡
+		//åˆ·æ–°æ‚¬æµ®
 		for (auto pElement : pShape->Element)
 			if (pElement->Picked(ptPos, pConfig))
 				pElement->SetStateHover();
@@ -252,7 +252,7 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	//CancelTreeViewAndListView();
 	//RestorePickedLineStyle();
 
-	//ÉèÖÃÑ¡Çø¿òÆðÊ¼µã
+	//è®¾ç½®é€‰åŒºæ¡†èµ·å§‹ç‚¹
 	rcSelect.left = ptPos.x;
 	rcSelect.top = ptPos.y;
 
@@ -260,7 +260,7 @@ void TSelectTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 	if (pElement != nullptr)
 	{
-		if (pElement->bDrawSquare)//µã»÷ÁËÑ¡Ôñ¼¯ÖÐµÄÔªËØ
+		if (pElement->bDrawSquare)//ç‚¹å‡»äº†é€‰æ‹©é›†ä¸­çš„å…ƒç´ 
 		{
 			if (eMode == SELECT_MOVE)
 			{
@@ -344,10 +344,10 @@ void TSelectTool::SelectById(int id, bool ChooseTreeView, bool UpdateListView)
 
 void TSelectTool::CancelTreeViewAndListView()
 {
-	//Í¨ÖªTreeViewÈ¡ÏûÑ¡ÖÐ
+	//é€šçŸ¥TreeViewå–æ¶ˆé€‰ä¸­
 	pTreeViewContent->SelectNull();
 
-	//Í¨ÖªListViewÇå¿Õ
+	//é€šçŸ¥ListViewæ¸…ç©º
 	pListView->DeleteAllItems();
 }
 
@@ -360,7 +360,7 @@ void TSelectTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 	if (pElement != nullptr)
 	{
-		if (!pElement->bDrawSquare)//²»ÔÚÑ¡Ôñ¼¯
+		if (!pElement->bDrawSquare)//ä¸åœ¨é€‰æ‹©é›†
 			Select(pElement, true, true);
 
 		pElement->NoticeListView(pListView);
@@ -368,12 +368,12 @@ void TSelectTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		sTips.clear();
 		pCanvas->Invalidate();
 
-		//µ¯³öÓÒ¼ü²Ëµ¥£¬
+		//å¼¹å‡ºå³é”®èœå•ï¼Œ
 		HMENU hMenu = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_RIGHT));
 		hMenu = GetSubMenu(hMenu, 0);
 		ClientToScreen(hWnd, &ptPos);
 		
-		//´Ë´¦¾ä±úÎªCanvas¾ä±ú£¬ÏûÏ¢ÉÏ´«ÖÁMainWindow£¬ÓÉMainWindow½ÓÊÕ·¢ËÍDELETE¼üÖÁ±¾¼¶
+		//æ­¤å¤„å¥æŸ„ä¸ºCanvaså¥æŸ„ï¼Œæ¶ˆæ¯ä¸Šä¼ è‡³MainWindowï¼Œç”±MainWindowæŽ¥æ”¶å‘é€DELETEé”®è‡³æœ¬çº§
 		TrackPopupMenu(hMenu, TPM_RIGHTBUTTON, ptPos.x, ptPos.y, 0, hWnd, NULL);
 		//}
 	}
@@ -398,13 +398,13 @@ void TSelectTool::OnHotKey(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 }
 
-//ÓÉ×æÏÈ²åÈëWM_PAINTÊÂ¼þÖÐ½øÐÐ»æÖÆ
+//ç”±ç¥–å…ˆæ’å…¥WM_PAINTäº‹ä»¶ä¸­è¿›è¡Œç»˜åˆ¶
 void TSelectTool::Draw(HDC hdc)
 {
 	for (auto pElement : PickedElements)
 		pElement->DrawPickSquare(hdc, pConfig);
 
-	//»­Ñ¡Ôñ¿ò
+	//ç”»é€‰æ‹©æ¡†
 	if (bShowSelRect)
 	{
 		TDraw::DrawRect(hdc, rcSelect, pConfig->logpenFront);
@@ -422,7 +422,7 @@ void TSelectTool::Draw(HDC hdc)
 		TDraw::DrawTips(hdc, ptMouse, ClientRect, sTips.c_str(), pConfig);
 }
 
-//½öÓÃÓÚÌí¼ÓÔ­¶¯¼þÊ±µÄÅÐ¶Ï
+//ä»…ç”¨äºŽæ·»åŠ åŽŸåŠ¨ä»¶æ—¶çš„åˆ¤æ–­
 bool TSelectTool::CanBeDriver(TElement *&pElementFront)
 {
 	if (PickedElements.size() == 1 && PickedElements.front()->CanBeDragged())

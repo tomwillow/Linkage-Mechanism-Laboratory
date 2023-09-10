@@ -20,7 +20,7 @@ public:
 
 	virtual void TRealLine::Draw(HDC hdc, const TConfiguration* pConfig) override;
 	virtual void TRealLine::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) override;
-	virtual const String TRealLine::GetElementTypeName() override;//得到类型名称
+	virtual const String TRealLine::GetElementTypeName() override;//寰楀埌绫诲瀷鍚嶇О
 	virtual void TRealLine::NoticeListView(TListView *pListView) override;
 	virtual bool TRealLine::WriteFile(HANDLE &hf, DWORD &now_pos)override;
 	virtual bool TRealLine::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)override;

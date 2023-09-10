@@ -31,10 +31,10 @@ void TFramePointTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	Attach->AttachAll(ptPos);
 	tempFramePoint.dpt = Attach->dptAttach;
 
-	sTips = TEXT("µã»÷ÒÔ½¨Á¢»ú¼Üµã");
+	sTips = TEXT("ç‚¹å‡»ä»¥å»ºç«‹æœºæž¶ç‚¹");
 	if (Attach->bAttachedEndpoint)
 	{
-		sTips += TEXT("\r\nÒÑÎü¸½¶Ëµã£º½¨Á¢ÖØºÏÔ¼Êø");
+		sTips += TEXT("\r\nå·²å¸é™„ç«¯ç‚¹ï¼šå»ºç«‹é‡åˆçº¦æŸ");
 	}
 }
 
@@ -49,7 +49,7 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	pTreeViewContent->AddItem(&tempFramePoint, pShape->iNextId);
 	pPrevFramePoint = pShape->AddElement(&tempFramePoint);
 
-	sTips = TEXT("ÒÑ½¨Á¢¡£");
+	sTips = TEXT("å·²å»ºç«‹ã€‚");
 
 	if (Attach->pAttachElement!=NULL)
 	switch (Attach->pAttachElement->eType)
@@ -69,7 +69,7 @@ void TFramePointTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		coincide.pElement[1] = pPrevFramePoint;
 		coincide.PointIndexOfElement[1] = 0;
 
-		//Ô¼ÊøÈë¿â
+		//çº¦æŸå…¥åº“
 		pTreeViewContent->AddItem(&coincide, pShape->iNextId);
 		pShape->AddElement(&coincide);
 
@@ -84,14 +84,14 @@ void TFramePointTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	pCanvas->Invalidate();
 }
 
-//²åÈëWM_PAINTÊÂ¼þÖÐ½øÐÐ»æÖÆ
+//æ’å…¥WM_PAINTäº‹ä»¶ä¸­è¿›è¡Œç»˜åˆ¶
 void TFramePointTool::Draw(HDC hdc)
 {
 	if (bShowTips)
 		TDraw::DrawTips(hdc, ptMouse, ClientRect, sTips.c_str(), pConfig);
 
 	TDraw::DrawFramePoint(hdc, &tempFramePoint, pConfig);
-	//ÒÑ´æ´¢µãÓÉCanvas¸ºÔð»æÖÆ
+	//å·²å­˜å‚¨ç‚¹ç”±Canvasè´Ÿè´£ç»˜åˆ¶
 	Attach->Draw(hdc);
 }
 

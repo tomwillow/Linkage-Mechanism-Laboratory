@@ -18,12 +18,12 @@ TBar::~TBar()
 {
 }
 
-const String TBar::GetElementTypeName()//µÃµ½ÀàĞÍÃû³Æ
+const String TBar::GetElementTypeName()//å¾—åˆ°ç±»å‹åç§°
 {
-	return TEXT("¸Ë");
+	return TEXT("æ†");
 }
 
-//²»Í¨Öªlistview£¬ÓÉreallineÍ¨Öª
+//ä¸é€šçŸ¥listviewï¼Œç”±reallineé€šçŸ¥
 
 void TBar::Draw(HDC hdc, const TConfiguration* pConfig)
 {

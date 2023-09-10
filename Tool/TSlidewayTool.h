@@ -4,7 +4,7 @@
 class TSlidewayTool :public TLineTool
 {
 private:
-	//void TSlidewayTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig);//ËùÓĞ¼ÓÈëÔ¼Êø¾­¹ı´Ë´¦
+	//void TSlidewayTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig);//æ‰€æœ‰åŠ å…¥çº¦æŸç»è¿‡æ­¤å¤„
 public:
 	TSlidewayTool();
 	~TSlidewayTool();

@@ -48,16 +48,16 @@ void TVariableTable::SetValueFromVarStr(String VarStr, double value)
 	VariableValue[it - VariableTable.begin()] = value;
 }
 
-std::vector<String>::iterator TVariableTable::FindVariableTable(const String varstr)//²éÕÒ±äÁ¿ÊÇ·ñÔÚ±äÁ¿±íÖĞ£¬Ã»ÓĞÔò·µ»Øfalse
+std::vector<String>::iterator TVariableTable::FindVariableTable(const String varstr)//æŸ¥æ‰¾å˜é‡æ˜¯å¦åœ¨å˜é‡è¡¨ä¸­ï¼Œæ²¡æœ‰åˆ™è¿”å›false
 {
 	return std::find(VariableTable.begin(), VariableTable.end(), varstr);
 }
 
-//Á¬´øvalueÒ»ÆğÉ¾
+//è¿å¸¦valueä¸€èµ·åˆ 
 void TVariableTable::RemoveOne(Ostream *pStr, String var, bool bIgnoreUnExisted)
 {
 	auto it = FindVariableTable(var);
-	if (it == VariableTable.end())//Î´¶¨Òå
+	if (it == VariableTable.end())//æœªå®šä¹‰
 	{
 		if (bIgnoreUnExisted)
 			return;
@@ -92,7 +92,7 @@ void TVariableTable::DefineOne(Ostream *pStr, String var, double value, bool bIg
 	}
 
 	auto it = FindVariableTable(var);
-	if (it != VariableTable.end())//ÒÑ¶¨Òå
+	if (it != VariableTable.end())//å·²å®šä¹‰
 	{
 		if (bIgnoreReDef)
 		{
@@ -123,11 +123,11 @@ void TVariableTable::DefineOne(Ostream *pStr, String var, double value, bool bIg
 
 }
 
-//ĞÂ¶¨ÒåµÄÈôÓë¾ÉµÄÖØÃû¿É¹ıÂËµôÖØ¶¨Òå
+//æ–°å®šä¹‰çš„è‹¥ä¸æ—§çš„é‡åå¯è¿‡æ»¤æ‰é‡å®šä¹‰
 void TVariableTable::Define(Ostream *pStr, String input_str, String input_num, bool bIgnoreReDef)
 {
 	using namespace std;
-	//ÇĞ·Östr£¬new³öÃ¿¸öĞÂ±äÁ¿
+	//åˆ‡åˆ†strï¼Œnewå‡ºæ¯ä¸ªæ–°å˜é‡
 
 	std::vector<String> tempVar = StrSliceToVector(input_str);
 	std::vector<double> tempValue;
@@ -138,7 +138,7 @@ void TVariableTable::Define(Ostream *pStr, String input_str, String input_num, b
 
 	if (tempVar.size() != tempValue.size())
 	{
-		if (pStr != NULL) *pStr << TEXT("±äÁ¿ÃûÓë³õÊ¼ÖµÊıÁ¿²»¶ÔµÈ¡£");
+		if (pStr != NULL) *pStr << TEXT("å˜é‡åä¸åˆå§‹å€¼æ•°é‡ä¸å¯¹ç­‰ã€‚");
 		eError = ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT;
 		throw TError{ eError, TEXT("VAR:") + input_str + TEXT(" VALUE:") + input_num };
 		return;
@@ -153,9 +153,9 @@ void TVariableTable::Output(Ostream *pStr)
 {
 	if (pStr != NULL)
 	{
-		*pStr << TEXT("ÒÑ¶¨Òå±äÁ¿(");
+		*pStr << TEXT("å·²å®šä¹‰å˜é‡(");
 		*pStr << VariableTable.size();
-		*pStr << TEXT("¸ö):");
+		*pStr << TEXT("ä¸ª):");
 
 		for (auto &Var : VariableTable)
 		{
@@ -167,7 +167,7 @@ void TVariableTable::Output(Ostream *pStr)
 	}
 }
 
-//²»É¾µôÔ­±äÁ¿£¬½ö½ö¼ÓÉÏVarTableµÄÖµ
+//ä¸åˆ æ‰åŸå˜é‡ï¼Œä»…ä»…åŠ ä¸ŠVarTableçš„å€¼
 void TVariableTable::SetValueByVarTable(TVariableTable &VarTable)
 {
 	for (int i = 0; i < VarTable.VariableTable.size(); ++i)
@@ -180,7 +180,7 @@ void TVariableTable::SetValueByVarTable(TVariableTable &VarTable)
 	}
 }
 
-void TVariableTable::OutputValue(Ostream *pStr)//Êä³ö x=0 ĞÎÊ½
+void TVariableTable::OutputValue(Ostream *pStr)//è¾“å‡º x=0 å½¢å¼
 {
 	if (pStr != NULL)
 	{

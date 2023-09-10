@@ -20,9 +20,9 @@ TFramePoint::~TFramePoint()
 {
 }
 
-const String TFramePoint::GetElementTypeName()//µÃµ½ÀàÐÍÃû³Æ
+const String TFramePoint::GetElementTypeName()//å¾—åˆ°ç±»åž‹åç§°
 {
-	return TEXT("»ú¼Ü");
+	return TEXT("æœºæž¶");
 }
 
 void TFramePoint::NoticeListView(TListView *pListView)
@@ -51,7 +51,7 @@ RECT TFramePoint::GetFramePointBox(const TConfiguration *pConfig)
 
 void TFramePoint::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
 {
-	//»­Ê°È¡·½¸ñ
+	//ç”»æ‹¾å–æ–¹æ ¼
 	TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(dpt));
 }
 
@@ -77,6 +77,6 @@ bool TFramePoint::InSelCross(RECT rect, const TConfiguration *pConfig)
 
 bool TFramePoint::PointIsAttached(DPOINT dptNowPos, TAttach *pAttach, const TConfiguration *pConfig)
 {
-	//Îü¸½»ú¼Üµã
+	//å¸é™„æœºæž¶ç‚¹
 	return pAttach->AttachPointByElement(dptNowPos, dpt, 0, this, pConfig);
 }

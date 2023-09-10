@@ -9,8 +9,8 @@
 
 #pragma comment(lib, "comctl32.lib")
 
-enum PartType { PT_FIXED,//¹Ì¶¨´óĞ¡
-	PT_NONE };//¿ÉÉìËõ
+enum PartType { PT_FIXED,//å›ºå®šå¤§å°
+	PT_NONE };//å¯ä¼¸ç¼©
 
 class TStatus:public TControl
 {
@@ -35,7 +35,7 @@ public:
 	void TStatus::SetText(int pane, LPCTSTR str);
 	void CDECL TStatus::SetText(int id, TCHAR szFormat[], ...);
 	void TStatus::AddPart(int id, int iWidth, PartType type);
-	LRESULT TStatus::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)//ĞéÄâÏûÏ¢´¦Àíº¯Êı£¬¿ÉÖØÔØ
+	LRESULT TStatus::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)//è™šæ‹Ÿæ¶ˆæ¯å¤„ç†å‡½æ•°ï¼Œå¯é‡è½½
 	{
 		switch (uMsg)
 		{

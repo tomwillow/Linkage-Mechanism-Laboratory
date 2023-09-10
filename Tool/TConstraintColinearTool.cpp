@@ -61,27 +61,27 @@ void TConstraintColinearTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	switch (dptHit.size())
 	{
 	case 0:
-		if (pAttach->bShowExtensionLine)//ÒÑÊ°È¡
+		if (pAttach->bShowExtensionLine)//å·²æ‹¾å–
 		{
-			sTips = TEXT("ÒÑÎü¸½£ºµã»÷ÒÔÈ·¶¨µÚÒ»¸öÁ¬½Ó¹¹¼þ");
+			sTips = TEXT("å·²å¸é™„ï¼šç‚¹å‡»ä»¥ç¡®å®šç¬¬ä¸€ä¸ªè¿žæŽ¥æž„ä»¶");
 		}
 		else
-			sTips = TEXT("ÇëÑ¡ÔñÒª½¨Á¢Ô¼ÊøµÄµÚÒ»¸öÁ¬½Ó¹¹¼þ");
+			sTips = TEXT("è¯·é€‰æ‹©è¦å»ºç«‹çº¦æŸçš„ç¬¬ä¸€ä¸ªè¿žæŽ¥æž„ä»¶");
 
 		break;
 	case 1:
-		if (pAttach->bShowExtensionLine)//ÒÑÊ°È¡
+		if (pAttach->bShowExtensionLine)//å·²æ‹¾å–
 		{
-		if (pAttach->pAttachElement == pColinear->pElement[0])//Ê°È¡×ÔÉí
-			sTips = TEXT("²»ÄÜÔÚÍ¬Ò»¸ö¹¹¼þÉÏ½¨Á¢Ô¼Êø");
+		if (pAttach->pAttachElement == pColinear->pElement[0])//æ‹¾å–è‡ªèº«
+			sTips = TEXT("ä¸èƒ½åœ¨åŒä¸€ä¸ªæž„ä»¶ä¸Šå»ºç«‹çº¦æŸ");
 		else
-			sTips = TEXT("ÒÑÎü¸½£ºµã»÷ÒÔÈ·¶¨µÚ¶þ¸öÁ¬½Ó¹¹¼þ");
+			sTips = TEXT("å·²å¸é™„ï¼šç‚¹å‡»ä»¥ç¡®å®šç¬¬äºŒä¸ªè¿žæŽ¥æž„ä»¶");
 		}
 		else
-			sTips = TEXT("ÇëÑ¡ÔñÒª½¨Á¢Ô¼ÊøµÄµÚ¶þ¸öÁ¬½Ó¹¹¼þ");
+			sTips = TEXT("è¯·é€‰æ‹©è¦å»ºç«‹çº¦æŸçš„ç¬¬äºŒä¸ªè¿žæŽ¥æž„ä»¶");
 
 
-		sTips += TEXT("\r\nÓÒ¼ü/Esc ¿ÉÈ¡Ïû");
+		sTips += TEXT("\r\nå³é”®/Esc å¯å–æ¶ˆ");
 		break;
 	}
 
@@ -90,12 +90,12 @@ void TConstraintColinearTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 
 void TConstraintColinearTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
-	if (pAttach->bShowExtensionLine)//ÒÑÊ°È¡
+	if (pAttach->bShowExtensionLine)//å·²æ‹¾å–
 	{
 		dptHit.push_back(ptPos);
 		switch (dptHit.size())
 		{
-		case 1://°´ÏÂµÚÒ»µã
+		case 1://æŒ‰ä¸‹ç¬¬ä¸€ç‚¹
 			pColinear = new TConstraintColinear;
 			pColinear->SetStyle(pConfig->logpen);
 
@@ -106,9 +106,9 @@ void TConstraintColinearTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 			break;
 		case 2:
-			if (pAttach->pAttachElement == pColinear->pElement[0])//Ê°È¡×ÔÉí
+			if (pAttach->pAttachElement == pColinear->pElement[0])//æ‹¾å–è‡ªèº«
 			{
-				sTips = TEXT("²»ÄÜÔÚÍ¬Ò»¸ö¹¹¼þÉÏ½¨Á¢Ô¼Êø");
+				sTips = TEXT("ä¸èƒ½åœ¨åŒä¸€ä¸ªæž„ä»¶ä¸Šå»ºç«‹çº¦æŸ");
 				break;
 			}
 
@@ -118,21 +118,21 @@ void TConstraintColinearTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 			AddIntoShape();
 			Reset();
-			sTips = TEXT("½¨Á¢Íê³É");
+			sTips = TEXT("å»ºç«‹å®Œæˆ");
 			break;
 		}
 	}
-	else//ÎÞÐ§µã»÷
-		sTips = TEXT("Ñ¡ÔñÎÞÐ§£ºÇëµã»÷ÒÑ´æÔÚ¹¹¼þÉÏµÄµã");
+	else//æ— æ•ˆç‚¹å‡»
+		sTips = TEXT("é€‰æ‹©æ— æ•ˆï¼šè¯·ç‚¹å‡»å·²å­˜åœ¨æž„ä»¶ä¸Šçš„ç‚¹");
 }
 
 void TConstraintColinearTool::AddIntoShape()
 {
-	//Èë¿â
+	//å…¥åº“
 	AddTreeViewItem(pColinear, pShape->iNextId);
 	pShape->AddElement(pColinear);
 
-	//Ë¢ÐÂ·½³Ì×é
+	//åˆ·æ–°æ–¹ç¨‹ç»„
 	RefreshEquations();
 }
 

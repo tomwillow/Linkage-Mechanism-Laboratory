@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include <CommCtrl.h>
 #include "..\Common\tchar_head.h"
-#pragma comment(lib,"comctl32.lib")//ÑùÊ½Ê¹ÓÃ
+#pragma comment(lib,"comctl32.lib")//æ ·å¼ä½¿ç”¨
 
 #include "TControl.h"
 
@@ -21,9 +21,9 @@ private:
 protected:
 
 public:
-	bool bIsFlat;//¸¡¶¯ÑùÊ½
-	bool bTextOnRight;//ÎÄ±¾·ÅÖÃÔÚÓÒ±ß
-	bool bAutoWrap;//°´Å¥×Ô¶¯»»ĞĞ
+	bool bIsFlat;//æµ®åŠ¨æ ·å¼
+	bool bTextOnRight;//æ–‡æœ¬æ”¾ç½®åœ¨å³è¾¹
+	bool bAutoWrap;//æŒ‰é’®è‡ªåŠ¨æ¢è¡Œ
 	TToolbar();
 	~TToolbar();
 	void TToolbar::CreateToolbar(HWND hwndParent, HINSTANCE hInst);

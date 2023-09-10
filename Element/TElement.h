@@ -41,13 +41,13 @@ protected:
 	virtual bool TElement::InSelCross(RECT rect, const TConfiguration *pConfig){ return false; }
 public:
 	int id;
-	bool available;//Î´ÆôÓÃ
-	EnumElementType eType;//ÀàĞÍ
+	bool available;//æœªå¯ç”¨
+	EnumElementType eType;//ç±»å‹
 	EnumElementClass eClass;
-	TCHAR Name[64];//Ãû³Æ
-	LOGPEN logpenStyleShow, logpenStyle;//ÏÔÊ¾ÑùÊ½£¬±¾ÉíÑùÊ½
+	TCHAR Name[64];//åç§°
+	LOGPEN logpenStyleShow, logpenStyle;//æ˜¾ç¤ºæ ·å¼ï¼Œæœ¬èº«æ ·å¼
 
-	std::vector<DPOINT> vecDpt;//µã¼¯
+	std::vector<DPOINT> vecDpt;//ç‚¹é›†
 	std::vector<std::vector<int>> vecIsJoint;
 
 	DPOINT dpt;
@@ -57,7 +57,7 @@ public:
 	unsigned char alpha;
 
 	virtual ~TElement();
-	virtual const String TElement::GetElementTypeName()=0;//µÃµ½ÀàĞÍÃû³Æ
+	virtual const String TElement::GetElementTypeName()=0;//å¾—åˆ°ç±»å‹åç§°
 	virtual bool TElement::WriteFile(HANDLE &hf, DWORD &now_pos)=0;
 	virtual bool TElement::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)=0;
 	virtual void TElement::Draw(HDC hdc, const TConfiguration* pConfig) = 0;
@@ -76,7 +76,7 @@ public:
 
 	TElement& TElement::operator=(const TElement &element);
 
-	//Element¶ÀÓĞº¯Êı
+	//Elementç‹¬æœ‰å‡½æ•°
 	virtual void TElement::SetX(double x) final;
 	virtual void TElement::SetY(double y) final;
 	virtual void TElement::SetStateNormal() final;
@@ -87,13 +87,13 @@ public:
 	virtual bool TElement::IsConstraint()const final{ return eClass == ELEMENT_CLASS_CONSTRAINT; }
 	virtual bool TElement::CanBeDragged()const final{ return eClass == ELEMENT_CLASS_NORMAL; }
 
-	virtual void TElement::SetStyle(const LOGPEN &logpen) final;//ÉèÖÃÑùÊ½
-	virtual void TElement::SetStyle(TConfiguration *pConfig) final;//ÉèÖÃÑùÊ½
+	virtual void TElement::SetStyle(const LOGPEN &logpen) final;//è®¾ç½®æ ·å¼
+	virtual void TElement::SetStyle(TConfiguration *pConfig) final;//è®¾ç½®æ ·å¼
 	virtual void TElement::SetColor(COLORREF cr) final;
 	virtual void TElement::SetLineWidth(LONG width) final;
 };
 
-	const String GetLineStyleName(UINT linestyle);//µÃµ½ÏßĞÍÃû³Æ
+	const String GetLineStyleName(UINT linestyle);//å¾—åˆ°çº¿å‹åç§°
 	DPOINT GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle);
 	void RegularRect(RECT &rect);
 	bool RectInRect(const RECT &rcBig, const RECT &rcSmall);

@@ -16,9 +16,9 @@ TLine::~TLine()
 {
 }
 
-const String TLine::GetElementTypeName()//µÃµ½ÀàĞÍÃû³Æ
+const String TLine::GetElementTypeName()//å¾—åˆ°ç±»å‹åç§°
 {
-	return TEXT("ÆÁÄ»Ïß");
+	return TEXT("å±å¹•çº¿");
 }
 
 TLine& TLine::operator=(const TLine &Line)

@@ -8,13 +8,13 @@ public:
 	TCHAR_Function();
 	~TCHAR_Function();
 
-	//Ìæ»»È«²¿ srcÔ´×Ö·û´®£¬sub±»Ìæ»»ÄÚÈİ£¬destÌæ»»µÄÄÚÈİ
-	//·µ»ØÌæ»»¹ıµÄÊıÁ¿
-	//src´óĞ¡Ğè×ÔĞĞ±£Ö¤£¬º¯ÊıÄÚ²»ÑéÖ¤Ö¸ÕëÔ½½ç
+	//æ›¿æ¢å…¨éƒ¨ srcæºå­—ç¬¦ä¸²ï¼Œsubè¢«æ›¿æ¢å†…å®¹ï¼Œdestæ›¿æ¢çš„å†…å®¹
+	//è¿”å›æ›¿æ¢è¿‡çš„æ•°é‡
+	//srcå¤§å°éœ€è‡ªè¡Œä¿è¯ï¼Œå‡½æ•°å†…ä¸éªŒè¯æŒ‡é’ˆè¶Šç•Œ
 	static int TCHAR_Function::Replace(TCHAR *src, TCHAR *sub, TCHAR *dest);
 	static void TCHAR_Function::ReplaceLoop(TCHAR *src, TCHAR *sub, TCHAR *dest);
 
-	//°´ÕÕÖ¸¶¨·Ö¸ô·ûÇĞ·Ö×Ö·û´®´æÈëresult£¬resultÖĞµÄÔªËØÊÇnew³öÀ´µÄ
+	//æŒ‰ç…§æŒ‡å®šåˆ†éš”ç¬¦åˆ‡åˆ†å­—ç¬¦ä¸²å­˜å…¥resultï¼Œresultä¸­çš„å…ƒç´ æ˜¯newå‡ºæ¥çš„
 	static void TCHAR_Function::Split(TCHAR *src, std::vector<TCHAR *> &result, TCHAR *sub);
 
 	static bool TCHAR_Function::isAlphaCharOrUnderline(TCHAR c);

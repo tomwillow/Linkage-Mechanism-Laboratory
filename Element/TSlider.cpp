@@ -24,9 +24,9 @@ TSlider::~TSlider()
 {
 }
 
-const String TSlider::GetElementTypeName()//µÃµ½ÀàÐÍÃû³Æ
+const String TSlider::GetElementTypeName()//å¾—åˆ°ç±»åž‹åç§°
 {
-	return TEXT("»¬¿é");
+	return TEXT("æ»‘å—");
 }
 
 void TSlider::NoticeListView(TListView *pListView)
@@ -35,8 +35,8 @@ void TSlider::NoticeListView(TListView *pListView)
 
 	TCHAR buffer[16];
 
-	pListView->AddAttributeItem(TEXT("Ô­µã"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
-	pListView->AddAttributeItem(TEXT("½Ç¶È"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), RAD2DEG(angle));
+	pListView->AddAttributeItem(TEXT("åŽŸç‚¹"), CTRLTYPE_COOR_EDIT, &dpt, TEXT("%.3f,%.3f"), dpt.x, dpt.y);
+	pListView->AddAttributeItem(TEXT("è§’åº¦"), CTRLTYPE_ANGLE_VALUE_EDIT, &angle, TEXT("%f"), RAD2DEG(angle));
 
 	for (size_t i = 0; i < vecDpt.size(); ++i)
 	{
@@ -87,7 +87,7 @@ bool TSlider::ReadFile(HANDLE &hf, DWORD &now_pos,TShape *pShape)
 		return true;
 }
 
-//SliderµÄ-1µãÎª(1,0)µã£¬ÓÃÓÚÖ¸¶¨»¬¹ì
+//Sliderçš„-1ç‚¹ä¸º(1,0)ç‚¹ï¼Œç”¨äºŽæŒ‡å®šæ»‘è½¨
 const DPOINT TSlider::GetRelativePointByIndex(int PointIndexOfElement)const 
 {
 	if (PointIndexOfElement == -1)
@@ -96,7 +96,7 @@ const DPOINT TSlider::GetRelativePointByIndex(int PointIndexOfElement)const
 		return vecDpt[PointIndexOfElement];
 }
 
-//SliderµÄ-1µãÎª(1,0)µã£¬¾ø¶Ô×ø±êÉèÖÃÎªÔ­µã
+//Sliderçš„-1ç‚¹ä¸º(1,0)ç‚¹ï¼Œç»å¯¹åæ ‡è®¾ç½®ä¸ºåŽŸç‚¹
 DPOINT TSlider::GetAbsolutePointByIndex(int PointIndexOfElement) const
 {
 	if (PointIndexOfElement == -1)
@@ -114,7 +114,7 @@ void TSlider::Draw(HDC hdc, const TConfiguration* pConfig)
 void TSlider::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
 {
 	for (auto &Dpt : vecDpt)
-		//»­Ê°È¡·½¸ñ
+		//ç”»æ‹¾å–æ–¹æ ¼
 		TDraw::DrawPickSquare(hdc, pConfig->RealToScreen(TDraw::GetAbsolute(Dpt, dpt, angle)));
 }
 

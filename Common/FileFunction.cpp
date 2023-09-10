@@ -4,8 +4,8 @@
 
 #include <Windows.h>
 
-//´«Èëindex=1ÔòµÃµ½´«ÈëÎÄ¼şÃû
-//³É¹¦È¡µÃ·µ»Øtrue 
+//ä¼ å…¥index=1åˆ™å¾—åˆ°ä¼ å…¥æ–‡ä»¶å
+//æˆåŠŸå–å¾—è¿”å›true 
 bool GetCommandLineByIndex(int index, TCHAR *assigned)
 {
 	int iCmdLineCount = -1;
@@ -18,7 +18,7 @@ bool GetCommandLineByIndex(int index, TCHAR *assigned)
 	while ((s = _tcschr(s, TEXT('\"'))) != NULL)
 	{
 		s++;
-		if (inchar == false)//¿ª¶Ë
+		if (inchar == false)//å¼€ç«¯
 		{
 			start = s;
 			inchar = true;
@@ -60,8 +60,8 @@ bool GetFileExists(TCHAR filename[])
 	}
 }
 
-//lpstrFilter¸ñÊ½£ºTEXT("»ú¹¹Éè¼ÆÎÄ¼ş(*.lml)\0*.lml\0\0")
-//ofn²»ÁíÉè¿Õ¼ä±£´æÎÄ¼şµØÖ·£¬¸Ä¶¯szFileµÈÍ¬ÓÚ¸Ä¶¯ofn.lpstrFile
+//lpstrFilteræ ¼å¼ï¼šTEXT("æœºæ„è®¾è®¡æ–‡ä»¶(*.lml)\0*.lml\0\0")
+//ofnä¸å¦è®¾ç©ºé—´ä¿å­˜æ–‡ä»¶åœ°å€ï¼Œæ”¹åŠ¨szFileç­‰åŒäºæ”¹åŠ¨ofn.lpstrFile
 void InitialOpenFileName(OPENFILENAME *ofn, HWND hwnd, TCHAR szFile[], TCHAR lpstrFilter[], DWORD nMaxFile)
 {
 	// Initialize OPENFILENAME
@@ -71,7 +71,7 @@ void InitialOpenFileName(OPENFILENAME *ofn, HWND hwnd, TCHAR szFile[], TCHAR lps
 	ofn->lpstrFile = szFile;
 	ofn->lpstrFile[0] = TEXT('\0');
 	ofn->nMaxFile = nMaxFile;
-	ofn->lpstrFilter = lpstrFilter;//Á½¸ö\0±íÊ¾½áÊø
+	ofn->lpstrFilter = lpstrFilter;//ä¸¤ä¸ª\0è¡¨ç¤ºç»“æŸ
 	ofn->nFilterIndex = 1;
 	ofn->lpstrFileTitle = NULL;
 	ofn->nMaxFileTitle = 0;
@@ -82,7 +82,7 @@ BOOL OpenFileDialog(HWND hWnd, TCHAR szFileName[], TCHAR lpstrFilter[])
 {
 	OPENFILENAME ofn;
 	InitialOpenFileName(&ofn, hWnd, szFileName, lpstrFilter);
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;//ÏŞ¶¨ÎÄ¼ş±ØĞë´æÔÚ
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;//é™å®šæ–‡ä»¶å¿…é¡»å­˜åœ¨
 	return GetOpenFileName(&ofn);
 }
 

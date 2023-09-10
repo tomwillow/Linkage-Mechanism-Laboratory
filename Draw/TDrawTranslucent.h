@@ -14,7 +14,7 @@ private:
 	BYTE alpha;
 	long left, top, width, height;
 
-	bool bExchangedX, bExchangedY;//由于出现负宽度及负高度导致的X,Y坐标交换
+	bool bExchangedX, bExchangedY;//鐢变簬鍑虹幇璐熷搴﹀強璐熼珮搴﹀鑷寸殑X,Y鍧愭爣浜ゆ崲
 
 	std::vector<RECT *> vecpRect;
 	struct TAPT
@@ -35,7 +35,7 @@ public:
 	TDrawTranslucent();
 	~TDrawTranslucent();
 
-	//执行Start后，hdc将变为hBitmap，之后直接使用hdc绘图即可。在End中将恢复原hdc
+	//鎵цStart鍚庯紝hdc灏嗗彉涓篽Bitmap锛屼箣鍚庣洿鎺ヤ娇鐢╤dc缁樺浘鍗冲彲銆傚湪End涓皢鎭㈠鍘焗dc
 	void TDrawTranslucent::Start(HDC &hdc, byte alpha, long left, long top, long width, long height, bool bNeedDrawBlack);
 	void TDrawTranslucent::Start(HDC &hdc, byte alpha, const RECT &rect, bool bNeedDrawBlack);
 	void TDrawTranslucent::End();

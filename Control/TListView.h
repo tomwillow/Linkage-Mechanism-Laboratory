@@ -28,22 +28,22 @@ private:
 	TShape *pShape;
 	TTreeViewContent *pTreeViewContent;
 protected:
-	//ĞéÄâÏûÏ¢´¦Àíº¯Êı£¬¿ÉÖØÔØ
+	//è™šæ‹Ÿæ¶ˆæ¯å¤„ç†å‡½æ•°ï¼Œå¯é‡è½½
 	LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 public:
 	TListView();
 	~TListView();
 	int id;
-	void TListView::CreateListViewEx(HWND hParent, UINT id, HINSTANCE hInst);//´´½¨ListView
-	void TListView::AddColumn(TCHAR text[], int width, int styleLVCFMT = LVCFMT_LEFT);//Ìí¼ÓÁĞ±êÇ©
-	void TListView::InsertColumn(int index, TCHAR text[], int width, int styleLVCFMT = LVCFMT_LEFT);//²åÈëÁĞ±êÇ©
-	void CDECL TListView::InsertItem(int index, int subitem,const TCHAR szFormat[], ...);//²åÈëÏîÄ¿
+	void TListView::CreateListViewEx(HWND hParent, UINT id, HINSTANCE hInst);//åˆ›å»ºListView
+	void TListView::AddColumn(TCHAR text[], int width, int styleLVCFMT = LVCFMT_LEFT);//æ·»åŠ åˆ—æ ‡ç­¾
+	void TListView::InsertColumn(int index, TCHAR text[], int width, int styleLVCFMT = LVCFMT_LEFT);//æ’å…¥åˆ—æ ‡ç­¾
+	void CDECL TListView::InsertItem(int index, int subitem,const TCHAR szFormat[], ...);//æ’å…¥é¡¹ç›®
 	void CDECL TListView::AddAttributeItem(const TCHAR szName[],enumCtrlType eCtrlType,void *pContent,const TCHAR szEditFormat[], ...);
-	void CDECL TListView::SetAttributeItemValue(int index, TCHAR szFormat[], ...);//Î´ÓÃ
-	int TListView::GetItemCount();//µÃµ½ÏîÄ¿Êı
-	void TListView::DeleteAllItems();//Çå³ıÈ«²¿Ïî
-	RECT TListView::GetGridRect(int index, int subitem);//¸ù¾İĞĞºÅºÍÁĞºÅµÃµ½¸ñ×Ó×ø±ê
-	RECT TListView::GetGridRectInMargin(int index, int subitem);//µÃµ½¸ñ×Ó±ß¿òÄÚµÄ×ø±ê
+	void CDECL TListView::SetAttributeItemValue(int index, TCHAR szFormat[], ...);//æœªç”¨
+	int TListView::GetItemCount();//å¾—åˆ°é¡¹ç›®æ•°
+	void TListView::DeleteAllItems();//æ¸…é™¤å…¨éƒ¨é¡¹
+	RECT TListView::GetGridRect(int index, int subitem);//æ ¹æ®è¡Œå·å’Œåˆ—å·å¾—åˆ°æ ¼å­åæ ‡
+	RECT TListView::GetGridRectInMargin(int index, int subitem);//å¾—åˆ°æ ¼å­è¾¹æ¡†å†…çš„åæ ‡
 	//void TListView::LoadObject(int index);
 };
 

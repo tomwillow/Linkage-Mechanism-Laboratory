@@ -9,7 +9,7 @@ double TTransfer::TCHAR2double(TCHAR s[])
 	return _tcstod(s, NULL);//(TCHAR **)(s + _tcslen(s))
 }
 
-double TTransfer::TCHAR2double(TCHAR *start, TCHAR *end)//¿ªÊ¼×Ö·û£¬½áÊø×Ö·û
+double TTransfer::TCHAR2double(TCHAR *start, TCHAR *end)//å¼€å§‹å­—ç¬¦ï¼Œç»“æŸå­—ç¬¦
 {
 	int len = end - start;
 	TCHAR *temp = new TCHAR[len + 1];
@@ -57,8 +57,8 @@ TCHAR * TTransfer::double2TCHAR(double d, TCHAR s[], int iDigit)
 
 TCHAR * TTransfer::double2TCHAR_AutoTrim0(double d, TCHAR s[])
 {
-	int n = 6;//Ò»¿ªÊ¼¾Í¼Ù¶¨Ð¡ÊýÎ»ÊýÎª6Î»
-	long temp = (long)(d * 1e6);//½«6Î»Ð¡ÊýÈ«²¿È¡³ö£¬²¢ÉáÆú¼ÆËãºó¶àÓàµÄ¿ÉÄÜÊÇÎó²îµÄÐ¡Êý²¿·Ö
+	int n = 6;//ä¸€å¼€å§‹å°±å‡å®šå°æ•°ä½æ•°ä¸º6ä½
+	long temp = (long)(d * 1e6);//å°†6ä½å°æ•°å…¨éƒ¨å–å‡ºï¼Œå¹¶èˆå¼ƒè®¡ç®—åŽå¤šä½™çš„å¯èƒ½æ˜¯è¯¯å·®çš„å°æ•°éƒ¨åˆ†
 	for (n = 6; n > 0; n--)
 	{
 		if (0 != temp % 10) break;

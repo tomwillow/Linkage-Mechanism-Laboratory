@@ -29,16 +29,16 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 	{
 			//if (tempEdit.Text != NULL)
 			{
-				//Ë¢ÐÂTreeViewContent
+				//åˆ·æ–°TreeViewContent
 				pTreeViewContent->DeleteAllItems();
 				pTreeViewContent->Initial();
 				pTreeViewContent->AddAllItem();
 
-				pTreeViewContent->SelectById(id);//Ë¢ÐÂListView
+				pTreeViewContent->SelectById(id);//åˆ·æ–°ListView
 
 				//pShape->GetElementById(id)->NoticeListView(this);
 
-				//»Ö¸´Î»ÖÃ
+				//æ¢å¤ä½ç½®
 				ListView_Scroll(hWnd,origin.x,origin.y);
 				win.pSolver->RefreshEquations();
 				win.Canvas.Invalidate();
@@ -51,7 +51,7 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 	case WM_MOUSEWHEEL:
 		if (tempEdit.GetVisible())
 		{
-			RECT rect = GetGridRectInMargin(tempEdit.ListItemIndex, 1);//µã»÷ÏîÄÚÈÝÇøµÄ×ø±ê
+			RECT rect = GetGridRectInMargin(tempEdit.ListItemIndex, 1);//ç‚¹å‡»é¡¹å†…å®¹åŒºçš„åæ ‡
 
 			tempEdit.SetPosition(rect);
 			PostMessage(hWnd, WM_PAINT, 0, 0);
@@ -63,20 +63,20 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 		int xPos = LOWORD(lParam);
 		int yPos = HIWORD(lParam);
 
-		int index = ListView_GetHotItem(hWnd);//µã»÷ÏîµÄÐòºÅ
-		RECT rect = GetGridRectInMargin(index, 1);//µã»÷ÏîÄÚÈÝÇøµÄ×ø±ê
-		bool bClickCol1 =xPos > ListView_GetColumnWidth(hWnd, 0);//µã»÷µÄÄÚÈÝÇø¶ø²»ÊÇÏîÄ¿Ãû
+		int index = ListView_GetHotItem(hWnd);//ç‚¹å‡»é¡¹çš„åºå·
+		RECT rect = GetGridRectInMargin(index, 1);//ç‚¹å‡»é¡¹å†…å®¹åŒºçš„åæ ‡
+		bool bClickCol1 =xPos > ListView_GetColumnWidth(hWnd, 0);//ç‚¹å‡»çš„å†…å®¹åŒºè€Œä¸æ˜¯é¡¹ç›®å
 
 
 		tempEdit.SetVisible(false);
 
-		if (index != -1)//È·ÊµÑ¡ÖÐ
+		if (index != -1)//ç¡®å®žé€‰ä¸­
 		{
-			if (bClickCol1)//µãµÄµÚ2ÁÐ
+			if (bClickCol1)//ç‚¹çš„ç¬¬2åˆ—
 			{
-				//ÏÔÊ¾¿Ø¼þ
+				//æ˜¾ç¤ºæŽ§ä»¶
 
-				//µÃµ½ÊÓÍ¼Ô­µã
+				//å¾—åˆ°è§†å›¾åŽŸç‚¹
 				ListView_GetOrigin(hWnd, &origin);
 
 				switch (vecCtrlType[index])
@@ -94,7 +94,7 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 				case CTRLTYPE_ANGLE_EDIT:
 				{
 
-					//ÉèÖÃEdit²¢ÏÔÊ¾
+					//è®¾ç½®Editå¹¶æ˜¾ç¤º
 					tempEdit.eCtrlType = vecCtrlType[index];
 					tempEdit.pContent = vecpContent[index];
 					tempEdit.ListItemIndex = index;
@@ -104,7 +104,7 @@ LRESULT TListView::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam,
 					ListView_GetItemText(hWnd, index, 1, buf, sizeof(buf)*sizeof(TCHAR));
 					tempEdit.SetText(buf);
 
-					//¸³ÓèÐÞ¸ÄÈ¨
+					//èµ‹äºˆä¿®æ”¹æƒ
 					tempEdit.pElement = pShape->GetElementById(id);
 
 					tempEdit.SetVisible(true);
@@ -154,7 +154,7 @@ int TListView::GetItemCount()
 
 void CDECL TListView::AddAttributeItem(const TCHAR szName[], enumCtrlType eCtrlType, void *pContent, const TCHAR szEditFormat[], ...)
 {
-	//²åÈë±êÇ©
+	//æ’å…¥æ ‡ç­¾
 	InsertItem(iRowCount, 0, szName);
 
 	TCHAR szBuffer[1024];
@@ -163,7 +163,7 @@ void CDECL TListView::AddAttributeItem(const TCHAR szName[], enumCtrlType eCtrlT
 	_vsntprintf_s(szBuffer, sizeof(szBuffer) / sizeof(TCHAR), szEditFormat, pArgList);
 	va_end(pArgList);
 
-	//²åÈëÄÚÈÝ
+	//æ’å…¥å†…å®¹
 	InsertItem(iRowCount - 1, 1, szBuffer);
 
 	vecCtrlType.push_back(eCtrlType);
@@ -196,11 +196,11 @@ void TListView::CreateListViewEx(HWND hParent, UINT id, HINSTANCE hInst)
 	//	WS_CHILD | WS_VISIBLE | LVS_ICON | LVS_REPORT | LVS_SINGLESEL,//|LVS_EDITLABELS|WS_BORDER
 	//	0, 0, 0, 0, hParent, (HMENU)id, hInst);
 
-	//ÉèÖÃÀ©Õ¹·ç¸ñ£ºÌí¼Ó¸ñ×ÓÏßÒÔ¼°ÕûÐÐÑ¡ÖÐ
+	//è®¾ç½®æ‰©å±•é£Žæ ¼ï¼šæ·»åŠ æ ¼å­çº¿ä»¥åŠæ•´è¡Œé€‰ä¸­
 	DWORD styles = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES;
 	ListView_SetExtendedListViewStyleEx(m_hWnd, styles, styles);
 
-	//´´½¨Edit
+	//åˆ›å»ºEdit
 	tempEdit.CreateEditEx(m_hWnd, 0, m_hInst);
 	tempEdit.SetDefaultGuiFont();
 	tempEdit.SetPosition(10, 10, 100, 20);
@@ -270,7 +270,7 @@ RECT TListView::GetGridRect(int index, int subitem)
 {
 	RECT rect;
 	ListView_GetSubItemRect(m_hWnd, index, subitem, LVIR_BOUNDS, &rect);
-	//¶ÔÓÚµÚÒ»ÁÐ£¬ÐèÒªÌØÊâ´¦Àí
+	//å¯¹äºŽç¬¬ä¸€åˆ—ï¼Œéœ€è¦ç‰¹æ®Šå¤„ç†
 	if (subitem == 0)
 	{
 		int nWidth0 = ListView_GetColumnWidth(m_hWnd, 0);
@@ -291,11 +291,11 @@ RECT TListView::GetGridRect(int index, int subitem)
 //	{
 //		TFramePoint *pElement = (TFramePoint *)pShape->Element[index];
 //		AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), pElement->id);
-//		AddAttributeItem(TEXT("Ãû³Æ"), CTRLTYPE_EDIT, &(pElement->Name), pElement->Name);
-//		AddAttributeItem(TEXT("ÀàÐÍ"), CTRLTYPE_NULL, NULL, TEXT("»ú¼Ü"));
-//		AddAttributeItem(TEXT("ÏßÐÍ"), CTRLTYPE_NULL, NULL, pElement->GetLineStyleName(pElement->logpenStyle.lopnStyle, buffer));
-//		AddAttributeItem(TEXT("Ïß¿í"), CTRLTYPE_NULL, NULL, TEXT("%d"), pElement->logpenStyle.lopnWidth);
-//		AddAttributeItem(TEXT("ÑÕÉ«"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), pElement->logpenStyle.lopnColor);
+//		AddAttributeItem(TEXT("åç§°"), CTRLTYPE_EDIT, &(pElement->Name), pElement->Name);
+//		AddAttributeItem(TEXT("ç±»åž‹"), CTRLTYPE_NULL, NULL, TEXT("æœºæž¶"));
+//		AddAttributeItem(TEXT("çº¿åž‹"), CTRLTYPE_NULL, NULL, pElement->GetLineStyleName(pElement->logpenStyle.lopnStyle, buffer));
+//		AddAttributeItem(TEXT("çº¿å®½"), CTRLTYPE_NULL, NULL, TEXT("%d"), pElement->logpenStyle.lopnWidth);
+//		AddAttributeItem(TEXT("é¢œè‰²"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), pElement->logpenStyle.lopnColor);
 //		AddAttributeItem(TEXT("P0"), CTRLTYPE_COOR_EDIT, &(pElement->dpt), TEXT("%.3f,%.3f"), pElement->dpt.x, pElement->dpt.y);
 //		break;
 //	}

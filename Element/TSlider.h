@@ -18,7 +18,7 @@ public:
 		int index1;
 		int index2;
 	};
-	std::vector<LinkLine> vecLine;//Á¬½Ó¼¯
+	std::vector<LinkLine> vecLine;//è¿æ¥é›†
 	TSlider();
 	~TSlider();
 
@@ -26,7 +26,7 @@ public:
 	virtual bool TSlider::WriteFile(HANDLE &hf, DWORD &now_pos)override;
 	virtual bool TSlider::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)override;
 	const DPOINT TSlider::GetRelativePointByIndex(int PointIndexOfElement) const override;
-	virtual const String TSlider::GetElementTypeName() override;//µÃµ½ÀàĞÍÃû³Æ
+	virtual const String TSlider::GetElementTypeName() override;//å¾—åˆ°ç±»å‹åç§°
 	virtual void TSlider::Draw(HDC hdc, const TConfiguration* pConfig) override;
 	virtual void TSlider::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) override;
 	DPOINT TSlider::GetAbsolutePointByIndex(int PointIndexOfElement) const override;

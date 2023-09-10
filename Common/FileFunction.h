@@ -8,11 +8,11 @@ bool GetFileExists(TCHAR filename[]);
 void InitialOpenFileName(OPENFILENAME *ofn, HWND hwnd, TCHAR szFile[], TCHAR lpstrFilter[], DWORD nMaxFile= MAX_PATH);
 
 
-//szFileName±£´æÎÄ¼şÃûµÄÎ»ÖÃ
-//lpstrFilterÊ¾Àı£º TEXT("»ú¹¹Éè¼ÆÎÄ¼ş(*.lml)\0*.lml\0\0")
+//szFileNameä¿å­˜æ–‡ä»¶åçš„ä½ç½®
+//lpstrFilterç¤ºä¾‹ï¼š TEXT("æœºæ„è®¾è®¡æ–‡ä»¶(*.lml)\0*.lml\0\0")
 BOOL OpenFileDialog(HWND hWnd, TCHAR szFileName[], TCHAR lpstrFilter[]);
 
-//szFileName±£´æÎÄ¼şÃûµÄÎ»ÖÃ
-//lpstrFilterÊ¾Àı£º TEXT("»ú¹¹Éè¼ÆÎÄ¼ş(*.lml)\0*.lml\0\0")
-//lpstrDefExtÊ¾Àı£º TEXT("lml")
+//szFileNameä¿å­˜æ–‡ä»¶åçš„ä½ç½®
+//lpstrFilterç¤ºä¾‹ï¼š TEXT("æœºæ„è®¾è®¡æ–‡ä»¶(*.lml)\0*.lml\0\0")
+//lpstrDefExtç¤ºä¾‹ï¼š TEXT("lml")
 BOOL SaveFileDialog(HWND hWnd, TCHAR szFileName[], TCHAR lpstrFilter[], TCHAR lpstrDefExt[]);

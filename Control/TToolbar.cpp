@@ -73,7 +73,7 @@ void TToolbar::CreateToolbar(HWND hwndParent, HINSTANCE hInst)
 	RegisterProc();
 }
 
-//ÄÚ²¿º¯Êı£º´´½¨Í¼Æ¬ÁĞ±í
+//å†…éƒ¨å‡½æ•°ï¼šåˆ›å»ºå›¾ç‰‡åˆ—è¡¨
 void TToolbar::CreateImageList(UINT uMsg,int cx, int cy, UINT BitmapID,COLORREF crMask)
 {
 	HIMAGELIST m_hImageList;
@@ -86,25 +86,25 @@ void TToolbar::CreateImageList(UINT uMsg,int cx, int cy, UINT BitmapID,COLORREF 
 	SendMessage(m_hWnd, uMsg, (WPARAM)0, (LPARAM)m_hImageList);
 }
 
-//ÉèÖÃ¹¤¾ßÀ¸Í¼Æ¬
+//è®¾ç½®å·¥å…·æ å›¾ç‰‡
 void TToolbar::LoadImageList(int cx, int cy, UINT BitmapID,COLORREF crMask)
 {
 	CreateImageList(TB_SETIMAGELIST, cx, cy, BitmapID,crMask);
 }
 
-//ÉèÖÃ¹¤¾ßÀ¸Ğü¸¡Í¼Æ¬
+//è®¾ç½®å·¥å…·æ æ‚¬æµ®å›¾ç‰‡
 void TToolbar::LoadHotImageList(int cx, int cy, UINT BitmapID, COLORREF crMask)
 {
 	CreateImageList(TB_SETHOTIMAGELIST, cx, cy, BitmapID, crMask);
 }
 
-//ÉèÖÃ¹¤¾ßÀ¸½ûÓÃÍ¼Æ¬
+//è®¾ç½®å·¥å…·æ ç¦ç”¨å›¾ç‰‡
 void TToolbar::LoadDisabledImageList(int cx, int cy, UINT BitmapID, COLORREF crMask)
 {
 	CreateImageList(TB_SETDISABLEDIMAGELIST, cx, cy, BitmapID,crMask);
 }
 
-//Ìí¼Ó°´Å¥
+//æ·»åŠ æŒ‰é’®
 void TToolbar::AddElement(int IconIndex,int idCommand,BYTE fsState,BYTE fsStyle,BYTE bReverse[],DWORD_PTR dwData,INT_PTR iString)
 {
 	iButtonNum++;
@@ -120,22 +120,22 @@ void TToolbar::AddElement(int IconIndex,int idCommand,BYTE fsState,BYTE fsStyle,
 	tbButtons[iButtonNum - 1].iString = iString;
 }
 
-//Ìí¼ÓÆÕÍ¨°´Å¥£ºIconIndexÎª°´Å¥ĞòºÅ£¬¶ÔÓ¦ÓÚÍ¼Æ¬ÇĞ·ÖºóµÚ¼¸¿é¡£´Ó0¿ªÊ¼¡£
+//æ·»åŠ æ™®é€šæŒ‰é’®ï¼šIconIndexä¸ºæŒ‰é’®åºå·ï¼Œå¯¹åº”äºå›¾ç‰‡åˆ‡åˆ†åç¬¬å‡ å—ã€‚ä»0å¼€å§‹ã€‚
 void TToolbar::AddButton(int IconIndex, int idCommand,bool Enable, TCHAR iString[])
 {
 	AddElement(IconIndex, idCommand, Enable?TBSTATE_ENABLED:0, BTNS_BUTTON, NULL, NULL, (INT_PTR)iString);
 }
 
-//Ìí¼Ó·Ö¸ô·û£ºiWidthÖ¸·Ö¸ô·û×ó±ß½çµ½ÏÂÒ»¸ö°´Å¥×ó±ß½çµÄ¾àÀë
+//æ·»åŠ åˆ†éš”ç¬¦ï¼šiWidthæŒ‡åˆ†éš”ç¬¦å·¦è¾¹ç•Œåˆ°ä¸‹ä¸€ä¸ªæŒ‰é’®å·¦è¾¹ç•Œçš„è·ç¦»
 void TToolbar::AddSeparator(int iWidth)
 {
 	AddElement(iWidth, 0, 0, BTNS_SEP, NULL, NULL, NULL);
 }
 
-//Ìí¼ÓÒ»¸öGroup°´Å¥
+//æ·»åŠ ä¸€ä¸ªGroupæŒ‰é’®
 void TToolbar::AddGroup(int IconIndex, int iGroupNum, int idCommand, bool Enable, TCHAR iString[])
 {
-	if (mapGroup.find(iGroupNum) != mapGroup.end())//ÓĞ
+	if (mapGroup.find(iGroupNum) != mapGroup.end())//æœ‰
 		mapGroup[iGroupNum].insert(idCommand);
 	else
 	{
@@ -148,13 +148,13 @@ void TToolbar::AddGroup(int IconIndex, int iGroupNum, int idCommand, bool Enable
 	AddElement(IconIndex, idCommand, Enable ? TBSTATE_ENABLED : 0, BTNS_CHECKGROUP, NULL, NULL, (INT_PTR)iString);
 }
 
-//Ìí¼ÓÒ»¸öCheck°´Å¥
+//æ·»åŠ ä¸€ä¸ªCheckæŒ‰é’®
 void TToolbar::AddCheck(int IconIndex, int idCommand, bool Enable, TCHAR iString[])
 {
 	AddElement(IconIndex, idCommand, Enable ? TBSTATE_ENABLED : 0, BTNS_CHECK, NULL, NULL, (INT_PTR)iString);
 }
 
-//ÏÔÊ¾¹¤¾ßÀ¸
+//æ˜¾ç¤ºå·¥å…·æ 
 void TToolbar::ShowToolbar()
 {
 	// Add buttons.
@@ -165,7 +165,7 @@ void TToolbar::ShowToolbar()
 	SendMessage(m_hWnd, TB_AUTOSIZE, 0, 0);
 }
 
-//Ë¢ĞÂ¹¤¾ßÀ¸
+//åˆ·æ–°å·¥å…·æ 
 void TToolbar::FreshSize()
 {
 	// Resize the toolbar, and then show it.

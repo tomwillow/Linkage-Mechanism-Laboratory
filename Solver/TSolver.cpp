@@ -72,7 +72,7 @@ void TSolver::Outputln(const TCHAR *szFormat, ...)
 			_vsntprintf(szBuffer, _tcslen(szFormat) + 1024, szFormat, pArgList);
 			va_end(pArgList);
 
-			//×·¼Ó»»ĞĞ
+			//è¿½åŠ æ¢è¡Œ
 			*pOS << szBuffer;
 			*pOS << TEXT("\r\n");
 
@@ -121,13 +121,13 @@ void TSolver::RecordStartDragPos(TElement *pElement, DPOINT dpt)
 		dRelativeAngle = 0;
 }
 
-//Ìí¼ÓÊó±êÔ¼Êø
+//æ·»åŠ é¼ æ ‡çº¦æŸ
 void TSolver::AddMouseConstraint(int index, DPOINT dptm)
 {
 	AddMouseConstraint(pShape->Element[index],dptm);
 }
 
-//Ìí¼ÓÊó±êÔ¼Êø
+//æ·»åŠ é¼ æ ‡çº¦æŸ
 void TSolver::AddMouseConstraint(TElement *pElement, DPOINT dptm)
 {
 	if (pElement->CanBeDragged())
@@ -165,19 +165,19 @@ void TSolver::ClearEuqations()
 
 void TSolver::RefreshEquations()
 {
-	//È«²¿ÇåÀí
+	//å…¨éƒ¨æ¸…ç†
 	subsVar.clear();
 	subsValue.clear();
 	ClearOutput();
 	ClearEuqations();
 
-	//¿ªÊ¼
-	Outputln(TEXT("×ÔÓÉ¶È: DOF = nc - nh = nb*3 - nh = %d*3 - %d = %d"), pShape->nb, pShape->nh(), pShape->DOF());
+	//å¼€å§‹
+	Outputln(TEXT("è‡ªç”±åº¦: DOF = nc - nh = nb*3 - nh = %d*3 - %d = %d"), pShape->nb, pShape->nh(), pShape->DOF());
 	int i, j;
 	DPOINT SiP, SjP, SiQ, SjQ;
 	TCHAR buffer1[1024], buffer2[1024];
 
-	Outputln(TEXT("\r\nÔ¼Êø·½³Ì:"));
+	Outputln(TEXT("\r\nçº¦æŸæ–¹ç¨‹:"));
 
 	for (auto element : pShape->Element)
 	{
@@ -187,12 +187,12 @@ void TSolver::RefreshEquations()
 		{
 			pShape->GetSijP((TConstraintCoincide *)element, SiP, SjP, i, j);
 
-			//µÃµ½2¸öÖØºÏ¹¹¼şµÄ¹ãÒå×ø±ê
+			//å¾—åˆ°2ä¸ªé‡åˆæ„ä»¶çš„å¹¿ä¹‰åæ ‡
 			double xi, yi, phii, xj, yj, phij;
 			pShape->GetCoordinateByElement(((TConstraintCoincide *)element)->pElement[0], &xi, &yi, &phii);
 			pShape->GetCoordinateByElement(((TConstraintCoincide *)element)->pElement[1], &xj, &yj, &phij);
 
-			//¶¨Òå±äÁ¿¼°Æä³õÊ¼Öµ
+			//å®šä¹‰å˜é‡åŠå…¶åˆå§‹å€¼
 			//_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			//_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
 			//Equations->DefineVariable(pOS, buffer1, buffer2);
@@ -203,8 +203,8 @@ void TSolver::RefreshEquations()
 			Equations->DefineOneVariable(pOS, TEXT("y") + To_string(j), yj, true);
 			Equations->DefineOneVariable(pOS, TEXT("phi") + To_string(j), phij, true);
 
-			//¶ÁÈë·½³Ì
-			/* ÍÆµ¼½á¹û£º
+			//è¯»å…¥æ–¹ç¨‹
+			/* æ¨å¯¼ç»“æœï¼š
 			xi + xiP*cos(phii) - yiP*sin(phii) - xj  - xjP*cos(phij) + yjP*sin(phij)
 			yi + xiP*sin(phii) + yiP*cos(phii) - yj  - xjP*sin(phij) - yjP*cos(phij)  */
 			_stprintf(buffer1, TEXT("x%d+%f*cos(phi%d)-%f*sin(phi%d)-x%d-%f*cos(phi%d)+%f*sin(phi%d)"), i, SiP.x, i, SiP.y, i, j, SjP.x, j, SjP.y, j);
@@ -213,23 +213,23 @@ void TSolver::RefreshEquations()
 			Equations->AddEquation(pOS, buffer2, false);
 			break;
 		}
-		case CONSTRAINT_COLINEAR://¹²ÏßÔ¼Êø
+		case CONSTRAINT_COLINEAR://å…±çº¿çº¦æŸ
 		{
 			TConstraintColinear *pColinear = (TConstraintColinear *)element;
-			//¹¹¼şi
+			//æ„ä»¶i
 			pShape->GetSP(pColinear->pElement[0], pColinear->PointBeginIndexOfElement[0], SiP, i);//xiP,yiP
 			pShape->GetSQ(pColinear->pElement[0], pColinear->PointEndIndexOfElement[0], SiQ, i);//xiQ,yiQ
 
-			//¹¹¼şj
+			//æ„ä»¶j
 			pShape->GetSP(pColinear->pElement[1], pColinear->PointBeginIndexOfElement[1], SjP, j);//xjP,yjP
 			pShape->GetSQ(pColinear->pElement[1], pColinear->PointEndIndexOfElement[1], SjQ, j);//xjQ,yjQ
 
-			//µÃµ½2¸öÖØºÏ¹¹¼şµÄ¹ãÒå×ø±ê
+			//å¾—åˆ°2ä¸ªé‡åˆæ„ä»¶çš„å¹¿ä¹‰åæ ‡
 			double xi, yi, phii, xj, yj, phij;
 			pShape->GetCoordinateByElement(pColinear->pElement[0], &xi, &yi, &phii);
 			pShape->GetCoordinateByElement(pColinear->pElement[1], &xj, &yj, &phij);
 
-			//¶¨Òå±äÁ¿¼°Æä³õÊ¼Öµ
+			//å®šä¹‰å˜é‡åŠå…¶åˆå§‹å€¼
 			//_stprintf(buffer1, TEXT("x%d y%d phi%d x%d y%d phi%d"), i, i, i, j, j, j);
 			//_stprintf(buffer2, TEXT("%f %f %f %f %f %f"), xi, yi, phii, xj, yj, phij);
 			//Equations->DefineVariable(pOS, buffer1, buffer2, true);
@@ -240,8 +240,8 @@ void TSolver::RefreshEquations()
 			Equations->DefineOneVariable(pOS, TEXT("y") + To_string(j), yj, true);
 			Equations->DefineOneVariable(pOS, TEXT("phi") + To_string(j), phij, true);
 
-			//¶ÁÈë·½³Ì
-			//ÍÆµ¼½á¹û£º
+			//è¯»å…¥æ–¹ç¨‹
+			//æ¨å¯¼ç»“æœï¼š
 			/*
 			(cos(phii)*(yiP - yiQ) + sin(phii)*(xiP - xiQ))*(xi - xj + xiP*cos(phii) - xjP*cos(phij) - yiP*sin(phii) + yjP*sin(phij))
 			- (cos(phii)*(xiP - xiQ) - sin(phii)*(yiP - yiQ))*(yi - yj + yiP*cos(phii) - yjP*cos(phij) + xiP*sin(phii) - xjP*sin(phij))
@@ -269,7 +269,7 @@ void TSolver::RefreshEquations()
 			subsValue.push_back(element->dpt.x);
 			subsValue.push_back(element->dpt.y);
 			subsValue.push_back(element->angle);
-			//SolveÊ±£¬½¨Á¢Jacobian»áÌæ»»µô
+			//Solveæ—¶ï¼Œå»ºç«‹Jacobianä¼šæ›¿æ¢æ‰
 			break;
 		}
 		case DRIVER:
@@ -284,13 +284,13 @@ void TSolver::RefreshEquations()
 	}
 
 	if (Equations->GetEquationsCount() == 0)
-		Outputln(TEXT("\r\nÎŞÔ¼Êø¡£\r\n"));
+		Outputln(TEXT("\r\næ— çº¦æŸã€‚\r\n"));
 
 	if (pShape->DOF() == 1)
-		Outputln(TEXT("\r\n¿ÉÒÔÍÏ¶¯¡£"));
+		Outputln(TEXT("\r\nå¯ä»¥æ‹–åŠ¨ã€‚"));
 	else
 		if (pShape->DOF() > 1)
-			Outputln(TEXT("\r\nÇ·Ô¼Êø¡£"));
+			Outputln(TEXT("\r\næ¬ çº¦æŸã€‚"));
 
 	if (pOS != NULL)
 		RefreshWindowText();
@@ -306,7 +306,7 @@ void TSolver::ClearOutput()
 	}
 }
 
-//±ØĞëÊ¹ÓÃÁË±¾º¯Êı²ÅË¢ĞÂEditÄÚÈİ
+//å¿…é¡»ä½¿ç”¨äº†æœ¬å‡½æ•°æ‰åˆ·æ–°Editå†…å®¹
 void TSolver::RefreshWindowText()
 {
 	if (hwndOutput != NULL)
@@ -321,7 +321,7 @@ void TSolver::RefreshWindowText()
 	}
 }
 
-//½«ShapeµÄElementÉèÖÃÎªVariableTable¶¨ÒåµÄÊıÖµ
+//å°†Shapeçš„Elementè®¾ç½®ä¸ºVariableTableå®šä¹‰çš„æ•°å€¼
 void TSolver::SetElementDisplacement(const TVariableTable &VariableTable)
 {
 	for (size_t i = 0; i < VariableTable.VariableTable.size(); i++)
@@ -356,7 +356,7 @@ void TSolver::SetElementDisplacement(const TVariableTable &VariableTable)
 	}
 }
 
-//Çø·Öx y phi£¬°´ÕÕ±äÁ¿±íµÄË³Ğò£¬½«vecpValueÁ´½Óµ½ÔªËØµÄÖµ
+//åŒºåˆ†x y phiï¼ŒæŒ‰ç…§å˜é‡è¡¨çš„é¡ºåºï¼Œå°†vecpValueé“¾æ¥åˆ°å…ƒç´ çš„å€¼
 void TSolver::LinkpValue(std::vector<double *> &vecpValue)
 {
 	vecpValue.clear();
@@ -389,10 +389,10 @@ void TSolver::GetResult(std::vector<double> &vecResult)
 	vecResult = Equations->VariableTable.VariableValue;
 }
 
-//Çó½â
+//æ±‚è§£
 void TSolver::Solve()
 {
-	clock_t start, stop;//clock_tÊÇclock()º¯Êı·µ»ØÀàĞÍ
+	clock_t start, stop;//clock_tæ˜¯clock()å‡½æ•°è¿”å›ç±»å‹
 	double duration;
 
 	start = clock();
@@ -400,9 +400,9 @@ void TSolver::Solve()
 	SubsFramePoint();
 	Equations->SimplifyEquations(pOS);
 	Equations->BuildJacobian(pOS);
-	Equations->SolveEquations(pOS);//½â·½³Ì
+	Equations->SolveEquations(pOS);//è§£æ–¹ç¨‹
 
-	if (Equations->hasSolved)//½â³ö
+	if (Equations->hasSolved)//è§£å‡º
 	{
 		SetElementDisplacement(Equations->VariableTable);
 	}
@@ -410,7 +410,7 @@ void TSolver::Solve()
 	stop = clock();
 	duration = ((double)(stop - start)) / CLK_TCK;
 
-	Outputln(TEXT("\r\nºÄÊ± %f s"), duration);
+	Outputln(TEXT("\r\nè€—æ—¶ %f s"), duration);
 
 	if (pOS != NULL)
 		RefreshWindowText();
@@ -422,8 +422,8 @@ void TSolver::SubsFramePoint()
 		Equations->Subs(pOS, subsVar, subsValue);
 }
 
-//Çó½âÖ®Ç°ĞèÒªµ÷ÓÃSubsFramePoint
-//·µ»ØÊÇ·ñÇó½â³É¹¦
+//æ±‚è§£ä¹‹å‰éœ€è¦è°ƒç”¨SubsFramePoint
+//è¿”å›æ˜¯å¦æ±‚è§£æˆåŠŸ
 bool TSolver::Solve(double t)
 {
 	if (pOS)
@@ -438,14 +438,14 @@ bool TSolver::Solve(double t)
 
 	SubsFramePoint();
 
-	//¼ÓÈëÇı¶¯·½³Ì
+	//åŠ å…¥é©±åŠ¨æ–¹ç¨‹
 	for (auto StrDriver : vecStrDriver)
 		Equations->AddEquation(pOS, StrDriver, true);
 
-	Equations->BuildEquationsV(pOS);//´ËÊ±t»¹ÔÚ±äÁ¿×éÄÚ
+	Equations->BuildEquationsV(pOS);//æ­¤æ—¶tè¿˜åœ¨å˜é‡ç»„å†…
 	Equations->BuildEquationsA_Phitt(pOS);
 
-	Equations->Subs(pOS, TEXT("t"), t);//·½³Ì×é´úÈët
+	Equations->Subs(pOS, TEXT("t"), t);//æ–¹ç¨‹ç»„ä»£å…¥t
 	//Equations->SimplifyEquations(pOS);
 
 	Equations->BuildVariableTableV(pOS);
@@ -453,20 +453,20 @@ bool TSolver::Solve(double t)
 
 	Equations->BuildJacobian(pOS);
 
-	//½â³öÎ»ÒÆ·½³Ì
+	//è§£å‡ºä½ç§»æ–¹ç¨‹
 	Equations->SolveEquations(pOS);
 
 	if (Equations->hasSolved)
 	{
-		//½â³öËÙ¶È·½³Ì
+		//è§£å‡ºé€Ÿåº¦æ–¹ç¨‹
 		Equations->SubsV(pOS, TEXT("t"), t);
 		Equations->SolveEquationsV(pOS);
 
-		//½â³ö¼ÓËÙ¶È·½³Ì
+		//è§£å‡ºåŠ é€Ÿåº¦æ–¹ç¨‹
 		Equations->SubsA(pOS, TEXT("t"), t);
 		Equations->SolveEquationsA(pOS);
 
-		//ÉèÖÃÎ»ÒÆ
+		//è®¾ç½®ä½ç§»
 		SetElementDisplacement(Equations->VariableTable);
 	}
 	RefreshWindowText();
@@ -484,7 +484,7 @@ void TSolver::GetMesureResult(std::vector<DialogAnimation::TListBoxItem> &vecIte
 			using namespace DialogAnimation;
 		case D:
 		{
-			pVarTable = &(Equations->VariableTableUnsolved); //Ö¸ÏòVariableTable
+			pVarTable = &(Equations->VariableTableUnsolved); //æŒ‡å‘VariableTable
 
 			DPOINT dptAb=vecItems[i].pElement->GetAbsolutePointByIndex(vecItems[i].index_of_point);
 			switch (vecItems[i].value_type)
@@ -499,18 +499,18 @@ void TSolver::GetMesureResult(std::vector<DialogAnimation::TListBoxItem> &vecIte
 			break;
 		}
 		case V:
-			pVarTable = &(Equations->VariableTableV);//Ö¸ÏòVariableTableV
+			pVarTable = &(Equations->VariableTableV);//æŒ‡å‘VariableTableV
 			vecItems[i].data.push_back(pVarTable->VariableValue[vecIndex[i]]);
 			break;
 		case A:
-			pVarTable = &(Equations->VariableTableA);//Ö¸ÏòVariableTableA
+			pVarTable = &(Equations->VariableTableA);//æŒ‡å‘VariableTableA
 			vecItems[i].data.push_back(pVarTable->VariableValue[vecIndex[i]]);
 			break;
 		}
 	}
 }
 
-//ÒÔÎ´½â³ö±äÁ¿±íÎªË³ĞòÒÀ¾İ£¬µ÷ÓÃÇ°±ØĞëSubsFramePoint
+//ä»¥æœªè§£å‡ºå˜é‡è¡¨ä¸ºé¡ºåºä¾æ®ï¼Œè°ƒç”¨å‰å¿…é¡»SubsFramePoint
 void TSolver::LinkMesureResult(const std::vector<DialogAnimation::TListBoxItem> &vecItems, std::vector<int> &vecIndex)
 {
 	String temp;
@@ -524,10 +524,10 @@ void TSolver::LinkMesureResult(const std::vector<DialogAnimation::TListBoxItem> 
 		case PHI:temp = TEXT("phi"); break;
 		}
 		temp+=To_string(Item.id);
-		//ÖÁ´ËµÃµ½±äÁ¿Ãû
+		//è‡³æ­¤å¾—åˆ°å˜é‡å
 
-		//Î»ÒÆ±íºÍËÙ¶È±íÏîÄ¿Ë³ĞòÒ»ÖÂ£¬µÃµ½±äÁ¿Ë÷Òı
-		TVariableTable *pVarTable = &(Equations->VariableTableUnsolved);//ÒÔÎ´½â³ö±äÁ¿±íË³ĞòÎª×¼
+		//ä½ç§»è¡¨å’Œé€Ÿåº¦è¡¨é¡¹ç›®é¡ºåºä¸€è‡´ï¼Œå¾—åˆ°å˜é‡ç´¢å¼•
+		TVariableTable *pVarTable = &(Equations->VariableTableUnsolved);//ä»¥æœªè§£å‡ºå˜é‡è¡¨é¡ºåºä¸ºå‡†
 
 		auto it = find(pVarTable->VariableTable.begin(), pVarTable->VariableTable.end(), temp);
 		if (it != pVarTable->VariableTable.end())
@@ -566,7 +566,7 @@ void TSolver::Demo()
 	Equations->AddEquation(pOS, TEXT("phi2-ln(t)"), true);
 	Equations->Subs(pOS, subsVar, subsValue);
 
-	Equations->BuildEquationsV(pOS);//´ËÊ±t»¹ÔÚ±äÁ¿×éÄÚ
+	Equations->BuildEquationsV(pOS);//æ­¤æ—¶tè¿˜åœ¨å˜é‡ç»„å†…
 	Equations->BuildEquationsA_Phitt(pOS);//
 
 	Equations->Subs(pOS, TEXT("t"), 0.1);
@@ -577,20 +577,20 @@ void TSolver::Demo()
 
 	Equations->BuildJacobian(pOS);
 
-	//½â³öÎ»ÒÆ·½³Ì
+	//è§£å‡ºä½ç§»æ–¹ç¨‹
 	Equations->SolveEquations(pOS);
 
 	if (Equations->hasSolved)
 	{
-		//½â³öËÙ¶È·½³Ì
+		//è§£å‡ºé€Ÿåº¦æ–¹ç¨‹
 		Equations->SubsV(pOS, TEXT("t"), 0.1);//
 		Equations->SolveEquationsV(pOS);//
 
-		//½â³ö¼ÓËÙ¶È·½³Ì
+		//è§£å‡ºåŠ é€Ÿåº¦æ–¹ç¨‹
 		Equations->SubsA(pOS, TEXT("t"), 0.1);//
 		Equations->SolveEquationsA(pOS);
 
-		//ÉèÖÃÎ»ÒÆ
+		//è®¾ç½®ä½ç§»
 		SetElementDisplacement(Equations->VariableTable);
 	}
 	RefreshWindowText();
@@ -607,7 +607,7 @@ void TSolver::Demo()
 	//}
 	//Equations->SolveEquations(pOS);
 
-	//½¨Á¢ExpressionTree
+	//å»ºç«‹ExpressionTree
 	//TExpressionTree ex;
 	//TVariableTable VarTable;
 	//Outputln(VarTable.Define(true,TEXT("  x   y z   ")));

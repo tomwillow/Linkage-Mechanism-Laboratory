@@ -41,7 +41,7 @@ TDraw::~TDraw()
 	Gdiplus::GdiplusShutdown(gdiplusStartupToken);
 }
 
-//ÓÃ·¨£º
+//ç”¨æ³•ï¼š
 //Image * pImage = NULL;
 //ImageFromIDResource(IDR_PNG_NO_PIC, L"png", pImage);
 //delete pImage;
@@ -107,14 +107,14 @@ void TDraw::DrawLogo(HINSTANCE hInst, UINT nID, LPCTSTR sType, HDC hdc, const RE
 	}
 }
 
-//»­Ö±Ïß£¬²»´øÑùÊ½
+//ç”»ç›´çº¿ï¼Œä¸å¸¦æ ·å¼
 void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos)
 {
 	::MoveToEx(hdc, ptFirstPos.x, ptFirstPos.y, NULL);
 	::LineTo(hdc, ptSecondPos.x, ptSecondPos.y);
 }
 
-//»­Ö±Ïß£¬´øÑùÊ½
+//ç”»ç›´çº¿ï¼Œå¸¦æ ·å¼
 void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos, const LOGPEN &logpen)
 {
 	HPEN hPen;
@@ -125,7 +125,7 @@ void TDraw::DrawLine(HDC hdc, POINT ptFirstPos, POINT ptSecondPos, const LOGPEN 
 	::DeleteObject(hPen);
 }
 
-//»­Ö±Ïß£¬´øÑùÊ½£¬ÒÔlogpenStyleÎª×¼
+//ç”»ç›´çº¿ï¼Œå¸¦æ ·å¼ï¼Œä»¥logpenStyleä¸ºå‡†
 void TDraw::DrawLine(HDC hdc, TLine Line)
 {
 	HPEN hPen;
@@ -136,7 +136,7 @@ void TDraw::DrawLine(HDC hdc, TLine Line)
 	::DeleteObject(hPen);
 }
 
-//»­Ö±Ïß£¬´øÑùÊ½
+//ç”»ç›´çº¿ï¼Œå¸¦æ ·å¼
 void TDraw::DrawPolyline(HDC hdc, const POINT *apt, int count, LOGPEN &logpen)
 {
 	HPEN hPen;
@@ -155,7 +155,7 @@ void TDraw::DrawBar(HDC hdc, TBar *pBar, const TConfiguration *pConfig)
 		DrawBarSimple(hdc, pBar, pConfig);
 }
 
-//¼ÆËã¾àÀëÏßÁ½¶ËµãÄÚ²àdistµ¥Î»£¬½á¹û¸³ÓèÔ­¶Ëµã
+//è®¡ç®—è·ç¦»çº¿ä¸¤ç«¯ç‚¹å†…ä¾§distå•ä½ï¼Œç»“æœèµ‹äºˆåŸç«¯ç‚¹
 void TDraw::CalcBarLineEndpoint(POINT &ptBegin, POINT &ptEnd, int distBegin, int distEnd)
 {
 	double theta1 = GetAngleFromPointScreen(ptBegin, ptEnd);
@@ -207,9 +207,9 @@ void TDraw::DrawBarTranslucent(HDC hdc, TBar *pBar, const TConfiguration *pConfi
 }
 
 
-	//ÓÉÕæ²ÊÉ«Í¼Ïñ½¨Á¢×î¼Ñµ÷É«°å
-/*Ö±½Ó´«ÈëÖ¸Õë£¬º¯ÊıÄÚ½«new³öÄÚÈİ¡£deleteÓÉµ÷ÓÃÕß¸ºÔğ¡£
-·µ»Ø£ºÎ»Éî
+	//ç”±çœŸå½©è‰²å›¾åƒå»ºç«‹æœ€ä½³è°ƒè‰²æ¿
+/*ç›´æ¥ä¼ å…¥æŒ‡é’ˆï¼Œå‡½æ•°å†…å°†newå‡ºå†…å®¹ã€‚deleteç”±è°ƒç”¨è€…è´Ÿè´£ã€‚
+è¿”å›ï¼šä½æ·±
 e.g.
 unsigned char *palette;
 GetGifPaletteByHwnd(hWnd,palette);
@@ -228,7 +228,7 @@ void TDraw::Create8TreePal(HWND hWnd, unsigned char *&palette, int &color_num, i
 	TImage Image(hWnd);
 
 	// Initialize octree variables
-	pTree = NULL;                                       //°Ë²æÊ÷ÖÃ0£¨³õÊ¼»¯£©
+	pTree = NULL;                                       //å…«å‰æ ‘ç½®0ï¼ˆåˆå§‹åŒ–ï¼‰
 	nLeafCount = 0;
 	for (i = 0; i <= (int)depth; i++) pReducibleNodes[i] = NULL;
 
@@ -241,9 +241,9 @@ void TDraw::Create8TreePal(HWND hWnd, unsigned char *&palette, int &color_num, i
 			g = (BYTE)(data >> 8);
 			r = (BYTE)(data >> 16);
 			AddColor(&pTree, r, g, b, depth, 0, &nLeafCount,
-				pReducibleNodes);                 //Ïò°Ë²æÊ÷ÖĞÔö¼ÓÒ»ÖÖÑÕÉ«
-			while (nLeafCount > color_num)              //Èô½ÚµãÊı³¬¹ıµ÷É«°åµ¥ÔªÊı
-				ReduceTree(depth, &nLeafCount, pReducibleNodes); //¼õÉÙ½Úµã
+				pReducibleNodes);                 //å‘å…«å‰æ ‘ä¸­å¢åŠ ä¸€ç§é¢œè‰²
+			while (nLeafCount > color_num)              //è‹¥èŠ‚ç‚¹æ•°è¶…è¿‡è°ƒè‰²æ¿å•å…ƒæ•°
+				ReduceTree(depth, &nLeafCount, pReducibleNodes); //å‡å°‘èŠ‚ç‚¹
 		}
 
 	palette = new unsigned char[color_num * 3];
@@ -253,8 +253,8 @@ void TDraw::Create8TreePal(HWND hWnd, unsigned char *&palette, int &color_num, i
 	DeleteTree(&pTree);
 }
 
-/*Ö±½Ó´«ÈëÖ¸Õë£¬º¯ÊıÄÚ½«new³öÄÚÈİ¡£deleteÓÉµ÷ÓÃÕß¸ºÔğ¡£
-·µ»Ø£ºÎ»Éî
+/*ç›´æ¥ä¼ å…¥æŒ‡é’ˆï¼Œå‡½æ•°å†…å°†newå‡ºå†…å®¹ã€‚deleteç”±è°ƒç”¨è€…è´Ÿè´£ã€‚
+è¿”å›ï¼šä½æ·±
 e.g. 
 unsigned char *palette;
 GetGifPaletteByHwnd(hWnd,palette);
@@ -276,11 +276,11 @@ void TDraw::GetGifPaletteByHwnd(HWND hWnd, unsigned char *&palette,int &color_nu
 			palette_32[data]++;
 		}
 
-	//°´ÕÕÆµÂÊÅÅĞò
-	std::vector<PAIR> palette_sorted(palette_32.begin(), palette_32.end());//¸´ÖÆµ½vector
+	//æŒ‰ç…§é¢‘ç‡æ’åº
+	std::vector<PAIR> palette_sorted(palette_32.begin(), palette_32.end());//å¤åˆ¶åˆ°vector
 	std::sort(palette_sorted.begin(), palette_sorted.end(), [](const PAIR &lhs, const PAIR &rhs){return lhs.second > rhs.second; });
 	
-	//¼ÆËãÎ»Éî
+	//è®¡ç®—ä½æ·±
 	color_num = 256;
 	depth = 8;
 	while (palette_sorted.size() < color_num && depth!=1)
@@ -289,16 +289,16 @@ void TDraw::GetGifPaletteByHwnd(HWND hWnd, unsigned char *&palette,int &color_nu
 		depth --;
 	}
 
-	//½Øµô¶àÓàÑÕÉ«
+	//æˆªæ‰å¤šä½™é¢œè‰²
 	if (palette_sorted.size() > color_num)
 		palette_sorted.erase(palette_sorted.begin() + color_num, palette_sorted.end());
 	else
 		color_num = palette_sorted.size();
 
-	//°´ÕÕRGBÖµÅÅĞò
+	//æŒ‰ç…§RGBå€¼æ’åº
 	std::sort(palette_sorted.begin(), palette_sorted.end(), [](const PAIR &lhs, const PAIR &rhs){return lhs.first < rhs.first; });
 
-	//Ğ´Èëµ÷É«ÅÌ
+	//å†™å…¥è°ƒè‰²ç›˜
 		palette = new unsigned char[color_num*3];
 		for (int i = 0; i < color_num; ++i)
 		{
@@ -308,8 +308,8 @@ void TDraw::GetGifPaletteByHwnd(HWND hWnd, unsigned char *&palette,int &color_nu
 		}
 }
 
-//¸ù¾İpaletteµÃµ½Ë÷Òı
-//¶Ôpalette¶ş·Ö²éÕÒ£¬ÕÒ³öºÍdata×î½Ó½üµÄ
+//æ ¹æ®paletteå¾—åˆ°ç´¢å¼•
+//å¯¹paletteäºŒåˆ†æŸ¥æ‰¾ï¼Œæ‰¾å‡ºå’Œdataæœ€æ¥è¿‘çš„
 unsigned char TDraw::GetIndexFromPalette(const UINT32 &data, const unsigned char *palette, const int &color_num)
 {
 	unsigned char low, high, mid(0);
@@ -332,8 +332,8 @@ unsigned char TDraw::GetIndexFromPalette(const UINT32 &data, const unsigned char
 	}
 	return mid;
 }
-//¸ù¾İpaletteµÃµ½Ë÷Òı
-//¶Ôpalette¶ş·Ö²éÕÒ£¬ÕÒ³öºÍdata×î½Ó½üµÄ
+//æ ¹æ®paletteå¾—åˆ°ç´¢å¼•
+//å¯¹paletteäºŒåˆ†æŸ¥æ‰¾ï¼Œæ‰¾å‡ºå’Œdataæœ€æ¥è¿‘çš„
 unsigned char TDraw::GetIndexFromPalette(const UINT32 &data, const std::vector<unsigned int> &palette, const int &color_num)
 {
 	unsigned char low, high, mid(0);
@@ -356,7 +356,7 @@ unsigned char TDraw::GetIndexFromPalette(const UINT32 &data, const std::vector<u
 }
 
 
-//¸ù¾İpaletteµÃµ½Ë÷Òı
+//æ ¹æ®paletteå¾—åˆ°ç´¢å¼•
 unsigned char TDraw::GetIndexFromPalette_Slow(const UINT32 &data, const std::vector<unsigned int> &palette, const int &color_num)
 {
 	unsigned char index=0;
@@ -381,7 +381,7 @@ bool TDraw::CaptureWindowToFile(HWND hWnd, TCHAR szFileName[])
 {
 	TImage Image(hWnd);
 
-	//½«hBitmapÖĞÊı¾İ´æ³ö
+	//å°†hBitmapä¸­æ•°æ®å­˜å‡º
 	unsigned char *rgb = new unsigned char[Image.width*Image.height * 3];
 	unsigned char *p = rgb;
 	unsigned x, y;
@@ -476,8 +476,8 @@ COLORREF TDraw::HSB2RGB(float h, float s, float v)
 	return RGB(r * 255.0, g * 255.0, b * 255.0);
 }
 
-//¸ù¾İITU - R BT 601
-//ÁÁ¶ÈÖµY = 0.299r + 0.587g + 0.114b
+//æ ¹æ®ITU - R BT 601
+//äº®åº¦å€¼Y = 0.299r + 0.587g + 0.114b
 COLORREF TDraw::GetBrighterColor(COLORREF cr)
 {
 #define PLUS 0.2
@@ -503,7 +503,7 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 {
 	POINT pt[4];
 	CalcBarRectCoor(pt, ptBegin, ptEnd, angle, pConfig->BAR_R * 2);
-	//»­Íâ¿òÏß
+	//ç”»å¤–æ¡†çº¿
 
 	HPEN hPen = ::CreatePenIndirect(&logpen);
 	::SelectObject(hdc, hPen);
@@ -520,7 +520,7 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
 
-	//ÉÏÏÂ×óÓÒ¸÷¼Ó°ë¾¶
+	//ä¸Šä¸‹å·¦å³å„åŠ åŠå¾„
 	int left = min(ptBegin.x, ptEnd.x) - pConfig->BAR_R, top = min(ptBegin.y, ptEnd.y) - pConfig->BAR_R;
 	int width = abs(ptBegin.x - ptEnd.x) + 2 * pConfig->BAR_R, height = abs(ptBegin.y - ptEnd.y) + 2 * pConfig->BAR_R;
 
@@ -528,21 +528,21 @@ void TDraw::DrawBarTranslucent(HDC hdc, POINT &ptBegin, POINT &ptEnd, double ang
 	Translucent.Start(hdc, alpha, left, top, width, height, logpen.lopnColor == 0);
 	Translucent.Input(&ptBegin).Input(&ptEnd).Input(pt, 4);
 
-	//¿ªÊ¼»­
+	//å¼€å§‹ç”»
 	hPen = (HPEN)::GetStockObject(NULL_PEN);
 	::SelectObject(hdc, hPen);
 	hBrush = CreateSolidBrush(logpen.lopnColor);
 	::SelectObject(hdc, hBrush);
 
-	//Ìî³äÁ½¸ö°ëÔ²
+	//å¡«å……ä¸¤ä¸ªåŠåœ†
 	::Ellipse(hdc, ptBegin.x - pConfig->BAR_R, ptBegin.y - pConfig->BAR_R, ptBegin.x + pConfig->BAR_R, ptBegin.y + pConfig->BAR_R);
 	::Ellipse(hdc, ptEnd.x - pConfig->BAR_R, ptEnd.y - pConfig->BAR_R, ptEnd.x + pConfig->BAR_R, ptEnd.y + pConfig->BAR_R);
 
-	Polygon(hdc, pt, 4);//Ìî³ä
+	Polygon(hdc, pt, 4);//å¡«å……
 
 	::DeleteObject(hPen);
 	::DeleteObject(hBrush);
-	//»­Íê
+	//ç”»å®Œ
 
 	Translucent.End();
 
@@ -562,11 +562,11 @@ void TDraw::CalcPolylineBarRgn(HRGN &hRgn, const std::vector<DPOINT> &vecDpt, DP
 		return;
 	}
 
-	//Ïà¶Ô×ø±ê×ªÎª¾ø¶Ô×ø±ê
+	//ç›¸å¯¹åæ ‡è½¬ä¸ºç»å¯¹åæ ‡
 	std::vector<POINT> vecpt;
 	GetAbsoluteScreen(vecpt, vecDpt, dpt, angle, pConfig);
 
-	//¼ÆËãÇøÓò
+	//è®¡ç®—åŒºåŸŸ
 	HRGN hRgnTemp;
 	hRgn = CreateEllipticRgn(vecpt[0].x - pConfig->BAR_R, vecpt[0].y - pConfig->BAR_R, vecpt[0].x + pConfig->BAR_R, vecpt[0].y + pConfig->BAR_R);
 
@@ -599,19 +599,19 @@ void TDraw::DrawPolylineBarSimple(HDC hdc, TPolylineBar *pPolylineBar, const TCo
 		return;
 	}
 
-	//Ïà¶Ô×ø±ê×ªÎª¾ø¶Ô×ø±ê
+	//ç›¸å¯¹åæ ‡è½¬ä¸ºç»å¯¹åæ ‡
 	std::vector<POINT> vecpt;
 	GetAbsoluteScreen(vecpt, pPolylineBar->vecDpt, pPolylineBar->dpt, pPolylineBar->angle, pConfig);
 
 	HPEN hPen = CreatePenIndirect(&(pPolylineBar->logpenStyleShow));
 	SelectObject(hdc, hPen);
 
-	//»­Ïß
+	//ç”»çº¿
 	size_t i = 0;
 	POINT ptBegin, ptEnd;
 	int distBegin, distEnd;
-	int dist = 4;//ºÍÄÚÔ²µÄ°ë¾¶²î
-	for (size_t i = 0; i < vecpt.size() - 1; ++i)//µÚ1¸ö-µ¹ÊıµÚ2¸ö
+	int dist = 4;//å’Œå†…åœ†çš„åŠå¾„å·®
+	for (size_t i = 0; i < vecpt.size() - 1; ++i)//ç¬¬1ä¸ª-å€’æ•°ç¬¬2ä¸ª
 	{
 		ptBegin = vecpt[i];
 		ptEnd = vecpt[i + 1];
@@ -623,7 +623,7 @@ void TDraw::DrawPolylineBarSimple(HDC hdc, TPolylineBar *pPolylineBar, const TCo
 		else
 			distBegin = 0;
 		if (!pPolylineBar->vecIsJoint[i + 1].empty())
-			if (i == vecpt.size() - 2)//µ¹ÊıµÚ2µã
+			if (i == vecpt.size() - 2)//å€’æ•°ç¬¬2ç‚¹
 				distEnd = pConfig->FRAMEPOINT_R;
 			else
 				distEnd = pConfig->FRAMEPOINT_R + dist;
@@ -635,13 +635,13 @@ void TDraw::DrawPolylineBarSimple(HDC hdc, TPolylineBar *pPolylineBar, const TCo
 		DrawLine(hdc, ptBegin, ptEnd);
 	}
 
-	//»­»¡
+	//ç”»å¼§
 	HBRUSH hBrush = CreateSolidBrush(pPolylineBar->logpenStyleShow.lopnColor);
 	SelectObject(hdc, hBrush);
 
-	for (size_t i = 1; i < vecpt.size() - 1; ++i)//µÚ2¸ö-µ¹ÊıµÚ2¸ö
+	for (size_t i = 1; i < vecpt.size() - 1; ++i)//ç¬¬2ä¸ª-å€’æ•°ç¬¬2ä¸ª
 	{
-		if (!pPolylineBar->vecIsJoint[i].empty())//ÓĞ½ÂÁ´
+		if (!pPolylineBar->vecIsJoint[i].empty())//æœ‰é“°é“¾
 		{
 			DrawArc(hdc, vecpt[i], pConfig->FRAMEPOINT_R + dist, vecpt[i - 1], vecpt[i + 1], true);
 		}
@@ -676,21 +676,21 @@ void TDraw::DrawPolylineBarTranslucent(HDC hdc, TPolylineBar *pPolylineBar, cons
 	hBrush = CreateSolidBrush(pPolylineBar->logpenStyleShow.lopnColor);
 	::SelectObject(hdc, hBrush);
 
-	//»æÖÆ±ßÏß
+	//ç»˜åˆ¶è¾¹çº¿
 	FrameRgn(hdc, hRgn, hBrush, 1, 1);
 
-	//µÃµ½°üÎ§ºĞ
+	//å¾—åˆ°åŒ…å›´ç›’
 	RECT rc;
 	GetRgnBox(hRgn, &rc);
 	SetMarginRect(&rc, -(pConfig->BAR_R + 1));
 
-	//½«ËùÓĞ×ø±êÒÆµ½×óÉÏ½ÇÎ»ÖÃ
+	//å°†æ‰€æœ‰åæ ‡ç§»åˆ°å·¦ä¸Šè§’ä½ç½®
 	OffsetRgn(hRgn, -rc.left, -rc.top);
 
 	TDrawTranslucent Translucent;
 	Translucent.Start(hdc, pPolylineBar->alpha, rc, pPolylineBar->logpenStyleShow.lopnColor == 0);
 
-	//Ìî³äÇøÓò
+	//å¡«å……åŒºåŸŸ
 	FillRgn(hdc, hRgn, hBrush);
 
 	DeleteObject(hRgn);
@@ -737,7 +737,7 @@ bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt, const TConfiguration
 	return PointInRgn(FramePointRgn, 6, pt);
 }
 
-//»­¿ÕĞÄÔ² ÓĞÑùÊ½
+//ç”»ç©ºå¿ƒåœ† æœ‰æ ·å¼
 void TDraw::DrawCircle(HDC hdc, POINT pt, int r, LOGPEN logpen)
 {
 	HPEN hPen;
@@ -753,18 +753,18 @@ void TDraw::DrawCircle(HDC hdc, POINT pt, int r, LOGPEN logpen)
 	::DeleteObject(hBrush);
 }
 
-//»­Ô² Ã»ÓĞÑùÊ½
+//ç”»åœ† æ²¡æœ‰æ ·å¼
 void TDraw::DrawCircle(HDC hdc, POINT pt, int r)
 {
 	::Ellipse(hdc, pt.x - r, pt.y - r, pt.x + r + 1, pt.y + r + 1);
 }
 
-//»­»ú¼Üµã
+//ç”»æœºæ¶ç‚¹
 void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, const TConfiguration *pConfig)
 {
 	POINT ptO = pConfig->RealToScreen(pFramePoint->dpt);
 
-	//ÉèÖÃÔ²ÏÂ·½µÄÁ½¸öµã
+	//è®¾ç½®åœ†ä¸‹æ–¹çš„ä¸¤ä¸ªç‚¹
 	POINT ptA1, ptB1;
 	if (!pFramePoint->vecIsJoint.empty() && pFramePoint->vecIsJoint[0].size() > 0)
 	{
@@ -777,18 +777,18 @@ void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, const TConfigurati
 		ptB1 = ptO;
 	}
 
-	//ÉèÖÃÈı½ÇĞÎµÄµ×±ßÁ½¸öµã
+	//è®¾ç½®ä¸‰è§’å½¢çš„åº•è¾¹ä¸¤ä¸ªç‚¹
 	POINT ptA2, ptB2;
 	ptA2 = { LONG(ptO.x - pConfig->FRAMEPOINT_H*tan(pConfig->FRAMEPOINT_ANGLE / 2.0)), LONG(ptO.y + pConfig->FRAMEPOINT_H) };
 	ptB2 = { LONG(ptO.x + pConfig->FRAMEPOINT_H*tan(pConfig->FRAMEPOINT_ANGLE / 2.0)), LONG(ptA2.y) };
 
-	//ÉèÖÃµØÃæÏß
+	//è®¾ç½®åœ°é¢çº¿
 	POINT ptH1, ptH2;
 	ptH1 = { LONG(ptO.x - pConfig->FRAMEPOINT_B / 2.0), LONG(ptO.y + pConfig->FRAMEPOINT_H) };
 	ptH2 = { LONG(ptO.x + pConfig->FRAMEPOINT_B / 2.0), LONG(ptH1.y) };
 
 
-	if (pConfig->bDrawReal)//·ÂÕæÏÔÊ¾
+	if (pConfig->bDrawReal)//ä»¿çœŸæ˜¾ç¤º
 	{
 		HPEN hPen = (HPEN)::GetStockObject(NULL_PEN);
 		HBRUSH hBrush = CreateSolidBrush(pConfig->crLink);
@@ -822,7 +822,7 @@ void TDraw::DrawFramePoint(HDC hdc, TFramePoint *pFramePoint, const TConfigurati
 
 		DrawLine(hdc, ptH1, ptH2);
 
-		//»­ÆÊÃæÏß
+		//ç”»å‰–é¢çº¿
 		DrawSection(hdc, ptH1.x, ptH1.y, ptH2.x, ptH1.y + pConfig->FRAMEPOINT_SECTION_H, 6, 45);
 
 		::DeleteObject(hPen);
@@ -862,7 +862,7 @@ void TDraw::DrawSlidewaySingle(HDC hdc, const LOGPEN &logpen, const DPOINT &dptB
 	HPEN hPen;
 	HBRUSH hBrush;
 
-	//»­±Ê²»Í¬
+	//ç”»ç¬”ä¸åŒ
 	if (pConfig->bDrawReal)
 		hPen = ::CreatePen(PS_SOLID, 2, 0);
 	else
@@ -918,7 +918,7 @@ void TDraw::DrawSlidewaySingle(HDC hdc, const LOGPEN &logpen, const DPOINT &dptB
 	::DeleteObject(hBrush);
 }
 
-//µÃµ½µã¼¯µÄ°üÎ§ºĞ rectÖµ±£´æµÄÊÇ×ø±ê
+//å¾—åˆ°ç‚¹é›†çš„åŒ…å›´ç›’ rectå€¼ä¿å­˜çš„æ˜¯åæ ‡
 void TDraw::GetBoundingBox(std::vector<POINT> &vecpt, RECT *rect)
 {
 	LONG xmin, ymin, xmax, ymax;
@@ -941,7 +941,7 @@ void TDraw::GetBoundingBox(std::vector<POINT> &vecpt, RECT *rect)
 	rect->bottom = ymax;
 }
 
-//µÃµ½µã¼¯µÄ°üÎ§ºĞ rectÖµ±£´æµÄÊÇ×ø±ê
+//å¾—åˆ°ç‚¹é›†çš„åŒ…å›´ç›’ rectå€¼ä¿å­˜çš„æ˜¯åæ ‡
 void TDraw::GetBoundingBox(std::vector<DPOINT> &vecdpt, RECT *rect)
 {
 	double xmin, ymin, xmax, ymax;
@@ -964,7 +964,7 @@ void TDraw::GetBoundingBox(std::vector<DPOINT> &vecdpt, RECT *rect)
 	rect->bottom = (LONG)ymin;
 }
 
-//µÃµ½µã¼¯µÄ°üÎ§ºĞ rectÖµ±£´æµÄÊÇ×ø±ê
+//å¾—åˆ°ç‚¹é›†çš„åŒ…å›´ç›’ rectå€¼ä¿å­˜çš„æ˜¯åæ ‡
 void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect, bool YPlusIsUP)
 {
 	int xmin, ymin, xmax, ymax;
@@ -995,7 +995,7 @@ void TDraw::GetBoundingBox(POINT apt[], int apt_num, RECT *rect, bool YPlusIsUP)
 	}
 }
 
-//»­ÆÊÃæÏß£ºdÎª´¹Ö±¼ä¾à£¬angleDEGÎª½Ç¶È£¬´«Èë²ÎÊıÒÔY·½ÏòÏòÉÏÎªÕı
+//ç”»å‰–é¢çº¿ï¼šdä¸ºå‚ç›´é—´è·ï¼ŒangleDEGä¸ºè§’åº¦ï¼Œä¼ å…¥å‚æ•°ä»¥Yæ–¹å‘å‘ä¸Šä¸ºæ­£
 void TDraw::DrawSection(HDC hdc, POINT apt[], int apt_num, int d, double angleDEG)
 {
 	HRGN hRgn;
@@ -1005,7 +1005,7 @@ void TDraw::DrawSection(HDC hdc, POINT apt[], int apt_num, int d, double angleDE
 	RECT rect;
 	GetBoundingBox(apt, apt_num, &rect, true);
 
-	//°üÎ§ºĞÍâ½ÓÔ²Ö±¾¶
+	//åŒ…å›´ç›’å¤–æ¥åœ†ç›´å¾„
 	double r = sqrt(pow(double(rect.right - rect.left), 2) + pow(double(rect.top - rect.bottom), 2)) / 2;
 
 	POINT center = { (rect.right + rect.left) / 2, (rect.top + rect.bottom) / 2 };
@@ -1047,7 +1047,7 @@ void TDraw::DrawSection(HDC hdc, POINT apt[], int apt_num, int d, double angleDE
 	::DeleteObject(hRgn);
 }
 
-//»­ÆÊÃæÏß£ºdÎª´¹Ö±¼ä¾à£¬angleDEGÎª½Ç¶È
+//ç”»å‰–é¢çº¿ï¼šdä¸ºå‚ç›´é—´è·ï¼ŒangleDEGä¸ºè§’åº¦
 void TDraw::DrawSection(HDC hdc, int x1, int y1, int x2, int y2, int d, double angleDEG)
 {
 	double angle = DEG2RAD(angleDEG);
@@ -1072,7 +1072,7 @@ void TDraw::DrawSection(HDC hdc, int x1, int y1, int x2, int y2, int d, double a
 	::DeleteObject(hRgn);
 }
 
-//½«µã¼¯ÒÔÖ¸¶¨Ô­µãĞı×ªtheta£¬´«ÈëµãÒÔY·½ÏòÏòÉÏÎªÕı
+//å°†ç‚¹é›†ä»¥æŒ‡å®šåŸç‚¹æ—‹è½¬thetaï¼Œä¼ å…¥ç‚¹ä»¥Yæ–¹å‘å‘ä¸Šä¸ºæ­£
 void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta)
 {
 	int x, y;
@@ -1081,39 +1081,39 @@ void TDraw::Rotate(POINT apt[], int apt_num, int Ox, int Oy, double theta)
 		x = apt[i].x;
 		y = apt[i].y;
 
-		//ÏÈÆ½ÒÆµ½Ô­µã
+		//å…ˆå¹³ç§»åˆ°åŸç‚¹
 		x -= Ox;
 		y -= Oy;
 
-		//Ğı×ªºóÔÙÆ½ÒÆ»ØÔ­Î»ÖÃ
+		//æ—‹è½¬åå†å¹³ç§»å›åŸä½ç½®
 		apt[i].x = (LONG)(x*cos(theta) - y*sin(theta) + Ox);
 		apt[i].y = (LONG)(x*sin(theta) + y*cos(theta) + Oy);
 	}
 }
 
-//·µ»ØptÏà¶ÔÓÚÔ­µãptOµÄ½Ç¶È£¬´«ÈëµãÒÔY·½ÏòÏòÉÏÎªÕı
+//è¿”å›ptç›¸å¯¹äºåŸç‚¹ptOçš„è§’åº¦ï¼Œä¼ å…¥ç‚¹ä»¥Yæ–¹å‘å‘ä¸Šä¸ºæ­£
 double GetAngleFromPoint(POINT ptO, POINT pt)
 {
 	double angle = 0;
-	if (((pt.x - ptO.x) > 0) && ((pt.y - ptO.y) >= 0))//µÚ1ÏóÏŞ[0,PI/2)
+	if (((pt.x - ptO.x) > 0) && ((pt.y - ptO.y) >= 0))//ç¬¬1è±¡é™[0,PI/2)
 		angle = atan(double(pt.y - ptO.y) / (pt.x - ptO.x));
-	if (((pt.x - ptO.x) <= 0) && ((pt.y - ptO.y) > 0)) //µÚ2ÏóÏŞ[PI/2,PI)
+	if (((pt.x - ptO.x) <= 0) && ((pt.y - ptO.y) > 0)) //ç¬¬2è±¡é™[PI/2,PI)
 		angle = M_PI / 2 + atan(double(ptO.x - pt.x) / (pt.y - ptO.y));
-	if (((pt.x - ptO.x) < 0) && ((pt.y - ptO.y) <= 0))//µÚ3ÏóÏŞ[PI,PI*3/2)
+	if (((pt.x - ptO.x) < 0) && ((pt.y - ptO.y) <= 0))//ç¬¬3è±¡é™[PI,PI*3/2)
 		angle = M_PI + atan(double(ptO.y - pt.y) / (ptO.x - pt.x));
-	if (((pt.x - ptO.x) >= 0) && ((pt.y - ptO.y) < 0))//µÚ4ÏóÏŞ[PI*3/2,2*PI)
+	if (((pt.x - ptO.x) >= 0) && ((pt.y - ptO.y) < 0))//ç¬¬4è±¡é™[PI*3/2,2*PI)
 		angle = 3.0 / 2.0 * M_PI + atan(double(pt.x - ptO.x) / (ptO.y - pt.y));
 	return angle;
 }
 
-//·µ»Ø¼Ğ½Ç£¬ºãÎªÕı
+//è¿”å›å¤¹è§’ï¼Œæ’ä¸ºæ­£
 double TDraw::GetAngleBetweenPointReal(const DPOINT &pt1, const DPOINT &ptO, const DPOINT &pt2)
 {
 	double angle = abs(GetAngleFromPointReal(ptO, pt1) - GetAngleFromPointReal(ptO, pt2));
 	return angle > M_PI ? 2 * M_PI - angle : angle;
 }
 
-//·µ»Øpt1-pt2¼Ğ½Ç,ÄæÊ±Õë·½Ïò
+//è¿”å›pt1-pt2å¤¹è§’,é€†æ—¶é’ˆæ–¹å‘
 double TDraw::GetAngleBetweenPointScreen(const POINT &pt1, const POINT &ptO, const POINT &pt2)
 {
 	double angle = GetAngleFromPointScreen(ptO, pt2) - GetAngleFromPointScreen(ptO, pt1);
@@ -1121,22 +1121,22 @@ double TDraw::GetAngleBetweenPointScreen(const POINT &pt1, const POINT &ptO, con
 	//return GetAngleFromPointScreen(ptO, pt2) - GetAngleFromPointScreen(ptO, pt1);
 }
 
-//·µ»ØptÏà¶ÔÓÚÔ­µãptOµÄ½Ç¶È£¬´«ÈëµãÒÔY·½ÏòÏòÉÏÎªÕı
+//è¿”å›ptç›¸å¯¹äºåŸç‚¹ptOçš„è§’åº¦ï¼Œä¼ å…¥ç‚¹ä»¥Yæ–¹å‘å‘ä¸Šä¸ºæ­£
 double TDraw::GetAngleFromPointReal(DPOINT ptO, DPOINT pt)
 {
 	double angle = 0;
-	if (((pt.x - ptO.x) >= 0) && ((pt.y - ptO.y) >= 0))//µÚ1ÏóÏŞ[0,PI/2)
+	if (((pt.x - ptO.x) >= 0) && ((pt.y - ptO.y) >= 0))//ç¬¬1è±¡é™[0,PI/2)
 		angle = atan(double(pt.y - ptO.y) / (pt.x - ptO.x));
-	if (((pt.x - ptO.x) <= 0) && ((pt.y - ptO.y) > 0)) //µÚ2ÏóÏŞ[PI/2,PI)
+	if (((pt.x - ptO.x) <= 0) && ((pt.y - ptO.y) > 0)) //ç¬¬2è±¡é™[PI/2,PI)
 		angle = M_PI / 2 + atan(double(ptO.x - pt.x) / (pt.y - ptO.y));
-	if (((pt.x - ptO.x) < 0) && ((pt.y - ptO.y) <= 0))//µÚ3ÏóÏŞ[PI,PI*3/2)
+	if (((pt.x - ptO.x) < 0) && ((pt.y - ptO.y) <= 0))//ç¬¬3è±¡é™[PI,PI*3/2)
 		angle = M_PI + atan(double(ptO.y - pt.y) / (ptO.x - pt.x));
-	if (((pt.x - ptO.x) >= 0) && ((pt.y - ptO.y) < 0))//µÚ4ÏóÏŞ[PI*3/2,2*PI)
+	if (((pt.x - ptO.x) >= 0) && ((pt.y - ptO.y) < 0))//ç¬¬4è±¡é™[PI*3/2,2*PI)
 		angle = 3.0 / 2.0 * M_PI + atan(double(pt.x - ptO.x) / (ptO.y - pt.y));
 	return angle;
 }
 
-//ÒÔÆÁÄ»µã·µ»Ø½Ç¶È£¬´«ÈëµãÒÔY·½ÏòÏòÏÂÎªÕı
+//ä»¥å±å¹•ç‚¹è¿”å›è§’åº¦ï¼Œä¼ å…¥ç‚¹ä»¥Yæ–¹å‘å‘ä¸‹ä¸ºæ­£
 double TDraw::GetAngleFromPointScreen(POINT pt0, POINT pt)
 {
 	pt0.y = -pt0.y;
@@ -1144,7 +1144,7 @@ double TDraw::GetAngleFromPointScreen(POINT pt0, POINT pt)
 	return GetAngleFromPoint(pt0, pt);
 }
 
-//ÒÔX·½ÏòÎª¶Ô³ÆÖá¾µÏñ
+//ä»¥Xæ–¹å‘ä¸ºå¯¹ç§°è½´é•œåƒ
 void TDraw::MirrorX(POINT apt[], int apt_num, int Oy)
 {
 	for (int i = 0; i < apt_num; i++)
@@ -1179,7 +1179,7 @@ void TDraw::MoveRect(RECT &rc, int left, int top)
 	rc.bottom -= top;
 }
 
-//½«µã¼¯aptÏòangle·½ÏòÒÆ¶¯dist¾àÀë£¬aptÎªÆÁÄ»×ø±ê
+//å°†ç‚¹é›†aptå‘angleæ–¹å‘ç§»åŠ¨distè·ç¦»ï¼Œaptä¸ºå±å¹•åæ ‡
 void TDraw::Move(POINT apt[], int apt_num, double angle, double dist)
 {
 	for (int i = 0; i < apt_num; i++)
@@ -1191,20 +1191,20 @@ void TDraw::Move(POINT apt[], int apt_num, double angle, double dist)
 	}
 }
 
-//»­¼ıÍ·£ºÃ»ÓĞÑùÊ½
-//Ê¼Ä©µã¾ùÎªÆÁÄ»×ø±ê
+//ç”»ç®­å¤´ï¼šæ²¡æœ‰æ ·å¼
+//å§‹æœ«ç‚¹å‡ä¸ºå±å¹•åæ ‡
 void TDraw::DrawArrow(HDC hdc, POINT ptBegin, POINT ptEnd, int length, int width)
 {
 	POINT apt[3];
 	int aptNum = 3;
-	//ÏÈ¼ÆËãÖ¸ÏòÖÕµã£¬·½ÏòÎªXÖáÏò¼ıÍ·×ø±ê£¬ÔÙĞı×ªtheta¶È¡£
+	//å…ˆè®¡ç®—æŒ‡å‘ç»ˆç‚¹ï¼Œæ–¹å‘ä¸ºXè½´å‘ç®­å¤´åæ ‡ï¼Œå†æ—‹è½¬thetaåº¦ã€‚
 	apt[0] = ptEnd;
 	apt[1].x = ptEnd.x - length;
 	apt[1].y = ptEnd.y + width / 2;
 	apt[2].x = ptEnd.x - length;
 	apt[2].y = ptEnd.y - width / 2;
 
-	//ÓÉÓÚ»ñÈ¡½Ç¼°Ğı×ªº¯ÊıÊ¹ÓÃµÑ¿¨¶û×ø±êÏµ£¬¹ÊÏÈ·­×ªÆÁÄ»×ø±ê£¬¼ÆËãÍêºóÔÙ·­×ª»ØÈ¥¡£
+	//ç”±äºè·å–è§’åŠæ—‹è½¬å‡½æ•°ä½¿ç”¨ç¬›å¡å°”åæ ‡ç³»ï¼Œæ•…å…ˆç¿»è½¬å±å¹•åæ ‡ï¼Œè®¡ç®—å®Œåå†ç¿»è½¬å›å»ã€‚
 	TDraw::MirrorX(&ptBegin, 1, 0);
 	TDraw::MirrorX(&ptEnd, 1, 0);
 	TDraw::MirrorX(apt, aptNum, 0);
@@ -1218,7 +1218,7 @@ void TDraw::DrawArrow(HDC hdc, POINT ptBegin, POINT ptEnd, int length, int width
 	Polygon(hdc, apt, aptNum);
 }
 
-//»­×ø±êÖá£º¸½´øÑùÊ½
+//ç”»åæ ‡è½´ï¼šé™„å¸¦æ ·å¼
 void TDraw::DrawAxes(HDC hdc, int Ox, int Oy, COLORREF crColor)
 {
 	int AxesLen = 40;
@@ -1240,7 +1240,7 @@ void TDraw::DrawAxes(HDC hdc, int Ox, int Oy, COLORREF crColor)
 	DeleteObject(hPen);
 }
 
-//»­XĞÎ
+//ç”»Xå½¢
 void TDraw::DrawCross(HDC hdc, POINT pt, int size, LOGPEN Style)
 {
 	HPEN hPen;
@@ -1256,7 +1256,7 @@ void TDraw::DrawCross(HDC hdc, POINT pt, int size, LOGPEN Style)
 	::DeleteObject(hPen);
 }
 
-//Ìî³ä¾ØĞÎ
+//å¡«å……çŸ©å½¢
 void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor)
 {
 	HBRUSH hBrush;
@@ -1266,13 +1266,13 @@ void TDraw::FillRect(HDC hdc, RECT *rect, COLORREF crColor)
 	::DeleteObject(hBrush);
 }
 
-//»­Íø¸ñ
+//ç”»ç½‘æ ¼
 void TDraw::DrawGrid(HDC hdc, const RECT &rect, POINT ptOrg, COLORREF crGridBig, COLORREF crGridSmall, const TConfiguration *pConfig)
 {
 	int minGrid = 10;
 	int maxGrid = 40;
 
-	DPOINT realGrid = { 2, 2 };//ÕæÊµÍø¸ñ´óĞ¡2mm
+	DPOINT realGrid = { 2, 2 };//çœŸå®ç½‘æ ¼å¤§å°2mm
 	POINT screenGrid = pConfig->LengthToScreen(realGrid);
 
 	while (screenGrid.x<minGrid || screenGrid.x>maxGrid)
@@ -1290,12 +1290,12 @@ void TDraw::DrawGrid(HDC hdc, const RECT &rect, POINT ptOrg, COLORREF crGridBig,
 		screenGrid = pConfig->LengthToScreen(realGrid);
 	}
 
-	//Ô­µã¶ÔĞ¡¸ñ´óĞ¡È¡Óà£¬µÃµ½Íø¸ñ³õÊ¼Æ«ÒÆÁ¿
+	//åŸç‚¹å¯¹å°æ ¼å¤§å°å–ä½™ï¼Œå¾—åˆ°ç½‘æ ¼åˆå§‹åç§»é‡
 	int xOffset = ptOrg.x % screenGrid.x;
 	int yOffset = ptOrg.y % screenGrid.y;
 
-	//Ô­µã¼õÈ¥Íø¸ñÆ«ÒÆÁ¿£¬³ıÒÔ¸ñ×Ó´óĞ¡µÃµ½µ½Ô­µãµÄ¸ñÊı¡£ÔÙ¶Ô5È¡Óà£¬µÃµ½Ô­µãµ½×ó²à×î½ü´ó¸ñ¸ñÊı¡£
-	//ÓÃ¸ñÊıÈ¡ÓàÈôµÃµ½xBigOffsetÔòÓ¦»­´ó¸ñ¡£
+	//åŸç‚¹å‡å»ç½‘æ ¼åç§»é‡ï¼Œé™¤ä»¥æ ¼å­å¤§å°å¾—åˆ°åˆ°åŸç‚¹çš„æ ¼æ•°ã€‚å†å¯¹5å–ä½™ï¼Œå¾—åˆ°åŸç‚¹åˆ°å·¦ä¾§æœ€è¿‘å¤§æ ¼æ ¼æ•°ã€‚
+	//ç”¨æ ¼æ•°å–ä½™è‹¥å¾—åˆ°xBigOffsetåˆ™åº”ç”»å¤§æ ¼ã€‚
 	int xBigOffset = ((ptOrg.x - xOffset) / screenGrid.x) % 5;
 	if (xBigOffset < 0) xBigOffset = 5 + xBigOffset;
 	int yBigOffset = ((ptOrg.y - yOffset) / screenGrid.y) % 5;
@@ -1364,14 +1364,14 @@ bool TDraw::ShowConstraintCoincideDotLine(TElement *element, const TConfiguratio
 {
 	TConstraintCoincide *temp = (TConstraintCoincide *)element;
 
-	//±È½Ïp1,p2£¬¾àÀë´óÔò»­ĞéÏß
+	//æ¯”è¾ƒp1,p2ï¼Œè·ç¦»å¤§åˆ™ç”»è™šçº¿
 	if (DistanceScreen(temp->GetLinkDpt(0), temp->GetLinkDpt(1), pConfig) > 4)
 		return true;
 	else
 		return false;
 }
 
-//ÑùÊ½²ÉÓÃÅäÖÃÄÚÖÃ
+//æ ·å¼é‡‡ç”¨é…ç½®å†…ç½®
 void TDraw::DrawConstraintColinear_inner(HDC hdc, const POINT &pt1, const POINT &pt2, LOGPEN logpen, const TConfiguration *pConfig)
 {
 
@@ -1397,8 +1397,8 @@ void TDraw::DrawConstraintColinear_inner(HDC hdc, const POINT &pt1, const POINT 
 	DeleteObject(hPen);
 }
 
-//ÊÇ·ñÏÔÊ¾¹²ÏßÔ¼ÊøÏß£¨¹²ÏßÔ¼ÊøÎ»ÖÃ²»Âú×ã£©
-//ptCenter1,ptCenter2:·µ»ØÓ¦¸ÃÏÔÊ¾¹²ÏßÔ¼ÊøÏßµÄµã
+//æ˜¯å¦æ˜¾ç¤ºå…±çº¿çº¦æŸçº¿ï¼ˆå…±çº¿çº¦æŸä½ç½®ä¸æ»¡è¶³ï¼‰
+//ptCenter1,ptCenter2:è¿”å›åº”è¯¥æ˜¾ç¤ºå…±çº¿çº¦æŸçº¿çš„ç‚¹
 bool TDraw::ShowConstraintColinearDotLine(const TConstraintColinear *pColinear, POINT &ptCenter1, POINT &ptCenter2, const TConfiguration *pConfig)
 {
 	DPOINT P1, Q1, P2, Q2;
@@ -1409,9 +1409,9 @@ bool TDraw::ShowConstraintColinearDotLine(const TConstraintColinear *pColinear, 
 	ptCenter2 = pConfig->RealToScreen(GetCenter(P2, Q2));
 
 	DPOINT dptIntersection;
-	if (PointInRealLineOrExtension(P1, dptIntersection, P2, Q2, pConfig) != -1)//P1ÔÚP2 Q2ÉÏ
-		if (PointInRealLineOrExtension(Q1, dptIntersection, P2, Q2, pConfig) != -1)//Q1Ò²ÔÚP2 Q2ÉÏ
-			return false;//P1Q1 P2Q2¹²Ïß£¬²»»æÖÆ
+	if (PointInRealLineOrExtension(P1, dptIntersection, P2, Q2, pConfig) != -1)//P1åœ¨P2 Q2ä¸Š
+		if (PointInRealLineOrExtension(Q1, dptIntersection, P2, Q2, pConfig) != -1)//Q1ä¹Ÿåœ¨P2 Q2ä¸Š
+			return false;//P1Q1 P2Q2å…±çº¿ï¼Œä¸ç»˜åˆ¶
 
 	return true;
 
@@ -1425,7 +1425,7 @@ void TDraw::DrawConstraintColinear(HDC hdc, TConstraintColinear *pColinear, cons
 		DrawConstraintColinear_inner(hdc, ptCenter1, ptCenter2, pColinear->logpenStyleShow, pConfig);
 }
 
-//ÕæÕıµÄÖØºÏ»æÖÆº¯Êı ÑùÊ½²ÉÓÃÅäÖÃÄÚÖÃ
+//çœŸæ­£çš„é‡åˆç»˜åˆ¶å‡½æ•° æ ·å¼é‡‡ç”¨é…ç½®å†…ç½®
 void TDraw::DrawConstraintCoincide(HDC hdc, DPOINT dpt0, DPOINT dpt1, const LOGPEN &logpen, const TConfiguration *pConfig)
 {
 	if (DistanceScreen(dpt0, dpt1, pConfig) > 4)
@@ -1438,7 +1438,7 @@ void TDraw::DrawConstraintCoincide(HDC hdc, DPOINT dpt0, DPOINT dpt1, const LOGP
 	if (pConfig->bDrawReal)
 	{
 		HPEN hPen = (HPEN)::GetStockObject(NULL_PEN);
-		HBRUSH hBrush = ::CreateSolidBrush(pConfig->crLink);//Ê¼ÖÕÊÇºÚÉ«
+		HBRUSH hBrush = ::CreateSolidBrush(pConfig->crLink);//å§‹ç»ˆæ˜¯é»‘è‰²
 		::SelectObject(hdc, hPen);
 		::SelectObject(hdc, hBrush);
 
@@ -1451,10 +1451,10 @@ void TDraw::DrawConstraintCoincide(HDC hdc, DPOINT dpt0, DPOINT dpt1, const LOGP
 		DrawCircle(hdc, GetCenter(pConfig->RealToScreen(dpt0), pConfig->RealToScreen(dpt1)), pConfig->FRAMEPOINT_R, pConfig->logpenFront);
 }
 
-//×Ô´øÕæÊµäÖÈ¾
+//è‡ªå¸¦çœŸå®æ¸²æŸ“
 void TDraw::DrawConstraintCoincide(HDC hdc, TConstraintCoincide *pCoincide, const TConfiguration *pConfig)
 {
-	//±È½Ïp1,p2£¬¾àÀë´óÔò»­ĞéÏß
+	//æ¯”è¾ƒp1,p2ï¼Œè·ç¦»å¤§åˆ™ç”»è™šçº¿
 	DPOINT dpt[2];
 	dpt[0] = pCoincide->GetLinkDpt(0);
 	dpt[1] = pCoincide->GetLinkDpt(1);
@@ -1504,7 +1504,7 @@ void TDraw::ClientPosToScreen(HWND hWnd, POINT *pt)
 	pt->y += rect.top;
 }
 
-//¸ù¾İ±ßÔµÁ¿¸ü¸Ärect marginÎªÕıÔòËõĞ¡
+//æ ¹æ®è¾¹ç¼˜é‡æ›´æ”¹rect marginä¸ºæ­£åˆ™ç¼©å°
 void TDraw::SetMarginRect(RECT *rect, int margin)
 {
 	rect->left += margin;
@@ -1513,7 +1513,7 @@ void TDraw::SetMarginRect(RECT *rect, int margin)
 	rect->bottom -= margin;
 }
 
-//¸ù¾İ±ßÔµÁ¿¸ü¸Ärect£¬²»¸ü¸ÄÔ­À´µÄrect marginÎªÕıÔòËõĞ¡
+//æ ¹æ®è¾¹ç¼˜é‡æ›´æ”¹rectï¼Œä¸æ›´æ”¹åŸæ¥çš„rect marginä¸ºæ­£åˆ™ç¼©å°
 RECT TDraw::GetMarginRect(RECT rect, int margin)
 {
 	RECT rc = rect;
@@ -1521,14 +1521,14 @@ RECT TDraw::GetMarginRect(RECT rect, int margin)
 	return rc;
 }
 
-//¸ù¾İ±ßÔµÁ¿¸ü¸Ärect£¬²»¸ü¸ÄÔ­À´µÄrect marginÎªÕıÔòËõĞ¡
-//right,bottom±íÊ¾³¤¿í ¶ø·Ç×ø±ê
+//æ ¹æ®è¾¹ç¼˜é‡æ›´æ”¹rectï¼Œä¸æ›´æ”¹åŸæ¥çš„rect marginä¸ºæ­£åˆ™ç¼©å°
+//right,bottomè¡¨ç¤ºé•¿å®½ è€Œéåæ ‡
 RECT TDraw::GetMarginCtrlRect(const RECT &rect, int margin)
 {
 	return{ rect.left + margin, rect.top + margin, rect.right - 2 * margin, rect.bottom - 2 * margin };
 }
 
-//¸ù¾İ±ßÔµÁ¿¸ü¸Ärect£¬²»¸ü¸ÄÔ­À´µÄrect,marginÎªÕı ÔòËõĞ¡
+//æ ¹æ®è¾¹ç¼˜é‡æ›´æ”¹rectï¼Œä¸æ›´æ”¹åŸæ¥çš„rect,marginä¸ºæ­£ åˆ™ç¼©å°
 RECT TDraw::GetMarginRect(RECT rect, LONG margin_left, LONG margin_top, LONG margin_right, LONG margin_bottom)
 {
 	return{ rect.left + margin_left, rect.top + margin_top, rect.right - margin_right, rect.bottom - margin_bottom };
@@ -1608,11 +1608,11 @@ void TDraw::DrawAdjustedText(HDC hdc, POINT &ptMouse, const RECT &rcLimited, con
 	rc.left = ptMouse.x + dist;
 	rc.top = ptMouse.y + dist;
 
-	DrawSystemFontText(hdc, text, rc, pConfig->logpenFront.lopnColor, DT_CALCRECT);//²»»á»­³öÀ´£¬Ö»ÊÇÓÃÀ´Ë¢ĞÂrcµÄ
+	DrawSystemFontText(hdc, text, rc, pConfig->logpenFront.lopnColor, DT_CALCRECT);//ä¸ä¼šç”»å‡ºæ¥ï¼Œåªæ˜¯ç”¨æ¥åˆ·æ–°rcçš„
 	LONG width = rc.right - rc.left;
 	LONG height = rc.bottom - rc.top;
 	rcBk = rc;
-	SetMarginRect(&rcBk, -5);//À©´ó5px
+	SetMarginRect(&rcBk, -5);//æ‰©å¤§5px
 
 	if (rcBk.right > rcLimited.right)
 	{
@@ -1632,32 +1632,32 @@ void TDraw::DrawAdjustedText(HDC hdc, POINT &ptMouse, const RECT &rcLimited, con
 POINT TDraw::GetSystemFontSize(HDC hdc, const TCHAR text[])
 {
 	RECT rc = { 0, 0, 0, 0 };
-	DrawSystemFontText(hdc, text, rc, 0, DT_CALCRECT);//²»»á»­³öÀ´£¬Ö»ÊÇÓÃÀ´Ë¢ĞÂrcµÄ
+	DrawSystemFontText(hdc, text, rc, 0, DT_CALCRECT);//ä¸ä¼šç”»å‡ºæ¥ï¼Œåªæ˜¯ç”¨æ¥åˆ·æ–°rcçš„
 	return{ rc.right, rc.bottom };
 }
 
 void TDraw::DrawSystemFontText(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format)
 {
-	DrawTextAdvance(hdc, text, &rect, 9, 400, color, TEXT("ËÎÌå"), format);
+	DrawTextAdvance(hdc, text, &rect, 9, 400, color, TEXT("å®‹ä½“"), format);
 }
 
 void TDraw::DrawSystemFontTextVertical(HDC hdc, const TCHAR text[], RECT &rect, COLORREF color, UINT format)
 {
-	DrawTextAdvance(hdc, text, &rect, 9, 400, color, TEXT("ËÎÌå"), format, 900, 900);
+	DrawTextAdvance(hdc, text, &rect, 9, 400, color, TEXT("å®‹ä½“"), format, 900, 900);
 }
 
-//ÅĞ¶ÏµãÊÇ·ñÎ»ÓÚÖ±Ïß»òÖ±ÏßµÄÑÓ³¤ÏßÉÏ 
-//·µ»ØÖµ£º-1¶¼²»ÔÚ 0ÔÚÏß¶ÎÉÏ 1ÔÚpt1Ò»²àÑÓ³¤Ïß 2ÔÚpt2Ò»²àÑÓ³¤Ïß
-//Èç¹ûÔÚÈİ²îÒÔÄÚÔòdptIntersectionÉèÎª½»µã×ø±ê£¬·ñÔò²»±ä
-//Èİ²î²ÉÓÃpConfigÄÚÊı¾İ
+//åˆ¤æ–­ç‚¹æ˜¯å¦ä½äºç›´çº¿æˆ–ç›´çº¿çš„å»¶é•¿çº¿ä¸Š 
+//è¿”å›å€¼ï¼š-1éƒ½ä¸åœ¨ 0åœ¨çº¿æ®µä¸Š 1åœ¨pt1ä¸€ä¾§å»¶é•¿çº¿ 2åœ¨pt2ä¸€ä¾§å»¶é•¿çº¿
+//å¦‚æœåœ¨å®¹å·®ä»¥å†…åˆ™dptIntersectionè®¾ä¸ºäº¤ç‚¹åæ ‡ï¼Œå¦åˆ™ä¸å˜
+//å®¹å·®é‡‡ç”¨pConfigå†…æ•°æ®
 int TDraw::PointInRealLineOrExtension(const DPOINT &dptPos, DPOINT &dptIntersection, const DPOINT dptBegin, const DPOINT dptEnd, const TConfiguration *pConfig)
 {
-	if (Distance(dptBegin, dptEnd) < precision)//Á½µãÖØºÏ
+	if (Distance(dptBegin, dptEnd) < precision)//ä¸¤ç‚¹é‡åˆ
 	{
 		return -1;
 	}
 
-	//¼ÆËã´¹×ã
+	//è®¡ç®—å‚è¶³
 	DPOINT dptCalc;
 
 	double x, y;
@@ -1691,7 +1691,7 @@ int TDraw::PointInRealLineOrExtension(const DPOINT &dptPos, DPOINT &dptIntersect
 		double length = Distance(dptBegin, dptEnd);
 		double length1 = TDraw::Distance(dptCalc, dptBegin);
 		double length2 = TDraw::Distance(dptCalc, dptEnd);
-		if (length1 > length && length1 > length2)//ÔÚpt2Ò»²à
+		if (length1 > length && length1 > length2)//åœ¨pt2ä¸€ä¾§
 			return 2;
 		if (length2 > length && length2 > length1)//
 			return 1;
@@ -1714,26 +1714,26 @@ bool TDraw::PointInRealLine(const POINT &ptPos, const DPOINT &dptBegin, const DP
 	return PointInRealLine(ptPos, pt1, pt2, pConfig);
 }
 
-//ÅĞ¶ÏµãÊÇ·ñÔÚÏßÒÔÄÚ
+//åˆ¤æ–­ç‚¹æ˜¯å¦åœ¨çº¿ä»¥å†…
 bool TDraw::PointInRealLine(const POINT &ptPos, const  POINT &ptBegin, const  POINT &ptEnd, const TConfiguration *pConfig)
 {
 	double length = TDraw::Distance(ptBegin, ptEnd);
 	double length1 = TDraw::Distance(ptPos, ptBegin);
 	double length2 = TDraw::Distance(ptPos, ptEnd);
 
-	if (length1 + length2 - length <= 0.5)//Èİ²î
+	if (length1 + length2 - length <= 0.5)//å®¹å·®
 		return true;
 	else
 		return false;
 }
 
-//ÅĞ¶ÏµãÊÇ·ñÔÚÏßÒÔÄÚ
+//åˆ¤æ–­ç‚¹æ˜¯å¦åœ¨çº¿ä»¥å†…
 bool TDraw::PointInRealLine(POINT ptPos, TRealLine *pRealLine, const TConfiguration *pConfig)
 {
 	return PointInRealLine(ptPos, pConfig->RealToScreen(pRealLine->ptBegin), pConfig->RealToScreen(pRealLine->ptEnd), pConfig);
 }
 
-//¸ù¾İÆğÊ¼µã¼ÆËã¼Ó´ÖºóÏß¶ÎµÄËÄ¸ö½Çµã angle¿ÉÊ¹ÓÃGetAngleFromScreen¼ÆËãµÃµ½
+//æ ¹æ®èµ·å§‹ç‚¹è®¡ç®—åŠ ç²—åçº¿æ®µçš„å››ä¸ªè§’ç‚¹ angleå¯ä½¿ç”¨GetAngleFromScreenè®¡ç®—å¾—åˆ°
 void TDraw::CalcBarRectCoor(POINT ptResult[4], const POINT &ptBegin, const POINT &ptEnd, double angle, int width)
 {
 	ptResult[0] = { (LONG)(ptBegin.x + width / 2.0*sin(angle)), (LONG)(ptBegin.y + width / 2.0*cos(angle)) };
@@ -1742,7 +1742,7 @@ void TDraw::CalcBarRectCoor(POINT ptResult[4], const POINT &ptBegin, const POINT
 	ptResult[2] = { (LONG)(ptEnd.x - width / 2.0*sin(angle)), (LONG)(ptEnd.y - width / 2.0*cos(angle)) };
 }
 
-//¼ÆËã»¬¿é¾ØĞÎ×ø±ê ÊäÈë£ºÖĞĞÄµã ½Ç¶È Êä³ö£º4µã×ø±ê
+//è®¡ç®—æ»‘å—çŸ©å½¢åæ ‡ è¾“å…¥ï¼šä¸­å¿ƒç‚¹ è§’åº¦ è¾“å‡ºï¼š4ç‚¹åæ ‡
 void TDraw::CalcSliderRectCoor(POINT aptResult[4], const POINT &pt, double angle, const TConfiguration *pConfig)
 {
 	double c = sqrt(pConfig->SLIDER_H*pConfig->SLIDER_H + pConfig->SLIDER_B*pConfig->SLIDER_B) / 2;
@@ -1759,31 +1759,31 @@ void TDraw::GetAbsoluteReal(std::vector<DPOINT> &vecdptResult, const std::vector
 		vecdptResult.push_back(GetAbsolute(dpt, Org, angle));
 }
 
-//Ïà¶Ô×ø±ê×ª¾ø¶Ô×ø±ê rp=r+A*s'p Result²»Ô¤ÏÈÇå¿Õ
+//ç›¸å¯¹åæ ‡è½¬ç»å¯¹åæ ‡ rp=r+A*s'p Resultä¸é¢„å…ˆæ¸…ç©º
 void TDraw::GetAbsoluteScreen(std::vector<POINT> &vecptResult, const std::vector<DPOINT> &vecdpt, const DPOINT &Org, double angle, const TConfiguration *pConfig)
 {
 	for (auto dpt : vecdpt)
 		vecptResult.push_back(pConfig->RealToScreen(GetAbsolute(dpt, Org, angle)));
 }
 
-//Ïà¶Ô×ø±ê×ª¾ø¶Ô×ø±ê rp=r+A*s'p
+//ç›¸å¯¹åæ ‡è½¬ç»å¯¹åæ ‡ rp=r+A*s'p
 DPOINT TDraw::GetAbsolute(const DPOINT &dpt, const DPOINT &Org, double angle)
 {
 	return{ Org.x + dpt.x*cos(angle) - dpt.y*sin(angle),
 		Org.y + dpt.x*sin(angle) + dpt.y*cos(angle) };
 }
 
-//¾ø¶Ô×ø±ê×ªÏà¶Ô×ø±ê s'p=AT*(rp-r)
+//ç»å¯¹åæ ‡è½¬ç›¸å¯¹åæ ‡ s'p=AT*(rp-r)
 DPOINT TDraw::GetRelative(const DPOINT &dpt, const DPOINT &Org, double angle)
 {
 	return{ cos(angle)*(dpt.x - Org.x) + sin(angle)*(dpt.y - Org.y),
 		-sin(angle)*(dpt.x - Org.x) + cos(angle)*(dpt.y - Org.y) };
 }
 
-//µÃµ½Á½ÌõÏßµÄ½»µã
+//å¾—åˆ°ä¸¤æ¡çº¿çš„äº¤ç‚¹
 bool TDraw::GetIntersection(const DPOINT &dptL1Begin, const DPOINT &dptL1End, const DPOINT &dptL2Begin, const  DPOINT &dptL2End, DPOINT &dptIntersection)
 {
-	//L1,L2¶ËµãÖØºÏµÄÇé¿öÎ´¿¼ÂÇ
+	//L1,L2ç«¯ç‚¹é‡åˆçš„æƒ…å†µæœªè€ƒè™‘
 	const double &x1 = dptL1Begin.x;
 	const double &y1 = dptL1Begin.y;
 	const double &x2 = dptL1End.x;
@@ -1806,9 +1806,9 @@ bool TDraw::GetIntersection(const DPOINT &dptL1Begin, const DPOINT &dptL1End, co
 		return false;
 }
 
-//²»´øÑùÊ½»¡Ïß
-//pt:Ô­µã r:°ë¾¶
-//pt1,pt2:ÉÈĞÎÊ¼Ä©·½ÏòµÄµã
+//ä¸å¸¦æ ·å¼å¼§çº¿
+//pt:åŸç‚¹ r:åŠå¾„
+//pt1,pt2:æ‰‡å½¢å§‹æœ«æ–¹å‘çš„ç‚¹
 void TDraw::DrawArc(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, bool bAlwaysDrawAngleBetween)
 {
 	if (bAlwaysDrawAngleBetween && GetAngleBetweenPointScreen(pt1, pt, pt2) > M_PI)//>180
@@ -1817,10 +1817,10 @@ void TDraw::DrawArc(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POI
 		Arc(hdc, pt.x - r, pt.y - r, pt.x + r, pt.y + r, pt1.x, pt1.y, pt2.x, pt2.y);
 }
 
-//²»´øÑùÊ½ÉÈĞÎ
-//pt:Ô­µã r:°ë¾¶
-//pt1,pt2:ÉÈĞÎÊ¼Ä©·½ÏòµÄµã
-//bAlwaysDrawAngleBetween:ÎªtrueÔòÊ¼ÖÕ»­¼Ğ½Ç
+//ä¸å¸¦æ ·å¼æ‰‡å½¢
+//pt:åŸç‚¹ r:åŠå¾„
+//pt1,pt2:æ‰‡å½¢å§‹æœ«æ–¹å‘çš„ç‚¹
+//bAlwaysDrawAngleBetween:ä¸ºtrueåˆ™å§‹ç»ˆç”»å¤¹è§’
 void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, bool bAlwaysDrawAngleBetween)
 {
 	if (bAlwaysDrawAngleBetween && GetAngleBetweenPointScreen(pt1, pt, pt2) > M_PI)//>180
@@ -1829,9 +1829,9 @@ void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POI
 		Pie(hdc, pt.x - r, pt.y - r, pt.x + r, pt.y + r, pt1.x, pt1.y, pt2.x, pt2.y);
 }
 
-//´øÑùÊ½ÉÈĞÎ
-//pt:Ô­µã r:°ë¾¶
-//pt1,pt2:ÉÈĞÎÊ¼Ä©·½ÏòµÄµã
+//å¸¦æ ·å¼æ‰‡å½¢
+//pt:åŸç‚¹ r:åŠå¾„
+//pt1,pt2:æ‰‡å½¢å§‹æœ«æ–¹å‘çš„ç‚¹
 void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POINT &pt2, const LOGPEN &logpen, const COLORREF &crColor)
 {
 	HPEN hPen;
@@ -1850,25 +1850,25 @@ void TDraw::DrawPie(HDC hdc, const POINT &pt, int r, const POINT &pt1, const POI
 
 void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, const TConfiguration *pConfig)
 {
-	//»­Ïß
+	//ç”»çº¿
 	if (pConfig->bDrawReal == false)
 		for (auto iter = pSlider->vecLine.begin(); iter != pSlider->vecLine.end(); ++iter)
 		{
-			DPOINT &A1 = pSlider->vecDpt[iter->index1];//Ïà¶Ô×ø±ê
-			DPOINT &A2 = pSlider->vecDpt[iter->index2];//Ïà¶Ô×ø±ê
+			DPOINT &A1 = pSlider->vecDpt[iter->index1];//ç›¸å¯¹åæ ‡
+			DPOINT &A2 = pSlider->vecDpt[iter->index2];//ç›¸å¯¹åæ ‡
 			DPOINT dptBegin = GetAbsolute(A1, pSlider->dpt, pSlider->angle);
 			DPOINT dptEnd = GetAbsolute(A2, pSlider->dpt, pSlider->angle);
 			DrawRealLine(hdc, dptBegin, dptEnd, pSlider->logpenStyleShow, pConfig);
 
-			//¼ÆËãµÃµ½Ïà½»µã
+			//è®¡ç®—å¾—åˆ°ç›¸äº¤ç‚¹
 			double b = pConfig->ScreenToLengthX(pConfig->SLIDER_B);
 			double h = pConfig->ScreenToLengthY(pConfig->SLIDER_H);
-			DPOINT R1 = { b / 2, h / 2 };//Ïà¶Ô×ø±ê
-			DPOINT R2 = { -b / 2, h / 2 };//Ïà¶Ô×ø±ê
-			DPOINT R3 = { -b / 2, -h / 2 };//Ïà¶Ô×ø±ê
-			DPOINT R4 = { b / 2, -h / 2 };//Ïà¶Ô×ø±ê
-			DPOINT B1, B2;//Ïà¶Ô×ø±ê
-			DPOINT dptIntersection;//Ïà¶Ô×ø±ê
+			DPOINT R1 = { b / 2, h / 2 };//ç›¸å¯¹åæ ‡
+			DPOINT R2 = { -b / 2, h / 2 };//ç›¸å¯¹åæ ‡
+			DPOINT R3 = { -b / 2, -h / 2 };//ç›¸å¯¹åæ ‡
+			DPOINT R4 = { b / 2, -h / 2 };//ç›¸å¯¹åæ ‡
+			DPOINT B1, B2;//ç›¸å¯¹åæ ‡
+			DPOINT dptIntersection;//ç›¸å¯¹åæ ‡
 			if (GetIntersection(A1, A2, R4, R1, dptIntersection))
 			{
 				B1 = R4; B2 = R1;
@@ -1928,13 +1928,13 @@ void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, const TConfiguration *pConfig)
 	TDrawTranslucent Translucent;
 	if (pConfig->bDrawReal)
 	{
-		//µş¼Ó¶à¶Î¸ËÇøÓò
+		//å åŠ å¤šæ®µæ†åŒºåŸŸ
 		HRGN hRgnPolylineBar;
 		CalcPolylineBarRgn(hRgnPolylineBar, pSlider->vecDpt, pSlider->dpt, pSlider->angle, pConfig);
 		CombineRgn(hRgn, hRgn, hRgnPolylineBar, RGN_OR);
 		::DeleteObject(hRgnPolylineBar);
 
-		FrameRgn(hdc, hRgn, hBrushFrame, 1, 1);//»­±ßÏß
+		FrameRgn(hdc, hRgn, hBrushFrame, 1, 1);//ç”»è¾¹çº¿
 
 		GetRgnBox(hRgn, &rect);
 		SetMarginRect(&rect, -1);
@@ -1949,7 +1949,7 @@ void TDraw::DrawSlider(HDC hdc, TSlider *pSlider, const TConfiguration *pConfig)
 	{
 		FillRgn(hdc, hRgn, hBrushFill);
 
-		FrameRgn(hdc, hRgn, hBrushFrame, 1, 1);//»­±ßÏß
+		FrameRgn(hdc, hRgn, hBrushFrame, 1, 1);//ç”»è¾¹çº¿
 	}
 
 	::DeleteObject(hBrushFill);
@@ -1996,7 +1996,7 @@ bool TDraw::PickConstraintCoincide(POINT ptPos, TElement *element, const TConfig
 {
 	TConstraintCoincide *temp = (TConstraintCoincide *)element;
 
-	//ÖØºÏĞéÏßÏÔÊ¾£¬ÇÒĞéÏß±»Ê°È¡
+	//é‡åˆè™šçº¿æ˜¾ç¤ºï¼Œä¸”è™šçº¿è¢«æ‹¾å–
 	if (TDraw::ShowConstraintCoincideDotLine(temp, pConfig) && TDraw::PointInRealLine(ptPos, temp->GetLinkDpt(0), temp->GetLinkDpt(1), pConfig))
 	{
 		return true;

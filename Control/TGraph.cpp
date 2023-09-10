@@ -64,7 +64,7 @@ void TGraph::SetMargin(int iMargin)
 	OnSize(0, 0);
 }
 
-void TGraph::Refresh()//Ë¢ĞÂ µÈÍ¬ÓÚµ÷ÓÃOnSize
+void TGraph::Refresh()//åˆ·æ–° ç­‰åŒäºè°ƒç”¨OnSize
 {
 	OnSize(0, 0);
 }
@@ -74,14 +74,14 @@ void TGraph::OnSize(WPARAM wParam, LPARAM lParam)
 	if (!bDraw)
 		return;
 
-	LONG lScaleLong = 6;//¿Ì¶È³¤¶È
+	LONG lScaleLong = 6;//åˆ»åº¦é•¿åº¦
 	LONG lScaleRightWidth = 0;
 
 	rcGraph = ClientRect;
 	//if (GetMenu(m_hWnd))
 	//	rcGraph.bottom-=GetSystemMetrics(SM_CYMENUSIZE);
 
-	//Ô¤¼ÆËã¼ä¾à
+	//é¢„è®¡ç®—é—´è·
 	{
 		HDC hdc = GetDC(m_hWnd);
 		lTextHeight = TDraw::GetSystemFontSize(hdc, TEXT("test")).y;
@@ -103,7 +103,7 @@ void TGraph::OnSize(WPARAM wParam, LPARAM lParam)
 		iMarginRight = lScaleRightWidth;
 	}
 
-	//¼ä¾àÉúĞ§
+	//é—´è·ç”Ÿæ•ˆ
 	rcGraph.top += iMarginTop;
 	rcGraph.bottom -= iMarginBottom;
 	rcGraph.left += iMarginLeft;
@@ -111,7 +111,7 @@ void TGraph::OnSize(WPARAM wParam, LPARAM lParam)
 
 	TDraw::SetMarginRect(&rcGraph, 10);
 
-	CalcPointArray(rcGraph);//¼ÆËãÏÔÊ¾µã
+	CalcPointArray(rcGraph);//è®¡ç®—æ˜¾ç¤ºç‚¹
 
 	{
 		HDC hdc = GetDC(m_hWnd);
@@ -135,14 +135,14 @@ void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOG
 	TPointData PointData;
 	PointData.dptVector = dptInputVector;
 
-	//×î´ó×îĞ¡µÃµ½³õÖµ
+	//æœ€å¤§æœ€å°å¾—åˆ°åˆå€¼
 	if (PointData.dptVector.size() > 0)
 	{
 		PointData.x_max = PointData.x_min = PointData.dptVector[0].x;
 		PointData.y_max = PointData.y_min = PointData.dptVector[0].y;
 	}
 
-	//µÃµ½Êı¾İµã±ß½ç
+	//å¾—åˆ°æ•°æ®ç‚¹è¾¹ç•Œ
 	for (auto dpt : PointData.dptVector)
 	{
 		if (dpt.x > PointData.x_max) PointData.x_max = dpt.x;
@@ -154,7 +154,7 @@ void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOG
 	PointData.y_len = PointData.y_max - PointData.y_min;
 
 	PointData.iPtCount = PointData.dptVector.size();
-	PointData.ptArray = new POINT[PointData.iPtCount];//´ËÊ±½ö³õÊ¼»¯£¬Ã»ÓĞ¼ÆËã
+	PointData.ptArray = new POINT[PointData.iPtCount];//æ­¤æ—¶ä»…åˆå§‹åŒ–ï¼Œæ²¡æœ‰è®¡ç®—
 
 	PointData.logpen = logpen;
 
@@ -164,7 +164,7 @@ void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOG
 
 	PointData.sLabelY = szUnitLabel;
 
-	//ÉèÖÃLegend´óĞ¡
+	//è®¾ç½®Legendå¤§å°
 	RECT rcTemp;
 	ZeroMemory(&rcTemp, sizeof(rcTemp));
 	HDC hdc = GetDC(m_hWnd);
@@ -173,23 +173,23 @@ void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOG
 	PointData.lLegendWidth = rcTemp.right - rcTemp.left;
 	PointData.lLegendHeight = rcTemp.bottom - rcTemp.top;
 
-	//Ìí¼ÓMenu
-	HMENU hMenu = GetMenu(m_hWnd);//È¡µÃ²Ëµ¥¾ä±ú
-	HMENU hMenuView = GetSubMenu(hMenu, 1);//¡°Êı¾İ¡±²Ëµ¥
-	if (vecPointData.empty())//µÚÒ»ÌõÊı¾İÔòĞÂ½¨ Êı¾İ ²Ëµ¥¾ä±ú
+	//æ·»åŠ Menu
+	HMENU hMenu = GetMenu(m_hWnd);//å–å¾—èœå•å¥æŸ„
+	HMENU hMenuView = GetSubMenu(hMenu, 1);//â€œæ•°æ®â€èœå•
+	if (vecPointData.empty())//ç¬¬ä¸€æ¡æ•°æ®åˆ™æ–°å»º æ•°æ® èœå•å¥æŸ„
 	{
 		hMenuData = CreateMenu();
-		InsertMenu(hMenuView, 1, MF_POPUP | MF_BYPOSITION, (UINT)hMenuData, TEXT("Êı¾İ"));
+		InsertMenu(hMenuView, 1, MF_POPUP | MF_BYPOSITION, (UINT)hMenuData, TEXT("æ•°æ®"));
 
 		PointData.bShowGridBig=PointData.bShowGridSmall = true;
 	}
 	AppendMenu(hMenuData, MF_CHECKED, ID_MENU_GRAPH_DATA_START + vecPointData.size(), PointData.sLegend.c_str());
 
-	//Èë¿â
+	//å…¥åº“
 	vecPointData.push_back(PointData);
 
 	OnSize(0, 0);
-	//Ìí¼Óµã±Ø¶¨¾­¹ı´Ë´¦
+	//æ·»åŠ ç‚¹å¿…å®šç»è¿‡æ­¤å¤„
 }
 
 
@@ -230,20 +230,20 @@ void TGraph::DrawGridAndScale(HDC hdc)
 		{
 			for (auto &GridLineAndScale : PointData.vecGridLineAndScale)
 			{
-				//»­¿Ì¶ÈÏß	
+				//ç”»åˆ»åº¦çº¿	
 				TDraw::DrawLine(hdc, GridLineAndScale.ptScaleBegin, GridLineAndScale.ptScaleEnd, pConfig->logpenBlack);
 
-				//»­¿Ì¶È×Ö
+				//ç”»åˆ»åº¦å­—
 				TDraw::DrawSystemFontText(hdc, GridLineAndScale.sScale.c_str(), GridLineAndScale.rcScaleText, 0, DT_CENTER);
 
-				//»­´óÍø¸ñ
+				//ç”»å¤§ç½‘æ ¼
 				if (PointData.bShowGridBig)
 					TDraw::DrawLine(hdc, GridLineAndScale.ptGridStart, GridLineAndScale.ptGridEnd, pConfig->logpenGraphGridBig);
 			}
 			TDraw::DrawLine(hdc, PointData.ptAxisBegin,PointData.ptAxisEnd, pConfig->logpenBlack);
 		}
 
-	//»­Ğ¡Íø¸ñ
+	//ç”»å°ç½‘æ ¼
 	for (auto &PointData : vecPointData)
 		if (PointData.Show)
 			if (PointData.bShowGridSmall)
@@ -257,21 +257,21 @@ void CalcGridParameters(HDC hdc, bool isX, const RECT &rcGraph, double v_min, do
 	int &x_all_scale_count, int &x_precision_digit, double &x_start, double &x_step, double &x_step_small, int &small_grid_per_big_grid, bool &bDrawSmallGrid)
 {
 
-	int width = rcGraph.right - rcGraph.left;//ÏÔÊ¾Çø¿í¶È
-	int height = rcGraph.bottom - rcGraph.top;//ÏÔÊ¾Çø¸ß¶È
+	int width = rcGraph.right - rcGraph.left;//æ˜¾ç¤ºåŒºå®½åº¦
+	int height = rcGraph.bottom - rcGraph.top;//æ˜¾ç¤ºåŒºé«˜åº¦
 
 	double x_len = v_max - v_min;
 
-	double x_all_scale_len(0.0);//¿Ì¶ÈÇøÊµ¼Ê·¶Î§
-	int x_all_scale_number(0);//Ğ¡¿Ì¶ÈÊıÁ¿
+	double x_all_scale_len(0.0);//åˆ»åº¦åŒºå®é™…èŒƒå›´
+	int x_all_scale_number(0);//å°åˆ»åº¦æ•°é‡
 
 	SignificantDigit(x_len, 2, x_all_scale_number, x_all_scale_len, x_precision_digit);
 
 	double num = pow(10, x_precision_digit);//+ (v_min < 0 ? -1 : -1)
-	x_start = trunc(v_min*num) / num;//x¿Ì¶È¿ªÊ¼Î»ÖÃ
+	x_start = trunc(v_min*num) / num;//xåˆ»åº¦å¼€å§‹ä½ç½®
 
-	//ÊÔËã¿Ì¶ÈÎÄ×Ö¿í¶È
-	LONG min_px_between_2_scale;//Á½¸ö´óÍø¸ñ¼äµÄÔÊĞí×îĞ¡ÏñËØ£¬µÍÓÚ´ËÖµÔò´óÍø¸ñ¼ä¸ô¼Ó±¶
+	//è¯•ç®—åˆ»åº¦æ–‡å­—å®½åº¦
+	LONG min_px_between_2_scale;//ä¸¤ä¸ªå¤§ç½‘æ ¼é—´çš„å…è®¸æœ€å°åƒç´ ï¼Œä½äºæ­¤å€¼åˆ™å¤§ç½‘æ ¼é—´éš”åŠ å€
 	{
 		RECT rcTemp;
 		TCHAR szScaleX[64];
@@ -285,8 +285,8 @@ void CalcGridParameters(HDC hdc, bool isX, const RECT &rcGraph, double v_min, do
 	}
 
 	int units_per_big_grid = 1;
-	x_all_scale_count = x_all_scale_number / units_per_big_grid;//Ã¿5¸öµ¥Î»Ò»¸ö´ó¿Ì¶È
-	x_step = x_all_scale_len / x_all_scale_number * units_per_big_grid;//Ã¿¸ö´ó¿Ì¶È¼äÊµ¼Ê¾àÀë
+	x_all_scale_count = x_all_scale_number / units_per_big_grid;//æ¯5ä¸ªå•ä½ä¸€ä¸ªå¤§åˆ»åº¦
+	x_step = x_all_scale_len / x_all_scale_number * units_per_big_grid;//æ¯ä¸ªå¤§åˆ»åº¦é—´å®é™…è·ç¦»
 
 	LONG px_between_2_scale;
 	while (1)
@@ -307,11 +307,11 @@ void CalcGridParameters(HDC hdc, bool isX, const RECT &rcGraph, double v_min, do
 		default:
 			units_per_big_grid *= 2;
 		}
-		x_all_scale_count = x_all_scale_number / units_per_big_grid;//Ã¿5¸öµ¥Î»Ò»¸ö´ó¿Ì¶È
-		x_step = x_all_scale_len / x_all_scale_number * units_per_big_grid;//Ã¿¸ö´ó¿Ì¶È¼äÊµ¼Ê¾àÀë
+		x_all_scale_count = x_all_scale_number / units_per_big_grid;//æ¯5ä¸ªå•ä½ä¸€ä¸ªå¤§åˆ»åº¦
+		x_step = x_all_scale_len / x_all_scale_number * units_per_big_grid;//æ¯ä¸ªå¤§åˆ»åº¦é—´å®é™…è·ç¦»
 	}
 
-	//½«xÆğµãÆğËãÖÁ¸ÕºÃÎ»ÓÚÕû¸ñµÄÇ°Ò»¸ñ
+	//å°†xèµ·ç‚¹èµ·ç®—è‡³åˆšå¥½ä½äºæ•´æ ¼çš„å‰ä¸€æ ¼
 	//before: x_min=136.4 x_strat=100 x_step=5
 	//after: x_start=135
 	if (x_start < v_min)
@@ -338,12 +338,12 @@ void CalcGridParameters(HDC hdc, bool isX, const RECT &rcGraph, double v_min, do
 	}
 
 	small_grid_per_big_grid = units_per_big_grid;
-	x_step_small = x_step / small_grid_per_big_grid;//Ğ¡Íø¸ñ¼ä¸ô
+	x_step_small = x_step / small_grid_per_big_grid;//å°ç½‘æ ¼é—´éš”
 	{
 		int x_step_small_px = isX ? TDraw::DPOINT2POINTXLEN(x_start, x_start + x_step_small, v_min, v_max, rcGraph) : TDraw::DPOINT2POINTYLEN(x_start, x_start + x_step_small, v_min, v_max, rcGraph);
 		if (x_step_small_px > 20)
 		{
-			//ËõĞ¡Ğ¡Íø¸ñ
+			//ç¼©å°å°ç½‘æ ¼
 
 			while (x_step_small_px > 20)
 			{
@@ -360,23 +360,23 @@ void CalcGridParameters(HDC hdc, bool isX, const RECT &rcGraph, double v_min, do
 		else
 			if (x_step_small_px < 10)
 				bDrawSmallGrid = false;
-		//else 4-20 Î¬³ÖÔ­×´
+		//else 4-20 ç»´æŒåŸçŠ¶
 	}
 }
 
-//¼ÆËãÍø¸ñ¼°¿Ì¶ÈÊı¾İ
-//¸Ä±äÊı¾İ£º
+//è®¡ç®—ç½‘æ ¼åŠåˆ»åº¦æ•°æ®
+//æ”¹å˜æ•°æ®ï¼š
 // vecGridLineAndScale, vecGridScaleSmall,rcLabelY, lScaleLeftWidth
-//¶ÁÈ¡Êı¾İ£º
+//è¯»å–æ•°æ®ï¼š
 //x_min, x_max, y_min, y_max, sLabelY
 void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize, LONG &lRightSize,
 	const RECT &rcGraph, LONG &lPrevAllWidth, LONG lScaleLong, LONG lInterval)
 {
-	//XÍø¸ñ²ÎÊı
+	//Xç½‘æ ¼å‚æ•°
 	int x_all_scale_count;
-	int x_precision_digit(0);//ÓĞĞ§Êı×Ö½áÊø´¦Î»ÓÚÔ­Êı×ÖµÄµÚ¼¸Î» ÔÚĞ¡ÊıµãÓÒ±ßÔòÎªÕı
-	double x_start;//x¿Ì¶È¿ªÊ¼Î»ÖÃ
-	double x_step;//Ã¿¸ö´ó¿Ì¶È¼äÊµ¼Ê¾àÀë
+	int x_precision_digit(0);//æœ‰æ•ˆæ•°å­—ç»“æŸå¤„ä½äºåŸæ•°å­—çš„ç¬¬å‡ ä½ åœ¨å°æ•°ç‚¹å³è¾¹åˆ™ä¸ºæ­£
+	double x_start;//xåˆ»åº¦å¼€å§‹ä½ç½®
+	double x_step;//æ¯ä¸ªå¤§åˆ»åº¦é—´å®é™…è·ç¦»
 	double x_step_small;
 	int x_small_grid_per_big_grid;
 	bool bDrawSmallGridX = true;
@@ -384,11 +384,11 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 	CalcGridParameters(hdc, true, rcGraph, PointData.x_min, PointData.x_max,
 		x_all_scale_count, x_precision_digit, x_start, x_step, x_step_small, x_small_grid_per_big_grid, bDrawSmallGridX);
 
-	//YÍø¸ñ²ÎÊı
+	//Yç½‘æ ¼å‚æ•°
 	int y_all_scale_count;
-	int y_precision_digit(0);//ÓĞĞ§Êı×Ö½áÊø´¦Î»ÓÚÔ­Êı×ÖµÄµÚ¼¸Î» ÔÚĞ¡ÊıµãÓÒ±ßÔòÎªÕı
-	double y_start;//x¿Ì¶È¿ªÊ¼Î»ÖÃ
-	double y_step;//Ã¿¸ö´ó¿Ì¶È¼äÊµ¼Ê¾àÀë
+	int y_precision_digit(0);//æœ‰æ•ˆæ•°å­—ç»“æŸå¤„ä½äºåŸæ•°å­—çš„ç¬¬å‡ ä½ åœ¨å°æ•°ç‚¹å³è¾¹åˆ™ä¸ºæ­£
+	double y_start;//xåˆ»åº¦å¼€å§‹ä½ç½®
+	double y_step;//æ¯ä¸ªå¤§åˆ»åº¦é—´å®é™…è·ç¦»
 	double y_step_small;
 	int y_small_grid_per_big_grid;
 	bool bDrawSmallGridY = true;
@@ -408,7 +408,7 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 	TCHAR szScale[64];
 	DPOINT dpt, dptSmall;
 
-	//´æÈëXÍø¸ñÊı¾İ
+	//å­˜å…¥Xç½‘æ ¼æ•°æ®
 	lBottomSize = 0;
 	lRightSize = 0;
 	for (int i = 0; i < x_all_scale_count + 1; ++i)
@@ -417,9 +417,9 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 		GridLineAndScale.ptScaleEnd = GridLineAndScale.ptScaleBegin = TDraw::DPOINT2POINT(dpt, PointData.x_min, PointData.x_max, PointData.y_min, PointData.y_max, rcGraph);
 		GridLineAndScale.ptScaleBegin.y = rcGraph.bottom;
 		GridLineAndScale.ptScaleEnd.y = GridLineAndScale.ptScaleBegin.y + lScaleLong;
-		//TDraw::DrawLine(hdc, ptBegin, ptEnd, pConfig->logpenBlack);//»­¿Ì¶ÈÏß
+		//TDraw::DrawLine(hdc, ptBegin, ptEnd, pConfig->logpenBlack);//ç”»åˆ»åº¦çº¿
 
-		//»­¿Ì¶ÈÎÄ×Ö
+		//ç”»åˆ»åº¦æ–‡å­—
 		TTransfer::double2TCHAR(dpt.x, szScale, x_precision_digit);
 		GridLineAndScale.sScale = szScale;
 		GridLineAndScale.rcScaleText = { 0, 0, 0, 0 };
@@ -431,13 +431,13 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 		GridLineAndScale.rcScaleText.bottom = GridLineAndScale.rcScaleText.top + GridLineAndScale.rcScaleText.bottom;
 		//TDraw::DrawSystemFontText(hdc, szScaleX, rcScaleX, 0, DT_CENTER);
 
-		//»­´óÍø¸ñÏß
+		//ç”»å¤§ç½‘æ ¼çº¿
 		GridLineAndScale.ptGridStart = GridLineAndScale.ptScaleEnd;
 		GridLineAndScale.ptGridEnd.x = GridLineAndScale.ptScaleBegin.x;
 		GridLineAndScale.ptGridEnd.y = rcGraph.top;
 		//TDraw::DrawLine(hdc, ptGridBigTop, ptBegin, pConfig->logpenGraphGridBig);
 
-		//»­Ğ¡Íø¸ñÏß
+		//ç”»å°ç½‘æ ¼çº¿
 		if (bDrawSmallGridX)
 			for (int j = 1; j < x_small_grid_per_big_grid; ++j)
 			{
@@ -451,7 +451,7 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 				PointData.vecGridScaleSmall.push_back(GridScaleSmall);
 			}
 
-		//´óÍø¸ñÈô³¬³ö·¶Î§Ôò²»»­
+		//å¤§ç½‘æ ¼è‹¥è¶…å‡ºèŒƒå›´åˆ™ä¸ç”»
 		if (GridLineAndScale.ptScaleBegin.x<rcGraph.left || GridLineAndScale.ptScaleBegin.x>rcGraph.right)
 			continue;
 
@@ -464,7 +464,7 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 		PointData.vecGridLineAndScale.push_back(GridLineAndScale);
 	}
 
-	//´æÈëYÍø¸ñÊı¾İ
+	//å­˜å…¥Yç½‘æ ¼æ•°æ®
 	PointData.lScaleLeftWidth = 0;
 	for (int i = 0; i < y_all_scale_count + 1; ++i)
 	{
@@ -472,9 +472,9 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 		GridLineAndScale.ptScaleEnd = GridLineAndScale.ptScaleBegin = TDraw::DPOINT2POINT(dpt, PointData.x_min, PointData.x_max, PointData.y_min, PointData.y_max, rcGraph);
 		GridLineAndScale.ptScaleBegin.x = rcGraph.left;
 		GridLineAndScale.ptScaleEnd.x = GridLineAndScale.ptScaleBegin.x - lScaleLong;
-		//TDraw::DrawLine(hdc, ptBegin, ptEnd, pConfig->logpenBlack);//»­¿Ì¶ÈÏß
+		//TDraw::DrawLine(hdc, ptBegin, ptEnd, pConfig->logpenBlack);//ç”»åˆ»åº¦çº¿
 
-		//»­¿Ì¶ÈÎÄ×Ö
+		//ç”»åˆ»åº¦æ–‡å­—
 		TTransfer::double2TCHAR(dpt.y, szScale, y_precision_digit);
 		GridLineAndScale.sScale = szScale;
 		GridLineAndScale.rcScaleText = { 0, 0, 0, 0 };
@@ -487,7 +487,7 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 		//TDraw::DrawSystemFontTeyt(hdc, szScaley, rcScaley, 0, DT_CENTER);
 
 
-		//»­´óÍø¸ñÏß
+		//ç”»å¤§ç½‘æ ¼çº¿
 		GridLineAndScale.ptGridStart.x = rcGraph.left;
 		GridLineAndScale.ptGridStart.y = GridLineAndScale.ptScaleBegin.y;
 		GridLineAndScale.ptGridEnd.y = GridLineAndScale.ptScaleBegin.y;
@@ -496,7 +496,7 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 		//TDraw::DrawLine(hdc, ptGridBigTop, ptBegin, pConfig->logpenGraphGridBig);
 
 
-		//»­Ğ¡Íø¸ñÏß
+		//ç”»å°ç½‘æ ¼çº¿
 		if (bDrawSmallGridY)
 			for (int j = 1; j < y_small_grid_per_big_grid; ++j)
 			{
@@ -511,14 +511,14 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 				PointData.vecGridScaleSmall.push_back(GridScaleSmall);
 			}
 
-		//´óÍø¸ñÈô³¬³ö·¶Î§Ôò²»»­
+		//å¤§ç½‘æ ¼è‹¥è¶…å‡ºèŒƒå›´åˆ™ä¸ç”»
 		if (GridLineAndScale.ptScaleBegin.y<rcGraph.top || GridLineAndScale.ptScaleBegin.y>rcGraph.bottom)
 			continue;
 
 		LONG newLeftSize = rcGraph.left - GridLineAndScale.rcScaleText.left;
 		if (newLeftSize > PointData.lScaleLeftWidth) PointData.lScaleLeftWidth = newLeftSize;
 
-		//Ïò×óÒÆ¶¯
+		//å‘å·¦ç§»åŠ¨
 		//GridLineAndScale.ptGridEnd.x -= lPrevAllWidth;
 		GridLineAndScale.ptScaleBegin.x -= lPrevAllWidth;
 		GridLineAndScale.ptScaleEnd.x -= lPrevAllWidth;
@@ -532,7 +532,7 @@ void TGraph::CalcGridAndScale(HDC hdc, TPointData &PointData, LONG &lBottomSize,
 		PointData.ptAxisEnd.y = rcGraph.bottom;
 	}
 
-	//µ¥Î»ÎÄ×Ö
+	//å•ä½æ–‡å­—
 	TDraw::DrawSystemFontText(hdc, PointData.sLabelY.c_str(), PointData.rcLabelY, 0, DT_CALCRECT);
 	PointData.rcLabelY.top = rcGraph.top;
 	PointData.rcLabelY.bottom = rcGraph.bottom;// +PointData.rcLabelY.right;
@@ -550,13 +550,13 @@ void TGraph::OnDraw(HDC hdc)
 
 	SetBkMode(hdc, TRANSPARENT);
 
-	//Ìî³ä´ó±³¾°
+	//å¡«å……å¤§èƒŒæ™¯
 	TDraw::FillRect(hdc, &ClientRect, pConfig->crGraphBackground);
 
-	//Ìî³äÍ¼±³¾°-°×É«
+	//å¡«å……å›¾èƒŒæ™¯-ç™½è‰²
 	TDraw::FillRect(hdc, &(rcGraph), RGB(255, 255, 255));
 
-	//±êÌâ
+	//æ ‡é¢˜
 	if (bShowTitle)
 	{
 		RECT rcTitle;
@@ -570,10 +570,10 @@ void TGraph::OnDraw(HDC hdc)
 	//scale
 	DrawGridAndScale(hdc);
 
-	//»­ºÚ¿ò
+	//ç”»é»‘æ¡†
 	TDraw::DrawRect(hdc, TDraw::GetMarginRect(rcGraph, -1), pConfig->logpenBlack);
 
-	//x×ø±êµ¥Î»
+	//xåæ ‡å•ä½
 	if (bShowLabelX)
 	{
 		RECT rcUnitsX;
@@ -584,7 +584,7 @@ void TGraph::OnDraw(HDC hdc)
 		TDraw::DrawSystemFontText(hdc, sLabelX.c_str(), rcUnitsX, 0, DT_CENTER | DT_TOP);
 	}
 
-	//y×ø±êµ¥Î»
+	//yåæ ‡å•ä½
 	//if (bShowLabelY)
 	for (auto &PointData : vecPointData)
 	{
@@ -592,34 +592,34 @@ void TGraph::OnDraw(HDC hdc)
 			TDraw::DrawSystemFontTextVertical(hdc, PointData.sLabelY.c_str(), PointData.rcLabelY, 0, DT_VCENTER | DT_SINGLELINE);
 	}
 
-	//»­Êó±êÏß
+	//ç”»é¼ æ ‡çº¿
 	if (bShowMouseLine && PtInRect(&(rcGraph), ptMouse))
 	{
 		TDraw::DrawLine(hdc, LineMouseX);
 		TDraw::DrawLine(hdc, LineMouseY);
 	}
 
-	//»­Êı¾İÏß
+	//ç”»æ•°æ®çº¿
 	for (auto PointData : vecPointData)
 	{
 		if (PointData.Show == true)
 			TDraw::DrawPolyline(hdc, PointData.ptArray, PointData.iPtCount, PointData.logpen);
 	}
 
-	//»­Í¼Àı
+	//ç”»å›¾ä¾‹
 	if (bShowLegend)
 		DrawLegend(hdc, pConfig->logpenBlack);
 
-	//ÏÔÊ¾²¶×½Êı¾İ
+	//æ˜¾ç¤ºæ•æ‰æ•°æ®
 	if (bShowMouseLine && iPickPointDataIndex != -1 && vecPointData[iPickPointDataIndex].Show)
 	{
 		static TCHAR szCoordinate[32];
 		_stprintf(szCoordinate, TEXT("(%f,%f)"), vecPointData[iPickPointDataIndex].dptVector[iPick].x, vecPointData[iPickPointDataIndex].dptVector[iPick].y);
 
-		//ÏÔÊ¾×ø±ê
+		//æ˜¾ç¤ºåæ ‡
 		TDraw::DrawTips(hdc, ptMouse, ClientRect, szCoordinate, pConfig);
 
-		//»­·½¿é
+		//ç”»æ–¹å—
 		TDraw::DrawPickSquare(hdc, vecPointData[iPickPointDataIndex].ptArray[iPick]);
 	}
 
@@ -628,10 +628,10 @@ void TGraph::OnDraw(HDC hdc)
 void TGraph::DrawLegend(HDC hdc, const LOGPEN &logpenBorder)
 {
 
-	POINT ptUpperRight = { rcGraph.right - 10, rcGraph.top + 10 };//Àë±ßÔµ¾àÀë10
+	POINT ptUpperRight = { rcGraph.right - 10, rcGraph.top + 10 };//ç¦»è¾¹ç¼˜è·ç¦»10
 	LONG lAllTextWidth(0), lAllTextHeight(0);
-	LONG lLineLong = 36;//Í¼ÀıÊ¾·¶Ïß³¤¶È
-	LONG lDistFromLineAndText = 4;//ÄÚÍâ¿ò¼ä¾à
+	LONG lLineLong = 36;//å›¾ä¾‹ç¤ºèŒƒçº¿é•¿åº¦
+	LONG lDistFromLineAndText = 4;//å†…å¤–æ¡†é—´è·
 	for (auto &PointData : vecPointData)
 	{
 		if (PointData.Show)
@@ -707,8 +707,8 @@ void TGraph::OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			Invalidate();
 }
 
-//ÊäÈë vecPointData, ptMouse
-//Êä³ö iPick, iPickPointDataIndex
+//è¾“å…¥ vecPointData, ptMouse
+//è¾“å‡º iPick, iPickPointDataIndex
 void TGraph::AttachPoint()
 {
 	double dist, min_dist = 10;//px
@@ -719,7 +719,7 @@ void TGraph::AttachPoint()
 			for (int i = 0; i < vecPointData[index].iPtCount; ++i)
 			{
 				dist = TDraw::Distance(vecPointData[index].ptArray[i], ptMouse);
-				if (dist < min_dist)//±éÀúËùÓĞ µÃµ½×î½ü
+				if (dist < min_dist)//éå†æ‰€æœ‰ å¾—åˆ°æœ€è¿‘
 				{
 					min_dist = dist;
 					iPick = i;
@@ -817,9 +817,9 @@ void TGraph::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (SaveFileDialog(m_hWnd, szFileNamePNG, TEXT("PNG File\0*.png\0\0"), TEXT("png")))
 		{
 			if (TDraw::CaptureWindowToFile(m_hWnd, szFileNamePNG))
-				MessageBox(NULL, TEXT("±£´æ³É¹¦¡£"), TEXT(""), 0);
+				MessageBox(NULL, TEXT("ä¿å­˜æˆåŠŸã€‚"), TEXT(""), 0);
 			else
-				MessageBox(NULL, TEXT("±£´æÊ§°Ü¡£"), TEXT(""), MB_ICONERROR);
+				MessageBox(NULL, TEXT("ä¿å­˜å¤±è´¥ã€‚"), TEXT(""), MB_ICONERROR);
 		}
 		break;
 	case ID_SAVE_AS_CSV:
@@ -827,9 +827,9 @@ void TGraph::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (SaveFileDialog(m_hWnd, szFileNameCSV, TEXT("CSV File\0*.csv\0\0"), TEXT("csv")))
 		{
 			if (SaveToCSV(szFileNameCSV))
-				MessageBox(NULL, TEXT("±£´æ³É¹¦¡£"), TEXT(""), 0);
+				MessageBox(NULL, TEXT("ä¿å­˜æˆåŠŸã€‚"), TEXT(""), 0);
 			else
-				MessageBox(NULL, TEXT("±£´æÊ§°Ü¡£"), TEXT(""), MB_ICONERROR);
+				MessageBox(NULL, TEXT("ä¿å­˜å¤±è´¥ã€‚"), TEXT(""), MB_ICONERROR);
 		}
 		break;
 	case ID_MENU_GRAPH_SHOW_TITLE:
@@ -857,7 +857,7 @@ void TGraph::OnCommand(WPARAM wParam, LPARAM lParam)
 		Invalidate();
 		break;
 	}
-	default://ÉèÖÃÄ³ÌõÏßµÄÏÔÒş
+	default://è®¾ç½®æŸæ¡çº¿çš„æ˜¾éš
 		size_t index = wmId - ID_MENU_GRAPH_DATA_START;
 
 		bool bChecked = GetMenuState(hMenu, wmId, MF_BYCOMMAND) == MF_CHECKED;

@@ -18,7 +18,7 @@ TImage::TImage(HWND hWnd)
 	BITMAPINFO bmpInfo = { 0 };
 	bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	bmpInfo.bmiHeader.biWidth = width;
-	bmpInfo.bmiHeader.biHeight = -height;//正数，说明数据从下到上，如为负数，则从上到下  
+	bmpInfo.bmiHeader.biHeight = -height;//姝ｆ暟锛岃鏄庢暟鎹粠涓嬪埌涓婏紝濡備负璐熸暟锛屽垯浠庝笂鍒颁笅  
 	bmpInfo.bmiHeader.biPlanes = 1;
 	bmpInfo.bmiHeader.biBitCount = 32;
 	bmpInfo.bmiHeader.biCompression = BI_RGB;

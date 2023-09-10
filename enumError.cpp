@@ -5,46 +5,46 @@ String GetErrorInfo(enumError err)
 	switch (err)
 	{
 	case ERROR_NO:
-		return TEXT("²Ù×÷³É¹¦Íê³É¡£");
+		return TEXT("æ“ä½œæˆåŠŸå®Œæˆã€‚");
 		break;
 	case ERROR_ILLEGALCHAR:
-		return TEXT("´íÎó£º³öÏÖ·Ç·¨×Ö·û¡£");
+		return TEXT("é”™è¯¯ï¼šå‡ºç°éæ³•å­—ç¬¦ã€‚");
 		break;
 	case ERROR_PARENTHESIS_NOT_MATCH:
-		return TEXT("´íÎó£ºÀ¨ºÅ²»Æ¥Åä¡£");
+		return TEXT("é”™è¯¯ï¼šæ‹¬å·ä¸åŒ¹é…ã€‚");
 		break;
 	case ERROR_INVALID_VARNAME:
-		return TEXT("´íÎó£º²»ÕıÈ·µÄ±äÁ¿Ãû£¨±ØĞëÒÔÏÂ»®Ïß\"_\"»òÓ¢ÎÄ×ÖÄ¸¿ªÍ·£©¡£");
+		return TEXT("é”™è¯¯ï¼šä¸æ­£ç¡®çš„å˜é‡åï¼ˆå¿…é¡»ä»¥ä¸‹åˆ’çº¿\"_\"æˆ–è‹±æ–‡å­—æ¯å¼€å¤´ï¼‰ã€‚");
 		break;
 	case ERROR_WRONG_EXPRESSION:
-		return TEXT("´íÎó£º´íÎóµÄ±í´ïÊ½¡£");
+		return TEXT("é”™è¯¯ï¼šé”™è¯¯çš„è¡¨è¾¾å¼ã€‚");
 		break;
 	case ERROR_EMPTY_INPUT:
-		return TEXT("±í´ïÊ½Îª¿Õ¡£");
+		return TEXT("è¡¨è¾¾å¼ä¸ºç©ºã€‚");
 		break;
 	case ERROR_DIVIDE_ZERO:
-		return TEXT("´íÎó£º²»ÄÜ³ıÒÔ0¡£");
+		return TEXT("é”™è¯¯ï¼šä¸èƒ½é™¤ä»¥0ã€‚");
 		break;
 	case ERROR_UNDEFINED_VARIABLE:
-		return TEXT("´íÎó£ºÎ´¶¨ÒåµÄ±äÁ¿¡£");
+		return TEXT("é”™è¯¯ï¼šæœªå®šä¹‰çš„å˜é‡ã€‚");
 		break;
 	case ERROR_ZERO_POWEROF_ZERO:
-		return TEXT("´íÎó£º0µÄ0´Î·½¡£");
+		return TEXT("é”™è¯¯ï¼š0çš„0æ¬¡æ–¹ã€‚");
 		break;
 	case ERROR_SUBS_NOT_EQUAL:
-		return TEXT("´íÎó£ºÌæ»»Óë±»Ìæ»»ÊıÄ¿²»µÈ¡£");
+		return TEXT("é”™è¯¯ï¼šæ›¿æ¢ä¸è¢«æ›¿æ¢æ•°ç›®ä¸ç­‰ã€‚");
 		break;
 	case ERROR_NOT_LINK_VARIABLETABLE:
-		return TEXT("³ÌĞò´íÎó£ºÎ´Á´½Ó±äÁ¿±í¡£");
+		return TEXT("ç¨‹åºé”™è¯¯ï¼šæœªé“¾æ¥å˜é‡è¡¨ã€‚");
 		break;
 	case ERROR_OUTOF_DOMAIN:
-		return TEXT("´íÎó£º³¬³ö¶¨ÒåÓò¡£");
+		return TEXT("é”™è¯¯ï¼šè¶…å‡ºå®šä¹‰åŸŸã€‚");
 		break;
 	case ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT:
-		return TEXT("´íÎó£º±äÁ¿ÃûÓë³õÊ¼ÖµÊıÁ¿²»¶ÔµÈ¡£");
+		return TEXT("é”™è¯¯ï¼šå˜é‡åä¸åˆå§‹å€¼æ•°é‡ä¸å¯¹ç­‰ã€‚");
 		break;
 	case ERROR_I:
-		return TEXT("Ôİ²»Ö§³ÖĞéÊı¡£");
+		return TEXT("æš‚ä¸æ”¯æŒè™šæ•°ã€‚");
 		break;
 	default:
 		return TEXT("undefined error");

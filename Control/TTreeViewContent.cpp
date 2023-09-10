@@ -63,7 +63,7 @@ void TTreeViewContent::AddDriver(int id,const TCHAR szMemo[])
 	HTREEITEM temp;
 	TItem tempItem;
 	TCHAR buffer[64];
-	//ID:0 类型 名称
+	//ID:0 绫诲瀷 鍚嶇О
 	wsprintf(buffer, TEXT("ID:%d %s"), id,szMemo);
 
 	temp = InsertTreeviewItem(buffer, hPrevDriver);
@@ -77,7 +77,7 @@ void TTreeViewContent::AddItem(TElement *Element, int id)
 {
 	HTREEITEM temp;
 	TCHAR buffer[64];
-	//ID:0 类型 名称
+	//ID:0 绫诲瀷 鍚嶇О
 	wsprintf(buffer, TEXT("ID:%d "), id);
 	;
 	wsprintf(buffer, TEXT("%s %s %s"), buffer,Element->GetElementTypeName().c_str(), Element->Name);
@@ -115,9 +115,9 @@ void TTreeViewContent::AddItem(TElement *Element, int id)
 
 void TTreeViewContent::Initial()
 {
-	hPrevObject = InsertTreeviewItem(TEXT("元素"), TVI_ROOT);
-	hPrevConstraint = InsertTreeviewItem(TEXT("约束"), TVI_ROOT);
-	hPrevDriver = InsertTreeviewItem(TEXT("驱动"), TVI_ROOT);
+	hPrevObject = InsertTreeviewItem(TEXT("鍏冪礌"), TVI_ROOT);
+	hPrevConstraint = InsertTreeviewItem(TEXT("绾︽潫"), TVI_ROOT);
+	hPrevDriver = InsertTreeviewItem(TEXT("椹卞姩"), TVI_ROOT);
 }
 
 void TTreeViewContent::SelectNull()

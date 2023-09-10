@@ -2,7 +2,7 @@
 #include "..\Common\DetectMemoryLeak.h"
 #include "..\Draw\TDraw.h"
 
-#pragma comment(lib,"Msimg32.lib")//AlphaBlendÊ¹ÓÃ
+#pragma comment(lib,"Msimg32.lib")//AlphaBlendä½¿ç”¨
 
 TDrawTranslucent::TDrawTranslucent()
 {
@@ -13,21 +13,21 @@ TDrawTranslucent::~TDrawTranslucent()
 {
 }
 
-//ËùÓĞ»æÖÆx×ø±ê¾ù-left£¬y×ø±ê-top
-//Ö»Òª»­µÄ²»ÊÇºÚÉ« ±³¾°¾ÍÊÇºÚÉ« -> bNeedDrawBlack=false
-//±ê×¼¿ªÍ·£¨×¢ÏúÔÚEndTranslucentÖĞÍê³É£¬²»ĞèÊÖ¶¯´¦Àí£©
+//æ‰€æœ‰ç»˜åˆ¶xåæ ‡å‡-leftï¼Œyåæ ‡-top
+//åªè¦ç”»çš„ä¸æ˜¯é»‘è‰² èƒŒæ™¯å°±æ˜¯é»‘è‰² -> bNeedDrawBlack=false
+//æ ‡å‡†å¼€å¤´ï¼ˆæ³¨é”€åœ¨EndTranslucentä¸­å®Œæˆï¼Œä¸éœ€æ‰‹åŠ¨å¤„ç†ï¼‰
 //HDC hBitmapDC;
 //HBITMAP hBitmap;
 //VOID *pvBits;
 void TDrawTranslucent::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, bool bNeedDrawBlack)
 {
-	//ËùÓĞ¿ªÊ¼¾­¹ı´Ë´¦
+	//æ‰€æœ‰å¼€å§‹ç»è¿‡æ­¤å¤„
 	hBitmapDC = CreateCompatibleDC(NULL);
 
 	BITMAPINFO bmpInfo = { 0 };
 	bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	bmpInfo.bmiHeader.biWidth = width;
-	bmpInfo.bmiHeader.biHeight = height;//ÕıÊı£¬ËµÃ÷Êı¾İ´ÓÏÂµ½ÉÏ£¬ÈçÎ´¸ºÊı£¬Ôò´ÓÉÏµ½ÏÂ  
+	bmpInfo.bmiHeader.biHeight = height;//æ­£æ•°ï¼Œè¯´æ˜æ•°æ®ä»ä¸‹åˆ°ä¸Šï¼Œå¦‚æœªè´Ÿæ•°ï¼Œåˆ™ä»ä¸Šåˆ°ä¸‹  
 	bmpInfo.bmiHeader.biPlanes = 1;
 	bmpInfo.bmiHeader.biBitCount = 32;
 	bmpInfo.bmiHeader.biCompression = BI_RGB;
@@ -35,8 +35,8 @@ void TDrawTranslucent::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *
 	hBitmap = CreateDIBSection(hBitmapDC, &bmpInfo, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
 	SelectObject(hBitmapDC, hBitmap);
 
-	//¿ªÊ¼»­
-	if (bNeedDrawBlack)//±³¾°²»ÊÇºÚÉ«¾ÍÏÈÍ¿°×
+	//å¼€å§‹ç”»
+	if (bNeedDrawBlack)//èƒŒæ™¯ä¸æ˜¯é»‘è‰²å°±å…ˆæ¶‚ç™½
 	{
 		HPEN hPen = (HPEN)::GetStockObject(NULL_PEN);
 		::SelectObject(hBitmapDC, hPen);
@@ -55,7 +55,7 @@ void TDrawTranslucent::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap
 {
 	if (pvBits)
 	{
-		//½«ÓĞÄÚÈİÇøÓòÉèÎª²»Í¸Ã÷
+		//å°†æœ‰å†…å®¹åŒºåŸŸè®¾ä¸ºä¸é€æ˜
 		UINT32 *data;
 		if (bNeedDrawBlack)
 			for (int i = 0; i < width*height; ++i)
@@ -65,10 +65,10 @@ void TDrawTranslucent::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap
 					*data |= 0xff000000;
 			}
 		else
-			for (int i = 0; i < width*height; ++i)//ºÚÉ«±³¾°
+			for (int i = 0; i < width*height; ++i)//é»‘è‰²èƒŒæ™¯
 			{
 				data = ((UINT32 *)pvBits) + i;
-				if (*data)//ÎªºÚÉ«
+				if (*data)//ä¸ºé»‘è‰²
 					*data |= 0xff000000;
 			}
 	}
@@ -88,12 +88,12 @@ void TDrawTranslucent::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap
 	DeleteObject(hBitmapDC);
 }
 
-//ËùÓĞ»æÖÆx×ø±ê¾ù-left£¬y×ø±ê-top
-//Ö»Òª»­µÄ²»ÊÇºÚÉ« ±³¾°¾ÍÊÇºÚÉ« -> bNeedDrawBlack=false
+//æ‰€æœ‰ç»˜åˆ¶xåæ ‡å‡-leftï¼Œyåæ ‡-top
+//åªè¦ç”»çš„ä¸æ˜¯é»‘è‰² èƒŒæ™¯å°±æ˜¯é»‘è‰² -> bNeedDrawBlack=false
 void TDrawTranslucent::Start(HDC &hdc, byte alpha, long input_left, long input_top, long input_width, long input_height, bool bNeedDrawBlack)
 {
 	//OutputDebugPrintf(TEXT("il%d it%d iw%d ih%d\n"), input_left, input_top, input_width, input_height);
-	//ËùÓĞ¿ªÊ¼¾­¹ı´Ë´¦
+	//æ‰€æœ‰å¼€å§‹ç»è¿‡æ­¤å¤„
 	if (input_width < 0)
 	{
 		this->left = input_left + input_width;
@@ -129,8 +129,8 @@ void TDrawTranslucent::Start(HDC &hdc, byte alpha, long input_left, long input_t
 	hdc = hBitmapDC;
 }
 
-//ËùÓĞ»æÖÆx×ø±ê¾ùÓ¦-left£¬y×ø±êÓ¦-top
-//Ö»Òª»­µÄ²»ÊÇºÚÉ« ±³¾°¾ÍÊÇºÚÉ« -> bNeedDrawBlack=false
+//æ‰€æœ‰ç»˜åˆ¶xåæ ‡å‡åº”-leftï¼Œyåæ ‡åº”-top
+//åªè¦ç”»çš„ä¸æ˜¯é»‘è‰² èƒŒæ™¯å°±æ˜¯é»‘è‰² -> bNeedDrawBlack=false
 void TDrawTranslucent::Start(HDC &hdc, byte alpha, const RECT &rect, bool bNeedDrawBlack)
 {
 	Start(hdc, alpha, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, bNeedDrawBlack);
@@ -140,7 +140,7 @@ void TDrawTranslucent::End()
 {
 	this->EndTranslucent(hdcOld, hBitmapDC, hBitmap, pvBits, left,top,width,height, alpha, bNeedDrawBlack);
 	
-	//»Ö¸´´¦Àí
+	//æ¢å¤å¤„ç†
 	*phdc = hdcOld;
 	for (auto &pRect:vecpRect)
 		Restore(*pRect);

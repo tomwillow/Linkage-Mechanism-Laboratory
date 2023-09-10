@@ -12,7 +12,7 @@ public:
 	void TConstraintCoincide::BuildpDpt_inner(int i);
 	TConstraintCoincide();
 	~TConstraintCoincide();
-	virtual const String TConstraintCoincide::GetElementTypeName() override;//得到类型名称
+	virtual const String TConstraintCoincide::GetElementTypeName() override;//寰楀埌绫诲瀷鍚嶇О
 	void TConstraintCoincide::NoticeListView(TListView *pListView) override;
 	virtual bool TConstraintCoincide::WriteFile(HANDLE &hf, DWORD &now_pos) override;
 	virtual bool TConstraintCoincide::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape) override;

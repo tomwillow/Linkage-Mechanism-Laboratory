@@ -8,19 +8,19 @@
 class TExpressionTree
 {
 private:
-#define MAX_VAR_NAME 32//Í¬Ê±Ò²ÊÇ¸¡µãÊı×ª×Ö·û´®µÄ×î´ó³¤¶È
+#define MAX_VAR_NAME 32//åŒæ—¶ä¹Ÿæ˜¯æµ®ç‚¹æ•°è½¬å­—ç¬¦ä¸²çš„æœ€å¤§é•¿åº¦
 #define MIN_DOUBLE  1e-6
 	enum enumMathOperator{
 		MATH_NULL,
-		//Ò»Ôª
+		//ä¸€å…ƒ
 		MATH_POSITIVE, MATH_NEGATIVE,
 
-		//º¯Êı
+		//å‡½æ•°
 		MATH_SIN, MATH_COS, MATH_TAN,
 		MATH_ARCSIN, MATH_ARCCOS, MATH_ARCTAN, MATH_SQRT,
 		MATH_LN, MATH_LOG10, MATH_EXP,
 
-		//¶şÔª
+		//äºŒå…ƒ
 		MATH_ADD, MATH_SUBSTRACT,
 		MATH_MULTIPLY, MATH_DIVIDE,
 		MATH_POWER, MATH_AND, MATH_OR, MATH_MOD,
@@ -30,7 +30,7 @@ private:
 
 	enum enumNodeType{ NODE_NULL, NODE_NUMBER, NODE_OPERATOR, NODE_VARIABLE, NODE_FUNCTION };
 
-	/* µ¥¸öÔªËØ */
+	/* å•ä¸ªå…ƒç´  */
 	struct TNode
 	{
 		enumNodeType eType;
@@ -44,7 +44,7 @@ private:
 
 	void Release();
 
-	//ÔËËã·ûĞÔÖÊº¯Êı
+	//è¿ç®—ç¬¦æ€§è´¨å‡½æ•°
 	int GetOperateNum(enumMathOperator eOperator);
 	static String EnumOperatorToTChar(enumMathOperator eOperator);
 	bool isLeft2Right(enumMathOperator eOperator);
@@ -69,7 +69,7 @@ private:
 	static String Node2Str(const TNode &node);
 	void BuildExpressionTree(std::vector<TNode *> &PostOrder);
 	void TraverseInOrder(TNode *now, String &output);
-	void CalcNode(TNode *Operator, const TNode *Node1, const TNode *Node2);//¼ÆËã½ÚµãÖµ£¬Ö§³ÖËùÓĞÔËËã·ûºÍº¯Êı£¬½á¹û´æ½øOperator
+	void CalcNode(TNode *Operator, const TNode *Node1, const TNode *Node2);//è®¡ç®—èŠ‚ç‚¹å€¼ï¼Œæ”¯æŒæ‰€æœ‰è¿ç®—ç¬¦å’Œå‡½æ•°ï¼Œç»“æœå­˜è¿›Operator
 	void Simplify(TNode *now);
 	void GetNodeNum(TNode *now, int &n);
 	int GetNodeNum(TNode *head);
@@ -77,7 +77,7 @@ private:
 	void DeleteNodeTraversal(TNode *node);
 	void Diff(TNode *now, String var);
 	TNode * CopyNodeTree(TNode *oldNode);
-	//String  FindVariableTableFrom(const String varstr, std::vector<String > newVariableTable);//²éÕÒ±äÁ¿ÊÇ·ñÔÚ±äÁ¿±íÖĞ£¬Ã»ÓĞÔò·µ»ØNULL
+	//String  FindVariableTableFrom(const String varstr, std::vector<String > newVariableTable);//æŸ¥æ‰¾å˜é‡æ˜¯å¦åœ¨å˜é‡è¡¨ä¸­ï¼Œæ²¡æœ‰åˆ™è¿”å›NULL
 	void GetVariablePos(TNode *now, const String var, std::vector<TNode *> &VarsPos);
 	void GetVariablePos(const String var, std::vector<TNode *> &VarsPos);
 	void CopyVariableTable(std::vector<String > &Dest, const std::vector<String > source);
@@ -95,24 +95,24 @@ public:
 	TNode *head;
 	void Reset();
 	void  Vpa(bool bOutput);
-	void  LinkVariableTable(TVariableTable *p);//Á´½Ó±äÁ¿±í
+	void  LinkVariableTable(TVariableTable *p);//é“¾æ¥å˜é‡è¡¨
 	void  Read(const String expression, bool bOutput);
-	void  Read(double num, bool bOutput);//¶ÁÈëÖ»ÓĞ1¸öÊı×ÖµÄ±í´ïÊ½
+	void  Read(double num, bool bOutput);//è¯»å…¥åªæœ‰1ä¸ªæ•°å­—çš„è¡¨è¾¾å¼
 
-	//ËùÓĞ²Ù×÷·ûÎ´Íê³É
-	String  Solve(String &var, double &value);//Çó½âµ¥±äÁ¿·½³Ì ²»ÑéÖ¤¿ÉÇó½âĞÔ£¬ĞèÌáÇ°µ÷ÓÃHasOnlyOneVarÈ·ÈÏ ²»¸Ä¶¯±í´ïÊ½ÄÚÈİ
+	//æ‰€æœ‰æ“ä½œç¬¦æœªå®Œæˆ
+	String  Solve(String &var, double &value);//æ±‚è§£å•å˜é‡æ–¹ç¨‹ ä¸éªŒè¯å¯æ±‚è§£æ€§ï¼Œéœ€æå‰è°ƒç”¨HasOnlyOneVarç¡®è®¤ ä¸æ”¹åŠ¨è¡¨è¾¾å¼å†…å®¹
 	String  OutputStr();
-	void  Simplify(bool bOutput);//»¯¼ò
-	String  Diff(String var, int n, bool bOutput);//¶Ô±äÁ¿Çóµ¼
+	void  Simplify(bool bOutput);//åŒ–ç®€
+	String  Diff(String var, int n, bool bOutput);//å¯¹å˜é‡æ±‚å¯¼
 	void  Subs(String ptVar, double value, bool output);
-	void  Subs(const String vars,const String nums, bool output);//varsÎª±»Ìæ»»±äÁ¿£¬numsÎªÌæ»»±í´ïÊ½£¬ÒÔ¿Õ¸ñ·Ö¸ô
+	void  Subs(const String vars,const String nums, bool output);//varsä¸ºè¢«æ›¿æ¢å˜é‡ï¼Œnumsä¸ºæ›¿æ¢è¡¨è¾¾å¼ï¼Œä»¥ç©ºæ ¼åˆ†éš”
 	void  Subs(std::vector<String > VarsVector, std::vector<double> NumsVector, bool output);
-	bool CanCalc();//¼ì²éÊÇ·ñ»¹ÓĞ±äÁ¿´æÔÚ£¬¿ÉÒÔ¼ÆËãÔò·µ»Øtrue
-	bool IsSingleVar();//¼ì²éÊÇ·ñÎªÒ»Ôª(not used)
-	bool HasOnlyOneVar();//Ö»ÓĞÒ»¸ö±äÁ¿£¨Ö»ÓĞ¸Õread²ÅÓĞĞ§£©
-	bool CheckOnlyOneVar();//Ö»ÓĞÒ»¸ö±äÁ¿£¨ÊµÊ±ÑéÖ¤£©
-	double Value(bool operateHeadNode);//²»ÑéÖ¤¿É¼ÆËãĞÔ£¬±ØĞëÓëCanCalcºÏÓÃ
-	String  Calc(double *result = NULL);//¼ÆËã±í´ïÊ½µÄÖµ£¬Èô´«ÈëÁËresultÔò°Ñ½á¹û´æÈë¡£·µ»ØÖµÎª½á¹û×Ö·û´®»ò±í´ïÊ½´®¡£
+	bool CanCalc();//æ£€æŸ¥æ˜¯å¦è¿˜æœ‰å˜é‡å­˜åœ¨ï¼Œå¯ä»¥è®¡ç®—åˆ™è¿”å›true
+	bool IsSingleVar();//æ£€æŸ¥æ˜¯å¦ä¸ºä¸€å…ƒ(not used)
+	bool HasOnlyOneVar();//åªæœ‰ä¸€ä¸ªå˜é‡ï¼ˆåªæœ‰åˆšreadæ‰æœ‰æ•ˆï¼‰
+	bool CheckOnlyOneVar();//åªæœ‰ä¸€ä¸ªå˜é‡ï¼ˆå®æ—¶éªŒè¯ï¼‰
+	double Value(bool operateHeadNode);//ä¸éªŒè¯å¯è®¡ç®—æ€§ï¼Œå¿…é¡»ä¸CanCalcåˆç”¨
+	String  Calc(double *result = NULL);//è®¡ç®—è¡¨è¾¾å¼çš„å€¼ï¼Œè‹¥ä¼ å…¥äº†resultåˆ™æŠŠç»“æœå­˜å…¥ã€‚è¿”å›å€¼ä¸ºç»“æœå­—ç¬¦ä¸²æˆ–è¡¨è¾¾å¼ä¸²ã€‚
 
 	TExpressionTree& operator=(const TExpressionTree &expr);
 	TExpressionTree& operator+(const TExpressionTree &expr);

@@ -37,9 +37,9 @@ void TListViewEdit::ChangeSource()
 
 		DPOINT dpt;
 		std::vector<TCHAR *>szNums;
-		TCHAR_Function::Split(Text, szNums, TEXT(","));//ÇÐ·Ö×ø±ê
+		TCHAR_Function::Split(Text, szNums, TEXT(","));//åˆ‡åˆ†åæ ‡
 
-		if (szNums.size() == 2)//È·ÊµÊÇ×ø±ê
+		if (szNums.size() == 2)//ç¡®å®žæ˜¯åæ ‡
 		{
 			dpt.x = TTransfer::TCHAR2double(szNums[0]);
 			dpt.y = TTransfer::TCHAR2double(szNums[1]);
@@ -138,7 +138,7 @@ bool TListViewEdit::OnChar(WPARAM wParam, LPARAM lParam)
 		ChangeSource();
 		this->SetVisible(false);
 		
-		PostMessage(m_hParent, WM_USER, 0, 0);//Í¨ÖªListView¸üÐÂ
+		PostMessage(m_hParent, WM_USER, 0, 0);//é€šçŸ¥ListViewæ›´æ–°
 
 		return false;
 	}
@@ -149,6 +149,6 @@ bool TListViewEdit::OnKillFocus(WPARAM wParam, LPARAM lParam)
 {
 	ChangeSource();
 	this->SetVisible(false);
-	PostMessage(m_hParent, WM_USER, 0, 0);//Í¨ÖªListView¸üÐÂ
+	PostMessage(m_hParent, WM_USER, 0, 0);//é€šçŸ¥ListViewæ›´æ–°
 	return true;
 }

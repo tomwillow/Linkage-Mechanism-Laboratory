@@ -21,7 +21,7 @@ bool TLineEdit::OnKeyDown(WPARAM wParam, LPARAM lParam)
 		::SendMessage(m_hParent, WM_KEYDOWN, wParam, lParam);
 		return false;
 	default:
-		::PostMessage(m_hParent, WM_KEYDOWN, wParam, lParam);//·¢ËÍ¸¸´°¿Ú£¬ÏÈÌí¼Ó×Ö·ûÔÙÓÉ¸¸´°¿Ú´¦Àí
+		::PostMessage(m_hParent, WM_KEYDOWN, wParam, lParam);//å‘é€çˆ¶çª—å£ï¼Œå…ˆæ·»åŠ å­—ç¬¦å†ç”±çˆ¶çª—å£å¤„ç†
 		return true;
 	}
 	return true;

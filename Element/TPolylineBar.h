@@ -11,7 +11,7 @@ protected:
 public:
 	TPolylineBar();
 	~TPolylineBar();
-	virtual const String TPolylineBar::GetElementTypeName() override;//得到类型名称
+	virtual const String TPolylineBar::GetElementTypeName() override;//寰楀埌绫诲瀷鍚嶇О
 	void TPolylineBar::NoticeListView(TListView *pListView) override;
 	virtual void TPolylineBar::Draw(HDC hdc, const TConfiguration* pConfig) override;
 	virtual void TPolylineBar::DrawPickSquare(HDC hdc, const TConfiguration* pConfig) override;

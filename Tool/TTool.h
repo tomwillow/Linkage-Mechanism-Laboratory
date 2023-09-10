@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include "..\Common\String.h"
 
-//Îª±ÜÃâÖØ¸´Ë¢ĞÂ£¬¹¤¾ßÀà¼°ÆäÅÉÉúÀà²»µÃ·¢ËÍWM_PAINTÏûÏ¢£¬Ë¢ĞÂ¶¯×÷ÓÉCanvasÍê³É¡£
+//ä¸ºé¿å…é‡å¤åˆ·æ–°ï¼Œå·¥å…·ç±»åŠå…¶æ´¾ç”Ÿç±»ä¸å¾—å‘é€WM_PAINTæ¶ˆæ¯ï¼Œåˆ·æ–°åŠ¨ä½œç”±Canvaså®Œæˆã€‚
 //class TMainWindow;
 class TCanvas;
 class TShape;

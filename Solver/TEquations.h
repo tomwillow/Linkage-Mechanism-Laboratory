@@ -16,7 +16,7 @@ private:
 
 	TJacobian Jacobian;
 	TPEquations Equations, EquationsV, EquationsA;
-	TVariableTable VariableTableSolved;//ÒÑ½â³ö±äÁ¿±í
+	TVariableTable VariableTableSolved;//å·²è§£å‡ºå˜é‡è¡¨
 
 	void CalcPhiValue(Ostream *pOS,const TPEquations &Equations, TVector &PhiValue);
 	void MatrixMultiplyVector(TVector &Result, const TMatrix &Matrix, const TVector &Vector);
@@ -38,10 +38,10 @@ public:
 	double epsilon = 1e-12;
 	unsigned int max_step = 20;
 	bool hasSolved;
-	TVariableTable VariableTable; //×Ü±äÁ¿±í
+	TVariableTable VariableTable; //æ€»å˜é‡è¡¨
 	TVariableTable VariableTableUnsolved;
-	TVariableTable VariableTableV; //ËÙ¶È×Ü±äÁ¿±í
-	TVariableTable VariableTableA; //ËÙ¶È×Ü±äÁ¿±í
+	TVariableTable VariableTableV; //é€Ÿåº¦æ€»å˜é‡è¡¨
+	TVariableTable VariableTableA; //é€Ÿåº¦æ€»å˜é‡è¡¨
 
 	TExpressionTree * GetLastExpressionTree()
 	{
@@ -51,24 +51,24 @@ public:
 	void BuildEquationsA_Phitt(Ostream *pOS);
 	void CalcEquationsARight(Ostream *pOS, TVector &Right);
 	void OutputPhi(Ostream *pOS, TPEquations &Equations);
-	void BuildJacobian(Ostream *pOS);//½¨Á¢Jacobian
+	void BuildJacobian(Ostream *pOS);//å»ºç«‹Jacobian
 	void CopyJacobian(TJacobian &Result, const TJacobian &Origin);
 	void OutputJacobian(Ostream *pOS, const TJacobian &Jacobian);
 	void BuildVariableTableV(Ostream *pOS);
 	void BuildVariableTableA(Ostream *pOS);
 	size_t GetEquationsCount();
-	void AddEquation(Ostream *pOS, String szInput, bool istemp);//Ìí¼Ó·½³Ì
-	void RemoveTempEquations();//ÒÆ³ıÁÙÊ±·½³Ì
-	enumError SolveLinear(TMatrix &A, TVector &x, TVector &b);//½âÏßĞÔ·½³Ì×é ÏµÊıA£¬Î´ÖªÊıx
-	void SolveEquations(Ostream *pOS);//Çó½â·½³Ì×é
-	void SolveEquationsV(Ostream *pOS);//Çó½â·½³Ì×éV
-	void SolveEquationsA(Ostream *pOS);//Çó½â·½³Ì×éA
-	void SimplifyEquations(Ostream *pOS);//½«·½³Ì×éÖĞµÄ¼òµ¥·½³Ì½â³ö
+	void AddEquation(Ostream *pOS, String szInput, bool istemp);//æ·»åŠ æ–¹ç¨‹
+	void RemoveTempEquations();//ç§»é™¤ä¸´æ—¶æ–¹ç¨‹
+	enumError SolveLinear(TMatrix &A, TVector &x, TVector &b);//è§£çº¿æ€§æ–¹ç¨‹ç»„ ç³»æ•°Aï¼ŒæœªçŸ¥æ•°x
+	void SolveEquations(Ostream *pOS);//æ±‚è§£æ–¹ç¨‹ç»„
+	void SolveEquationsV(Ostream *pOS);//æ±‚è§£æ–¹ç¨‹ç»„V
+	void SolveEquationsA(Ostream *pOS);//æ±‚è§£æ–¹ç¨‹ç»„A
+	void SimplifyEquations(Ostream *pOS);//å°†æ–¹ç¨‹ç»„ä¸­çš„ç®€å•æ–¹ç¨‹è§£å‡º
 	void DefineVariable(Ostream *pOS, const String input_str, const String input_num = TEXT(""), bool bIgnoreReDef = false);
 	void DefineOneVariable(Ostream *pOS, String var, double value,bool bIgnoreReDef = false);
 	void Subs(Ostream *pOS, const String var, double value);
-	void Subs(Ostream *pOS, const String subsVars, const String subsValues);//´úÈë
-	void Subs(Ostream *pOS,const std::vector<String> &subsVars,const std::vector<double> &subsValue);//´úÈë
+	void Subs(Ostream *pOS, const String subsVars, const String subsValues);//ä»£å…¥
+	void Subs(Ostream *pOS,const std::vector<String> &subsVars,const std::vector<double> &subsValue);//ä»£å…¥
 	void SubsV(Ostream *pOS, String VarStr, double Value);
 	void SubsA(Ostream *pOS, String VarStr, double Value);
 	double GetValue(const String &var);

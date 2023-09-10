@@ -15,40 +15,40 @@ class TGraph :
 private:
 	//double x_max=21.3703, x_min=21.202, y_max=0.0, y_min=0.0;
 
-	//´óÍø¸ñÏß¼°¿Ì¶ÈÊı¾İÀàĞÍ
+	//å¤§ç½‘æ ¼çº¿åŠåˆ»åº¦æ•°æ®ç±»å‹
 	struct TGridLineAndScale
 	{
-		POINT ptGridStart;//´óÍø¸ñÏßÆğµã
+		POINT ptGridStart;//å¤§ç½‘æ ¼çº¿èµ·ç‚¹
 		POINT ptGridEnd;
-		POINT ptScaleBegin;//¿Ì¶ÈÆğµã
-		POINT ptScaleEnd;//¿Ì¶ÈÖÕµã
-		RECT rcScaleText;//¿Ì¶ÈÎÄ×Ö°üÎ§ºĞ
+		POINT ptScaleBegin;//åˆ»åº¦èµ·ç‚¹
+		POINT ptScaleEnd;//åˆ»åº¦ç»ˆç‚¹
+		RECT rcScaleText;//åˆ»åº¦æ–‡å­—åŒ…å›´ç›’
 		String sScale;
 	};
 
-	//Ğ¡Íø¸ñÏßÊı¾İÀàĞÍ
+	//å°ç½‘æ ¼çº¿æ•°æ®ç±»å‹
 	struct TGridScaleSmall
 	{
-		POINT ptBegin;//Ğ¡Íø¸ñÏßÆğµã
-		POINT ptEnd;//Ğ¡Íø¸ñÏßÖÕµã
+		POINT ptBegin;//å°ç½‘æ ¼çº¿èµ·ç‚¹
+		POINT ptEnd;//å°ç½‘æ ¼çº¿ç»ˆç‚¹
 	};
 
 	struct TPointData
 	{
 		bool Show;
-		std::vector<DPOINT> dptVector;//ÕæÊµÊı¾İ
+		std::vector<DPOINT> dptVector;//çœŸå®æ•°æ®
 		String sLegend;
 
-		LONG lLegendWidth, lLegendHeight;//¶ÔÓ¦Í¼ÀıµÄ¿í¸ß
-		int iPtCount;//µãÊıÁ¿
-		POINT *ptArray;//×ø±êµã
+		LONG lLegendWidth, lLegendHeight;//å¯¹åº”å›¾ä¾‹çš„å®½é«˜
+		int iPtCount;//ç‚¹æ•°é‡
+		POINT *ptArray;//åæ ‡ç‚¹
 		double x_max, y_max, x_min, y_min;
 		double x_len, y_len;
 
 		LOGPEN logpen;
-		std::vector<TGridLineAndScale> vecGridLineAndScale;//´óÍø¸ñÏß¼°¿Ì¶ÈÏß¼¯ºÏ
-		std::vector<TGridScaleSmall> vecGridScaleSmall;//Ğ¡Íø¸ñÏß¼¯ºÏ
-		LONG lScaleLeftWidth;//¿Ì¶È+¼ä¸ô+¿Ì¶ÈÎÄ×Ö ×Ü¿í¶È
+		std::vector<TGridLineAndScale> vecGridLineAndScale;//å¤§ç½‘æ ¼çº¿åŠåˆ»åº¦çº¿é›†åˆ
+		std::vector<TGridScaleSmall> vecGridScaleSmall;//å°ç½‘æ ¼çº¿é›†åˆ
+		LONG lScaleLeftWidth;//åˆ»åº¦+é—´éš”+åˆ»åº¦æ–‡å­— æ€»å®½åº¦
 		String sLabelY;
 		bool bShowGridBig = false;
 		bool bShowGridSmall = false;
@@ -56,11 +56,11 @@ private:
 
 		POINT ptAxisBegin, ptAxisEnd;
 	};
-		LONG lScaleBottomHeight;//¿Ì¶È+¼ä¸ô+¿Ì¶ÈÎÄ×Ö ×Ü¸ß¶È
+		LONG lScaleBottomHeight;//åˆ»åº¦+é—´éš”+åˆ»åº¦æ–‡å­— æ€»é«˜åº¦
 
 	std::vector<TPointData> vecPointData;
 
-	RECT rcGraph;//ÔÚ´°¿ÚÄÚµÄÏÔÊ¾·¶Î§
+	RECT rcGraph;//åœ¨çª—å£å†…çš„æ˜¾ç¤ºèŒƒå›´
 
 	TConfiguration *pConfig;
 	TLine LineMouseX, LineMouseY;
@@ -71,7 +71,7 @@ private:
 
 	int iMarginTop,iMarginBottom,iMarginLeft,iMarginRight;
 	LONG lTextHeight;
-	LONG lInterval=2;//¿Ì¶ÈÓë¿Ì¶ÈÎÄ×Ö¼ä¸ô
+	LONG lInterval=2;//åˆ»åº¦ä¸åˆ»åº¦æ–‡å­—é—´éš”
 
 
 	HMENU hMenuData;
@@ -91,15 +91,15 @@ private:
 		const RECT &rcGraph, LONG &lPrevAllWidth, LONG lScaleLong, LONG lInterval);
 	void TGraph::AttachPoint();
 public:
-	bool bDraw = true;//Èç¹ûÎªfalse£¬ÔòOnDrawÊÂ¼şÖĞ²»¶¯×÷
-	bool bRealClose = true;//Èç¹ûÎªtrue£¬Ôò¹Ø±ÕÊ±¹Ø±Õ´°¿Ú¡£·ñÔòÖ»Òş²Ø´°¿Ú
+	bool bDraw = true;//å¦‚æœä¸ºfalseï¼Œåˆ™OnDrawäº‹ä»¶ä¸­ä¸åŠ¨ä½œ
+	bool bRealClose = true;//å¦‚æœä¸ºtrueï¼Œåˆ™å…³é—­æ—¶å…³é—­çª—å£ã€‚å¦åˆ™åªéšè—çª—å£
 	bool bShowMouseLine = false;
 	bool bAdaptiveMargin = true;
 	bool bShowTitle = true;
 	bool bShowLabelX = true;
-	bool bShowLegend = true;//ÏÔÊ¾Í¼Àı
+	bool bShowLegend = true;//æ˜¾ç¤ºå›¾ä¾‹
 
-	//x,yÖá±êÇ©
+	//x,yè½´æ ‡ç­¾
 	String sLabelX;
 
 	TGraph(TConfiguration *pConfig);
@@ -107,7 +107,7 @@ public:
 	void TGraph::InputDptVector(const std::vector<double> &vecX, const std::vector<double> &vecY, const LOGPEN &logpen, bool visible, const TCHAR szLegend[] = TEXT(""), const TCHAR szUnitLabel[] = TEXT(""));
 	void TGraph::InputDptVector(const std::vector<DPOINT> &dptInputVector, const LOGPEN &logpen, bool visible, const TCHAR szLegend[] = TEXT(""),const TCHAR szUnitLabel[]=TEXT(""));
 	void TGraph::Clear();
-	void TGraph::Refresh();//Ë¢ĞÂ µÈÍ¬ÓÚµ÷ÓÃOnSize
+	void TGraph::Refresh();//åˆ·æ–° ç­‰åŒäºè°ƒç”¨OnSize
 	void TGraph::SetMargin(int iMargin);
 	void TGraph::SetPointDataVisible(int index,bool visible);
 };

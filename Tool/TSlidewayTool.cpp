@@ -15,7 +15,7 @@ TSlidewayTool::TSlidewayTool()
 	MoveLine = new TSlideway;
 	MoveLine->SetStyle(pConfig);
 
-	sType = TEXT("»¬µÀ");
+	sType = TEXT("æ»‘é“");
 	bCanBuildCoincide = false;
 }
 
@@ -49,7 +49,7 @@ void TSlidewayTool::AddIntoTreeViewContent(TElement *Element, int id)
 		TLineTool::AddIntoTreeViewContent(Element, id);
 }
 
-//void TSlidewayTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig)//ËùÓĞ¼ÓÈëÔ¼Êø¾­¹ı´Ë´¦
+//void TSlidewayTool::AddCoincide(TConstraintCoincide *pCoincide, int id, TConfiguration *pConfig)//æ‰€æœ‰åŠ å…¥çº¦æŸç»è¿‡æ­¤å¤„
 //{
 //
 //}

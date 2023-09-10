@@ -34,7 +34,7 @@ TShape::~TShape()
 	ReleaseAll();
 }
 
-//Ã»ÕÒµ½Ôò·µ»ØNULL
+//æ²¡æ‰¾åˆ°åˆ™è¿”å›NULL
 TElement* TShape::GetElementById(int id)
 {
 	for (auto pElement : Element)
@@ -60,7 +60,7 @@ std::vector<int> TShape::Delete(std::set<TElement *> &DeleteLists)
 {
 	std::vector<int> InfluencedId;
 	TElement *p1, *p2;
-	//ÏÈ¼ÓÈë¹ØÁªÔ¼Êø
+	//å…ˆåŠ å…¥å…³è”çº¦æŸ
 	for (auto pElement : Element)
 	{
 		if (pElement->IsConstraint())
@@ -68,8 +68,8 @@ std::vector<int> TShape::Delete(std::set<TElement *> &DeleteLists)
 			p1 = ((TConstraint *)pElement)->pElement[0];
 			p2 = ((TConstraint *)pElement)->pElement[1];
 			if (DeleteLists.find(p1) != DeleteLists.end() || DeleteLists.find(p2) != DeleteLists.end())
-			{//µ±Ç°ÔªËØÁ´½Óµ½µÄÔ¼Êø
-				DeleteLists.insert(pElement);//¼ÓÈëÉ¾³ıÁĞ±í
+			{//å½“å‰å…ƒç´ é“¾æ¥åˆ°çš„çº¦æŸ
+				DeleteLists.insert(pElement);//åŠ å…¥åˆ é™¤åˆ—è¡¨
 				InfluencedId.push_back(pElement->id);
 			}
 		}
@@ -145,8 +145,8 @@ void TShape::GetSQ(const TElement *pElement, int PointIndexOfElement, DPOINT &SQ
 	SQ = pElement->GetRelativePointByIndex(PointIndexOfElement);
 }
 
-//´«Èë£ºpElement,µãĞòºÅ
-//´«³ö£ºSP,i
+//ä¼ å…¥ï¼špElement,ç‚¹åºå·
+//ä¼ å‡ºï¼šSP,i
 void TShape::GetSP(const TElement *pElement, int PointIndexOfElement, DPOINT &SP, int &i)
 {
 	i = pElement->id;
@@ -183,7 +183,7 @@ bool TShape::ReadFromFile(TCHAR szFileName[])
 
 TElement* TShape::BuildElementByType(EnumElementType eType)const
 {
-	//°´ÕÕÀàĞÍ¶ÁÈëÔªËØ
+	//æŒ‰ç…§ç±»å‹è¯»å…¥å…ƒç´ 
 	switch (eType)
 	{
 	case ELEMENT_BAR:
@@ -215,7 +215,7 @@ bool TShape::ReadFromFile_inner(HANDLE hf)
 	if (GetLastError() != 0)
 		return false;
 
-	//¶ÁÈëÔªËØÊıÁ¿
+	//è¯»å…¥å…ƒç´ æ•°é‡
 	DWORD now_pos = 0;
 	int size;
 	ReadFile(hf, &size, sizeof(size), &now_pos, NULL);
@@ -226,15 +226,15 @@ bool TShape::ReadFromFile_inner(HANDLE hf)
 	EnumElementType eType;
 	for (int i = 0; i < size; i++)
 	{
-		//¶ÁÈëÀàĞÍ
+		//è¯»å…¥ç±»å‹
 		ReadFile(hf, &eType, sizeof(EnumElementType), &now_pos, NULL);
 		if (GetLastError() != 0)
 			return false;
 		now_pos += sizeof(EnumElementType);
 
-		//°´ÕÕÀàĞÍ¶ÁÈëÔªËØ
+		//æŒ‰ç…§ç±»å‹è¯»å…¥å…ƒç´ 
 		TElement *pElement = BuildElementByType(eType);
-		if (pElement == NULL)//ÀàĞÍºÅ²»ÕıÈ·
+		if (pElement == NULL)//ç±»å‹å·ä¸æ­£ç¡®
 			return false;
 		if (pElement->ReadFile(hf, now_pos, this))
 		{
@@ -259,7 +259,7 @@ bool TShape::ReadFromFile_inner(HANDLE hf)
 			delete pElement;
 			return false;
 		}
-	}//forÑ­»·½áÊø
+	}//forå¾ªç¯ç»“æŸ
 
 #if (defined _STUDENT) || (defined _TEACHER)
 	ReadFileString(hf, sStudentClass, now_pos);
@@ -275,7 +275,7 @@ bool TShape::ReadFromFile_inner(HANDLE hf)
 bool TShape::SaveToFile(TCHAR szFileName[])
 {
 
-	//ÎŞµ¯´°Ö±½Ó´æ´¢
+	//æ— å¼¹çª—ç›´æ¥å­˜å‚¨
 	HANDLE hf;
 	hf = CreateFile(szFileName,
 		GENERIC_WRITE,
@@ -287,13 +287,13 @@ bool TShape::SaveToFile(TCHAR szFileName[])
 	if (IsErrorShowMsgBox(TEXT("CreateFile"))) return false;
 	DWORD now_pos = 0;
 
-	//Ğ´ÈëÔªËØÊıÁ¿
+	//å†™å…¥å…ƒç´ æ•°é‡
 	int size = Element.size();
 	WriteFile(hf, &size, sizeof(size), &now_pos, NULL);
 	now_pos += sizeof(size);
-	if (IsErrorShowMsgBox(TEXT("Ğ´ÈëÔªËØÊıÁ¿"))) return false;
+	if (IsErrorShowMsgBox(TEXT("å†™å…¥å…ƒç´ æ•°é‡"))) return false;
 
-	//ÖğÌõĞ´ÈëElement
+	//é€æ¡å†™å…¥Element
 	for (auto pElement : Element)
 	{
 		if (!pElement->WriteFile(hf, now_pos))
@@ -322,7 +322,7 @@ TElement* TShape::GetPickedElement(const POINT &ptPos, const TConfiguration *pCo
 	return nullptr;
 }
 
-//µÃµ½ËùÓĞÔªËØÆÁÄ»´óĞ¡µÄ°üÎ§ºĞ¼°ÖĞĞÄ×ø±ê
+//å¾—åˆ°æ‰€æœ‰å…ƒç´ å±å¹•å¤§å°çš„åŒ…å›´ç›’åŠä¸­å¿ƒåæ ‡
 bool TShape::GetBoundingBox(RECT &rect, POINT &center, const TConfiguration *pConfig)
 {
 	if (Element.size() == 0)

@@ -14,7 +14,7 @@ public:
 	virtual bool TSlideway::WriteFile(HANDLE &hf, DWORD &now_pos) override;
 	virtual bool TSlideway::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape) override;
 	virtual void TSlideway::NoticeListView(TListView *pListView) override;
-	virtual const String TSlideway::GetElementTypeName() override;//得到类型名称
+	virtual const String TSlideway::GetElementTypeName() override;//寰楀埌绫诲瀷鍚嶇О
 	virtual void TSlideway::Draw(HDC hdc, const TConfiguration* pConfig) override;
 };
 

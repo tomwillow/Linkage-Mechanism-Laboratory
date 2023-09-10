@@ -22,7 +22,7 @@ private:
 	COLORREF PrevRandomColor;
 	std::vector<COLORREF> vecColorLib;
 
-	COLORREF crMouseLine;//ºÚÉ«
+	COLORREF crMouseLine;//é»‘è‰²
 	COLORREF crPen, crDash, crDot;
 
 public:
@@ -32,36 +32,36 @@ public:
 	bool bThemeDark = true;
 	bool bRandomColor = true;
 	bool bDrawGrid = true;
-	int FRAMEPOINT_TRANS_R=5;//°ëÍ¸Ã÷×´Ì¬½ÚµãÔ²°ë¾¶
-	int FRAMEPOINT_R = 6;//½ÚµãÔ²°ë¾¶
-	int FRAMEPOINT_H = 20;//¸ß-Ô²ĞÄµ½µØÏß¾àÀë
-	int FRAMEPOINT_B = 30;//µ×±ß³¤
-	int FRAMEPOINT_SECTION_H = 10;//ÆÊÃæÏßÇøÓò¸ß¶È
-	int FRAMEPOINT_ANGLE = int(DEG2RAD(60.0));//Èı½ÇĞÎ»¡¶È
-	int SLIDER_B = 45;//»¬¿é¿í
-	int SLIDER_H = 30;//»¬¿é¸ß
-	int BAR_R = 7;//¸Ë¼şÔ²½Ç°ë¾¶
-	int CROSS_SIZE = 18;//¡Á±ß³¤
+	int FRAMEPOINT_TRANS_R=5;//åŠé€æ˜çŠ¶æ€èŠ‚ç‚¹åœ†åŠå¾„
+	int FRAMEPOINT_R = 6;//èŠ‚ç‚¹åœ†åŠå¾„
+	int FRAMEPOINT_H = 20;//é«˜-åœ†å¿ƒåˆ°åœ°çº¿è·ç¦»
+	int FRAMEPOINT_B = 30;//åº•è¾¹é•¿
+	int FRAMEPOINT_SECTION_H = 10;//å‰–é¢çº¿åŒºåŸŸé«˜åº¦
+	int FRAMEPOINT_ANGLE = int(DEG2RAD(60.0));//ä¸‰è§’å½¢å¼§åº¦
+	int SLIDER_B = 45;//æ»‘å—å®½
+	int SLIDER_H = 30;//æ»‘å—é«˜
+	int BAR_R = 7;//æ†ä»¶åœ†è§’åŠå¾„
+	int CROSS_SIZE = 18;//Ã—è¾¹é•¿
 	int TOLERANCE = 5;
 	int COLINEAR_SYMBOL_L = 10;
 
 	double dAnglePrecision = 1e-1;
 	units uUnits = UNITS_MM;
-	LOGPEN logpen;//µ±Ç°»­±Ê
+	LOGPEN logpen;//å½“å‰ç”»ç¬”
 	LOGPEN logpenBlack;//
-	LOGPEN logpenFront;//»­¡Á ×Ö 
-	LOGPEN logpenAssist;//¸¨ÖúÏß£º°×É«ĞéÏß
-	LOGPEN logpenMouseLine;//Í¼ Êó±ê¸ú×ÙÏß£ººÚÉ«ĞéÏß
+	LOGPEN logpenFront;//ç”»Ã— å­— 
+	LOGPEN logpenAssist;//è¾…åŠ©çº¿ï¼šç™½è‰²è™šçº¿
+	LOGPEN logpenMouseLine;//å›¾ é¼ æ ‡è·Ÿè¸ªçº¿ï¼šé»‘è‰²è™šçº¿
 	LOGPEN logpenGridSmall;
-	LOGPEN logpenAssistLine;//¸¨ÖúÏß£ºÂÌÉ«ĞéÏß
-	LOGPEN logpenConstraintLine;//Ô¼ÊøÏß
-	LOGPEN logpenColinearSymbol;//¹²Ïß·ûºÅ
+	LOGPEN logpenAssistLine;//è¾…åŠ©çº¿ï¼šç»¿è‰²è™šçº¿
+	LOGPEN logpenConstraintLine;//çº¦æŸçº¿
+	LOGPEN logpenColinearSymbol;//å…±çº¿ç¬¦å·
 
-	COLORREF crFront;//Ç°¾°É«£º°×É«ÊµÏß
+	COLORREF crFront;//å‰æ™¯è‰²ï¼šç™½è‰²å®çº¿
 	COLORREF crBackground, crCoordinate;
 	COLORREF crGridBig, crGridSmall;
 
-	COLORREF crLink;//FramePoint ºÚÉ«
+	COLORREF crLink;//FramePoint é»‘è‰²
 	//Graph
 	LOGPEN logpenGraphGridSmall,logpenGraphGridBig;
 	COLORREF crGraphBackground, crGraphGridBig, crGraphGridSmall;

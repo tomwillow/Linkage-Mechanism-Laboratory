@@ -25,9 +25,9 @@ TConstraintColinear::~TConstraintColinear()
 {
 }
 
-const String TConstraintColinear::GetElementTypeName()//µÃµ½ÀàĞÍÃû³Æ
+const String TConstraintColinear::GetElementTypeName()//å¾—åˆ°ç±»å‹åç§°
 {
-	return TEXT("¹²Ïß");
+	return TEXT("å…±çº¿");
 }
 
 void TConstraintColinear::NoticeListView(TListView *pListView)
@@ -38,11 +38,11 @@ void TConstraintColinear::NoticeListView(TListView *pListView)
 
 	pListView->id = id;
 	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
-	pListView->AddAttributeItem(TEXT("Ãû³Æ"), CTRLTYPE_EDIT, &Name, Name);
-	pListView->AddAttributeItem(TEXT("ÀàĞÍ"), CTRLTYPE_NULL, NULL, GetElementTypeName().c_str());
-	pListView->AddAttributeItem(TEXT("ÏßĞÍ"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle).c_str());
-	pListView->AddAttributeItem(TEXT("Ïß¿í"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
-	pListView->AddAttributeItem(TEXT("ÑÕÉ«"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
+	pListView->AddAttributeItem(TEXT("åç§°"), CTRLTYPE_EDIT, &Name, Name);
+	pListView->AddAttributeItem(TEXT("ç±»å‹"), CTRLTYPE_NULL, NULL, GetElementTypeName().c_str());
+	pListView->AddAttributeItem(TEXT("çº¿å‹"), CTRLTYPE_NULL, NULL, GetLineStyleName(this->logpenStyle.lopnStyle).c_str());
+	pListView->AddAttributeItem(TEXT("çº¿å®½"), CTRLTYPE_NULL, NULL, TEXT("%d"), this->logpenStyle.lopnWidth);
+	pListView->AddAttributeItem(TEXT("é¢œè‰²"), CTRLTYPE_NULL, NULL, TEXT("0x%X"), this->logpenStyle.lopnColor);
 
 	wsprintf(buffer, TEXT("ID:%d P%d-P%d = ID:%d P%d-P%d"), pElement[0]->id,PointBeginIndexOfElement[0],PointEndIndexOfElement[0],
 		pElement[1]->id,PointBeginIndexOfElement[1], PointEndIndexOfElement[1] );
@@ -107,13 +107,13 @@ void TConstraintColinear::DrawPickSquare(HDC hdc, const TConfiguration* pConfig)
 	POINT ptCenter1, ptCenter2;
 	if (TDraw::ShowConstraintColinearDotLine(this, ptCenter1, ptCenter2, pConfig))
 	{
-		//»­Ê°È¡·½¸ñ
+		//ç”»æ‹¾å–æ–¹æ ¼
 		TDraw::DrawPickSquare(hdc, ptCenter1);
 		TDraw::DrawPickSquare(hdc, ptCenter2);
 	}
 	else
 	{
-		//»­ÖØºÏµã
+		//ç”»é‡åˆç‚¹
 		TDraw::DrawPickSquare(hdc, ptCenter1);
 	}
 }

@@ -10,12 +10,12 @@
 #pragma comment(lib,"Shell32.lib")//SHChangeNotify
 
 //-------------------------------------------------------------------------  
-// ¼ì²éÎÄ¼ş¹ØÁª  
+// æ£€æŸ¥æ–‡ä»¶å…³è”  
 //-------------------------------------------------------------------------  
-// @strAppKey           [in]: À©Õ¹ÃûÔÚ×¢²á±íÖĞµÄ¼üÖµ(txtfile)  
-// @strAppName          [in]: ĞèÒª¹ØÁªµÄÓ¦ÓÃ³ÌĞò(c:\app\app.exe)  
+// @strAppKey           [in]: æ‰©å±•ååœ¨æ³¨å†Œè¡¨ä¸­çš„é”®å€¼(txtfile)  
+// @strAppName          [in]: éœ€è¦å…³è”çš„åº”ç”¨ç¨‹åº(c:\app\app.exe)  
 //-------------------------------------------------------------------------  
-// @return              : true±íÊ¾³É¹¦
+// @return              : trueè¡¨ç¤ºæˆåŠŸ
 //-------------------------------------------------------------------------  
 bool CheckFileAssociation(TCHAR *strAppKey, TCHAR *strAppName)
 {
@@ -39,16 +39,16 @@ bool CheckFileAssociation(TCHAR *strAppKey, TCHAR *strAppName)
 }
 
 //-------------------------------------------------------------------------  
-// ×¢²áÎÄ¼şÍ¼±ê¹ØÁª  
+// æ³¨å†Œæ–‡ä»¶å›¾æ ‡å…³è”  
 //-------------------------------------------------------------------------  
-// @strExt              [in]: ĞèÒª¼ì²âµÄÎÄ¼şºó×º(.txt)  
-// @strAppKey           [in]: À©Õ¹ÃûÔÚ×¢²á±íÖĞµÄ¼üÖµ(txtfile)  
-// @strAppName          [in]: ĞèÒª¹ØÁªµÄÓ¦ÓÃ³ÌĞò(c:\app\app.exe)  
-// @strDefaultIcon      [in]: ¹ØÁªµÄÍ¼±êÎÄ¼ş(ico exe dll)  
-// @iResourceId         [in]: Í¼±êÎÄ¼şÔÚ×ÊÔ´ÖĞµÄ±àºÅ(101)  
-// @strDescribe         [in]: ÃèÊö  
+// @strExt              [in]: éœ€è¦æ£€æµ‹çš„æ–‡ä»¶åç¼€(.txt)  
+// @strAppKey           [in]: æ‰©å±•ååœ¨æ³¨å†Œè¡¨ä¸­çš„é”®å€¼(txtfile)  
+// @strAppName          [in]: éœ€è¦å…³è”çš„åº”ç”¨ç¨‹åº(c:\app\app.exe)  
+// @strDefaultIcon      [in]: å…³è”çš„å›¾æ ‡æ–‡ä»¶(ico exe dll)  
+// @iResourceId         [in]: å›¾æ ‡æ–‡ä»¶åœ¨èµ„æºä¸­çš„ç¼–å·(101)  
+// @strDescribe         [in]: æè¿°  
 //-------------------------------------------------------------------------  
-// @return              : 0±íÊ¾³É¹¦£¬ÆäËû±íÊ¾´íÎóÂë  
+// @return              : 0è¡¨ç¤ºæˆåŠŸï¼Œå…¶ä»–è¡¨ç¤ºé”™è¯¯ç   
 //-------------------------------------------------------------------------  
 int RegisterFileAssociation(TCHAR *strExt, TCHAR *strAppKey, TCHAR *strAppName, TCHAR *strDefaultIcon, int iResourceId,const TCHAR *strDescribe)
 {
@@ -59,11 +59,11 @@ int RegisterFileAssociation(TCHAR *strExt, TCHAR *strAppKey, TCHAR *strAppName, 
 	ret = WriteRegKey(HKEY_CLASSES_ROOT, strExt, TEXT(""), strAppKey);
 	if (ret != ERROR_SUCCESS) return ret;
 
-	//ÃèÊö
+	//æè¿°
 	ret = WriteRegKey(HKEY_CLASSES_ROOT, strAppKey, TEXT(""), strDescribe);
 	if (ret != ERROR_SUCCESS) return ret;
 
-	//Í¼±ê
+	//å›¾æ ‡
 	wsprintf(strTemp, TEXT("%s\\DefaultIcon"), strAppKey);
 	TCHAR strIconValue[MAX_PATH];
 	wsprintf(strIconValue, TEXT("%s,-%d"), strDefaultIcon, iResourceId);//xxxx.ico,-101
@@ -88,12 +88,12 @@ int RegisterFileAssociation(TCHAR *strExt, TCHAR *strAppKey, TCHAR *strAppName, 
 }
 
 //-------------------------------------------------------------------------  
-// È¡ÏûÎÄ¼şÍ¼±ê¹ØÁª  
+// å–æ¶ˆæ–‡ä»¶å›¾æ ‡å…³è”  
 //-------------------------------------------------------------------------  
-// @strExt              [in]: ĞèÒª¼ì²âµÄÎÄ¼şºó×º(.txt)  
-// @strAppKey           [in]: À©Õ¹ÃûÔÚ×¢²á±íÖĞµÄ¼üÖµ(txtfile)  
+// @strExt              [in]: éœ€è¦æ£€æµ‹çš„æ–‡ä»¶åç¼€(.txt)  
+// @strAppKey           [in]: æ‰©å±•ååœ¨æ³¨å†Œè¡¨ä¸­çš„é”®å€¼(txtfile)  
 //-------------------------------------------------------------------------  
-// @return              : 0±íÊ¾³É¹¦£¬ÆäËû±íÊ¾´íÎóÂë  
+// @return              : 0è¡¨ç¤ºæˆåŠŸï¼Œå…¶ä»–è¡¨ç¤ºé”™è¯¯ç   
 //-------------------------------------------------------------------------  
 int UnRegisterFileAssociation(TCHAR *strExt, TCHAR *strAppKey)
 {
@@ -110,14 +110,14 @@ int UnRegisterFileAssociation(TCHAR *strExt, TCHAR *strAppKey)
 }
 
 //-------------------------------------------------------------------------  
-// Ğ´×¢²á±íµÄµÄ·½·¨  
+// å†™æ³¨å†Œè¡¨çš„çš„æ–¹æ³•  
 //-------------------------------------------------------------------------  
-// @root            [in]: ×¢²á±í¸ù  
-// @subDir          [in]: ×Ó½á¹¹  
-// @regKey          [in]: ×¢²á±íÏî¼ü  
-// @regValue        [in]: ÒªĞ´ÈëµÄ×¢²á±íÖµ  
+// @root            [in]: æ³¨å†Œè¡¨æ ¹  
+// @subDir          [in]: å­ç»“æ„  
+// @regKey          [in]: æ³¨å†Œè¡¨é¡¹é”®  
+// @regValue        [in]: è¦å†™å…¥çš„æ³¨å†Œè¡¨å€¼  
 //-------------------------------------------------------------------------  
-// @return              : 0±íÊ¾³É¹¦£¬ÆäËû±íÊ¾´íÎóÂë  
+// @return              : 0è¡¨ç¤ºæˆåŠŸï¼Œå…¶ä»–è¡¨ç¤ºé”™è¯¯ç   
 //-------------------------------------------------------------------------  
 int WriteRegKey(HKEY root, TCHAR * subDir, TCHAR * regKey,const TCHAR * regValue)
 {
@@ -143,14 +143,14 @@ int WriteRegKey(HKEY root, TCHAR * subDir, TCHAR * regKey,const TCHAR * regValue
 }
 
 //-------------------------------------------------------------------------  
-// Ğ´×¢²á±íµÄµÄ·½·¨  
+// å†™æ³¨å†Œè¡¨çš„çš„æ–¹æ³•  
 //-------------------------------------------------------------------------  
-// @root            [in] : ×¢²á±í¸ù  
-// @subDir          [in] : ×Ó½á¹¹  
-// @regKey          [in] : ×¢²á±íÏî¼ü  
-// @regValue        [out]: ¶ÁµÄµÄ×¢²á±íÖµ  
+// @root            [in] : æ³¨å†Œè¡¨æ ¹  
+// @subDir          [in] : å­ç»“æ„  
+// @regKey          [in] : æ³¨å†Œè¡¨é¡¹é”®  
+// @regValue        [out]: è¯»çš„çš„æ³¨å†Œè¡¨å€¼  
 //-------------------------------------------------------------------------  
-// @return               : 0±íÊ¾³É¹¦£¬ÆäËû±íÊ¾´íÎóÂë  
+// @return               : 0è¡¨ç¤ºæˆåŠŸï¼Œå…¶ä»–è¡¨ç¤ºé”™è¯¯ç   
 //-------------------------------------------------------------------------  
 int ReadRegKey(HKEY root, TCHAR * subDir, TCHAR * regKey, TCHAR* regValue)
 {
@@ -171,12 +171,12 @@ int ReadRegKey(HKEY root, TCHAR * subDir, TCHAR * regKey, TCHAR* regValue)
 	return 0;
 }
 //-------------------------------------------------------------------------  
-// É¾×¢²á±íµÄµÄ·½·¨  
+// åˆ æ³¨å†Œè¡¨çš„çš„æ–¹æ³•  
 //-------------------------------------------------------------------------  
-// @root            [in] : ×¢²á±í¸ù  
-// @subDir          [in] : ×Ó½á¹¹  
+// @root            [in] : æ³¨å†Œè¡¨æ ¹  
+// @subDir          [in] : å­ç»“æ„  
 //-------------------------------------------------------------------------  
-// @return               : 0±íÊ¾³É¹¦£¬ÆäËû±íÊ¾´íÎóÂë  
+// @return               : 0è¡¨ç¤ºæˆåŠŸï¼Œå…¶ä»–è¡¨ç¤ºé”™è¯¯ç   
 //-------------------------------------------------------------------------  
 int DeleteRegTree(HKEY root, TCHAR * subDir)
 {

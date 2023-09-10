@@ -50,7 +50,7 @@ void TCanvas::DealMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void TCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	//ÈÈ¼ü·µ»Ø¸øÖ÷´°¿Ú
+	//çƒ­é”®è¿”å›ç»™ä¸»çª—å£
 	SendMessage(m_hParent, WM_COMMAND, wParam, lParam);
 	//win.OnCommand(wParam, lParam);
 }
@@ -108,7 +108,7 @@ void TCanvas::OnMouseMove(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-	//ÈôÖĞ¼ü°´ÏÂ£¬ÍÏ¶¯×ø±êÔ­µã²¢Ë¢ĞÂÏÔÊ¾
+	//è‹¥ä¸­é”®æŒ‰ä¸‹ï¼Œæ‹–åŠ¨åæ ‡åŸç‚¹å¹¶åˆ·æ–°æ˜¾ç¤º
 	if (bMButtonPressing)
 	{
 		pConfig->SetOrg(pConfig->GetOrg().x + (ptPos.x - uiMoveStart.x),
@@ -151,11 +151,11 @@ void TCanvas::OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	ptPos.x = LOWORD(lParam);
 	ptPos.y = HIWORD(lParam);
 
-	//WM_MOUSEWHEELÊÂ¼ş»ñµÃµÄÊÇÏà¶ÔÓÚÆÁÄ»µÄ¾ø¶Ô×ø±ê
+	//WM_MOUSEWHEELäº‹ä»¶è·å¾—çš„æ˜¯ç›¸å¯¹äºå±å¹•çš„ç»å¯¹åæ ‡
 	ScreenToClient(hWnd, &ptPos);
 
-	//Ê×ÏÈÈ¡µÃÊó±êÎ»ÖÃµ½Ô­µãµÄÊµ¼Ê¾àÀë£¬ÔÚ±ÈÀı±ä¶¯ºóÒÔÏàÍ¬µÄÊµ¼Ê¾àÀëÍÆ¶ÏĞÂµÄÔ­µãÎ»ÖÃ¡£
-	//±ä¶¯Ç°ºóµÄÒÀ¾İÊÇÊµ¼Ê¾àÀë²»±ä¡£
+	//é¦–å…ˆå–å¾—é¼ æ ‡ä½ç½®åˆ°åŸç‚¹çš„å®é™…è·ç¦»ï¼Œåœ¨æ¯”ä¾‹å˜åŠ¨åä»¥ç›¸åŒçš„å®é™…è·ç¦»æ¨æ–­æ–°çš„åŸç‚¹ä½ç½®ã€‚
+	//å˜åŠ¨å‰åçš„ä¾æ®æ˜¯å®é™…è·ç¦»ä¸å˜ã€‚
 	double xlen = pConfig->ScreenToLengthX(ptPos.x - pConfig->GetOrg().x);
 	double ylen = pConfig->ScreenToLengthY(ptPos.y - pConfig->GetOrg().y);
 
@@ -168,14 +168,14 @@ void TCanvas::OnMouseWheel(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	pTrackbar->SetPosByValue(pConfig->GetProportion(), 1e-6);
 
-	//ÒòÎªÔ­À´Ò²ÊÇ0£¬SetPosºóÒ²ÊÇ0£¬SetPos²»¼¤·¢NOTIFY£¬ËùÒÔÊÖ¶¯·¢
+	//å› ä¸ºåŸæ¥ä¹Ÿæ˜¯0ï¼ŒSetPosåä¹Ÿæ˜¯0ï¼ŒSetPosä¸æ¿€å‘NOTIFYï¼Œæ‰€ä»¥æ‰‹åŠ¨å‘
 	PostMessage(m_hParent, WM_NOTIFY, MAKELONG(IDR_TRACKBAR, 0), 0);
 
 	DealMessage(hWnd, uMsg, wParam, lParam);
 	Invalidate();
 }
 
-//ÄæÊ±Õë
+//é€†æ—¶é’ˆ
 void GetArcDPOINT(std::vector<DPOINT> &result,DPOINT dptO, double r, double angle1, double angle2, double all_step) 
 {
 	double dx = (angle2 - angle1) / all_step;
@@ -206,37 +206,37 @@ void DrawGear(HDC hdc,int m, int z, double x,double alphaDEG, DPOINT dpt,double 
 	SelectObject(hdc, hPen);
 	SelectObject(hdc, hBrush);
 
-	double ha = 1, c = (m>=1)?0.25:0.35; //³İ¶¥¸ßÏµÊı; ¶¥Ï¶ÏµÊı; ±äÎ»ÏµÊı
-	double alpha = DEG2RAD(alphaDEG); //Ñ¹Á¦½Ç
+	double ha = 1, c = (m>=1)?0.25:0.35; //é½¿é¡¶é«˜ç³»æ•°; é¡¶éš™ç³»æ•°; å˜ä½ç³»æ•°
+	double alpha = DEG2RAD(alphaDEG); //å‹åŠ›è§’
 		
-	double	r = z*m / 2; //·Ö¶ÈÔ²°ë¾¶
-	double	ra = r + (ha + x)*m; //³İ¶¥Ô²°ë¾¶
-	double	rf = r - (ha + c - x)*m; //³İ¸ùÔ²°ë¾¶
-	if (rf < 0) error = true;//±äÎ»ÏµÊı¹ıĞ¡£¨-x¹ı´ó£©£¬µ¼ÖÂ³İ¸ùÔ²°ë¾¶Îª¸º
+	double	r = z*m / 2; //åˆ†åº¦åœ†åŠå¾„
+	double	ra = r + (ha + x)*m; //é½¿é¡¶åœ†åŠå¾„
+	double	rf = r - (ha + c - x)*m; //é½¿æ ¹åœ†åŠå¾„
+	if (rf < 0) error = true;//å˜ä½ç³»æ•°è¿‡å°ï¼ˆ-xè¿‡å¤§ï¼‰ï¼Œå¯¼è‡´é½¿æ ¹åœ†åŠå¾„ä¸ºè´Ÿ
 
-	double	rb = r*cos(alpha); //»ùÔ²°ë¾¶
+	double	rb = r*cos(alpha); //åŸºåœ†åŠå¾„
 
 	//TDraw::DrawCircle(hdc, pConfig->RealToScreen(dpt), pConfig->LengthToScreenX(ra));
 	//TDraw::DrawCircle(hdc, pConfig->RealToScreen(dpt), pConfig->LengthToScreenX(rb));
 	//TDraw::DrawCircle(hdc, pConfig->RealToScreen(dpt), pConfig->LengthToScreenX(rf));
 
-	double p = M_PI*m; //³İ¾à
-	double s = p / 2 + 2 * x*m*tan(alpha); //³İºñ
+	double p = M_PI*m; //é½¿è·
+	double s = p / 2 + 2 * x*m*tan(alpha); //é½¿åš
 
 	double beta1 = involute(acos(rb / r));
 	double beta2 = s / (2 * r);
 	double beta = beta1 + beta2;
 
-	double rr = abs(rb - rf) / 2;//´ÖÈ¡Ô²½Ç°ë¾¶
+	double rr = abs(rb - rf) / 2;//ç²—å–åœ†è§’åŠå¾„
 	double mu = M_PI / z - beta;
-	double rr1 = rf*sin(mu) / (1 - sin(mu));//Á½Ô²½ÇÏà½»Ê±µÄ°ë¾¶
-	double rr2 = abs(rb - rf);//»ùÔ²ÖÁ³İ¸ù¾àÀë
+	double rr1 = rf*sin(mu) / (1 - sin(mu));//ä¸¤åœ†è§’ç›¸äº¤æ—¶çš„åŠå¾„
+	double rr2 = abs(rb - rf);//åŸºåœ†è‡³é½¿æ ¹è·ç¦»
 	if (rr > min(rr1, rr2)) rr = min(rr1, rr2);
 
 	std::vector<DPOINT> vecdpt;
 
-	//¿ªÊ¼¼ÆËã
-	//µÚ-2¶Î Ô²½Ç = Ô²½Ç5¾µÏñ
+	//å¼€å§‹è®¡ç®—
+	//ç¬¬-2æ®µ åœ†è§’ = åœ†è§’5é•œåƒ
 	double HE = rr, OH = rf + rr;
 	double gama = asin(HE / OH);
 	double epsilon = M_PI / 2 - gama - beta;
@@ -245,7 +245,7 @@ void DrawGear(HDC hdc,int m, int z, double x,double alphaDEG, DPOINT dpt,double 
 	double angle1 = M_PI + gama + beta;
 	double angle2 = angle1 + (M_PI / 2 - gama);
 
-	int pt_count__2 = pConfig->LengthToScreenX(rr)/2;//Ô²½Ç×ÜµãÊı
+	int pt_count__2 = pConfig->LengthToScreenX(rr)/2;//åœ†è§’æ€»ç‚¹æ•°
 	if (pt_count__2 < 2) pt_count__2 = 2;
 
 	std::vector<DPOINT> vecdpt5;
@@ -255,13 +255,13 @@ void DrawGear(HDC hdc,int m, int z, double x,double alphaDEG, DPOINT dpt,double 
 		vecdpt.push_back({ it->x, -it->y });
 	}
 
-	//µÚ-1¶Î Ö±Ïß
+	//ç¬¬-1æ®µ ç›´çº¿
 
-	//µÚ1¶Î ½¥¿ªÏß
+	//ç¬¬1æ®µ æ¸å¼€çº¿
 	int step_count = pConfig->LengthToScreenX(ra - rb)/4; if (step_count < 2) step_count = 2;
 	double alphaK = 0, alphaK_end = acos(rb / ra),  dx = alphaK_end /step_count ;
 
-	if (alphaK_end > beta) error = true;//±äÎ»ÏµÊı¹ı´ó£¬³İ¶¥½¥¿ªÏßÏà½»
+	if (alphaK_end > beta) error = true;//å˜ä½ç³»æ•°è¿‡å¤§ï¼Œé½¿é¡¶æ¸å¼€çº¿ç›¸äº¤
 
 	for (int step = 0; step <= step_count;++step)
 	{
@@ -272,15 +272,15 @@ void DrawGear(HDC hdc,int m, int z, double x,double alphaDEG, DPOINT dpt,double 
 		alphaK += dx;
 	}
 
-	//µÚ2¶Î ³İ¶¥Ô²
+	//ç¬¬2æ®µ é½¿é¡¶åœ†
 	double thetaba = involute(acos(rb / ra));
 	double thetaa = beta - thetaba;
 
-	step_count = pConfig->LengthToScreenX(thetaa * 2 * ra);//°ë¾¶*»¡¶È=»¡³¤
+	step_count = pConfig->LengthToScreenX(thetaa * 2 * ra);//åŠå¾„*å¼§åº¦=å¼§é•¿
 	if (step_count < 2) step_count = 2;
 	GetArcDPOINT(vecdpt, { 0, 0 }, ra, -thetaa, thetaa, step_count);
 
-	//µÚ3¶Î ½¥¿ªÏß = ½¥¿ªÏß1¾µÏñ
+	//ç¬¬3æ®µ æ¸å¼€çº¿ = æ¸å¼€çº¿1é•œåƒ
 	std::vector<DPOINT> vecdpt3(vecdpt.begin()+pt_count__2, vecdpt.end() - step_count);
 	for (auto &it = vecdpt3.rbegin(); it != vecdpt3.rend(); ++it)
 	{
@@ -288,18 +288,18 @@ void DrawGear(HDC hdc,int m, int z, double x,double alphaDEG, DPOINT dpt,double 
 		vecdpt.push_back(*it);
 	}
 
-	//µÚ4¶Î Ö±Ïß
+	//ç¬¬4æ®µ ç›´çº¿
 
-	//µÚ5¶Î Ô²½Ç
+	//ç¬¬5æ®µ åœ†è§’
 	vecdpt.insert(vecdpt.end(), vecdpt5.rbegin(),vecdpt5.rend());
 
-	//µÚ6¶Î ³İ¸ùÔ²»¡
+	//ç¬¬6æ®µ é½¿æ ¹åœ†å¼§
 	double phi = 2 * M_PI / z - 2 * beta - 2 * gama;
 
-	step_count = pConfig->LengthToScreenX(ra*phi);//°ë¾¶*»¡¶È=»¡³¤
+	step_count = pConfig->LengthToScreenX(ra*phi);//åŠå¾„*å¼§åº¦=å¼§é•¿
 	GetArcDPOINT(vecdpt, { 0, 0 }, rf, beta+gama, beta+gama+phi, step_count);
 
-	//ÕóÁĞ
+	//é˜µåˆ—
 	std::vector<DPOINT> vecdpt_all;// (vecdpt.begin(), vecdpt.end());
 	dx = 2 * M_PI / z;
 	double now_angle = 0;
@@ -314,9 +314,9 @@ void DrawGear(HDC hdc,int m, int z, double x,double alphaDEG, DPOINT dpt,double 
 		now_angle += dx;
 	}
 
-	//×ªÎªÆÁÄ»×ø±ê
+	//è½¬ä¸ºå±å¹•åæ ‡
 	std::vector<POINT> vecpt;
-	TDraw::GetAbsoluteScreen(vecpt, vecdpt_all, dpt, ang, pConfig);//ÔÚÕâÀïĞı×ª
+	TDraw::GetAbsoluteScreen(vecpt, vecdpt_all, dpt, ang, pConfig);//åœ¨è¿™é‡Œæ—‹è½¬
 	Polygon(hdc, vecpt.data(), vecpt.size());
 
 	DeleteObject(hPen);
@@ -328,36 +328,36 @@ void TCanvas::OnDraw(HDC hdc)
 {
 	SetBkMode(hdc, TRANSPARENT);
 
-	//Ìî³ä±³¾°
+	//å¡«å……èƒŒæ™¯
 	TDraw::FillRect(hdc, &ClientRect, pConfig->crBackground);
 
-	//»­Íø¸ñ
+	//ç”»ç½‘æ ¼
 	if (pConfig->bDrawGrid)
 		TDraw::DrawGrid(hdc, ClientRect, pConfig->GetOrg(), pConfig->crGridBig, pConfig->crGridSmall, pConfig);
 
-	//»­Ğ£»Õ
+	//ç”»æ ¡å¾½
 	if (pConfig->bDrawSchoolLogo)
 		Draw.DrawLogo(m_hInst,IDB_PNG_SCHOOL,TEXT("PNG"),hdc,ClientRect);
 
 #if (defined _STUDENT) || (defined _TEACHER)
-	//Ğ´Ñ§ºÅĞÅÏ¢
+	//å†™å­¦å·ä¿¡æ¯
 	std::String s;
-	s << TEXT("°à¼¶£º") + sStudentClass;
-	s << TEXT("\r\n\r\nĞÕÃû£º") + sStudentName;
-	s << TEXT("\r\n\r\nÑ§ºÅ£º") + sStudentNumber;
+	s << TEXT("ç­çº§ï¼š") + sStudentClass;
+	s << TEXT("\r\n\r\nå§“åï¼š") + sStudentName;
+	s << TEXT("\r\n\r\nå­¦å·ï¼š") + sStudentNumber;
 #endif
 #ifdef _TEACHER
-	s << TEXT("\r\n\r\n³É¼¨£º") + sStudentScore;
+	s << TEXT("\r\n\r\næˆç»©ï¼š") + sStudentScore;
 #endif
 #if (defined _STUDENT) || (defined _TEACHER)
 	POINT pt = { ClientRect.left, ClientRect.bottom };
 	TDraw::DrawTips(hdc, pt, ClientRect,s.c_str(), pConfig);
 #endif
 
-	if (pConfig->bDrawAxes)//»­×ø±êÔ­µã
+	if (pConfig->bDrawAxes)//ç”»åæ ‡åŸç‚¹
 		TDraw::DrawAxes(hdc, pConfig->GetOrg().x, pConfig->GetOrg().y, pConfig->crCoordinate);
 
-	//Í¼ĞÎ»æÖÆ
+	//å›¾å½¢ç»˜åˆ¶
 	for (auto pElement : pShape->Element)
 	{
 		pElement->Draw(hdc, pConfig);
@@ -372,9 +372,9 @@ void TCanvas::OnDraw(HDC hdc)
 		}
 	}
 
-	//¹¤¾ßÀà»æÖÆ
+	//å·¥å…·ç±»ç»˜åˆ¶
 	if (pManageTool->m_pCurrentTool != NULL)
-		pManageTool->m_pCurrentTool->Draw(hdc);//¹¤¾ßÔÚÊ¹ÓÃÖĞµÄÍ¼ĞÎ»æÖÆ½»ÓÉ¹¤¾ßÀàÖ´ĞĞ
+		pManageTool->m_pCurrentTool->Draw(hdc);//å·¥å…·åœ¨ä½¿ç”¨ä¸­çš„å›¾å½¢ç»˜åˆ¶äº¤ç”±å·¥å…·ç±»æ‰§è¡Œ
 
 	//DrawGear(hdc, 2, 42, 0, 20, { 0, 0 },0, pConfig->logpen, pConfig);
 }

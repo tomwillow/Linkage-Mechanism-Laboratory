@@ -25,13 +25,13 @@ public:
 	void TTreeViewContent::Initial();
 	int TTreeViewContent::GetIdFromHTreeView(HTREEITEM hTreeItem);
 	HTREEITEM TTreeViewContent::GetHTreeItemFromId(int id);
-	void TTreeViewContent::SelectById(int id);//发送至RightWindow OnNotify
+	void TTreeViewContent::SelectById(int id);//鍙戦�佽嚦RightWindow OnNotify
 	void TTreeViewContent::AddDriver(int id,const TCHAR szMemo[]);
 	void TTreeViewContent::AddItem(TElement *Element,int id);
 	void TTreeViewContent::DeleteById(int id);
 	void TTreeViewContent::SelectNull();
 	void TTreeViewContent::DeleteAllItems();
-	void TTreeViewContent::AddAllItem();//仅用于读入文件时使用
+	void TTreeViewContent::AddAllItem();//浠呯敤浜庤鍏ユ枃浠舵椂浣跨敤
 	LRESULT TTreeViewContent::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 };
 

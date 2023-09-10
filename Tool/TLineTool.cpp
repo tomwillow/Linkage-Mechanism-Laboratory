@@ -40,7 +40,7 @@ TLineTool::TLineTool()
 	pPrevLine = NULL;
 
 	bShowTips = true;
-	sType = TEXT("Ïß¶Î");
+	sType = TEXT("çº¿æ®µ");
 	bCanBuildCoincide = false;
 }
 
@@ -75,20 +75,20 @@ void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 
 	if (dptHit.size() > 0)
 	{
-		//¼ÆËãÔİ´æÏß³¤¶È²¢´æÈëEdit
+		//è®¡ç®—æš‚å­˜çº¿é•¿åº¦å¹¶å­˜å…¥Edit
 		//MoveLine->CalcLength();
 		LineEdit->SetText(TEXT("%.3f"), MoveLine->dLength);
 		SetFocus(LineEdit->m_hWnd);
 		LineEdit->SetSelectAll();
 
-		//¼ÆËã³ß´çÏß¸÷µã×ø±ê
-		int dist = 40;//Ôİ´æÏßºÍ³ß´çÏß¾àÀë
+		//è®¡ç®—å°ºå¯¸çº¿å„ç‚¹åæ ‡
+		int dist = 40;//æš‚å­˜çº¿å’Œå°ºå¯¸çº¿è·ç¦»
 		double theta = TDraw::GetAngleFromPointReal(MoveLine->ptBegin, MoveLine->ptEnd);
 		pt1 = pConfig->RealToScreen(MoveLine->ptBegin);
 		pt2 = pConfig->RealToScreen(MoveLine->ptEnd);
 		Line1->ptBegin = pt1;
 		Line2->ptBegin = pt2;
-		if (MoveLine->ptEnd.y - MoveLine->ptBegin.y >= 0)//Î»ÓÚ1,2ÏóÏŞ
+		if (MoveLine->ptEnd.y - MoveLine->ptBegin.y >= 0)//ä½äº1,2è±¡é™
 		{
 			TDraw::Move(&pt1, 1, theta + M_PI / 2, dist);
 			TDraw::Move(&pt2, 1, theta + M_PI / 2, dist);
@@ -101,13 +101,13 @@ void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 		Line1->ptEnd = pt1;
 		Line2->ptEnd = pt2;
 		LineDim->ptBegin = pt1; LineDim->ptEnd = pt2;
-		//Èô³ß´çÏß³¤¶ÈÎª0Ôò²»ÏÔÊ¾
+		//è‹¥å°ºå¯¸çº¿é•¿åº¦ä¸º0åˆ™ä¸æ˜¾ç¤º
 		if (LineDim->ptBegin.x == LineDim->ptEnd.x && LineDim->ptBegin.y == LineDim->ptEnd.y)
 			bShowDimLine = false;
 		else
 			bShowDimLine = true;
 
-		//ÉèÖÃEditÎ»ÖÃ²¢ÏÔÊ¾
+		//è®¾ç½®Editä½ç½®å¹¶æ˜¾ç¤º
 		if (LineEdit->m_hWnd != NULL && bShowDimLine == true)
 		{
 			int width = 60, height = 20;
@@ -124,32 +124,32 @@ void TLineTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 
 	ptMouse = pConfig->RealToScreen(Attach->dptAttach);
 	if (ptMouse.x == ptPrevPos.x && ptMouse.y == ptPrevPos.y)
-		sTips = TEXT("³¤¶ÈÎª0:ÇëÒÆ¶¯¹â±ê»òÊäÈëÊı¾İ");
+		sTips = TEXT("é•¿åº¦ä¸º0:è¯·ç§»åŠ¨å…‰æ ‡æˆ–è¾“å…¥æ•°æ®");
 	else
 	{
-		sTips = TEXT("µã»÷ÒÔ½¨Á¢");
+		sTips = TEXT("ç‚¹å‡»ä»¥å»ºç«‹");
 		sTips += sType;
 		if (bShowDimLine)
-			sTips += TEXT("\r\n£¨ÊäÈë¸ñÊ½: ³¤¶È or ³¤¶È<½Ç¶È or x×ø±ê,y×ø±ê£¨Ïà¶Ôµ±Ç°µã£©£©");
+			sTips += TEXT("\r\nï¼ˆè¾“å…¥æ ¼å¼: é•¿åº¦ or é•¿åº¦<è§’åº¦ or xåæ ‡,yåæ ‡ï¼ˆç›¸å¯¹å½“å‰ç‚¹ï¼‰ï¼‰");
 		if (Attach->bAttachedEndpoint && bCanBuildCoincide)
-			sTips += TEXT("\r\nÒÑÎü¸½¶Ëµã:×Ô¶¯½¨Á¢ÖØºÏÔ¼Êø");
+			sTips += TEXT("\r\nå·²å¸é™„ç«¯ç‚¹:è‡ªåŠ¨å»ºç«‹é‡åˆçº¦æŸ");
 	}
 
-	//ÓÉCanvasË¢ĞÂ
+	//ç”±Canvasåˆ·æ–°
 }
 
-//ÓÉ×æÏÈ²åÈëWM_PAINTÊÂ¼şÖĞ½øĞĞ»æÖÆ
+//ç”±ç¥–å…ˆæ’å…¥WM_PAINTäº‹ä»¶ä¸­è¿›è¡Œç»˜åˆ¶
 void TLineTool::Draw(HDC hdc)
 {
 
-	Attach->Draw(hdc);//Ö÷²æÓÉAttachÌá¹©
+	Attach->Draw(hdc);//ä¸»å‰ç”±Attachæä¾›
 
-	//»­ÁÙÊ±Ïß¼°³ß´çÏß
+	//ç”»ä¸´æ—¶çº¿åŠå°ºå¯¸çº¿
 	if (dptHit.size() > 0)
 	{
 		switch (myElementType)
 		{
-		case ELEMENT_REALLINE://µã¹ıÒ»´Îºó²Å¿ªÊ¼»­ÁÙÊ±Ïß
+		case ELEMENT_REALLINE://ç‚¹è¿‡ä¸€æ¬¡åæ‰å¼€å§‹ç”»ä¸´æ—¶çº¿
 			TDraw::DrawRealLine(hdc, *MoveLine, pConfig);
 			break;
 		case ELEMENT_BAR:
@@ -184,14 +184,14 @@ TElement * TLineTool::AddIntoShape(TRealLine &RealLine)
 
 void TLineTool::AddIntoTreeViewContent(TElement *Element, int id)
 {
-	//Ô¼ÊøÒ²Òª¾­¹ı´Ë´¦
+	//çº¦æŸä¹Ÿè¦ç»è¿‡æ­¤å¤„
 	if (Element->eType == ELEMENT_REALLINE)
 		Element->eType = myElementType;
 	pTreeViewContent->AddItem(Element, pShape->iNextId);
 }
 
-//LineEdit³öÏÖÊ±CanvasÊÇ½ÓÊÕ²»µ½KEYDOWNµÄ£¬×ÔÈ»LineToolÒ²½ÓÊÕ²»µ½¡£
-//KEYDOWNÏûÏ¢ÓÉLineEdit½Ø»ñ·¢ËÍ¸øCanvas£¬ÔÙ´«µİÏÂÀ´¡£
+//LineEditå‡ºç°æ—¶Canvasæ˜¯æ¥æ”¶ä¸åˆ°KEYDOWNçš„ï¼Œè‡ªç„¶LineToolä¹Ÿæ¥æ”¶ä¸åˆ°ã€‚
+//KEYDOWNæ¶ˆæ¯ç”±LineEditæˆªè·å‘é€ç»™Canvasï¼Œå†ä¼ é€’ä¸‹æ¥ã€‚
 void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam)
@@ -206,13 +206,13 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			TRealLine RealLine;
 			RealLine = *MoveLine;
 
-			//Èë¿â
+			//å…¥åº“
 			AddIntoTreeViewContent(&RealLine, pShape->iNextId);
 			pPrevLine = AddIntoShape(RealLine);
 
 			if (CoincideBegin != NULL)
 			{
-				//ÉÏÒ»¸öÔ¼ÊøÈë¿â
+				//ä¸Šä¸€ä¸ªçº¦æŸå…¥åº“
 				CoincideBegin->pElement[1] = pPrevLine;
 
 				AddCoincide(CoincideBegin, pShape->iNextId, pConfig);
@@ -223,7 +223,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				CoincideBegin = NULL;
 			}
 
-			//¼ÓÈëÁ¬½ÓÔ¼Êø£ºIDÉÏÒ»¸ö.end=IDÕâ¸ö.begin
+			//åŠ å…¥è¿æ¥çº¦æŸï¼šIDä¸Šä¸€ä¸ª.end=IDè¿™ä¸ª.begin
 			CoincideBegin = new TConstraintCoincide;
 			CoincideBegin->SetStyle(pConfig->logpen);
 
@@ -232,35 +232,35 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 			CoincideBegin->PointIndexOfElement[1] = 0;//ptBegin
 
-			//¼ÆËãµÃ³öµÄÖÕµã´æÈëÔİ´æµã¼¯
+			//è®¡ç®—å¾—å‡ºçš„ç»ˆç‚¹å­˜å…¥æš‚å­˜ç‚¹é›†
 			dptHit.push_back(RealLine.ptEnd);
 
-			//ÉèÖÃÁÙÊ±Ïß
+			//è®¾ç½®ä¸´æ—¶çº¿
 			POINT ptNew = pConfig->RealToScreen(RealLine.ptEnd);
 			InitialLine(RealLine.ptEnd);
 			Attach->InitialLine(ptNew);
 
-			LineEdit->SetVisible(false);//±ÜÃâÔÚ»­ÍêÏßºó»¹ÏÔÊ¾Edit
+			LineEdit->SetVisible(false);//é¿å…åœ¨ç”»å®Œçº¿åè¿˜æ˜¾ç¤ºEdit
 
-			//ÒÆ¶¯µ½ĞÂ×ø±ê
+			//ç§»åŠ¨åˆ°æ–°åæ ‡
 			TDraw::ClientPosToScreen(hWnd, &ptNew);
 			SetCursorPos(ptNew.x, ptNew.y);
 		}
 		break;
 	default:
-		//ËùÓĞ¼ü¾­¹ı´Ë´¦£¬²»Ö¹ÊÇEditÄÚµÄ
+		//æ‰€æœ‰é”®ç»è¿‡æ­¤å¤„ï¼Œä¸æ­¢æ˜¯Editå†…çš„
 
-		//µÃµ½×Ö·û²¢×ª»»
+		//å¾—åˆ°å­—ç¬¦å¹¶è½¬æ¢
 		double length, DegAngle;
 		DPOINT dpt;
 		TCHAR buffer[64];
 		LineEdit->GetText(buffer);
 
 		std::vector<TCHAR *>szNums;
-		TCHAR_Function::Split(buffer, szNums, TEXT(","));//ÇĞ·Ö×ø±ê
+		TCHAR_Function::Split(buffer, szNums, TEXT(","));//åˆ‡åˆ†åæ ‡
 
 		enum enumInputType{ INPUT_BAD, INPUT_LENGTH, INPUT_COORDINATE, INPUT_LENGTH_ANGLE } eInputType;
-		if (szNums.size() == 2)//È·ÊµÊÇ×ø±ê
+		if (szNums.size() == 2)//ç¡®å®æ˜¯åæ ‡
 		{
 			eInputType = INPUT_COORDINATE;
 			dpt.x = TTransfer::TCHAR2double(szNums[0]);
@@ -271,7 +271,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			szNums.clear();
 			TCHAR_Function::Split(buffer, szNums, TEXT("<"));
 			length = TTransfer::TCHAR2double(szNums[0]);
-			if (abs(length) > 1e-6)//³¤¶È>0
+			if (abs(length) > 1e-6)//é•¿åº¦>0
 				if (szNums.size() == 2)
 				{
 					eInputType = INPUT_LENGTH_ANGLE;
@@ -285,7 +285,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 				eInputType = INPUT_BAD;
 		}
 		TCHAR_Function::ReleaseVectorTCHAR(szNums);
-		//ÒÑµÃµ½dpt,length,angle
+		//å·²å¾—åˆ°dpt,length,angle
 
 		switch (eInputType)
 		{
@@ -294,7 +294,7 @@ void TLineTool::OnKeyDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			MoveLine->ptEnd.y = MoveLine->ptBegin.y + dpt.y;
 			break;
 		case INPUT_LENGTH:
-			DegAngle = TDraw::GetAngleFromPointReal(MoveLine->ptBegin, MoveLine->ptEnd);//·µ»ØÖµÎª»¡¶È
+			DegAngle = TDraw::GetAngleFromPointReal(MoveLine->ptBegin, MoveLine->ptEnd);//è¿”å›å€¼ä¸ºå¼§åº¦
 			MoveLine->SetPointByIvoryLine(Attach->GetiIvoryLine(), MoveLine->ptBegin, length, DegAngle);
 			break;
 		case INPUT_LENGTH_ANGLE:
@@ -328,12 +328,12 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 	//bShowDptText = false;
 	ptPos = pConfig->RealToScreen(MoveLine->ptEnd);
 
-	//´¦ÀíÔ¼Êø
-	if (dptHit.size() == 0)//µÚÒ»µã²¶×½µ½µÄÔ¼Êø
+	//å¤„ç†çº¦æŸ
+	if (dptHit.size() == 0)//ç¬¬ä¸€ç‚¹æ•æ‰åˆ°çš„çº¦æŸ
 	{
 		if (Attach->bAttachedEndpoint)
 		{
-			//ID±»²¶×½=IDĞÂÔªËØ.begin
+			//IDè¢«æ•æ‰=IDæ–°å…ƒç´ .begin
 			CoincideBegin = new TConstraintCoincide;
 			CoincideBegin->SetStyle(pConfig->logpen);
 			CoincideBegin->pElement[0] = Attach->pAttachElement;
@@ -342,14 +342,14 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			CoincideBegin->PointIndexOfElement[1] = 0;//ptBegin
 		}
 	}
-	else//·ÇµÚÒ»µã
+	else//éç¬¬ä¸€ç‚¹
 	{
 		if (ptPos.x == ptPrevPos.x && ptPos.y == ptPrevPos.y)
 			return;
 
-		//Èô³¬³ö1¸öµãÔòÈë¿â
+		//è‹¥è¶…å‡º1ä¸ªç‚¹åˆ™å…¥åº“
 		TRealLine RealLine;
-		RealLine.SetStyle(MoveLine->logpenStyle);//Ö»ÓĞ´Ë´¦ÏßÈë¿â£¬¸´ÖÆMoveLineÑÕÉ«£¬MoveLineÑÕÉ«È¡ĞÂ
+		RealLine.SetStyle(MoveLine->logpenStyle);//åªæœ‰æ­¤å¤„çº¿å…¥åº“ï¼Œå¤åˆ¶MoveLineé¢œè‰²ï¼ŒMoveLineé¢œè‰²å–æ–°
 		MoveLine->SetStyle(pConfig);
 		RealLine.SetPoint(dptHit[dptHit.size() - 1], MoveLine->ptEnd);
 
@@ -359,7 +359,7 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 		if (CoincideBegin != NULL)
 		{
-			//ÉÏÒ»¸öÔ¼ÊøÈë¿â
+			//ä¸Šä¸€ä¸ªçº¦æŸå…¥åº“
 			CoincideBegin->pElement[1] = pPrevLine;
 
 			AddCoincide(CoincideBegin, pShape->iNextId, pConfig);
@@ -372,9 +372,9 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			CoincideBegin = NULL;
 		}
 
-		if (Attach->bAttachedEndpoint)//ÈôÖÕµã²¶×½ÉÏÁË
+		if (Attach->bAttachedEndpoint)//è‹¥ç»ˆç‚¹æ•æ‰ä¸Šäº†
 		{
-			//ID±»²¶×½=IDÕâ¸ö.end
+			//IDè¢«æ•æ‰=IDè¿™ä¸ª.end
 			CoincideBegin = new TConstraintCoincide;
 			CoincideBegin->SetStyle(pConfig->logpen);
 			//CoincideBegin->eElementType1 = Attach->eAttachElementType;
@@ -382,10 +382,10 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			CoincideBegin->PointIndexOfElement[0] = Attach->iAttachElementPointIndex;
 
 			//CoincideBegin->eElementType2 = myElementType;
-			CoincideBegin->pElement[1] = pPrevLine;//´Ë´¦ÒÑÈë¿â£¬ÒÑÈë¿âÔªËØidÎªnextid-1
+			CoincideBegin->pElement[1] = pPrevLine;//æ­¤å¤„å·²å…¥åº“ï¼Œå·²å…¥åº“å…ƒç´ idä¸ºnextid-1
 			CoincideBegin->PointIndexOfElement[1] = 1;//ptEnd
 
-			//ÖÕµãÁ¬½ÓÈë¿â
+			//ç»ˆç‚¹è¿æ¥å…¥åº“
 			AddCoincide(CoincideBegin, pShape->iNextId, pConfig);
 			//AddIntoTreeViewContent(CoincideBegin, pShape->iNextId);
 			//pShape->AddCoincide(*CoincideBegin, pConfig);
@@ -397,35 +397,35 @@ void TLineTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 		}
 
 
-		//¼ÓÈëÁ¬½ÓÔ¼Êø£ºIDÉÏÒ»¸ö.end=IDÕâ¸ö.begin
+		//åŠ å…¥è¿æ¥çº¦æŸï¼šIDä¸Šä¸€ä¸ª.end=IDè¿™ä¸ª.begin
 		CoincideBegin = new TConstraintCoincide;
 		CoincideBegin->SetStyle(pConfig->logpen);
 		//CoincideBegin->eElementType1 = myElementType;
-		CoincideBegin->pElement[0] = pPrevLine;//ÉÏÒ»ÌõÏßid
+		CoincideBegin->pElement[0] = pPrevLine;//ä¸Šä¸€æ¡çº¿id
 		CoincideBegin->PointIndexOfElement[0] = 1;//ptEnd
 
 		//CoincideBegin->eElementType2 = myElementType;
-		//CoincideBegin->ElementId2 = pShape->iNextId;//´Ë´¦Î´Èë¿â£¬´ËÎªµ±Ç°ĞòºÅ
+		//CoincideBegin->ElementId2 = pShape->iNextId;//æ­¤å¤„æœªå…¥åº“ï¼Œæ­¤ä¸ºå½“å‰åºå·
 		CoincideBegin->PointIndexOfElement[1] = 0;//ptBegin
 	}
 
-	//µ±Ç°µã´æÈëÔİ´æµã¼¯
+	//å½“å‰ç‚¹å­˜å…¥æš‚å­˜ç‚¹é›†
 	dptHit.push_back(MoveLine->ptEnd);
 
-	//ÉèÖÃÁÙÊ±Ïß
+	//è®¾ç½®ä¸´æ—¶çº¿
 	InitialLine(MoveLine->ptEnd);
 	Attach->InitialLine(ptPos);
 
-	//´´½¨LineEdit»òÒş²Ø
+	//åˆ›å»ºLineEditæˆ–éšè—
 	if (LineEdit->m_hWnd == NULL)
 	{
 		LineEdit->CreateEditEx(pCanvas->m_hWnd, IDR_LINEEDIT, pCanvas->m_hInst);
 	}
 	else
-		LineEdit->SetVisible(false);//±ÜÃâÔÚ»­ÍêÏßºó»¹ÏÔÊ¾Edit
+		LineEdit->SetVisible(false);//é¿å…åœ¨ç”»å®Œçº¿åè¿˜æ˜¾ç¤ºEdit
 
 	ptPrevPos = ptPos;
-	//½»¸ø»­²¼Ë¢ĞÂ
+	//äº¤ç»™ç”»å¸ƒåˆ·æ–°
 }
 
 void TLineTool::InitialLine(DPOINT dptPos)
@@ -446,17 +446,17 @@ void TLineTool::InitialLine(DPOINT dptPos)
 void TLineTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	//bShowDptText = false;
-	if (dptHit.size() == 0)//Ã»ÓĞµãµÄÇé¿öÏÂµãÓÒ¼üÔòÖØÖÃ¹¤¾ß
+	if (dptHit.size() == 0)//æ²¡æœ‰ç‚¹çš„æƒ…å†µä¸‹ç‚¹å³é”®åˆ™é‡ç½®å·¥å…·
 		::PostMessage(hwndWin, WM_COMMAND, ID_SELECT, 0);
 	else
 	{
-		//ÈôÒÑ´´½¨EditÔòÒş²ØEdit
+		//è‹¥å·²åˆ›å»ºEditåˆ™éšè—Edit
 		if (LineEdit->m_hWnd != NULL)
 			LineEdit->SetVisible(false);
 
 		bShowDimLine = false;
 
-		//Ïû³ıÔİ´æÖØºÏÔ¼Êø
+		//æ¶ˆé™¤æš‚å­˜é‡åˆçº¦æŸ
 		if (CoincideBegin != NULL)
 		{
 			delete CoincideBegin;

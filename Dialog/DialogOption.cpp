@@ -26,10 +26,10 @@ INT_PTR CALLBACK DlgOptionProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 	{
 	case WM_INITDIALOG:
 	{
-		//Á´½Ó¿Ø¼ş
+		//é“¾æ¥æ§ä»¶
 		CheckRegFile.LinkControl(GetDlgItem(hDlg, IDC_CHECK_REG_FILE));
 
-		//¶ÁÈ¡×¢²á±í×´Ì¬
+		//è¯»å–æ³¨å†Œè¡¨çŠ¶æ€
 		TCHAR szSelfFileName[MAX_PATH];
 		GetCommandLineByIndex(0, szSelfFileName);
 		bHasRegFile=CheckFileAssociation(TEXT("lml files"), szSelfFileName);
@@ -55,7 +55,7 @@ INT_PTR CALLBACK DlgOptionProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 			EndDialog(hDlg, 0);
 			return TRUE;
 		case IDC_BUTTON_APPLY:
-			if (CheckRegFile.GetChecked() != bHasRegFile)//¸ü¸ÄÁËÑ¡Ïî²Å²Ù×÷
+			if (CheckRegFile.GetChecked() != bHasRegFile)//æ›´æ”¹äº†é€‰é¡¹æ‰æ“ä½œ
 			{
 				TCHAR szSelfFileName[MAX_PATH];
 				GetCommandLineByIndex(0, szSelfFileName);
@@ -70,11 +70,11 @@ INT_PTR CALLBACK DlgOptionProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 					bHasRegFile = CheckRegFile.GetChecked();
 					break;
 				case 5:
-					ShowMessage(TEXT("²Ù×÷Ê§°Ü£¬Çë³¢ÊÔÒÔ¹ÜÀíÔ±Éí·İÔËĞĞ³ÌĞò¡£"));
+					ShowMessage(TEXT("æ“ä½œå¤±è´¥ï¼Œè¯·å°è¯•ä»¥ç®¡ç†å‘˜èº«ä»½è¿è¡Œç¨‹åºã€‚"));
 					CheckRegFile.SetChecked(bHasRegFile);
 					break;
 				default:
-					ShowMessage(TEXT("²Ù×÷Ê§°Ü¡£´íÎóÂë%d"), err_code);
+					ShowMessage(TEXT("æ“ä½œå¤±è´¥ã€‚é”™è¯¯ç %d"), err_code);
 					CheckRegFile.SetChecked(bHasRegFile);
 					break;
 				}

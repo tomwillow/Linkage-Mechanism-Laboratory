@@ -45,27 +45,27 @@ namespace DialogAddDriver
 	HWND hComboExprType;
 	HWND hToolTipError;
 
-	//ËùÓĞ×ó²à¿Ø¼ş¸üĞÂ½øÈë´Ë´¦
+	//æ‰€æœ‰å·¦ä¾§æ§ä»¶æ›´æ–°è¿›å…¥æ­¤å¤„
 	void UpdateDlgAddDriver()
 	{
-		//¸ù¾İÀàĞÍÑ¡Ôñµ¥Î»
+		//æ ¹æ®ç±»å‹é€‰æ‹©å•ä½
 		switch (ComboBox_GetCurSel(hComboDriverType))
 		{
-		case 0://Î»ÒÆ
+		case 0://ä½ç§»
 			LabelDriverUnit.SetText(TEXT("rad"));
 			break;
-		case 1://ËÙ¶È
+		case 1://é€Ÿåº¦
 			LabelDriverUnit.SetText(TEXT("rad/sec"));
 			break;
-		case 2://¼ÓËÙ¶È
+		case 2://åŠ é€Ÿåº¦
 			LabelDriverUnit.SetText(TEXT("rad/sec^2"));
 			break;
 		}
 
-		//¸ù¾İ±í´ïÊ½ÀàĞÍ¾ö¶¨ÏÔÊ¾A,B
+		//æ ¹æ®è¡¨è¾¾å¼ç±»å‹å†³å®šæ˜¾ç¤ºA,B
 		switch (ComboBox_GetCurSel(hComboExprType))
 		{
-		case 0://³£Á¿
+		case 0://å¸¸é‡
 			Edit_SetReadOnly(EditExprRight.m_hWnd, TRUE);
 			EditA.SetVisible(true);
 			LabelA.SetVisible(true);
@@ -73,18 +73,18 @@ namespace DialogAddDriver
 			LabelB.SetVisible(false);
 			switch (ComboBox_GetCurSel(hComboDriverType))
 			{
-			case 0://Î»ÒÆ
+			case 0://ä½ç§»
 				EditExprRight.SetText(TEXT("%f"), TTransfer::TCHAR2double(EditA.GetText()));
 				break;
-			case 1://ËÙ¶È
+			case 1://é€Ÿåº¦
 				EditExprRight.SetText(TEXT("%f*t"), TTransfer::TCHAR2double(EditA.GetText()));
 				break;
-			case 2://¼ÓËÙ¶È
+			case 2://åŠ é€Ÿåº¦
 				EditExprRight.SetText(TEXT("0.5*%f*t^2"), TTransfer::TCHAR2double(EditA.GetText()));
 				break;
 			}
 			break;
-		case 1://Ö±Ïß
+		case 1://ç›´çº¿
 			Edit_SetReadOnly(EditExprRight.m_hWnd, TRUE);
 			EditA.SetVisible(true);
 			LabelA.SetVisible(true);
@@ -92,16 +92,16 @@ namespace DialogAddDriver
 			LabelB.SetVisible(true);
 			switch (ComboBox_GetCurSel(hComboDriverType))
 			{
-			case 0://Î»ÒÆ
+			case 0://ä½ç§»
 				EditExprRight.SetText(TEXT("%f*t+%f"), TTransfer::TCHAR2double(EditA.GetText()), TTransfer::TCHAR2double(EditB.GetText()));
 				break;
-			case 1://ËÙ¶È
+			case 1://é€Ÿåº¦
 				break;
-			case 2://¼ÓËÙ¶È
+			case 2://åŠ é€Ÿåº¦
 				break;
 			}
 			break;
-		case 2://×Ô¶¨Òå
+		case 2://è‡ªå®šä¹‰
 			Edit_SetReadOnly(EditExprRight.m_hWnd, FALSE);
 			EditA.SetVisible(false);
 			LabelA.SetVisible(false);
@@ -109,11 +109,11 @@ namespace DialogAddDriver
 			LabelB.SetVisible(false);
 			switch (ComboBox_GetCurSel(hComboDriverType))
 			{
-			case 0://Î»ÒÆ
+			case 0://ä½ç§»
 				break;
-			case 1://ËÙ¶È
+			case 1://é€Ÿåº¦
 				break;
-			case 2://¼ÓËÙ¶È
+			case 2://åŠ é€Ÿåº¦
 				break;
 			}
 			break;
@@ -146,7 +146,7 @@ namespace DialogAddDriver
 			pGraph->bShowMouseLine = true;
 			pGraph->bShowLabelX = false;
 			pGraph->bShowTitle = false;
-			pGraph->CreateEx(0, TEXT("Í¼±í"), TEXT("Í¼±í"),
+			pGraph->CreateEx(0, TEXT("å›¾è¡¨"), TEXT("å›¾è¡¨"),
 				WS_CHILD,
 				300,
 				50,
@@ -166,16 +166,16 @@ namespace DialogAddDriver
 
 			//
 			hComboDriverType = GetDlgItem(hDlg, IDC_COMBO_DRIVER_TYPE);
-			ComboBox_AddString(hComboDriverType, TEXT("Î»ÒÆ"));
-			ComboBox_AddString(hComboDriverType, TEXT("ËÙ¶È"));
-			ComboBox_AddString(hComboDriverType, TEXT("¼ÓËÙ¶È"));
+			ComboBox_AddString(hComboDriverType, TEXT("ä½ç§»"));
+			ComboBox_AddString(hComboDriverType, TEXT("é€Ÿåº¦"));
+			ComboBox_AddString(hComboDriverType, TEXT("åŠ é€Ÿåº¦"));
 			ComboBox_SetCurSel(hComboDriverType, 0);
 
 			//
 			hComboExprType = GetDlgItem(hDlg, IDC_COMBO_EXPR_TYPE);
-			ComboBox_AddString(hComboExprType, TEXT("³£Á¿"));
-			ComboBox_AddString(hComboExprType, TEXT("Ö±Ïß"));
-			ComboBox_AddString(hComboExprType, TEXT("×Ô¶¨Òå"));
+			ComboBox_AddString(hComboExprType, TEXT("å¸¸é‡"));
+			ComboBox_AddString(hComboExprType, TEXT("ç›´çº¿"));
+			ComboBox_AddString(hComboExprType, TEXT("è‡ªå®šä¹‰"));
 			ComboBox_SetCurSel(hComboExprType, 0);
 
 			//
@@ -196,7 +196,7 @@ namespace DialogAddDriver
 			CheckBoxA.LinkControl(GetDlgItem(hDlg, IDC_CHECK_A));
 			CheckBoxDisplacement.SetChecked(true);
 
-			//³õÊ¼ÉèÖÃ²¿·Ö
+			//åˆå§‹è®¾ç½®éƒ¨åˆ†
 			//ComboBox_SetCurSel(hComboDriverType, 0);
 			//ComboBox_SetCurSel(hComboExprType, 2);
 			//EditExprRight.SetText(TEXT("sin(t)"));
@@ -223,7 +223,7 @@ namespace DialogAddDriver
 					DestroyWindow(hToolTipError);
 					hToolTipError = NULL;
 				}
-				if (err != ERROR_NO)//ÓĞ´íÎó
+				if (err != ERROR_NO)//æœ‰é”™è¯¯
 				{
 					HDC hdc = (HDC)wParam;
 					HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0));
@@ -252,7 +252,7 @@ namespace DialogAddDriver
 			switch (LOWORD(wParam))
 			{
 
-				//¸Ä¶¯EditÄÚÈİ
+				//æ”¹åŠ¨Editå†…å®¹
 			case IDC_EDIT_A:
 			case IDC_EDIT_B:
 			{
@@ -263,7 +263,7 @@ namespace DialogAddDriver
 				break;
 			}
 
-			//Expr±ä¶¯
+			//Exprå˜åŠ¨
 			case IDC_EDIT_FORMULAR_R:
 			{
 				if (HIWORD(wParam) == EN_CHANGE)
@@ -284,7 +284,7 @@ namespace DialogAddDriver
 						ExprTempV.LinkVariableTable(&VariableTable);
 						ExprTempA.LinkVariableTable(&VariableTable);
 
-						//¶ÁÈëExpr
+						//è¯»å…¥Expr
 						String s = EditExprRight.GetText();
 						Expr.Read(s.c_str(), false);
 
@@ -319,7 +319,7 @@ namespace DialogAddDriver
 								dptVectorA.push_back({ t, valueA });
 							}
 
-							//Ñ­»·½áÊø£¬ËÍÈëÊı¾İ
+							//å¾ªç¯ç»“æŸï¼Œé€å…¥æ•°æ®
 								pGraph->InputDptVector(dptVector, { PS_SOLID, { 1, 0 }, 0 }, CheckBoxDisplacement.GetChecked(), TEXT("D"));
 								pGraph->InputDptVector(dptVectorV, { PS_SOLID, { 1, 0 }, RGB(255, 0, 0) }, CheckBoxV.GetChecked(), TEXT("V"));
 								pGraph->InputDptVector(dptVectorA, { PS_SOLID, { 1, 0 }, RGB(0, 255, 0) }, CheckBoxA.GetChecked(), TEXT("A"));
@@ -328,13 +328,13 @@ namespace DialogAddDriver
 					}
 					catch (TError &err)
 					{
-						//´æÈë´íÎóÂë
+						//å­˜å…¥é”™è¯¯ç 
 						SetProp(EditExprRight.m_hWnd, TEXT("error"), (HANDLE)err.id);
 					}
-					//Ë¢ĞÂ
+					//åˆ·æ–°
 					//pGraph->Invalidate();
 
-					//Îª¸üĞÂEdit±³¾° Ë¢ĞÂDlg  ½«´¥·¢WM_CTLCOLOREDIT
+					//ä¸ºæ›´æ–°EditèƒŒæ™¯ åˆ·æ–°Dlg  å°†è§¦å‘WM_CTLCOLOREDIT
 					RECT ClientRect;
 					GetClientRect(hDlg, &ClientRect);
 					InvalidateRect(hDlg, &ClientRect, TRUE);
@@ -355,7 +355,7 @@ namespace DialogAddDriver
 				pGraph->Invalidate();
 				break;
 
-				//¸Ä¶¯ComboBoxÑ¡Ïî
+				//æ”¹åŠ¨ComboBoxé€‰é¡¹
 			case IDC_COMBO_EXPR_TYPE:
 			case IDC_COMBO_DRIVER_TYPE:
 			{
@@ -368,7 +368,7 @@ namespace DialogAddDriver
 			}
 			case IDC_BUTTON_SET_NOW_POS_IS_ORIGIN:
 			{
-				//¼ÆËãt=0Ê±¿ÌµÄÖµ£¬²»µÈÓÚµ±Ç°Î»ÖÃÔò¼ÓÉÏµ±Ç°Î»ÖÃ
+				//è®¡ç®—t=0æ—¶åˆ»çš„å€¼ï¼Œä¸ç­‰äºå½“å‰ä½ç½®åˆ™åŠ ä¸Šå½“å‰ä½ç½®
 				TExpressionTree Expr,ExprTemp;
 				TVariableTable VariableTable;
 				VariableTable.DefineOne(NULL, TEXT("t"), 0.0);
@@ -401,7 +401,7 @@ namespace DialogAddDriver
 			}
 			case IDOK:
 			{
-				//Ìí¼ÓÔ¼Êø
+				//æ·»åŠ çº¦æŸ
 
 				TDriver Driver;
 				Driver.SetStyle(pConfig);

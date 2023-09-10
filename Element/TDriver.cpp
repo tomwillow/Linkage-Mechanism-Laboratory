@@ -14,9 +14,9 @@ TDriver::~TDriver()
 {
 }
 
-const String TDriver::GetElementTypeName()//得到类型名称
+const String TDriver::GetElementTypeName()//寰楀埌绫诲瀷鍚嶇О
 {
-	return TEXT("驱动");
+	return TEXT("椹卞姩");
 }
 
 bool TDriver::WriteFile(HANDLE &hf, DWORD &now_pos)

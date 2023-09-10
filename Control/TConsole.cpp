@@ -16,7 +16,7 @@ TConsole::~TConsole()
 
 void TConsole::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	//´ËÊ±m_hWndÉĞÎ´¸üĞÂ£¬²»¿ÉÊ¹ÓÃ¡£Ö»ÄÜÓÃhWnd¡£
+	//æ­¤æ—¶m_hWndå°šæœªæ›´æ–°ï¼Œä¸å¯ä½¿ç”¨ã€‚åªèƒ½ç”¨hWndã€‚
 	Edit.bAutoVScrol = true;
 	Edit.bMultiLine = true;
 	Edit.bNoHideSel = true;

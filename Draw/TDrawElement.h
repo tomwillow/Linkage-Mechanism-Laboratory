@@ -121,7 +121,7 @@ public:
 	static void TDraw::MakeRect(RECT &rcResult, double x_min, double x_max, double y_min, double y_max, const TConfiguration *pConfig);
 	static void TDraw::GetCenter(POINT &ptResult, const RECT &rect);
 
-	//拾取系列
+	//鎷惧彇绯诲垪
 	static bool TDraw::PointInPolylineBar(POINT ptPos, TPolylineBar *pPolylineBar,const TConfiguration *pConfig);
 	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt, const TConfiguration *pConfig);
 	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);
@@ -133,7 +133,7 @@ public:
 	static bool TDraw::PickConstraintColinear(POINT ptPos, TConstraintColinear *pColinear,const TConfiguration *pConfig);
 	static bool TDraw::PickConstraintCoincide(POINT ptPos, TElement *element,const TConfiguration *pConfig);
 
-	//透明处理
+	//閫忔槑澶勭悊
 	//static void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, bool bNeedDrawBlack);
 	//static void TDraw::StartTranslucent(HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, const RECT &rect, bool bNeedDrawBlack);
 	//static void TDraw::EndTranslucent(HDC &hdc, HDC &hBitmapDC, HBITMAP &hBitmap, VOID *&pvBits, long left, long top, long width, long height, BYTE alpha, bool bNeedDrawBlack);

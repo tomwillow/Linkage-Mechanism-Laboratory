@@ -12,7 +12,7 @@ public:
 	LONG width, height;
 
 	/*
-	°´ÒÔÏÂ¸ñÊ½¿É±éÀúÊı¾İ£º
+	æŒ‰ä»¥ä¸‹æ ¼å¼å¯éå†æ•°æ®ï¼š
 	UINT32 data;
 	for (y = 0; y < height; y++)
 		for (x = 0; x < width; x++)

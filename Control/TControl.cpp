@@ -34,7 +34,7 @@ void TControl::LinkControl(HWND hDlg, int id)
 	LinkControl(GetDlgItem(hDlg, id));
 }
 
-//½öÊ¹ÓÃx,y×ø±ê£¬width,heightÊ¹ÓÃÔ­´óĞ¡
+//ä»…ä½¿ç”¨x,yåæ ‡ï¼Œwidth,heightä½¿ç”¨åŸå¤§å°
 void TControl::SetPositionOnlyOrigin(const RECT &rect)
 {
 	RECT rc;
@@ -42,13 +42,13 @@ void TControl::SetPositionOnlyOrigin(const RECT &rect)
 	SetPosition(rect.left, rect.top, rc.right, rc.bottom);
 }
 
-//rightºÍbottom±£´æµÄÊÇ¿íºÍ¸ß
+//rightå’Œbottomä¿å­˜çš„æ˜¯å®½å’Œé«˜
 void TControl::SetRect(RECT &rect)
 {
 	::MoveWindow(m_hWnd, rect.left,rect.top,  rect.right, rect.bottom, true);
 }
 
-//¶Ô½Çµã×ø±ê
+//å¯¹è§’ç‚¹åæ ‡
 void TControl::SetRect(int x1, int y1, int x2, int y2)
 {
 	::MoveWindow(m_hWnd, x1, y1, x2 - x1, y2 - y1, true);
@@ -61,7 +61,7 @@ void TControl::SetPosition(int x, int y, int width, int height)
 	//::SetWindowPos(m_hWnd, HWND_TOP, x, y, width, height, 0);//SWP_SHOWWINDOW
 }
 
-//rectÖĞ¸÷Öµ¾ùÎª×ø±ê
+//rectä¸­å„å€¼å‡ä¸ºåæ ‡
 void TControl::SetPosition(RECT rect)
 {
 	::MoveWindow(m_hWnd, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, true);
@@ -85,13 +85,13 @@ LRESULT CALLBACK TControl::subControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 		return CallWindowProc((WNDPROC)oldProc, hWnd, uMsg, wParam, lParam);
 }
 
-void TControl::LinkControl(HWND hwndControl)//Á´½Óµ½ÒÑÓĞ¿Ø¼ş£¨ÓÃÓÚ¶Ô»°¿òÖĞ£©
+void TControl::LinkControl(HWND hwndControl)//é“¾æ¥åˆ°å·²æœ‰æ§ä»¶ï¼ˆç”¨äºå¯¹è¯æ¡†ä¸­ï¼‰
 {
 	m_hWnd = hwndControl;
 	RegisterProc();
 }
 
-void TControl::RegisterProc()//´´½¨´°¿Úºó×¢²á
+void TControl::RegisterProc()//åˆ›å»ºçª—å£åæ³¨å†Œ
 {
 #ifdef _WIN64
 	SetWindowLongPtr(m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
@@ -104,7 +104,7 @@ void TControl::RegisterProc()//´´½¨´°¿Úºó×¢²á
 	SetProp(m_hWnd, TEXT("oldProc"), oldProc);
 }
 
-LRESULT TControl::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)//ĞéÄâÏûÏ¢´¦Àíº¯Êı£¬¿ÉÖØÔØ
+LRESULT TControl::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)//è™šæ‹Ÿæ¶ˆæ¯å¤„ç†å‡½æ•°ï¼Œå¯é‡è½½
 {
 	return CallWindowProc(wndproc, hWnd, uMsg, wParam, lParam);
 }
@@ -172,7 +172,7 @@ void CDECL TControl::SetText(const TCHAR szFormat[], ...)
 
 void TControl::GetText(TCHAR text[])
 {
-	::GetWindowText(m_hWnd, text, GetLength() + 1);//²»ÖªµÀÎªÊ²Ã´Òª¼Ó1²ÅÈ¡µÃÈ«
+	::GetWindowText(m_hWnd, text, GetLength() + 1);//ä¸çŸ¥é“ä¸ºä»€ä¹ˆè¦åŠ 1æ‰å–å¾—å…¨
 }
 
 TCHAR * TControl::GetText()
@@ -209,7 +209,7 @@ bool TControl::GetEnable()
 	return (bool)IsWindowEnabled(m_hWnd);
 }
 
-//×Ô¶¯È¥µôĞ¡ÊıÄ©Î²0£¬×î¶àÏÔÊ¾6Î»
+//è‡ªåŠ¨å»æ‰å°æ•°æœ«å°¾0ï¼Œæœ€å¤šæ˜¾ç¤º6ä½
 void TControl::SetDouble(double d)
 {
 	TCHAR s[64];
@@ -222,7 +222,7 @@ double TControl::GetDouble()
 	return _tcstod(GetText(), NULL);
 }
 
-//»ñµÃ¹¤¾ßÀ¸´óĞ¡
+//è·å¾—å·¥å…·æ å¤§å°
 RECT TControl::GetClientRect()
 {
 	RECT rect;

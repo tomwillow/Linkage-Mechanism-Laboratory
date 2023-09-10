@@ -10,7 +10,7 @@
 #define CanMod(a,b,precision) \
 		(IsZero((a)/(b)-(long)((a)/(b)),(precision)))
 
-//Èç¹ûa´óÓÚ2Pi»òÐ¡ÓÚ-2Pi£¬Ôò»®¹é½ø¡À2Pi·¶Î§
+//å¦‚æžœaå¤§äºŽ2Piæˆ–å°äºŽ-2Piï¼Œåˆ™åˆ’å½’è¿›Â±2PièŒƒå›´
 #define MakeIn2Pi(a) ((abs(a)>2*M_PI)?(((a)/M_PI/2-(long)((a)/M_PI/2))*2*M_PI):(a))
 
 extern double precision;

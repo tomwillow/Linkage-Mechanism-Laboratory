@@ -25,14 +25,14 @@ public:
 	void TControl::SetDefaultGuiFont();
 	void TControl::SetFont(TCHAR FontName[], int FontSize);
 	void TControl::SetText(const String &s);
-	void CDECL TControl::SetText(const TCHAR szFormat[], ...);//ÉèÖÃÄÚÈİ
+	void CDECL TControl::SetText(const TCHAR szFormat[], ...);//è®¾ç½®å†…å®¹
 	void TControl::GetText(TCHAR text[]);
 	TCHAR * TControl::GetText();
-	int TControl::GetLength();//»ñÈ¡×Ö·û´®³¤¶È	
-	void TControl::SetPosition(int x, int y, int width, int height);//ÉèÖÃ´óĞ¡¼°Î»ÖÃ
-	void TControl::SetPosition(RECT rect);//ÉèÖÃ´óĞ¡¼°Î»ÖÃ
+	int TControl::GetLength();//è·å–å­—ç¬¦ä¸²é•¿åº¦	
+	void TControl::SetPosition(int x, int y, int width, int height);//è®¾ç½®å¤§å°åŠä½ç½®
+	void TControl::SetPosition(RECT rect);//è®¾ç½®å¤§å°åŠä½ç½®
 	void TControl::SetPositionOnlyOrigin(const RECT &rect);
-	void TControl::SetVisible(bool bShow);//ÉèÖÃ¿É¼ûĞÔ
+	void TControl::SetVisible(bool bShow);//è®¾ç½®å¯è§æ€§
 	bool TControl::GetVisible();
 	void TControl::SetDouble(double d);
 	double TControl::GetDouble();
@@ -40,8 +40,8 @@ public:
 	bool TControl::GetEnable();
 protected:
 	TCHAR *Text;
-	void TControl::RegisterProc();//´´½¨´°¿Úºó×¢²á
+	void TControl::RegisterProc();//åˆ›å»ºçª—å£åæ³¨å†Œ
 
-	virtual LRESULT TControl::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);//ĞéÄâÏûÏ¢´¦Àíº¯Êı£¬¿É¸²¸Ç
+	virtual LRESULT TControl::WndProc(WNDPROC wndproc, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);//è™šæ‹Ÿæ¶ˆæ¯å¤„ç†å‡½æ•°ï¼Œå¯è¦†ç›–
 
 };

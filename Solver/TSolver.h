@@ -17,11 +17,11 @@ class TSolver:public TTool
 {
 private:
 	Ostream *pOS;
-	HWND hwndOutput;//Êä³ö´°¿Ú¾ä±ú
-	std::vector<String> vecStrDriver;//Çı¶¯·½³Ì
-	TEquations *Equations;//Ô¼Êø·½³Ì
+	HWND hwndOutput;//è¾“å‡ºçª—å£å¥æŸ„
+	std::vector<String> vecStrDriver;//é©±åŠ¨æ–¹ç¨‹
+	TEquations *Equations;//çº¦æŸæ–¹ç¨‹
 	//String subsVar, subsValue;
-	std::vector<String> subsVar;//»ú¼Üµã±äÁ¿Ãû¼°Öµ
+	std::vector<String> subsVar;//æœºæ¶ç‚¹å˜é‡ååŠå€¼
 	std::vector<double> subsValue;
 	std::vector<int> idOrder;//
 	struct TCondition

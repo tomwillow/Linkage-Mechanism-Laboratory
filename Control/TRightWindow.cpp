@@ -42,8 +42,8 @@ void TRightWindow::OnDraw(HDC hdc)
 	TDraw::DrawRect(hdc, rcRegion1, logpenMargin);
 	TDraw::DrawRect(hdc, rcRegion2, logpenMargin);
 
-	TDraw::DrawSystemFontText(hdc, TEXT("ÄÚÈİ"), TDraw::GetMarginRect(rcTitle1, 4), RGB(50, 50, 50), DT_VCENTER | DT_SINGLELINE);
-	TDraw::DrawSystemFontText(hdc, TEXT("ÊôĞÔ"), TDraw::GetMarginRect(rcTitle2, 4), RGB(50, 50, 50), DT_VCENTER | DT_SINGLELINE);
+	TDraw::DrawSystemFontText(hdc, TEXT("å†…å®¹"), TDraw::GetMarginRect(rcTitle1, 4), RGB(50, 50, 50), DT_VCENTER | DT_SINGLELINE);
+	TDraw::DrawSystemFontText(hdc, TEXT("å±æ€§"), TDraw::GetMarginRect(rcTitle2, 4), RGB(50, 50, 50), DT_VCENTER | DT_SINGLELINE);
 }
 
 void TRightWindow::OnLButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -53,15 +53,15 @@ void TRightWindow::OnLButtonDown(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 void TRightWindow::OnCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	//´ËÊ±m_hWndÉĞÎ´¸üĞÂ£¬²»¿ÉÊ¹ÓÃ¡£Ö»ÄÜÓÃhWnd¡£
+	//æ­¤æ—¶m_hWndå°šæœªæ›´æ–°ï¼Œä¸å¯ä½¿ç”¨ã€‚åªèƒ½ç”¨hWndã€‚
 	TreeViewContent.CreateTreeViewEx(hWnd, IDC_TREEVIEW, m_hInst);
 	TreeViewContent.Initial();
 	SetTreeViewPos();
 
 	ListView.CreateListViewEx(hWnd, IDC_LISTVIEW, m_hInst);
 	SetListViewPos();
-	ListView.AddColumn(TEXT("ÏîÄ¿"), 60);
-	ListView.AddColumn(TEXT("Öµ"), 108);
+	ListView.AddColumn(TEXT("é¡¹ç›®"), 60);
+	ListView.AddColumn(TEXT("å€¼"), 108);
 
 }
 
@@ -83,24 +83,24 @@ void TRightWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			HTREEITEM hTreeItem=TreeView_HitTest(lpnmhdr->hwndFrom, &pt);
 
-			//µÃµ½±»Ñ¡ÏîµÄid
+			//å¾—åˆ°è¢«é€‰é¡¹çš„id
 			int id = TreeViewContent.GetIdFromHTreeView(hTreeItem);
 
 			if (id != -1)
 			{
 
-				//½áÊøµ±Ç°¹¤¾ß£¬Ê¹ÓÃÑ¡Ôñ¹¤¾ß
+				//ç»“æŸå½“å‰å·¥å…·ï¼Œä½¿ç”¨é€‰æ‹©å·¥å…·
 				if (win.m_ManageTool.m_uiCurActiveTool != ID_SELECT &&
 					win.m_ManageTool.m_uiCurActiveTool != ID_DRAG)
 					win.m_ManageTool.SetCurActiveTool(ID_SELECT);
 
-				//ËÍÈëÑ¡Ôñ¹¤¾ß
+				//é€å…¥é€‰æ‹©å·¥å…·
 				((TSelectTool *)win.m_ManageTool.m_pCurrentTool)->SelectById(id,false,true);
 
-				////Ë¢ĞÂÏÔÊ¾
+				////åˆ·æ–°æ˜¾ç¤º
 				//win.Canvas.Invalidate();
 				
-				//µ¯³öÓÒ¼ü²Ëµ¥
+				//å¼¹å‡ºå³é”®èœå•
 				HMENU hMenu = LoadMenu(m_hInst, MAKEINTRESOURCE(IDR_MENU_RIGHT));
 				hMenu = GetSubMenu(hMenu, 0);
 				ClientToScreen(lpnmhdr->hwndFrom, &pt);
@@ -110,28 +110,28 @@ void TRightWindow::OnNotify(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			break;
 		}
-		case TVN_SELCHANGED://¸Ä±äÑ¡Ïî
+		case TVN_SELCHANGED://æ”¹å˜é€‰é¡¹
 		{
 			LPNMTREEVIEW pnmtv = (LPNMTREEVIEW)lParam;
-			if (pnmtv->itemNew.hItem == NULL)//Ã»ÓĞÑ¡Ôñ
+			if (pnmtv->itemNew.hItem == NULL)//æ²¡æœ‰é€‰æ‹©
 				break;
 
-			//µÃµ½±»Ñ¡ÏîµÄid
+			//å¾—åˆ°è¢«é€‰é¡¹çš„id
 			int id = TreeViewContent.GetIdFromHTreeView(pnmtv->itemNew.hItem);
 
-			//½áÊøµ±Ç°¹¤¾ß£¬Ê¹ÓÃÑ¡Ôñ¹¤¾ß
+			//ç»“æŸå½“å‰å·¥å…·ï¼Œä½¿ç”¨é€‰æ‹©å·¥å…·
 			if (win.m_ManageTool.m_uiCurActiveTool != ID_SELECT &&
 				win.m_ManageTool.m_uiCurActiveTool != ID_DRAG)
 				win.m_ManageTool.SetCurActiveTool(ID_SELECT);
 
-			//ËÍÈëÑ¡Ôñ¹¤¾ß
+			//é€å…¥é€‰æ‹©å·¥å…·
 			((TSelectTool *)win.m_ManageTool.m_pCurrentTool)->SelectById(id,false,true);
 
-			////Ë¢ĞÂListView
+			////åˆ·æ–°ListView
 			//if (id != -1)
 			//	win.m_Shape.GetElementById(id)->NoticeListView(&ListView);
 
-			////Ë¢ĞÂÏÔÊ¾
+			////åˆ·æ–°æ˜¾ç¤º
 			//win.Canvas.Invalidate();
 
 			break;

@@ -18,9 +18,9 @@ TSlideway::TSlideway()
 	SlidewayStyle = 0;
 }
 
-const String TSlideway::GetElementTypeName()//得到类型名称
+const String TSlideway::GetElementTypeName()//寰楀埌绫诲瀷鍚嶇О
 {
-	return TEXT("固定导轨");
+	return TEXT("鍥哄畾瀵艰建");
 }
 
 TSlideway::~TSlideway()
@@ -79,9 +79,9 @@ void TSlideway::NoticeListView(TListView *pListView)
 {
 	TRealLine::NoticeListView(pListView);
 	
-	pListView->AddAttributeItem(TEXT("阴影长度"), CTRLTYPE_INT_EDIT, &ShadowLength, TEXT("%d"), ShadowLength);
-	pListView->AddAttributeItem(TEXT("阴影位置"), CTRLTYPE_INT_EDIT, &ShadowQuadrant, TEXT("%d"), ShadowQuadrant);
-	pListView->AddAttributeItem(TEXT("样式"), CTRLTYPE_INT_EDIT, &SlidewayStyle, TEXT("%d"), SlidewayStyle);
+	pListView->AddAttributeItem(TEXT("闃村奖闀垮害"), CTRLTYPE_INT_EDIT, &ShadowLength, TEXT("%d"), ShadowLength);
+	pListView->AddAttributeItem(TEXT("闃村奖浣嶇疆"), CTRLTYPE_INT_EDIT, &ShadowQuadrant, TEXT("%d"), ShadowQuadrant);
+	pListView->AddAttributeItem(TEXT("鏍峰紡"), CTRLTYPE_INT_EDIT, &SlidewayStyle, TEXT("%d"), SlidewayStyle);
 }
 
 void TSlideway::Draw(HDC hdc, const TConfiguration* pConfig)

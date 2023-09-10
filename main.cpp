@@ -16,7 +16,7 @@
 #pragma comment(lib,"kernel32.lib")
 #pragma comment(lib,"user32.lib")
 #pragma comment(lib,"gdi32.lib")
-#pragma comment(lib,"comctl32.lib")//ÑùÊ½Ê¹ÓÃ
+#pragma comment(lib,"comctl32.lib")//æ ·å¼ä½¿ç”¨
 #pragma comment(lib,"Comdlg32.lib")
 
 TMainWindow win;
@@ -28,10 +28,10 @@ std::String sStudentNumber;
 std::String sStudentScore;
 
 #ifdef _STUDENT
-	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory Ñ§Éú°æ v0.4");
+	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory å­¦ç”Ÿç‰ˆ v0.4");
 #else
 	#ifdef _TEACHER
-	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory ½ÌÊ¦°æ v0.4");
+	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory æ•™å¸ˆç‰ˆ v0.4");
 	#else
 	const TCHAR szAppTitle[] = TEXT("Linkage Mechanism Laboratory v0.4");
 	#endif

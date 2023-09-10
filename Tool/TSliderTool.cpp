@@ -48,13 +48,13 @@ void TSliderTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 	switch (dptHit.size())
 	{
 	case 0:
-		sTips = TEXT("µã»÷ÒÔ½¨Á¢ĞÂ»¬¿é");
+		sTips = TEXT("ç‚¹å‡»ä»¥å»ºç«‹æ–°æ»‘å—");
 
-		//ÉèÖÃÁÙÊ±»¬¿é
+		//è®¾ç½®ä¸´æ—¶æ»‘å—
 		pSlider->dpt = pAttach->dptAttach;
-		if (pAttach->bShowExtensionLine)//ÒÑÊ°È¡Ö±Ïß
+		if (pAttach->bShowExtensionLine)//å·²æ‹¾å–ç›´çº¿
 		{
-			//ÉèÖÃpSliderµÄangle
+			//è®¾ç½®pSliderçš„angle
 			switch (pAttach->pAttachElement->eType)
 			{
 			case ELEMENT_REALLINE:
@@ -79,7 +79,7 @@ void TSliderTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 				break;
 			}
 
-			sTips += TEXT("\r\nÒÑÎü¸½Ïß¶Î£º½¨Á¢¹²ÏßÔ¼Êø");
+			sTips += TEXT("\r\nå·²å¸é™„çº¿æ®µï¼šå»ºç«‹å…±çº¿çº¦æŸ");
 		}
 		else
 		{
@@ -88,19 +88,19 @@ void TSliderTool::OnMouseMove(HWND hWnd, UINT nFlags, POINT ptPos)
 
 
 		break;
-	case 1://ÒÑÓĞ¿éÎ»ÖÃ
-		//ÉèÖÃÏßÎ»ÖÃ
+	case 1://å·²æœ‰å—ä½ç½®
+		//è®¾ç½®çº¿ä½ç½®
 
 		pSlider->vecDpt[1] = TDraw::GetRelative(pAttach->dptAttach, pSlider->dpt, pSlider->angle);
 		pSlider->vecLine[0] = { 0, 1 };
 
-		sTips = TEXT("µã»÷ÒÔÈ·¶¨»¬¿é¸ËÎ»ÖÃ\nµ¥»÷ÓÒ¼ü¿É²»ÉèÖÃ»¬¿é¸Ë");
+		sTips = TEXT("ç‚¹å‡»ä»¥ç¡®å®šæ»‘å—æ†ä½ç½®\nå•å‡»å³é”®å¯ä¸è®¾ç½®æ»‘å—æ†");
 		break;
 	}
 
-	if (pAttach->bAttachedEndpoint)//²¶×½µ½¶Ëµã
+	if (pAttach->bAttachedEndpoint)//æ•æ‰åˆ°ç«¯ç‚¹
 	{
-		sTips += TEXT("\r\nÒÑÎü¸½¶Ëµã£º½¨Á¢ÖØºÏÔ¼Êø");
+		sTips += TEXT("\r\nå·²å¸é™„ç«¯ç‚¹ï¼šå»ºç«‹é‡åˆçº¦æŸ");
 	}
 }
 
@@ -110,18 +110,18 @@ void TSliderTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 	switch (dptHit.size())
 	{
-	case 1://µÚÒ»´Îµã×ó¼ü£¬ÉèÖÃ»¬¿é
+	case 1://ç¬¬ä¸€æ¬¡ç‚¹å·¦é”®ï¼Œè®¾ç½®æ»‘å—
 	{
-		//ÉèÖÃ»¬¿é
+		//è®¾ç½®æ»‘å—
 		pSlider->dpt = pAttach->dptAttach;
 		pSlider->vecDpt[0] = TDraw::GetRelative(pSlider->dpt, pSlider->dpt, pSlider->angle);
 		pSlider->vecDpt.resize(2);
 		pSlider->vecIsJoint.resize(2);
 		pSlider->vecLine.resize(1);
 
-		if (pAttach->bAttachedEndpoint)//²¶×½µ½¶Ëµã ÔòÌí¼ÓÖØºÏÔ¼Êø
+		if (pAttach->bAttachedEndpoint)//æ•æ‰åˆ°ç«¯ç‚¹ åˆ™æ·»åŠ é‡åˆçº¦æŸ
 		{
-			//Ìí¼ÓÖØºÏÔ¼Êø
+			//æ·»åŠ é‡åˆçº¦æŸ
 			TConstraintCoincide *pCoincide = new TConstraintCoincide;
 			pCoincide->SetStyle(pConfig->logpen);
 			pCoincide->pElement[0] = pAttach->pAttachElement;
@@ -133,9 +133,9 @@ void TSliderTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 			stackpCoincide.push(pCoincide);
 		}
 
-		if (pAttach->bShowExtensionLine)//ÒÑÊ°È¡Ö±Ïß
+		if (pAttach->bShowExtensionLine)//å·²æ‹¾å–ç›´çº¿
 		{
-			//ÉèÖÃ¹²ÏßÔ¼Êø
+			//è®¾ç½®å…±çº¿çº¦æŸ
 			TConstraintColinear *pColinear = new TConstraintColinear;
 			pColinear->SetStyle(pConfig->logpen);
 			pColinear->pElement[0] = pAttach->pAttachElement;
@@ -144,19 +144,19 @@ void TSliderTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 			pColinear->pElement[1] = pSlider;
 			pColinear->PointBeginIndexOfElement[1] = 0;
-			pColinear->PointEndIndexOfElement[1] = -1;//{1,0}µã
+			pColinear->PointEndIndexOfElement[1] = -1;//{1,0}ç‚¹
 
 			stackpColinear.push(pColinear);
 		}
 
 		break;
 	}
-	case 2://µÚ¶ş´Îµã×ó¼ü
+	case 2://ç¬¬äºŒæ¬¡ç‚¹å·¦é”®
 
 
-		if (pAttach->bAttachedEndpoint)//²¶×½µ½¶Ëµã ÔòÌí¼ÓÖØºÏÔ¼Êø
+		if (pAttach->bAttachedEndpoint)//æ•æ‰åˆ°ç«¯ç‚¹ åˆ™æ·»åŠ é‡åˆçº¦æŸ
 		{
-			//Ìí¼ÓÖØºÏÔ¼Êø
+			//æ·»åŠ é‡åˆçº¦æŸ
 			TConstraintCoincide *pCoincide = new TConstraintCoincide;
 			pCoincide->SetStyle(pConfig->logpen);
 			pCoincide->pElement[0] = pAttach->pAttachElement;
@@ -169,10 +169,10 @@ void TSliderTool::OnLButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 
 		}
 
-		//Èë¿â
+		//å…¥åº“
 		AddIntoShape();
 
-		//ÖØÖÃ×´Ì¬
+		//é‡ç½®çŠ¶æ€
 		Reset();
 		OnMouseMove(hWnd, nFlags, ptPos);
 
@@ -186,7 +186,7 @@ void TSliderTool::Reset()
 		delete pAttach;
 	pAttach = new TAttach(pCanvas, pShape, pConfig);
 
-	//ÖØÉèÁÙÊ±¿é
+	//é‡è®¾ä¸´æ—¶å—
 	if (pSlider != NULL)
 		delete pSlider;
 	pSlider = new TSlider;
@@ -194,7 +194,7 @@ void TSliderTool::Reset()
 	pSlider->vecDpt.resize(1);
 	pSlider->vecIsJoint.resize(1);
 
-	//ÖØÉè×´Ì¬
+	//é‡è®¾çŠ¶æ€
 	dptHit.clear();
 
 	bShowTips = true;
@@ -215,11 +215,11 @@ void TSliderTool::Reset()
 
 void TSliderTool::AddIntoShape()
 {
-	//»¬¿éÈë¿â
+	//æ»‘å—å…¥åº“
 	AddTreeViewItem(pSlider, pShape->iNextId);
 	TSlider *pSavedSlider = dynamic_cast<TSlider *>(pShape->AddElement(pSlider));
 
-	//ÖØºÏÔ¼ÊøÈë¿â
+	//é‡åˆçº¦æŸå…¥åº“
 	while (!stackpCoincide.empty())
 	{
 		stackpCoincide.top()->pElement[1] = pSavedSlider;
@@ -231,10 +231,10 @@ void TSliderTool::AddIntoShape()
 		stackpCoincide.pop();
 	}
 
-	//¹²ÏßÔ¼ÊøÈë¿â
+	//å…±çº¿çº¦æŸå…¥åº“
 	while (!stackpColinear.empty())
 	{
-		stackpColinear.top()->pElement[1] = pSavedSlider;//¸üĞÂpElementÒÔÖ¸Ïò¸Õ±£´æµÄSlider
+		stackpColinear.top()->pElement[1] = pSavedSlider;//æ›´æ–°pElementä»¥æŒ‡å‘åˆšä¿å­˜çš„Slider
 
 		AddTreeViewItem(stackpColinear.top(), pShape->iNextId);
 		pShape->AddElement(stackpColinear.top());
@@ -243,7 +243,7 @@ void TSliderTool::AddIntoShape()
 		stackpColinear.pop();
 	}
 
-	//Ë¢ĞÂ·½³Ì×é
+	//åˆ·æ–°æ–¹ç¨‹ç»„
 	RefreshEquations();
 }
 
@@ -251,22 +251,22 @@ void TSliderTool::OnRButtonDown(HWND hWnd, UINT nFlags, POINT ptPos)
 {
 	switch (dptHit.size())
 	{
-	case 0://¿ÕµãÓÒ¼ü
-		//Ã»ÓĞµãµÄÇé¿öÏÂµãÓÒ¼üÔòÖØÖÃ¹¤¾ß
+	case 0://ç©ºç‚¹å³é”®
+		//æ²¡æœ‰ç‚¹çš„æƒ…å†µä¸‹ç‚¹å³é”®åˆ™é‡ç½®å·¥å…·
 		ResetTool();
 		break;
-	case 1://¸Õ»­»¬¿é»¹Ã»»­Ïß
+	case 1://åˆšç”»æ»‘å—è¿˜æ²¡ç”»çº¿
 
-		//ÏßÉèÖÃÎªÔ­µã
+		//çº¿è®¾ç½®ä¸ºåŸç‚¹
 		pSlider->vecDpt.resize(1);
 		pSlider->vecIsJoint.resize(1);
 		pSlider->vecLine.clear();
 
 
-		//Èë¿â
+		//å…¥åº“
 		AddIntoShape();
 
-		//ÖØÖÃ×´Ì¬
+		//é‡ç½®çŠ¶æ€
 		Reset();
 		OnMouseMove(hWnd, nFlags, ptPos);
 
