@@ -3,7 +3,7 @@
 #define _CRT_NON_CONFORMING_SWPRINTFS
 
 #include "..\Common\DetectMemoryLeak.h"
-#include "..\Common\String.h"
+#include "../Common/String.h"
 #include "..\Solver\TVariableTable.h"
 
 #include <algorithm>
@@ -24,37 +24,35 @@ TVariableTable::~TVariableTable()
 {
 }
 
-double TVariableTable::GetValueFromVarPoint(const String VarStr)
+double TVariableTable::GetValueFromVarPoint(const std::string VarStr)
 {
 	auto it = FindVariableTable(VarStr);
 	if (it == VariableTable.end())
 	{
 		eError = ERROR_UNDEFINED_VARIABLE;
 		throw TError{ eError, VarStr };
-		return 0.0;
 	}
 	return VariableValue[it - VariableTable.begin()];
 }
 
-void TVariableTable::SetValueFromVarStr(String VarStr, double value)
+void TVariableTable::SetValueFromVarStr(std::string VarStr, double value)
 {
 	auto it = FindVariableTable(VarStr);
 	if (it == VariableTable.end())
 	{
 		eError = ERROR_UNDEFINED_VARIABLE;
 		throw TError{ eError, VarStr };
-		return;
 	}
 	VariableValue[it - VariableTable.begin()] = value;
 }
 
-std::vector<String>::iterator TVariableTable::FindVariableTable(const String varstr)//查找变量是否在变量表中，没有则返回false
+std::vector<std::string>::iterator TVariableTable::FindVariableTable(const std::string varstr)//查找变量是否在变量表中，没有则返回false
 {
 	return std::find(VariableTable.begin(), VariableTable.end(), varstr);
 }
 
 //连带value一起删
-void TVariableTable::RemoveOne(Ostream *pStr, String var, bool bIgnoreUnExisted)
+void TVariableTable::RemoveOne(std::ostream *pStr, std::string var, bool bIgnoreUnExisted)
 {
 	auto it = FindVariableTable(var);
 	if (it == VariableTable.end())//未定义
@@ -73,16 +71,16 @@ void TVariableTable::RemoveOne(Ostream *pStr, String var, bool bIgnoreUnExisted)
 	VariableValue.erase(VariableValue.begin() + index);
 }
 
-//void TVariableTable::Remove(Ostream *pStr, const String vars, bool bIgnoreUnExisted)
+//void TVariableTable::Remove(std::ostream *pStr, const std::string vars, bool bIgnoreUnExisted)
 //{
-//	std::vector<String> temp = StrSliceToVector(vars);
+//	std::vector<std::string> temp = StrSliceToVector(vars);
 //	for (auto &var : temp)
 //	{
 //		RemoveOne(pStr,var,bIgnoreUnExisted);
 //	}
 //}
 
-void TVariableTable::DefineOne(Ostream *pStr, String var, double value, bool bIgnoreReDef)
+void TVariableTable::DefineOne(std::ostream *pStr, std::string var, double value, bool bIgnoreReDef)
 {
 	if (!isLegalName(var))
 	{
@@ -124,12 +122,12 @@ void TVariableTable::DefineOne(Ostream *pStr, String var, double value, bool bIg
 }
 
 //新定义的若与旧的重名可过滤掉重定义
-void TVariableTable::Define(Ostream *pStr, String input_str, String input_num, bool bIgnoreReDef)
+void TVariableTable::Define(std::ostream *pStr, std::string input_str, std::string input_num, bool bIgnoreReDef)
 {
 	using namespace std;
 	//切分str，new出每个新变量
 
-	std::vector<String> tempVar = StrSliceToVector(input_str);
+	std::vector<std::string> tempVar = StrSliceToVector(input_str);
 	std::vector<double> tempValue;
 	if (input_num.empty())
 		tempValue = std::vector<double>(tempVar.size());
@@ -140,7 +138,7 @@ void TVariableTable::Define(Ostream *pStr, String input_str, String input_num, b
 	{
 		if (pStr != NULL) *pStr << TEXT("变量名与初始值数量不对等。");
 		eError = ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT;
-		throw TError{ eError, TEXT("VAR:") + input_str + TEXT(" VALUE:") + input_num };
+		throw TError{ eError, "VAR:" + input_str + " VALUE:" + input_num };
 		return;
 	}
 
@@ -149,7 +147,7 @@ void TVariableTable::Define(Ostream *pStr, String input_str, String input_num, b
 
 }
 
-void TVariableTable::Output(Ostream *pStr)
+void TVariableTable::Output(std::ostream *pStr)
 {
 	if (pStr != NULL)
 	{
@@ -180,7 +178,7 @@ void TVariableTable::SetValueByVarTable(TVariableTable &VarTable)
 	}
 }
 
-void TVariableTable::OutputValue(Ostream *pStr)//输出 x=0 形式
+void TVariableTable::OutputValue(std::ostream *pStr)//输出 x=0 形式
 {
 	if (pStr != NULL)
 	{
@@ -196,7 +194,7 @@ void TVariableTable::OutputValue(Ostream *pStr)//输出 x=0 形式
 }
 
 
-bool TVariableTable::isLegalName(String s)
+bool TVariableTable::isLegalName(std::string s)
 {
 	if (s.empty()) return false;
 	if (s[0] == '_' || (s[0] >= 'A' && s[0] <= 'z'))

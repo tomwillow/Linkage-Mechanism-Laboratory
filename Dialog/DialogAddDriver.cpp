@@ -233,8 +233,7 @@ namespace DialogAddDriver
 					//SetTextColor(hdc, RGB(255, 0, 0));
 
 					TCHAR szErr[64];
-					String sErr;
-					sErr=GetErrorInfo(err);
+					std::string sErr=GetErrorInfo(err);
 					hToolTipError=CreateToolTip(hDlg, EditExprRight.m_hWnd,
 #ifdef _WIN64
 						(HINSTANCE)GetWindowLong(hDlg, GWLP_HINSTANCE)
@@ -275,8 +274,8 @@ namespace DialogAddDriver
 						TExpressionTree Expr, ExprV, ExprA;
 						TExpressionTree ExprTemp, ExprTempV, ExprTempA;
 						TVariableTable VariableTable;
-						VariableTable.Define(NULL, TEXT("t"));
-						String sz_t = VariableTable.VariableTable[0];
+						VariableTable.Define(NULL, "t");
+						std::string sz_t = VariableTable.VariableTable[0];
 						Expr.LinkVariableTable(&VariableTable);
 						ExprV.LinkVariableTable(&VariableTable);
 						ExprA.LinkVariableTable(&VariableTable);
@@ -285,7 +284,7 @@ namespace DialogAddDriver
 						ExprTempA.LinkVariableTable(&VariableTable);
 
 						//读入Expr
-						String s = EditExprRight.GetText();
+						std::string s = toUTF8(EditExprRight.GetText());
 						Expr.Read(s.c_str(), false);
 
 
@@ -371,14 +370,14 @@ namespace DialogAddDriver
 				//计算t=0时刻的值，不等于当前位置则加上当前位置
 				TExpressionTree Expr,ExprTemp;
 				TVariableTable VariableTable;
-				VariableTable.DefineOne(NULL, TEXT("t"), 0.0);
+				VariableTable.DefineOne(NULL, "t", 0.0);
 				Expr.LinkVariableTable(&VariableTable); 
-				Expr.Read(EditExprRight.GetText(), false);
+				Expr.Read(toUTF8(EditExprRight.GetText()), false);
 				Expr.OutputStr();
 
 				ExprTemp = Expr;
 
-				ExprTemp.Subs(TEXT("t"), 0.0, false);
+				ExprTemp.Subs("t", 0.0, false);
 
 				double value=0.0;
 				try
@@ -395,7 +394,7 @@ namespace DialogAddDriver
 						Expr.operator+(dElementValue);
 						Expr.Simplify(false);
 
-						EditExprRight.SetText(Expr.OutputStr());
+						EditExprRight.SetText(utf8toWString(Expr.OutputStr()));
 					}
 				break;
 			}
@@ -406,8 +405,8 @@ namespace DialogAddDriver
 				TDriver Driver;
 				Driver.SetStyle(pConfig);
 
-				Driver.sExprLeft = EditExprLeft.GetText();
-				Driver.sExprRight = EditExprRight.GetText();
+				Driver.sExprLeft = toUTF8(EditExprLeft.GetText());
+                Driver.sExprRight = toUTF8(EditExprRight.GetText());
 
 				pTreeViewContent->AddItem(&Driver, pShape->iNextId);
 				pShape->AddElement(&Driver);

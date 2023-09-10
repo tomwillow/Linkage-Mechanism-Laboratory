@@ -16,12 +16,12 @@ class TListBoxItem;
 class TSolver:public TTool
 {
 private:
-	Ostream *pOS;
+	std::ostream *pOS;
 	HWND hwndOutput;//输出窗口句柄
-	std::vector<String> vecStrDriver;//驱动方程
+	std::vector<std::string> vecStrDriver;//驱动方程
 	TEquations *Equations;//约束方程
-	//String subsVar, subsValue;
-	std::vector<String> subsVar;//机架点变量名及值
+	//std::string subsVar, subsValue;
+	std::vector<std::string> subsVar;//机架点变量名及值
 	std::vector<double> subsValue;
 	std::vector<int> idOrder;//
 	struct TCondition
@@ -33,9 +33,9 @@ private:
 
 	double dRelativeAngle;
 
-	int TSolver::GetIdFromVariableStr(String varname);
-	void TSolver::Output(TCHAR szFormat[], ...);
-	void TSolver::Outputln(const TCHAR *szFormat, ...);
+	int TSolver::GetIdFromVariableStr(std::string varname);
+	void TSolver::Output(char szFormat[], ...);
+	void TSolver::Outputln(const char *szFormat, ...);
 	void TSolver::SetElementDisplacement(const TVariableTable &VariableTable);
 public:
 	TSolver();

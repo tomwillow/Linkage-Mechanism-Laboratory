@@ -23,8 +23,8 @@ bool TDriver::WriteFile(HANDLE &hf, DWORD &now_pos)
 {
 	TElement::WriteFile(hf, now_pos);
 
-	WriteFileString(hf, sExprLeft, now_pos);
-	WriteFileString(hf, sExprRight, now_pos);
+	WriteFileString(hf, utf8toWString(sExprLeft), now_pos);
+    WriteFileString(hf, utf8toWString(sExprRight), now_pos);
 
 	if (GetLastError() != ERROR_ALREADY_EXISTS && GetLastError() != 0)
 		return false;
@@ -36,8 +36,8 @@ bool TDriver::ReadFile(HANDLE &hf, DWORD &now_pos, TShape *pShape)
 {
 	TElement::ReadFile(hf, now_pos, pShape);
 
-	ReadFileString(hf, sExprLeft, now_pos);
-	ReadFileString(hf, sExprRight, now_pos);
+	ReadFileString(hf, utf8toWString(sExprLeft), now_pos);
+    ReadFileString(hf, utf8toWString(sExprRight), now_pos);
 
 	if (GetLastError() != 0)
 		return false;
@@ -51,6 +51,6 @@ void TDriver::NoticeListView(TListView *pListView)
 
 	pListView->id = id;
 	pListView->AddAttributeItem(TEXT("ID"), CTRLTYPE_NULL, NULL, TEXT("%d"), id);
-	pListView->AddAttributeItem(TEXT("Left"), CTRLTYPE_EDIT, NULL, sExprLeft.c_str());
-	pListView->AddAttributeItem(TEXT("Right"), CTRLTYPE_EDIT, NULL, sExprRight.c_str());
+        pListView->AddAttributeItem(TEXT("Left"), CTRLTYPE_EDIT, NULL, utf8toWString(sExprLeft).c_str());
+	pListView->AddAttributeItem(TEXT("Right"), CTRLTYPE_EDIT, NULL, utf8toWString(sExprRight).c_str());
 }

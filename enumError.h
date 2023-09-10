@@ -1,5 +1,6 @@
 #pragma once
-#include "Common\String.h"
+
+#include <string>
 
 enum enumError{
 	ERROR_NO,
@@ -28,8 +29,8 @@ enum enumError{
 struct TError :public std::exception
 {
 	enumError id;
-	String info;
-	TError(const enumError inId, const String &inInfo) :id(inId), info(inInfo){}
+	std::string info;
+	TError(const enumError inId, const std::string &inInfo) :id(inId), info(inInfo){}
 };
 
-String GetErrorInfo(enumError err);
+std::string GetErrorInfo(enumError err);

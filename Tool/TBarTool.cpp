@@ -10,7 +10,7 @@ TBarTool::TBarTool()
 {
 	myElementType = ELEMENT_BAR;
 
-	sType = TEXT("Á¬¸Ë");
+	sType = TEXT("è¿æ†");
 	bCanBuildCoincide = true;
 }
 

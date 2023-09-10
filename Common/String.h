@@ -115,16 +115,16 @@ using std::to_string;
 //	return s;
 //}
 
-inline void Replace(String &src, const String sub,const String dest)
+inline void Replace(std::string &src, const std::string sub,const std::string dest)
 {
-	auto it = String::npos;
+	auto it = std::string::npos;
 	size_t pos = 0;
 	size_t subn = sub.size();
 	size_t destn = dest.size();
 	while (1)
 	{
 		it = src.find(sub, pos);
-		if (it == String::npos)
+		if (it == std::string::npos)
 			break;
 
 		src.replace(it, subn, dest);
@@ -134,7 +134,9 @@ inline void Replace(String &src, const String sub,const String dest)
 
 std::wstring stringToWstring(const std::string& str);
 std::string wstringToString(const std::wstring& wstr);
+std::string toUTF8(const std::wstring &ws);
+std::wstring utf8toWString(const std::string &s);
 
-std::vector<String> StrSliceToVector(String s);
+std::vector<std::string> StrSliceToVector(std::string s);
 
-std::vector<double> StrSliceToDoubleVector(String s);
+std::vector<double> StrSliceToDoubleVector(std::string s);

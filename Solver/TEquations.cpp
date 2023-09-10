@@ -60,7 +60,7 @@ size_t TEquations::GetEquationsCount()
 	return Equations.size();
 }
 
-void TEquations::DefineOneVariable(Ostream *pOS, String var, double value, bool bIgnoreReDef)
+void TEquations::DefineOneVariable(std::ostream *pOS, std::string var, double value, bool bIgnoreReDef)
 {
 	VariableTable.DefineOne(pOS, var, value,bIgnoreReDef);
 
@@ -69,7 +69,7 @@ void TEquations::DefineOneVariable(Ostream *pOS, String var, double value, bool 
 
 }
 
-void TEquations::DefineVariable(Ostream *pOS, const String input_str, const String input_num, bool bIgnoreReDef)
+void TEquations::DefineVariable(std::ostream *pOS, const std::string input_str, const std::string input_num, bool bIgnoreReDef)
 {
 	VariableTable.Define(pOS, input_str, input_num,bIgnoreReDef);
 
@@ -77,7 +77,7 @@ void TEquations::DefineVariable(Ostream *pOS, const String input_str, const Stri
 	VariableTableUnsolved.VariableValue = VariableTable.VariableValue;
 }
 
-void TEquations::AddEquation(Ostream *pOS, String szInput, bool istemp)
+void TEquations::AddEquation(std::ostream *pOS, std::string szInput, bool istemp)
 {
 	TExpressionTree *temp = new TExpressionTree;
 	temp->LinkVariableTable(&VariableTable);
@@ -100,7 +100,7 @@ void TEquations::AddEquation(Ostream *pOS, String szInput, bool istemp)
 }
 
 //逐个方程对t求导，得到速度方程组右边
-void TEquations::BuildEquationsV(Ostream *pOS)
+void TEquations::BuildEquationsV(std::ostream *pOS)
 {
 	bool bOutput = pOS == NULL ? false : true;
 
@@ -116,7 +116,7 @@ void TEquations::BuildEquationsV(Ostream *pOS)
 		pEquatemp = new TExpressionTree;
 		*pEquatemp = *pEqua;
 
-		pEquatemp->Diff(TEXT("t"), 1, bOutput);
+		pEquatemp->Diff("t", 1, bOutput);
 		pEquatemp->Simplify(bOutput);
 
 		EquationsV.push_back(pEquatemp);
@@ -130,7 +130,7 @@ void TEquations::BuildEquationsV(Ostream *pOS)
 }
 
 //逐个方程对t求导，得到速度方程组右边
-void TEquations::BuildEquationsA_Phitt(Ostream *pOS)
+void TEquations::BuildEquationsA_Phitt(std::ostream *pOS)
 {
 	bool bOutput = pOS == NULL ? false : true;
 
@@ -146,7 +146,7 @@ void TEquations::BuildEquationsA_Phitt(Ostream *pOS)
 		pEquatemp = new TExpressionTree;
 		*pEquatemp = *pEqua;
 
-		pEquatemp->Diff(TEXT("t"), 1, bOutput);
+		pEquatemp->Diff("t", 1, bOutput);
 		pEquatemp->Simplify(bOutput);
 
 		EquationsA.push_back(pEquatemp);
@@ -204,7 +204,7 @@ void TEquations::MatrixMultiplyVector(TVector &Result, const TMatrix &Matrix, co
 
 
 //应在解出位置、速度方程后调用
-void TEquations::CalcEquationsARight(Ostream *pOS, TVector &Right)
+void TEquations::CalcEquationsARight(std::ostream *pOS, TVector &Right)
 {
 	//复制Jacobian矩阵
 	TJacobian JacobianTemp;
@@ -259,23 +259,23 @@ void TEquations::CalcEquationsARight(Ostream *pOS, TVector &Right)
 }
 
 //替换单一变量
-void TEquations::SubsV(Ostream *pOS, String VarStr, double Value)
+void TEquations::SubsV(std::ostream *pOS, std::string VarStr, double Value)
 {
 	SubsVar(pOS, EquationsV, VariableTable, VarStr, Value);
 }
 
 //替换单一变量
-void TEquations::SubsA(Ostream *pOS, String VarStr, double Value)
+void TEquations::SubsA(std::ostream *pOS, std::string VarStr, double Value)
 {
 	SubsVar(pOS, EquationsA, VariableTable, VarStr, Value);
 }
 
-void TEquations::SubsVar(Ostream *pOS, TPEquations &Equations, TVariableTable &LinkVariableTable, String VarStr, double Value)
+void TEquations::SubsVar(std::ostream *pOS, TPEquations &Equations, TVariableTable &LinkVariableTable, std::string VarStr, double Value)
 {
 	auto it = LinkVariableTable.FindVariableTable(VarStr);
 	if (it != LinkVariableTable.VariableTable.end())
 	{
-		String Var;
+		std::string Var;
 		Var = *it;
 		for (auto pEquation : Equations)
 		{
@@ -284,10 +284,10 @@ void TEquations::SubsVar(Ostream *pOS, TPEquations &Equations, TVariableTable &L
 	}
 }
 
-void TEquations::Subs(Ostream *pOS, const String var, double value)
+void TEquations::Subs(std::ostream *pOS, const std::string var, double value)
 {
 	if (var.empty())
-		throw TError{ ERROR_EMPTY_INPUT, TEXT("") };
+		throw TError{ ERROR_EMPTY_INPUT, "" };
 
 	//Table中存在
 	auto find1 = VariableTable.FindVariableTable(var) != VariableTable.VariableTable.end();
@@ -334,10 +334,10 @@ void TEquations::Subs(Ostream *pOS, const String var, double value)
 }
 
 
-void TEquations::Subs(Ostream *pOS, const std::vector<String> &subsVars, const std::vector<double> &subsValue)
+void TEquations::Subs(std::ostream *pOS, const std::vector<std::string> &subsVars, const std::vector<double> &subsValue)
 {
 	if (subsVars.size() != subsValue.size())
-		throw TError{ ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT,TEXT("") };
+		throw TError{ ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT,"" };
 
 	for (int i = 0; i < subsVars.size(); ++i)
 	{
@@ -346,23 +346,23 @@ void TEquations::Subs(Ostream *pOS, const std::vector<String> &subsVars, const s
 }
 
 //已解出变量组加入 未解出变量组剔除
-void TEquations::Subs(Ostream *pOS, const String subsVars, const String subsValues)//代入
+void TEquations::Subs(std::ostream *pOS, const std::string subsVars, const std::string subsValues)//代入
 {
-	std::vector<String> tempVars = StrSliceToVector(subsVars);
+	std::vector<std::string> tempVars = StrSliceToVector(subsVars);
 	std::vector<double> tempValues = StrSliceToDoubleVector(subsValues);
 
 	Subs(pOS, tempVars, tempValues);
 }
 
 //将未解出变量赋值给速度变量组
-void TEquations::BuildVariableTableV(Ostream *pOS)
+void TEquations::BuildVariableTableV(std::ostream *pOS)
 {
 	VariableTableV = VariableTableUnsolved;
 	VariableTableV.bShared = true;
 }
 
 //将未解出变量赋值给速度变量组
-void TEquations::BuildVariableTableA(Ostream *pOS)
+void TEquations::BuildVariableTableA(std::ostream *pOS)
 {
 	VariableTableA = VariableTableUnsolved;
 	VariableTableA.bShared = true;
@@ -422,7 +422,7 @@ void TEquations::BuildJacobian_inner(TJacobian &JacobianResult, const TPEquation
 }
 
 //链接VariableTableUnsolved
-void TEquations::BuildJacobian(Ostream *pOS)
+void TEquations::BuildJacobian(std::ostream *pOS)
 {
 	BuildJacobian_inner(Jacobian, Equations, VariableTableUnsolved);
 
@@ -437,7 +437,7 @@ void TEquations::BuildJacobian(Ostream *pOS)
 	}
 }
 
-void TEquations::OutputPhi(Ostream *pOS, TPEquations &Equations)
+void TEquations::OutputPhi(std::ostream *pOS, TPEquations &Equations)
 {
 	if (pOS != NULL)
 	{
@@ -454,7 +454,7 @@ void TEquations::OutputPhi(Ostream *pOS, TPEquations &Equations)
 	}
 }
 
-void TEquations::OutputJacobian(Ostream *pOS, const TJacobian &Jacobian)
+void TEquations::OutputJacobian(std::ostream *pOS, const TJacobian &Jacobian)
 {
 	//纯输出
 	if (pOS != NULL)
@@ -476,7 +476,7 @@ void TEquations::OutputJacobian(Ostream *pOS, const TJacobian &Jacobian)
 	}
 }
 
-void TEquations::Output(Ostream *pOS, TMatrix& m)
+void TEquations::Output(std::ostream *pOS, TMatrix& m)
 {
 	if (pOS != NULL)
 	{
@@ -497,7 +497,7 @@ void TEquations::Output(Ostream *pOS, TMatrix& m)
 	}
 }
 
-void TEquations::Output(Ostream *pOS, TVector& v)
+void TEquations::Output(std::ostream *pOS, TVector& v)
 {
 	if (pOS != NULL)
 	{
@@ -514,7 +514,7 @@ void TEquations::Output(Ostream *pOS, TVector& v)
 }
 
 //利用变量表中的值计算雅可比
-void TEquations::CalcJacobianValue(Ostream *pOS, TMatrix &JacobianValueResult, const TJacobian &Jacobian)
+void TEquations::CalcJacobianValue(std::ostream *pOS, TMatrix &JacobianValueResult, const TJacobian &Jacobian)
 {
 	JacobianValueResult.clear();
 	JacobianValueResult.resize(Jacobian.size());
@@ -548,7 +548,7 @@ void TEquations::CalcJacobianValue(Ostream *pOS, TMatrix &JacobianValueResult, c
 }
 
 //利用变量表中的值计算，方程中不前缀负号，计算出值加负号
-void TEquations::CalcPhiValue(Ostream *pOS, const TPEquations &Equations, TVector &PhiValue)
+void TEquations::CalcPhiValue(std::ostream *pOS, const TPEquations &Equations, TVector &PhiValue)
 {
 	PhiValue.clear();
 	TExpressionTree *temp;
@@ -755,7 +755,7 @@ bool TEquations::VectorAdd(TVector &Va, const TVector &Vb)
 }
 
 
-void TEquations::SolveEquationsV(Ostream *pOS)//求解方程组V
+void TEquations::SolveEquationsV(std::ostream *pOS)//求解方程组V
 {
 	TMatrix JacobianV;
 	TVector Phi;
@@ -772,7 +772,7 @@ void TEquations::SolveEquationsV(Ostream *pOS)//求解方程组V
 	}
 }
 
-void TEquations::SolveEquationsA(Ostream *pOS)//求解方程组A
+void TEquations::SolveEquationsA(std::ostream *pOS)//求解方程组A
 {
 	TMatrix JacobianA;
 	TVector Phi;
@@ -790,7 +790,7 @@ void TEquations::SolveEquationsA(Ostream *pOS)//求解方程组A
 }
 
 //牛顿-拉夫森方法求解
-void TEquations::SolveEquations(Ostream *pOS)
+void TEquations::SolveEquations(std::ostream *pOS)
 {
 	if (hasSolved == false)
 	{
@@ -921,7 +921,7 @@ void TEquations::SolveEquations(Ostream *pOS)
 }
 
 
-void TEquations::SimplifyEquations(Ostream *pOS)//将方程组中的简单方程解出
+void TEquations::SimplifyEquations(std::ostream *pOS)//将方程组中的简单方程解出
 {
 	std::vector<bool> vecHasSolved(Equations.size(), false);
 	//for (auto pExpr : Equations)
@@ -936,7 +936,7 @@ void TEquations::SimplifyEquations(Ostream *pOS)//将方程组中的简单方程
 
 			if (pExpr->CheckOnlyOneVar())
 			{
-				String var;
+				std::string var;
 				double value;
 				pExpr->Solve(var, value);
 				VariableTableSolved.VariableTable.push_back(var);//为共享单位，不负责析构变量
@@ -991,7 +991,7 @@ void TEquations::SimplifyEquations(Ostream *pOS)//将方程组中的简单方程
 	}
 }
 
-double TEquations::GetValue(const String &var)
+double TEquations::GetValue(const std::string &var)
 {
 	auto it = VariableTable.FindVariableTable(var);
 	if (it == VariableTable.VariableTable.end())

@@ -5,7 +5,7 @@
 #define _CRT_NON_CONFORMING_SWPRINTFS
 
 #include "..\Common\DetectMemoryLeak.h"
-
+#include "../Common/String.h"
 #include "..\Solver\TExpressionTree.h"
 
 #include <string>
@@ -90,7 +90,7 @@ void TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder)
 					//释放所有TNode，报错
 					ReleaseVectorTNode(PostOrder);
 					//Stack只是对PostOrder的重排序，所以不用delete
-					throw TError{ ERROR_WRONG_EXPRESSION, TEXT("") };
+					throw TError{ ERROR_WRONG_EXPRESSION, "" };
 					return;
 				}
 
@@ -103,7 +103,7 @@ void TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder)
 					//释放所有TNode，报错
 					ReleaseVectorTNode(PostOrder);
 					//Stack只是对PostOrder的重排序，所以不用delete
-					throw TError{ ERROR_WRONG_EXPRESSION, TEXT("") };
+					throw TError{ ERROR_WRONG_EXPRESSION, "" };
 					return;
 				}
 
@@ -120,7 +120,7 @@ void TExpressionTree::BuildExpressionTree(std::vector<TNode *> &PostOrder)
 					//释放所有TNode，报错
 					ReleaseVectorTNode(PostOrder);
 					//Stack只是对PostOrder的重排序，所以不用delete
-					throw TError{ ERROR_WRONG_EXPRESSION, TEXT("") };
+					throw TError{ ERROR_WRONG_EXPRESSION, "" };
 					return;
 				}
 
@@ -209,7 +209,7 @@ int TExpressionTree::Rank(enumMathOperator eOperator)
 	case MATH_RIGHT_PARENTHESIS:
 		return 0;
 	default:
-		throw TError{ ERROR_WRONG_MATH_OPERATOR, String(TEXT("VALUE:")) + To_string(eOperator) };
+		throw TError{ ERROR_WRONG_MATH_OPERATOR, std::string("VALUE:" + to_string(eOperator)) };
 	}
 }
 
@@ -292,91 +292,91 @@ bool TExpressionTree::isBaseOperator(TCHAR c)
 {
 	switch (c)
 	{
-	case TEXT('('):
-	case TEXT(')'):
-	case TEXT('+'):
-	case TEXT('-'):
-	case TEXT('*'):
-	case TEXT('/'):
-	case TEXT('^'):
-	case TEXT('&'):
-	case TEXT('|'):
-	case TEXT('%'):return true;
+	case '(':
+	case ')':
+	case '+':
+	case '-':
+	case '*':
+	case '/':
+	case '^':
+	case '&':
+	case '|':
+	case '%':return true;
 	}
 	return false;
 }
 
-TExpressionTree::enumMathOperator TExpressionTree::Str2Function(String s)
+TExpressionTree::enumMathOperator TExpressionTree::Str2Function(std::string s)
 {
-	if (s == TEXT("sin"))
+	if (s == "sin")
 	{
 		return MATH_SIN;
 	}
-	if (s == TEXT("cos"))
+        if (s == "cos")
 	{
 		return MATH_COS;
 	}
-	if (s == TEXT("tan"))
+        if (s == "tan")
 	{
 		return MATH_TAN;
 	}
-	if (s == TEXT("arcsin"))
+        if (s == "arcsin")
 	{
 		return MATH_ARCSIN;
 	}
-	if (s == TEXT("arccos"))
+        if (s == "arccos")
 	{
 		return MATH_ARCCOS;
 	}
-	if (s == TEXT("arctan"))
+        if (s == "arctan")
 	{
 		return MATH_ARCTAN;
 	}
-	if (s == TEXT("sqrt"))
+        if (s == "sqrt")
 	{
 		return MATH_SQRT;
 	}
-	if (s == TEXT("ln"))
+        if (s == "ln")
 	{
 		return MATH_LN;
 	}
-	if (s == TEXT("log10"))
+        if (s == "log10")
 	{
 		return MATH_LOG10;
 	}
-	if (s == TEXT("exp"))
+        if (s == "exp")
 	{
 		return MATH_EXP;
 	}
 	return MATH_NULL;
 }
 
-String TExpressionTree::Function2Str(TExpressionTree::enumMathOperator eOperator)
+std::string TExpressionTree::Function2Str(TExpressionTree::enumMathOperator eOperator)
 {
 	switch (eOperator)
 	{
 	case MATH_SIN:
-		return TEXT("sin");
+		return "sin";
 	case MATH_COS:
-		return TEXT("cos");
+		return "cos";
 	case MATH_TAN:
-		return TEXT("tan");
+		return "tan";
 	case MATH_ARCSIN:
-		return TEXT("arcsin");
+		return "arcsin";
 	case MATH_ARCCOS:
-		return TEXT("arccos");
+		return "arccos";
 	case MATH_ARCTAN:
-		return TEXT("arctan");
+		return "arctan";
 	case MATH_SQRT:
-		return TEXT("sqrt");
+		return "sqrt";
 	case MATH_LN:
-		return TEXT("ln");
+		return "ln";
 	case MATH_LOG10:
-		return TEXT("log10");
+		return "log10";
 	case MATH_EXP:
-		return TEXT("exp");
+		return "exp";
 	}
-	throw TError{ ERROR_WRONG_MATH_OPERATOR, String(TEXT("value=")) + To_string(eOperator) };
+	throw TError{ ERROR_WRONG_MATH_OPERATOR, std::string("value=" + to_string(eOperator)) };
 }
 
 
@@ -385,61 +385,61 @@ TExpressionTree::enumMathOperator TExpressionTree::BaseOperatorCharToEnum(TCHAR 
 {
 	switch (c)
 	{
-	case TEXT('('):
+	case '(':
 		return MATH_LEFT_PARENTHESIS;
-	case TEXT(')'):
+	case ')':
 		return MATH_RIGHT_PARENTHESIS;
-	case TEXT('+'):
+	case '+':
 		return MATH_ADD;
-	case TEXT('-'):
+	case '-':
 		return MATH_SUBSTRACT;
-	case TEXT('*'):
+	case '*':
 		return MATH_MULTIPLY;
-	case TEXT('/'):
+	case '/':
 		return MATH_DIVIDE;
-	case TEXT('^'):
+	case '^':
 		return MATH_POWER;
-	case TEXT('&'):
+	case '&':
 		return MATH_AND;
-	case TEXT('|'):
+	case '|':
 		return MATH_OR;
-	case TEXT('%'):
+	case '%':
 		return MATH_MOD;
 	default:
 		return MATH_NULL;
 	}
 }
 /*  */
-String TExpressionTree::EnumOperatorToTChar(TExpressionTree::enumMathOperator eOperator)
+std::string TExpressionTree::EnumOperatorToTChar(TExpressionTree::enumMathOperator eOperator)
 {
 	switch (eOperator)
 	{
 	case MATH_POSITIVE:
-		return String(TEXT("+"));
+		return "+";
 	case MATH_NEGATIVE:
-		return String(TEXT("-"));
+		return "-";
 	case MATH_LEFT_PARENTHESIS:
-		return String(TEXT("("));
+		return "(";
 	case MATH_RIGHT_PARENTHESIS:
-		return String(TEXT(")"));
+		return "";
 	case MATH_ADD:
-		return String(TEXT("+"));
+		return "+";
 	case MATH_SUBSTRACT:
-		return String(TEXT("-"));
+		return "-";
 	case MATH_MULTIPLY:
-		return String(TEXT("*"));
+		return "*";
 	case MATH_DIVIDE:
-		return String(TEXT("/"));
+		return "/";
 	case MATH_POWER:
-		return String(TEXT("^"));
+		return "^";
 	case MATH_AND:
-		return String(TEXT("&"));
+		return "&";
 	case MATH_OR:
-		return String(TEXT("|"));
+		return "|";
 	case MATH_MOD:
-		return String(TEXT("%"));
+		return "%";
 	default:
-		throw TError{ ERROR_WRONG_MATH_OPERATOR, String(TEXT("value:")) + To_string(eOperator) };
+		throw TError{ ERROR_WRONG_MATH_OPERATOR, std::string("value:" + to_string(eOperator)) };
 	}
 }
 
@@ -448,7 +448,7 @@ bool TExpressionTree::isLegal(TCHAR c)
 {
 	if (isDoubleChar(c)) return true;
 	if (isBaseOperator(c)) return true;
-	if (IsCharAlpha(c) || c == TEXT('_')) return true;
+	if (IsCharAlpha(c) || c == '_') return true;
 	return false;
 }
 
@@ -456,7 +456,7 @@ bool TExpressionTree::isLegal(TCHAR c)
 /* 字符是0-9或. */
 bool TExpressionTree::isDoubleChar(TCHAR c)
 {
-	if ((c >= TEXT('0') && c <= TEXT('9')) || c == TEXT('.'))
+	if ((c >= '0' && c <= '9') || c == '.')
 		return true;
 	else
 		return false;
@@ -564,19 +564,19 @@ void TExpressionTree::InQueue2PostQueue(std::queue<TNode *> &InOrder, std::vecto
 	if (parenthesis_num != 0)
 	{
 		ReleaseVectorTNode(PostOrder);
-		throw TError{ ERROR_PARENTHESIS_NOT_MATCH, TEXT("") };
+		throw TError{ ERROR_PARENTHESIS_NOT_MATCH, "" };
 	}
 }
 
-String TExpressionTree::Node2Str(const TNode &node)
+std::string TExpressionTree::Node2Str(const TNode &node)
 {
 	switch (node.eType)
 	{
 	case NODE_NUMBER:
 		if (abs(node.value - (long long)node.value) < MIN_DOUBLE)
-			return To_string((long long)node.value);
+			return to_string((long long)node.value);
 		else
-			return To_string(node.value);
+			return to_string(node.value);
 		break;
 	case NODE_VARIABLE:
 		return node.varname;
@@ -589,22 +589,22 @@ String TExpressionTree::Node2Str(const TNode &node)
 		break;
 	}
 	assert(0);
-	return TEXT("Error");
+	return "Error";
 }
 
-void TExpressionTree::TraverseInOrder(TNode *now, String &output)
+void TExpressionTree::TraverseInOrder(TNode *now, std::string &output)
 {
 	int has_parenthesis = 0;
 	if (GetOperateNum(now->eOperator) == 1)//一元运算符：函数和取负
 	{
 		if (now->eType == NODE_FUNCTION)
 		{
-			output += Node2Str(*now) + TEXT("(");
+			output += Node2Str(*now) + "(";
 			has_parenthesis = 1;
 		}
 		else
 		{
-			output += TEXT("(") + Node2Str(*now);
+			output += "(" + Node2Str(*now);
 			has_parenthesis = 1;
 		}
 	}
@@ -637,7 +637,7 @@ void TExpressionTree::TraverseInOrder(TNode *now, String &output)
 					//(now->parent->eOperator == MATH_DIVIDE && now == now->parent->right)
 					)
 				{
-					output += TEXT("(");
+					output += "(";
 					has_parenthesis = 1;
 				}
 	}
@@ -661,7 +661,7 @@ void TExpressionTree::TraverseInOrder(TNode *now, String &output)
 	//回到本级时补齐右括号，包住前面的东西
 	if (has_parenthesis)
 	{
-		output += TEXT(")");
+		output += "";
 	}
 }
 
@@ -686,49 +686,49 @@ int TExpressionTree::GetNodeNum(TNode *head)
 		return 0;
 }
 
-String  TExpressionTree::OutputStr()
+std::string  TExpressionTree::OutputStr()
 {
-	String temp;
+	std::string temp;
 
 	if (head != NULL)
 		TraverseInOrder(head, temp);
 	return temp;
 }
 
-void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOrder)
+void TExpressionTree::ReadToInOrder(std::string expression, std::queue<TNode *> &InOrder)
 {
 	if (expression.empty())
 	{
 		throw TError{ ERROR_EMPTY_INPUT, expression };
 		return;
 	}
-	Replace(expression, TEXT(" "), TEXT(""));
-	Replace(expression, TEXT("\t"), TEXT(""));
-	Replace(expression, TEXT("\r"), TEXT(""));
-	Replace(expression, TEXT("\n"), TEXT(""));
+	Replace(expression, " ", "");
+	Replace(expression, "\t", "");
+	Replace(expression, "\r", "");
+	Replace(expression, "\n", "");
 
 	//过滤掉所有多余的加减
-	Replace(expression, TEXT("--"), TEXT("+"));
-	Replace(expression, TEXT("+-"), TEXT("-"));
-	Replace(expression, TEXT("-+"), TEXT("-"));
+	Replace(expression, "--", "+");
+	Replace(expression, "+-", "-");
+	Replace(expression, "-+", "-");
 
 	//字符合法性检查
 	for (auto c : expression)
 		if (!isLegal(c))
 		{
-			throw TError{ ERROR_ILLEGALCHAR, String(TEXT("WRONG CHAR:")) + To_string(c) };
+			throw TError{ ERROR_ILLEGALCHAR, std::string("WRONG CHAR:") + to_string(c) };
 		}
 
 	//粗切分：利用operator切分
 	struct TStrPiece
 	{
 		bool bBaseOperator;
-		String s;
-		TStrPiece(bool bIn, String sIn) :bBaseOperator(bIn), s(sIn) {}
+		std::string s;
+		TStrPiece(bool bIn, std::string sIn) :bBaseOperator(bIn), s(sIn) {}
 	};
 	std::vector<TStrPiece> Data;
 
-	String temp;
+	std::string temp;
 	for (auto c : expression)
 	{
 		if (!isBaseOperator(c))
@@ -742,7 +742,7 @@ void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOr
 				Data.emplace_back(false, temp);
 				temp.clear();
 			}
-			Data.emplace_back(true, String{ c });
+			Data.emplace_back(true, std::string{ c });
 		}
 	}
 	if (!temp.empty())
@@ -801,10 +801,10 @@ void TExpressionTree::ReadToInOrder(String expression, std::queue<TNode *> &InOr
 					if (pVariableTable == NULL)
 					{
 						ReleaseVectorTNode(PreInOrder);
-						throw TError{ ERROR_NOT_LINK_VARIABLETABLE, TEXT("") };
+						throw TError{ ERROR_NOT_LINK_VARIABLETABLE, "" };
 						return;
 					}
-					if (!IsCharAlpha(Data[i].s[0]) && Data[i].s[0] != TEXT('_'))//变量名首字符需为下划线或字母
+					if (!IsCharAlpha(Data[i].s[0]) && Data[i].s[0] != '_')//变量名首字符需为下划线或字母
 					{
 						ReleaseVectorTNode(PreInOrder);
 						throw TError{ ERROR_INVALID_VARNAME, Data[i].s };
@@ -908,7 +908,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		{
 			//恢复修改并抛出异常
 			Operator->eType = NODE_FUNCTION;
-			throw TError{ ERROR_I, String(TEXT("sqrt(")) + To_string(value1) + String(TEXT(")")) };
+			throw TError{ ERROR_I, std::string("sqrt(") + to_string(value1) + std::string("") };
 			return;
 		}
 		Operator->value = sqrt(value1);
@@ -927,7 +927,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		{
 			//恢复修改并抛出异常
 			Operator->eType = NODE_FUNCTION;
-			throw TError{ ERROR_OUTOF_DOMAIN, String(TEXT("tan(")) + To_string(value) + String(TEXT(")")) };
+			throw TError{ ERROR_OUTOF_DOMAIN, std::string("tan(") + to_string(value) + std::string("") };
 			return;
 		}
 		Operator->value = tan(value1);
@@ -938,7 +938,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		{
 			//恢复修改并抛出异常
 			Operator->eType = NODE_FUNCTION;
-			throw TError{ ERROR_OUTOF_DOMAIN, String(TEXT("arcsin(")) + To_string(value1) + String(TEXT(")")) };
+			throw TError{ ERROR_OUTOF_DOMAIN, std::string("arcsin(") + to_string(value1) + std::string("") };
 			return;
 		}
 		Operator->value = asin(value1);
@@ -948,7 +948,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		{
 			//恢复修改并抛出异常
 			Operator->eType = NODE_FUNCTION;
-			throw TError{ ERROR_OUTOF_DOMAIN, String(TEXT("arccos(")) + To_string(value1) + String(TEXT(")")) };
+			throw TError{ ERROR_OUTOF_DOMAIN, std::string("arccos(") + to_string(value1) + std::string("") };
 		}
 		Operator->value = acos(value1);
 		break;
@@ -960,7 +960,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		{
 			//恢复修改并抛出异常
 			Operator->eType = NODE_FUNCTION;
-			throw TError{ ERROR_OUTOF_DOMAIN, String(TEXT("ln(")) + To_string(value1) + String(TEXT(")")) };
+			throw TError{ ERROR_OUTOF_DOMAIN, std::string("ln(") + to_string(value1) + std::string("") };
 		}
 		Operator->value = log(value1);
 		break;
@@ -969,7 +969,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		{
 			//恢复修改并抛出异常
 			Operator->eType = NODE_FUNCTION;
-			throw TError{ ERROR_OUTOF_DOMAIN, String(TEXT("log10(")) + To_string(value1) + String(TEXT(")")) };
+			throw TError{ ERROR_OUTOF_DOMAIN, std::string("log10(") + to_string(value1) + std::string("") };
 		}
 		Operator->value = log10(value1);
 		break;
@@ -984,7 +984,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 
 	case MATH_MOD://%
 		if ((int)value2 == 0)
-			throw TError{ ERROR_DIVIDE_ZERO, To_string(value2) };
+			throw TError{ ERROR_DIVIDE_ZERO, to_string(value2) };
 		Operator->value = (int)value1 % (int)value2;
 		break;
 	case MATH_AND://&
@@ -999,14 +999,14 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		if (abs(value1) < MIN_DOUBLE && abs(value2) < MIN_DOUBLE)
 		{
 			Operator->eType = NODE_OPERATOR;
-			throw TError{ ERROR_ZERO_POWEROF_ZERO, TEXT("") };
+			throw TError{ ERROR_ZERO_POWEROF_ZERO, "" };
 		}
 
 		//(-1)^0.5=i
 		if (value1 < 0 && IsIntAndEven(1ll / value2))
 		{
 			Operator->eType = NODE_OPERATOR;
-			throw TError{ ERROR_I, String(TEXT("pow(")) + To_string(value1) + TEXT(",") + To_string(value2) + TEXT(")") };
+			throw TError{ ERROR_I, std::string("pow(") + to_string(value1) + "," + to_string(value2) + "" };
 		}
 		Operator->value = pow(value1, value2);
 		break;
@@ -1018,7 +1018,7 @@ void TExpressionTree::CalcNode(TNode *Operator, const TNode *Node1, const TNode 
 		if (abs(value2) < MIN_DOUBLE)
 		{
 			Operator->eType = NODE_OPERATOR;
-			throw TError{ ERROR_DIVIDE_ZERO, TEXT("") };
+			throw TError{ ERROR_DIVIDE_ZERO, "" };
 		}
 		Operator->value = value1 / value2;
 		break;
@@ -1065,7 +1065,7 @@ TExpressionTree::TNode *TExpressionTree::NewNode(enumNodeType eType, enumMathOpe
 }
 
 //未完成求导：tan,arcsin,arccos,arctan
-void TExpressionTree::Diff(TNode *now, String var)
+void TExpressionTree::Diff(TNode *now, std::string var)
 {
 	switch (now->eType)
 	{
@@ -1534,13 +1534,13 @@ void TExpressionTree::Diff(TNode *now, String var)
 		//}
 		return;
 		default:
-			throw TError(ERROR_WRONG_MATH_OPERATOR, String(TEXT("未完成的运算符")) + Function2Str(now->eOperator));
+			throw TError(ERROR_WRONG_MATH_OPERATOR, std::string("未完成的运算符") + Function2Str(now->eOperator));
 		}
 	}
 	}
 }
 
-String  TExpressionTree::Diff(String var, int n, bool bOutput)
+std::string  TExpressionTree::Diff(std::string var, int n, bool bOutput)
 {
 	if (pVariableTable->FindVariableTable(var) == pVariableTable->VariableTable.end())
 		throw TError{ ERROR_UNDEFINED_VARIABLE, var };
@@ -1623,11 +1623,11 @@ void TExpressionTree::Simplify(TNode *now)
 
 		//被除数为0
 		if (now->eOperator == MATH_DIVIDE && RChildIs0)
-			throw TError{ ERROR_DIVIDE_ZERO, TEXT("") };
+			throw TError{ ERROR_DIVIDE_ZERO, "" };
 
 		//0的0次方
 		if (now->eOperator == MATH_POWER && LChildIs0 && RChildIs0)
-			throw TError{ ERROR_ZERO_POWEROF_ZERO, TEXT("") };
+			throw TError{ ERROR_ZERO_POWEROF_ZERO, "" };
 
 		//若左右儿子都是数字，则计算出来
 		if (now->left->eType == NODE_NUMBER && now->right->eType == NODE_NUMBER)
@@ -1794,12 +1794,12 @@ void  TExpressionTree::Simplify(bool bOutput)
 //		now->varname = temp;
 //}
 
-void TExpressionTree::GetVariablePos(const String var, std::vector<TNode *> &VarsPos)
+void TExpressionTree::GetVariablePos(const std::string var, std::vector<TNode *> &VarsPos)
 {
 	GetVariablePos(head, var, VarsPos);
 }
 
-void TExpressionTree::GetVariablePos(TNode *now, const String var, std::vector<TNode *> &VarsPos)
+void TExpressionTree::GetVariablePos(TNode *now, const std::string var, std::vector<TNode *> &VarsPos)
 {
 	if (now->eType == NODE_VARIABLE && now->varname == var)
 		VarsPos.push_back(now);
@@ -1809,7 +1809,7 @@ void TExpressionTree::GetVariablePos(TNode *now, const String var, std::vector<T
 		GetVariablePos(now->right, var, VarsPos);
 }
 
-void TExpressionTree::CopyVariableTable(std::vector<String > &Dest, const std::vector<String > source)
+void TExpressionTree::CopyVariableTable(std::vector<std::string > &Dest, const std::vector<std::string > source)
 {
 	Dest.clear();
 	for (auto sz : source)
@@ -1817,7 +1817,7 @@ void TExpressionTree::CopyVariableTable(std::vector<String > &Dest, const std::v
 }
 
 //替换 VarsVector变量 NumsVector数字
-void  TExpressionTree::Subs(std::vector<String > VarsVector, std::vector<double> NumsVector, bool output)
+void  TExpressionTree::Subs(std::vector<std::string > VarsVector, std::vector<double> NumsVector, bool output)
 {
 	if (VarsVector.size() == NumsVector.size())//替换与被替换元素数目相等
 	{
@@ -1827,7 +1827,7 @@ void  TExpressionTree::Subs(std::vector<String > VarsVector, std::vector<double>
 			auto it = pVariableTable->FindVariableTable(VarsVector[i]);
 			if (it != pVariableTable->VariableTable.end())//已识别出
 			{
-				String var = *it;
+				std::string var = *it;
 				//构建替换节点树
 				TExpressionTree Expr;
 				Expr.LinkVariableTable(pVariableTable);
@@ -1859,10 +1859,10 @@ void  TExpressionTree::Subs(std::vector<String > VarsVector, std::vector<double>
 		}
 	}
 	else
-		throw TError{ ERROR_SUBS_NOT_EQUAL, TEXT("") };
+		throw TError{ ERROR_SUBS_NOT_EQUAL, "" };
 }
 
-void TExpressionTree::Subs_inner(TNode *node, String ptVar, double value)
+void TExpressionTree::Subs_inner(TNode *node, std::string ptVar, double value)
 {
 	if (node->eType == NODE_VARIABLE && node->varname == ptVar)
 	{
@@ -1879,22 +1879,22 @@ void TExpressionTree::Subs_inner(TNode *node, String ptVar, double value)
 }
 
 //替换  var变量指针 value数字
-void  TExpressionTree::Subs(String ptVar, double value, bool output)
+void  TExpressionTree::Subs(std::string ptVar, double value, bool output)
 {
 	Subs_inner(head, ptVar, value);
 }
 
 //替换  vars变量串 nums数字串 以空格分隔，支持表达式替换
-void  TExpressionTree::Subs(const String vars, const String nums, bool output)
+void  TExpressionTree::Subs(const std::string vars, const std::string nums, bool output)
 {
 	if (vars.empty() || nums.empty())
 	{
-		throw TError{ ERROR_EMPTY_INPUT, TEXT("") };
+		throw TError{ ERROR_EMPTY_INPUT, "" };
 		return;
 	}
 
-	std::vector<String> VarsVector = StrSliceToVector(vars);
-	std::vector<String> NumsVector = StrSliceToVector(nums);
+	std::vector<std::string> VarsVector = StrSliceToVector(vars);
+	std::vector<std::string> NumsVector = StrSliceToVector(nums);
 
 	if (VarsVector.size() == NumsVector.size())//替换与被替换元素数目相等
 	{
@@ -1904,7 +1904,7 @@ void  TExpressionTree::Subs(const String vars, const String nums, bool output)
 			auto it = pVariableTable->FindVariableTable(VarsVector[i]);
 			if (it != pVariableTable->VariableTable.end())//已识别出
 			{
-				String var = *it;
+				std::string var = *it;
 				//构建替换节点树
 				TExpressionTree Expr;
 				Expr.LinkVariableTable(pVariableTable);
@@ -1936,7 +1936,7 @@ void  TExpressionTree::Subs(const String vars, const String nums, bool output)
 		}
 	}
 	else
-		throw TError{ ERROR_SUBS_NOT_EQUAL, TEXT("") };
+		throw TError{ ERROR_SUBS_NOT_EQUAL, "" };
 
 }
 
@@ -2111,7 +2111,7 @@ void TExpressionTree::Solve(TNode *now, TNode *&write_pos)
 }
 
 //求解单变量方程 不验证可求解性，需提前调用HasOnlyOneVar确认
-String  TExpressionTree::Solve(String &var, double &value)
+std::string  TExpressionTree::Solve(std::string &var, double &value)
 {
 	TExpressionTree Result;
 
@@ -2130,7 +2130,7 @@ String  TExpressionTree::Solve(String &var, double &value)
 }
 
 //读之前不清零，请自行处理
-void  TExpressionTree::Read(String expression, bool bOutput)
+void  TExpressionTree::Read(std::string expression, bool bOutput)
 {
 	std::queue<TNode *> InOrder;
 	std::vector<TNode *> PostOrder;
@@ -2228,7 +2228,7 @@ double TExpressionTree::Value(bool operateHeadNode)
 }
 
 //复制出一棵临时树计算值
-String  TExpressionTree::Calc(double *result)
+std::string  TExpressionTree::Calc(double *result)
 {
 	if (CanCalc())
 	{
@@ -2238,7 +2238,7 @@ String  TExpressionTree::Calc(double *result)
 		if (result != NULL)
 			*result = Duplicate->value;
 
-		String temp = Node2Str(*Duplicate);
+		std::string temp = Node2Str(*Duplicate);
 		delete Duplicate;
 
 		return temp;
@@ -2319,7 +2319,7 @@ TExpressionTree &TExpressionTree::operator*(double value)
 {
 	if (head == NULL)
 	{
-		throw TError{ ERROR_EMPTY_INPUT, TEXT("") };
+		throw TError{ ERROR_EMPTY_INPUT, "" };
 		return *this;
 	}
 
@@ -2342,7 +2342,7 @@ TExpressionTree &TExpressionTree::operator+(double value)
 {
 	if (head == NULL)
 	{
-		throw TError{ ERROR_EMPTY_INPUT, TEXT("") };
+		throw TError{ ERROR_EMPTY_INPUT, "" };
 		return *this;
 	}
 
@@ -2365,7 +2365,7 @@ TExpressionTree &TExpressionTree::operator-(double value)
 {
 	if (head == NULL)
 	{
-		throw TError{ ERROR_EMPTY_INPUT, TEXT("") };
+		throw TError{ ERROR_EMPTY_INPUT, "" };
 		return *this;
 	}
 

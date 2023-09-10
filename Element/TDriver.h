@@ -10,8 +10,8 @@ protected:
 	virtual void TDriver::Draw(HDC hdc, const TConfiguration* pConfig) {}
 	virtual void TDriver::DrawPickSquare(HDC hdc, const TConfiguration* pConfig){}
 public:
-	String sExprLeft;
-	String sExprRight;
+	std::string sExprLeft;
+	std::string sExprRight;
 	TDriver();
 	~TDriver();
 	bool TDriver::WriteFile(HANDLE &hf, DWORD &now_pos) override;

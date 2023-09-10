@@ -166,7 +166,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <AdditionalOptions>/D "_NORMAL" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D "_NORMAL" %(AdditionalOptions) /source-charset:utf-8</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -182,7 +182,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <AdditionalOptions>/D "_NORMAL" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D "_NORMAL" %(AdditionalOptions) /source-charset:utf-8</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -198,7 +198,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/D "_NORMAL" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D "_NORMAL" %(AdditionalOptions) /source-charset:utf-8</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -217,7 +217,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/D "_NORMAL" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D "_NORMAL" %(AdditionalOptions) /source-charset:utf-8</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -237,7 +237,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/D "_STUDENT" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D "_STUDENT" %(AdditionalOptions) /source-charset:utf-8</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -257,7 +257,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/D "_STUDENT" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D "_STUDENT" %(AdditionalOptions) /source-charset:utf-8</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -277,7 +277,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/D "_TEACHER" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D "_TEACHER" %(AdditionalOptions) /source-charset:utf-8</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -297,7 +297,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/D "_TEACHER" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D "_TEACHER" %(AdditionalOptions) /source-charset:utf-8</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
