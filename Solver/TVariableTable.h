@@ -10,7 +10,6 @@ private:
 	bool isLegalName(std::string s);
 public:
 	bool bShared;//如果是共享变量表则不delete元素
-	enumError eError;
 	std::vector<std::string> VariableTable;
 	std::vector<double> VariableValue;
 	TVariableTable();

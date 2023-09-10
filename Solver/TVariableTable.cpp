@@ -16,7 +16,6 @@ using namespace std;
 TVariableTable::TVariableTable()
 {
 	bShared = false;
-	eError = ERROR_NO;
 }
 
 
@@ -29,8 +28,7 @@ double TVariableTable::GetValueFromVarPoint(const std::string VarStr)
 	auto it = FindVariableTable(VarStr);
 	if (it == VariableTable.end())
 	{
-		eError = ERROR_UNDEFINED_VARIABLE;
-		throw TError{ eError, VarStr };
+		throw TError{ ERROR_UNDEFINED_VARIABLE, VarStr };
 	}
 	return VariableValue[it - VariableTable.begin()];
 }
@@ -40,8 +38,7 @@ void TVariableTable::SetValueFromVarStr(std::string VarStr, double value)
 	auto it = FindVariableTable(VarStr);
 	if (it == VariableTable.end())
 	{
-		eError = ERROR_UNDEFINED_VARIABLE;
-		throw TError{ eError, VarStr };
+		throw TError{ ERROR_UNDEFINED_VARIABLE, VarStr };
 	}
 	VariableValue[it - VariableTable.begin()] = value;
 }
@@ -61,8 +58,7 @@ void TVariableTable::RemoveOne(std::ostream *pStr, std::string var, bool bIgnore
 			return;
 		else
 		{
-			eError = ERROR_UNDEFINED_VARIABLE;
-			throw TError{ eError, var };
+			throw TError{ERROR_UNDEFINED_VARIABLE, var };
 			return;
 		}
 	}
@@ -84,8 +80,7 @@ void TVariableTable::DefineOne(std::ostream *pStr, std::string var, double value
 {
 	if (!isLegalName(var))
 	{
-		eError = ERROR_INVALID_VARNAME;
-		throw TError{ eError, var };
+		throw TError{ ERROR_INVALID_VARNAME, var };
 		return;
 	}
 
@@ -99,8 +94,7 @@ void TVariableTable::DefineOne(std::ostream *pStr, std::string var, double value
 		}
 		else
 		{
-			eError = ERROR_VAR_HAS_BEEN_DEFINED;
-			throw TError{ eError, var };
+			throw TError{ ERROR_VAR_HAS_BEEN_DEFINED, var };
 			return;
 		}
 	}
@@ -137,8 +131,7 @@ void TVariableTable::Define(std::ostream *pStr, std::string input_str, std::stri
 	if (tempVar.size() != tempValue.size())
 	{
 		if (pStr != NULL) *pStr << TEXT("变量名与初始值数量不对等。");
-		eError = ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT;
-		throw TError{ eError, "VAR:" + input_str + " VALUE:" + input_num };
+		throw TError{ ERROR_VAR_COUNT_NOT_EQUAL_NUM_COUNT, "VAR:" + input_str + " VALUE:" + input_num };
 		return;
 	}
 
