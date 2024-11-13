@@ -8,7 +8,7 @@
 
 #include "..\Control\TToolTip.h"
 
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 #include "..\Common\TTransfer.h"
 #include "..\Common\ShowMessage.h"
 

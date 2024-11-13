@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 
 class TControl
 {

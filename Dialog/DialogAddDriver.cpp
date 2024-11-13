@@ -16,7 +16,7 @@
 #include "..\Common\TTransfer.h"
 #include "..\Solver\TExpressionTree.h"
 #include "..\Solver\TVariableTable.h"
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 
 #include "..\Control\TMainWindow.h"
 extern TMainWindow win;

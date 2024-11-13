@@ -1,13 +1,13 @@
 #include "..\Common\tchar_head.h"
 #include "..\Common\MyMath.h"
 #include <Windows.h>
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 #include "..\Common\TTransfer.h"
 
 double precision = 1e-12;
 
-//ÊäÈë 1.0232 3
-//Êä³ö 102 1.02 2
+//è¾“å…¥ 1.0232 3
+//è¾“å‡º 102 1.02 2
 void SignificantDigit(double dNum, int iDigit, int &iResult, double &dResult,int &iPrecisionDigit)
 {
 	TCHAR sz[64];

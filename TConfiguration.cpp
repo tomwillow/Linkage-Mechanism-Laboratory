@@ -29,7 +29,7 @@ TConfiguration::~TConfiguration()
 void TConfiguration::SetTheme(bool bDark)
 {
 	if (bDark)
-	{//��ɫ
+	{//深色
 		crFront = RGB(255, 255, 255);
 
 		crPen = RGB(255, 255, 255);
@@ -41,7 +41,7 @@ void TConfiguration::SetTheme(bool bDark)
 		crGridSmall = RGB(39, 45, 56);
 	}
 	else
-	{//ǳɫ
+	{//浅色
 
 		crFront = RGB(0, 0, 0);
 

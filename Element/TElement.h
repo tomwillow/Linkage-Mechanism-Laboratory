@@ -2,7 +2,7 @@
 #include <vector>
 #include <Windows.h>
 
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 
 #include "..\Common\DPOINT.h"
 

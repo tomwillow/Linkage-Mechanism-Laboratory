@@ -3,7 +3,7 @@
 
 
 #include <windows.h>
-#include "Common\String.h"
+#include "Common\MyString.h"
 #include "Common\tchar_head.h"
 #include <CommCtrl.h>
 

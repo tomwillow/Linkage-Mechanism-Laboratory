@@ -129,7 +129,7 @@ public:
 	static void TDraw::MakeRect(RECT &rcResult, double x_min, double x_max, double y_min, double y_max, const TConfiguration *pConfig);
 	static void TDraw::GetCenter(POINT &ptResult, const RECT &rect);
 
-	//ʰȡϵ��
+	//拾取系列
 	static bool TDraw::PointInPolylineBar(POINT ptPos, TPolylineBar *pPolylineBar,const TConfiguration *pConfig);
 	static bool TDraw::PointInFramePoint(POINT ptFramePoint, POINT pt, const TConfiguration *pConfig);
 	static bool TDraw::PointInRgn(POINT *ptRgn, int RgnCount, POINT pt);

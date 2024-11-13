@@ -14,7 +14,7 @@ class TTreeView:public TControl
 public:
 	TTreeView();
 	~TTreeView();
-	void TTreeView::CreateTreeViewEx(HWND hParent, UINT id, HINSTANCE hInst);//´´½¨TreeView
+	void TTreeView::CreateTreeViewEx(HWND hParent, UINT id, HINSTANCE hInst);//åˆ›å»ºTreeView
 	HTREEITEM TTreeView::InsertTreeviewItem(const LPTSTR pszText, HTREEITEM htiParent);
 	virtual void TTreeView::Initial();
 };

@@ -2,7 +2,7 @@
 #include "..\Common\DetectMemoryLeak.h"
 
 #include <Windows.h>
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 #include "TEquations.h"
 
 TEquations::TEquations()

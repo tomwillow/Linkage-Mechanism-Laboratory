@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <vector>
 
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 
 #include "TTool.h"
 #include "..\Common\DPOINT.h"

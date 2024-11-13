@@ -23,7 +23,7 @@ TTreeView::~TTreeView()
 //		return CallWindowProc(oldControlProc, hWnd, uMsg, wParam, lParam);
 //}
 
-void TTreeView::CreateTreeViewEx(HWND hParent, UINT id, HINSTANCE hInst)//´´½¨TreeView
+void TTreeView::CreateTreeViewEx(HWND hParent, UINT id, HINSTANCE hInst)//åˆ›å»ºTreeView
 {
 
 	// Create the Treeview control

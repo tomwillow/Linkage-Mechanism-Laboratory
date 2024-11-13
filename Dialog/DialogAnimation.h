@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <Windows.h>
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 
 class TElement;
 namespace DialogAnimation
@@ -18,7 +18,7 @@ namespace DialogAnimation
 		int index_of_point;
 		enumListBoxItemType type;//P,V,A
 		enumListBoxItemValueType value_type;//X,Y,PHI
-		String s;//ÏîÄ¿Ãû³Æ
+		String s;//é¡¹ç›®åç§°
 		String sUnit;
 		std::vector<double> data;
 		TElement *pElement;

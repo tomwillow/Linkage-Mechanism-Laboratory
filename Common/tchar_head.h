@@ -11,3 +11,4 @@
 #endif
 
 #include <tchar.h>
+#include <string.h>

@@ -1,4 +1,4 @@
-#include "String.h"
+#include "MyString.h"
 
 std::wstring stringToWstring(const std::string &str) {
     LPCSTR pszSrc = str.c_str();
@@ -37,15 +37,14 @@ std::string wstringToString(const std::wstring &wstr) {
 }
 
 std::string toUTF8(const std::wstring &ws) {
-    int nLen = WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), -1, NULL, 0, NULL, NULL);
+    int nLen = WideCharToMultiByte(CP_UTF8, 0, ws.data(), ws.size(), NULL, 0, NULL, NULL);
     if (nLen == 0)
         return std::string("");
 
     std::string ret(nLen, 0);
 
-    int nLen2 = WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), -1, const_cast<char*>(ret.data()), nLen, NULL, NULL);
-    if (nLen2 != nLen)
-    {
+    int nLen2 = WideCharToMultiByte(CP_UTF8, 0, ws.data(), ws.size(), const_cast<char *>(ret.data()), nLen, NULL, NULL);
+    if (nLen2 != nLen) {
         throw std::runtime_error("WideCharToMultiByte fail");
     }
 
@@ -59,7 +58,7 @@ std::wstring utf8toWString(const std::string &s) {
 
     std::wstring ret(nLen, 0);
 
-    int nLen2 = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, const_cast<wchar_t*>(ret.data()), nLen);
+    int nLen2 = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, const_cast<wchar_t *>(ret.data()), nLen);
     if (nLen2 != nLen) {
         throw std::runtime_error("MultiByteToWideChar fail");
     }

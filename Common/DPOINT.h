@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 #include <initializer_list>
 
 class DPOINT

@@ -5,7 +5,7 @@
 #include "DialogScore.h"
 
 #include <Windows.h>
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 
 #include "..\resource.h"
 #include "..\Control\TEdit.h"

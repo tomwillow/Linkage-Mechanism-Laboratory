@@ -1,5 +1,5 @@
 #pragma once
-#include "Common\String.h"
+#include "Common\MyString.h"
 
 #if (defined _STUDENT) || (defined _TEACHER)
 extern std::String sStudentClass;

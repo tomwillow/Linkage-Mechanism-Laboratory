@@ -5,7 +5,7 @@
 #include "..\Tool\TTool.h"
 #include "..\Solver\TVariableTable.h"
 
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 #include "..\Common\DPOINT.h"
 
 #include "..\Dialog\DialogAnimation.h"

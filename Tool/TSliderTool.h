@@ -2,7 +2,7 @@
 #include <vector>
 #include <stack>
 #include "TTool.h"
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 
 class TConstraintColinear;
 class TConstraintCoincide;

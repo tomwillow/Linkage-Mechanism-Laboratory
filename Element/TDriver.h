@@ -1,6 +1,6 @@
 #pragma once
 #include "..\Element\TElement.h"
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 
 class TListView;
 class TDriver :

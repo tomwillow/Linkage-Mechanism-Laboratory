@@ -10,7 +10,7 @@ TBarTool::TBarTool()
 {
 	myElementType = ELEMENT_BAR;
 
-	sType = TEXT("连杆");
+	sType = TEXT("杩炴潌");
 	bCanBuildCoincide = true;
 }
 

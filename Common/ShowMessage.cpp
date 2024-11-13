@@ -45,8 +45,8 @@ bool IsErrorShowMsgBox(LPTSTR lpszFunction)
 		return false;
 }
 
-//¸ù¾İ´íÎóÂëµ¯³ö´íÎóĞÅÏ¢¿ò
-//lpszFunctionÎª³ö´í²½ÖèÃû³Æ
+//æ ¹æ®é”™è¯¯ç å¼¹å‡ºé”™è¯¯ä¿¡æ¯æ¡†
+//lpszFunctionä¸ºå‡ºé”™æ­¥éª¤åç§°
 void ShowErrorMsgBox(LPTSTR lpszFunction, DWORD dwErrorCode)
 {
 	// Retrieve the system error message for the last-error code
@@ -70,9 +70,9 @@ void ShowErrorMsgBox(LPTSTR lpszFunction, DWORD dwErrorCode)
 		(lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR));
 	StringCchPrintf((LPTSTR)lpDisplayBuf,
 		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-		TEXT("%sÊ§°Ü¡£´íÎóÂë %d: %s"),
+		TEXT("%så¤±è´¥ã€‚é”™è¯¯ç  %d: %s"),
 		lpszFunction, dwErrorCode, lpMsgBuf);
-	MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("´íÎó"), MB_OK);
+	MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("é”™è¯¯"), MB_OK);
 
 	LocalFree(lpMsgBuf);
 	LocalFree(lpDisplayBuf);

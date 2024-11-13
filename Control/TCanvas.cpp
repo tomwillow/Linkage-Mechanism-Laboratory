@@ -3,7 +3,7 @@
 #include "..\Common\tchar_head.h"
 #include <stdio.h>
 
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 
 #include "..\resource.h"
 #include "..\Control\TCanvas.h"

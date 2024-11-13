@@ -3,7 +3,7 @@
 #define _CRT_NON_CONFORMING_SWPRINTFS
 
 #include "..\Common\DetectMemoryLeak.h"
-#include "../Common/String.h"
+#include "../Common/MyString.h"
 #include "..\Solver\TVariableTable.h"
 
 #include <algorithm>

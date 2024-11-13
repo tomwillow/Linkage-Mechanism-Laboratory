@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 #include "TTool.h"
-#include "..\Common\String.h"
+#include "..\Common\MyString.h"
 
 #include "..\Common\DPOINT.h"
 
