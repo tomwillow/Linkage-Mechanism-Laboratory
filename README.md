@@ -1,7 +1,7 @@
 # Linkage-Mechanism-Laboratory
 连杆机构实验室
 
-![example workflow](https://github.com/tomwillow/Linkage-Mechanism-Laboratory/actions/workflows/msbuild.yml/badge.svg)
+![workflow badge](https://github.com/tomwillow/Linkage-Mechanism-Laboratory/actions/workflows/cmake-multi-platform.yml/badge.svg)
 
 ## 视频
 
